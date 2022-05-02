@@ -1,1 +1,1 @@
-console.log("Begin here")
+console.log("Sticky Rice For Life")
