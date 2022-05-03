@@ -16,8 +16,8 @@ body {
 }
 section {
   display: grid;
-  grid-template-columns: repeat(5, 3.5rem);
-  grid-template-rows: repeat(4, 3.5rem);
+  grid-template-columns: repeat(5, 4.25rem);
+  grid-template-rows: repeat(4, 4.25rem);
   grid-gap: 0.5rem;
   perspective: 800px;
 }
@@ -26,7 +26,6 @@ section {
   transform-style: preserve-3d;
   transition: all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: rgba(0, 0, 0, 0.2) 0px, 5px, 15px;
-  
 }
 .face,
 .back {
@@ -41,9 +40,44 @@ section {
   backface-visibility: hidden;
 }
 
-.toggleCard{
-    transform: rotateY(180deg);
+.toggleCard {
+  transform: rotateY(180deg);
 }
-.face{
-  transform: rotateY(-180deg)
+.face {
+  transform: rotateY(-180deg);
+}
+
+.overlay-text {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: none;
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: red;
+  font-family: Creepy, serif;
+  transition: background-color 500ms, font-size 500ms;
+}
+
+.overlay-text-small {
+  font-size: 0.3em;
+}
+
+.overlay-text.visible {
+  display: flex;
+  animation: overlay-grow 500ms forwards;
+}
+@keyframes overlay-grow {
+  from {
+    background-color: rgba(0, 0, 0, 0);
+    font-size: 0;
+  }
+  to {
+    background-color: rgba(0, 0, 0, .8);
+    font-size: 4em;
+  }
 }

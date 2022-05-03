@@ -8,7 +8,19 @@
     <title>Match It!</title>
 </head>
 <body>
-    <h1>Lives: <span class="playerLivesCount"></span></h1>
+    <h1>Match it!</h1>
+    <div class="overlay-text visible">
+        Click to Start
+      </div>
+      <div id="game-over-text" class="overlay-text">
+        GAME OVER
+        <span class="overlay-text-small">Click to Restart</span>
+      </div>
+      <div id="victory-text" class="overlay-text">
+        VICTORY
+        <span class="overlay-text-small">Click to Restart</span>
+      </div>
+    <p>Lives: <span id="playerLivesCount" class="playerLivesCount"></span></p>
     <section></section>
     
 <script src="/matchmatch/matchmatch.js"></script>    

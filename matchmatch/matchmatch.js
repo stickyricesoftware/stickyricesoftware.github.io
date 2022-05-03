@@ -1,8 +1,16 @@
 const section = document.querySelector("section");
-const playerLivesCount = document.querySelector("span");
-let playerLives = 10;
+const playerLivesCount = document.querySelector("#playerLivesCount");
+let playerLives = 20;
 
 playerLivesCount.textContent = playerLives;
+
+let overlays = Array.from(document.getElementsByClassName("overlay-text"));
+
+overlays.forEach((overlay) => {
+  overlay.addEventListener("click", () => {
+    overlay.classList.remove("visible");
+  });
+});
 
 const getData = () => [
   { imgSrc: "./images/122-200x200.jpg", name: "bridge" },
@@ -21,6 +29,8 @@ const mergedData = () => {
   const array2 = getData();
   const array3 = array1.concat(array2);
   return array3;
+  // const array4 = array3.concat(array3);
+  // return array4;
 };
 
 const randomise = () => {
@@ -31,6 +41,7 @@ const randomise = () => {
 
 const cardGenerator = () => {
   const cardData = randomise();
+
   // Generate the HTML
   cardData.forEach((item) => {
     const card = document.createElement("div");
@@ -60,7 +71,7 @@ const checkCards = (e) => {
   clickedCard.classList.add("flipped");
   const flippedCards = document.querySelectorAll(".flipped");
   const toggleCard = document.querySelectorAll(".toggleCard");
-  
+
   //Logic
   if (flippedCards.length === 2) {
     if (
@@ -77,20 +88,25 @@ const checkCards = (e) => {
         setTimeout(() => card.classList.remove("toggleCard"), 1000);
       });
       playerLives--;
+      
       playerLivesCount.textContent = playerLives;
       if (playerLives === 0) {
-        restart("Try again");
+        document.getElementById('game-over-text').classList.add('visible');
+        restart()
+        //restart("Try again");
       }
     }
   }
   //Run check to see if game has been won
   if (toggleCard.length === 20) {
-    restart("You won!!");
+    document.getElementById('victory-text').classList.add('visible');
+    restart()
+    //restart("You won!!");
   }
 };
 
 //Restart
-const restart = (text) => {
+const restart = () => {
   let cardData = randomise();
   let faces = document.querySelectorAll(".face");
   let cards = document.querySelectorAll(".card");
@@ -105,9 +121,9 @@ const restart = (text) => {
       section.style.pointerEvents = "all";
     }, 1000);
   });
-  playerLives = 10;
+  playerLives = 20;
   playerLivesCount.textContent = playerLives;
-  setTimeout(() => window.alert(text), 100);
+  //setTimeout(() => window.alert(text), 100);
 };
 
 cardGenerator();
