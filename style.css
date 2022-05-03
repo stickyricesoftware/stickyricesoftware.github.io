@@ -5,10 +5,10 @@
 }
 body {
   height: 100vh;
-  background-color: lightgoldenrodyellow; /* fallback for older browsers */
-  background: -webkit-linear-gradient(to right, lightgoldenrodyellow, lightgreen);
+  background-color: yellow; /* fallback for older browsers */
+  background: -webkit-linear-gradient(to bottom, yellow, green);
   /* Chrome 10-25, Safari 5.1-6*/
-  background: linear-gradient(to right, lightgoldenrodyellow, lightgreen);
+  background: linear-gradient(to bottom, yellow, green);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,4 +18,6 @@ body {
 h1{
 color: white;
 }
-
+#logo{
+  width: 200px;
+}
