@@ -113,3 +113,4 @@ const restart = (text) => {
 };
 
 cardGenerator();
+console.log('Started')
