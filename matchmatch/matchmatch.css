@@ -2,24 +2,25 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
 }
+
 body {
   height: 100vh;
-  background-color: lightblue; /* fallback for older browsers */
-  background: -webkit-linear-gradient(to right, lightblue, lightcoral);
-  /* Chrome 10-25, Safari 5.1-6*/
-  background: linear-gradient(to right, lightblue, lightcoral);
+  background-image: linear-gradient(to bottom right, #01ba5c, #00ae55);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  color: white;
 }
 section {
   display: grid;
   grid-template-columns: repeat(5, 4.25rem);
-  grid-template-rows: repeat(4, 4.25rem);
+  grid-template-rows: repeat(8, 4.25rem);
   grid-gap: 0.5rem;
   perspective: 800px;
+  
 }
 .card {
   position: relative;
@@ -34,19 +35,19 @@ section {
   position: absolute;
   pointer-events: none;
 }
-
 .back {
+  /* background-image: url("/matchmatch/clubs/clipart1593066.png"); */
+  background-size: 100%;
   background-color: white;
   backface-visibility: hidden;
+  border-radius: 10%;
 }
-
 .toggleCard {
   transform: rotateY(180deg);
 }
 .face {
   transform: rotateY(-180deg);
 }
-
 .overlay-text {
   top: 0;
   left: 0;
@@ -58,15 +59,12 @@ section {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  color: red;
-  font-family: Creepy, serif;
+  color: white;
   transition: background-color 500ms, font-size 500ms;
 }
-
 .overlay-text-small {
   font-size: 0.3em;
 }
-
 .overlay-text.visible {
   display: flex;
   animation: overlay-grow 500ms forwards;
@@ -77,7 +75,7 @@ section {
     font-size: 0;
   }
   to {
-    background-color: rgba(0, 0, 0, .8);
+    background-color: rgba(1, 186, 92, 0.9);
     font-size: 4em;
   }
 }

@@ -1,6 +1,6 @@
 const section = document.querySelector("section");
 const playerLivesCount = document.querySelector("#playerLivesCount");
-let playerLives = 20;
+let playerLives = 40;
 
 playerLivesCount.textContent = playerLives;
 
@@ -13,16 +13,36 @@ overlays.forEach((overlay) => {
 });
 
 const getData = () => [
-  { imgSrc: "./images/122-200x200.jpg", name: "bridge" },
-  { imgSrc: "./images/261-200x200.jpg", name: "sand" },
-  { imgSrc: "./images/396-200x200.jpg", name: "escalator" },
-  { imgSrc: "./images/485-200x200.jpg", name: "beach" },
-  { imgSrc: "./images/492-200x200.jpg", name: "field" },
-  { imgSrc: "./images/515-200x200.jpg", name: "plane" },
-  { imgSrc: "./images/630-200x200.jpg", name: "forest" },
-  { imgSrc: "./images/678-200x200.jpg", name: "mountains" },
-  { imgSrc: "./images/737-200x200.jpg", name: "city" },
-  { imgSrc: "./images/818-200x200.jpg", name: "statue" },
+  // { imgSrc: "./images/122-200x200.jpg", name: "bridge" },
+  // { imgSrc: "./images/261-200x200.jpg", name: "sand" },
+  // { imgSrc: "./images/396-200x200.jpg", name: "escalator" },
+  // { imgSrc: "./images/485-200x200.jpg", name: "beach" },
+  // { imgSrc: "./images/492-200x200.jpg", name: "field" },
+  // { imgSrc: "./images/515-200x200.jpg", name: "plane" },
+  // { imgSrc: "./images/630-200x200.jpg", name: "forest" },
+  // { imgSrc: "./images/678-200x200.jpg", name: "mountains" },
+  // { imgSrc: "./images/737-200x200.jpg", name: "city" },
+  // { imgSrc: "./images/818-200x200.jpg", name: "statue" },
+  { imgSrc: "./clubs/t1.svg", name: "MUN" },
+  { imgSrc: "./clubs/t2.svg", name: "LEE" },
+  { imgSrc: "./clubs/t3.svg", name: "ARS" },
+  { imgSrc: "./clubs/t4.svg", name: "NEW" },
+  { imgSrc: "./clubs/t6.svg", name: "TOT" },
+  { imgSrc: "./clubs/t7.svg", name: "AVL" },
+  { imgSrc: "./clubs/t8.svg", name: "CHE" },
+  { imgSrc: "./clubs/t11.svg", name: "EVE" },
+  { imgSrc: "./clubs/t13.svg", name: "LEI" },
+  { imgSrc: "./clubs/t14.svg", name: "LIV" },
+  { imgSrc: "./clubs/t20.svg", name: "SOU" },
+  { imgSrc: "./clubs/t21.svg", name: "WHU" },
+  { imgSrc: "./clubs/t31.svg", name: "CRY" },
+  { imgSrc: "./clubs/t36.svg", name: "BHA" },
+  { imgSrc: "./clubs/t39.svg", name: "WOL" },
+  { imgSrc: "./clubs/t43.svg", name: "MCI" },
+  { imgSrc: "./clubs/t45.svg", name: "NOR" },
+  { imgSrc: "./clubs/t57.svg", name: "WAT" },
+  { imgSrc: "./clubs/t90.svg", name: "BUR" },
+  { imgSrc: "./clubs/t94.svg", name: "BRE" },
 ];
 const mergedData = () => {
   const array1 = getData();
@@ -88,19 +108,22 @@ const checkCards = (e) => {
         setTimeout(() => card.classList.remove("toggleCard"), 1000);
       });
       playerLives--;
-      
+
       playerLivesCount.textContent = playerLives;
       if (playerLives === 0) {
-        document.getElementById('game-over-text').classList.add('visible');
-        restart()
+        document.getElementById("game-over-text").classList.add("visible");
+        restart();
         //restart("Try again");
       }
     }
   }
   //Run check to see if game has been won
-  if (toggleCard.length === 20) {
-    document.getElementById('victory-text').classList.add('visible');
-    restart()
+  if (toggleCard.length === 40) {
+    setTimeout(() => {
+      document.getElementById("victory-text").classList.add("visible");
+      restart();
+    }, 1000);
+
     //restart("You won!!");
   }
 };
@@ -121,9 +144,10 @@ const restart = () => {
       section.style.pointerEvents = "all";
     }, 1000);
   });
-  playerLives = 20;
+  playerLives = 40;
   playerLivesCount.textContent = playerLives;
   //setTimeout(() => window.alert(text), 100);
 };
 
 cardGenerator();
+//
