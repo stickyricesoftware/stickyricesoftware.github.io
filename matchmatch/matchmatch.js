@@ -253,10 +253,44 @@ function shareScore() {
   document.getElementById("modal-text").appendChild(x);
   
   
-  x.addEventListener("click", (e) => {
-    console.log(navigator.canShare())
-    console.log(e)
-    alert('sharing...')
+  // x.addEventListener("click", (e) => {
+  //   console.log(navigator.canShare())
+  //   console.log(e)
+  //   alert('sharing...')
+  // });
+
+  document.querySelector(".shareButton").addEventListener("click", (event) => {
+    // Fallback, Tries to use API only
+    // if navigator.share function is
+    // available
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Wordles With Friends",
+          text:
+            "Hey, check out my Wordle " +
+           
+            " score! I got " +
+           '\n' + 'TEST' + '\n\n' + 
+            "Tap on Kim's face to play",
+  
+          url: 'www.google.co.uk',
+        })
+        .then(() => {
+          console.log("Thanks for sharing!");
+          gtag('event', 'Player', {
+            'Clicked:' : 'Share Button'
+          });
+        })
+        .catch((err) => {
+          // Handle errors, if occured
+          console.log("Error while using Web share API:");
+          console.log(err);
+        });
+    } else {
+      // Alerts user if API not available
+      alert("Browser doesn't support this API !");
+    }
   });
   modal.style.display = "block";
     
