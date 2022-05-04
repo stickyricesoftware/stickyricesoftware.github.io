@@ -132,4 +132,7 @@ section {
 }
 .shareButton{
   background-color: rgba(1, 186, 92, 0.9);
+  color: white;
+  height: 40px;
+  width: 60px;
 }
