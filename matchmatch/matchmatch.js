@@ -1,6 +1,6 @@
 //Get Game Section
 const section = document.querySelector("section");
-const gameTime = 5;
+const gameTime = 90;
 var matched = 0
 var turns = 0;
 
@@ -235,7 +235,7 @@ function shareScore() {
   shareText = "I got " + matched + "/40 in " + turns + " taps"
   text = document.createTextNode("I got " + matched + "/40 in " + turns + " taps") 
   // scoreDiv.appendChild(text);  
-  
+  document.getElementById("modal-text").appendChild(text)
   document.getElementById("modal-text").appendChild(line1)
   document.getElementById("modal-text").appendChild(line2)
   document.getElementById("modal-text").appendChild(line3)
@@ -244,7 +244,7 @@ function shareScore() {
   document.getElementById("modal-text").appendChild(line6)
   document.getElementById("modal-text").appendChild(line7)
   document.getElementById("modal-text").appendChild(line8)
-  document.getElementById("modal-text").appendChild(text)
+  
 
   var x = document.createElement("BUTTON");
   x.classList.add("shareButton")
