@@ -14,7 +14,7 @@ body {
   align-items: center;
   flex-direction: column;
   color: white;
-  
+  overscroll-behavior: contain;
 }
 section {
   display: grid;
