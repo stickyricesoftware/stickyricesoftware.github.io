@@ -266,15 +266,9 @@ function shareScore() {
     if (navigator.share) {
       navigator
         .share({
-          title: "Wordles With Friends",
-          text:
-            "Hey, check out my Wordle " +
-           
-            " score! I got " +
-           '\n' + 'TEST' + '\n\n' + 
-            "Tap on Kim's face to play",
-  
-          url: 'www.google.co.uk',
+          title: "Match Match",
+          text: text,  
+          url: 'https://bit.ly/39Bzg6x',
         })
         .then(() => {
           console.log("Thanks for sharing!");
