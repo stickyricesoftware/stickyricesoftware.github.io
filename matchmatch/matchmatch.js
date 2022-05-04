@@ -267,7 +267,7 @@ function shareScore() {
       navigator
         .share({
           title: "Match Match",
-          text: text,  
+          text: text + '\n' + a + '\n' + b + '\n' + c + '\n' + d + '\n' + e + '\n' + f + '\n' + g + '\n' + h + '\n', 
           url: 'https://bit.ly/39Bzg6x',
         })
         .then(() => {
