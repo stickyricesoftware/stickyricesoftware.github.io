@@ -1,11 +1,17 @@
+//Get Game Section
 const section = document.querySelector("section");
+//Get lives indicator and set number of lives
 const playerLivesCount = document.querySelector("#playerLivesCount");
 let playerLives = 40;
-
 playerLivesCount.textContent = playerLives;
 
-let overlays = Array.from(document.getElementsByClassName("overlay-text"));
+//Get score indicator and set score to 0
+const playerScoreCount = document.querySelector("#playerScore");
+let playerScore = 0;
+playerScoreCount.textContent = playerScore;
 
+//Get start/win/lose overlays
+let overlays = Array.from(document.getElementsByClassName("overlay-text"));
 overlays.forEach((overlay) => {
   overlay.addEventListener("click", () => {
     overlay.classList.remove("visible");
@@ -45,6 +51,7 @@ const getData = () => [
   { imgSrc: "./clubs/t94.svg", name: "BRE" },
 ];
 const mergedData = () => {
+  //Get array and create matching pairs of each image
   const array1 = getData();
   const array2 = getData();
   const array3 = array1.concat(array2);
@@ -60,8 +67,8 @@ const randomise = () => {
 };
 
 const cardGenerator = () => {
+  //Randomise array
   const cardData = randomise();
-
   // Generate the HTML
   cardData.forEach((item) => {
     const card = document.createElement("div");
@@ -102,14 +109,16 @@ const checkCards = (e) => {
         card.classList.remove("flipped");
         card.style.pointerEvents = "none";
       });
+      playerScore++;
+      playerScoreCount.textContent = playerScore;
     } else {
       flippedCards.forEach((card) => {
         card.classList.remove("flipped");
         setTimeout(() => card.classList.remove("toggleCard"), 1000);
       });
       playerLives--;
-
       playerLivesCount.textContent = playerLives;
+
       if (playerLives === 0) {
         document.getElementById("game-over-text").classList.add("visible");
         restart();
@@ -121,10 +130,8 @@ const checkCards = (e) => {
   if (toggleCard.length === 40) {
     setTimeout(() => {
       document.getElementById("victory-text").classList.add("visible");
-      restart();
+      //restart();
     }, 1000);
-
-    //restart("You won!!");
   }
 };
 
@@ -146,6 +153,8 @@ const restart = () => {
   });
   playerLives = 40;
   playerLivesCount.textContent = playerLives;
+  playerScore = 0;
+  playerScoreCount.textContent = playerScore;
   //setTimeout(() => window.alert(text), 100);
 };
 
