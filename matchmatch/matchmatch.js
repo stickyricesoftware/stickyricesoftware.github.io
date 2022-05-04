@@ -1,34 +1,29 @@
 //Get Game Section
 const section = document.querySelector("section");
-//Get lives indicator and set number of lives
-const playerLivesCount = document.querySelector("#playerLivesCount");
-let playerLives = 40;
-playerLivesCount.textContent = playerLives;
+const gameTime = 5;
+var matched = 0
+var turns = 0;
 
 //Get score indicator and set score to 0
 const playerScoreCount = document.querySelector("#playerScore");
 let playerScore = 0;
 playerScoreCount.textContent = playerScore;
 
+//Get countdown
+const timeRemainingCounter = document.querySelector("#timeRemaining");
+let timeRemaining = gameTime;
+timeRemainingCounter.textContent = gameTime;
+
 //Get start/win/lose overlays
 let overlays = Array.from(document.getElementsByClassName("overlay-text"));
 overlays.forEach((overlay) => {
   overlay.addEventListener("click", () => {
     overlay.classList.remove("visible");
+    start();
   });
 });
 
-const getData = () => [
-  // { imgSrc: "./images/122-200x200.jpg", name: "bridge" },
-  // { imgSrc: "./images/261-200x200.jpg", name: "sand" },
-  // { imgSrc: "./images/396-200x200.jpg", name: "escalator" },
-  // { imgSrc: "./images/485-200x200.jpg", name: "beach" },
-  // { imgSrc: "./images/492-200x200.jpg", name: "field" },
-  // { imgSrc: "./images/515-200x200.jpg", name: "plane" },
-  // { imgSrc: "./images/630-200x200.jpg", name: "forest" },
-  // { imgSrc: "./images/678-200x200.jpg", name: "mountains" },
-  // { imgSrc: "./images/737-200x200.jpg", name: "city" },
-  // { imgSrc: "./images/818-200x200.jpg", name: "statue" },
+const initialiseCards = () => [
   { imgSrc: "./clubs/t1.svg", name: "MUN" },
   { imgSrc: "./clubs/t2.svg", name: "LEE" },
   { imgSrc: "./clubs/t3.svg", name: "ARS" },
@@ -50,10 +45,10 @@ const getData = () => [
   { imgSrc: "./clubs/t90.svg", name: "BUR" },
   { imgSrc: "./clubs/t94.svg", name: "BRE" },
 ];
-const mergedData = () => {
+const createBoard = () => {
   //Get array and create matching pairs of each image
-  const array1 = getData();
-  const array2 = getData();
+  const array1 = initialiseCards();
+  const array2 = initialiseCards();
   const array3 = array1.concat(array2);
   return array3;
   // const array4 = array3.concat(array3);
@@ -61,7 +56,7 @@ const mergedData = () => {
 };
 
 const randomise = () => {
-  const cardData = mergedData();
+  const cardData = createBoard();
   cardData.sort(() => Math.random() - 0.5);
   return cardData;
 };
@@ -97,8 +92,7 @@ const checkCards = (e) => {
   const clickedCard = e.target;
   clickedCard.classList.add("flipped");
   const flippedCards = document.querySelectorAll(".flipped");
-  const toggleCard = document.querySelectorAll(".toggleCard");
-
+  turns++;
   //Logic
   if (flippedCards.length === 2) {
     if (
@@ -116,27 +110,38 @@ const checkCards = (e) => {
         card.classList.remove("flipped");
         setTimeout(() => card.classList.remove("toggleCard"), 1000);
       });
-      playerLives--;
-      playerLivesCount.textContent = playerLives;
-
-      if (playerLives === 0) {
-        document.getElementById("game-over-text").classList.add("visible");
-        restart();
-        //restart("Try again");
-      }
     }
-  }
-  //Run check to see if game has been won
-  if (toggleCard.length === 40) {
-    setTimeout(() => {
-      document.getElementById("victory-text").classList.add("visible");
-      //restart();
-    }, 1000);
   }
 };
 
-//Restart
-const restart = () => {
+//Start
+const start = () => { 
+  turns = 0;
+  timeRemainingCounter.textContent = gameTime;
+  cardGenerator();
+  var countdown = setInterval(function () {
+    const toggleCard = document.querySelectorAll(".toggleCard");
+    timeRemaining--;
+    timeRemainingCounter.textContent = timeRemaining;
+    if (timeRemaining <= 0) {
+      clearInterval(countdown);
+      setTimeout(() => {
+        document.getElementById("game-over-text").classList.add("visible");
+        shareScore();
+        timeRemaining = gameTime;
+      }, 1000);
+    }
+    //Run check to see if game has been won
+    if (toggleCard.length === 40) {
+      clearInterval(countdown);
+      setTimeout(() => {
+        document.getElementById("game-over-text").classList.add("visible");
+        timeRemaining = gameTime;
+        shareScore();
+      }, 1000);
+    }
+  }, 1000);
+
   let cardData = randomise();
   let faces = document.querySelectorAll(".face");
   let cards = document.querySelectorAll(".card");
@@ -151,12 +156,126 @@ const restart = () => {
       section.style.pointerEvents = "all";
     }, 1000);
   });
-  playerLives = 40;
-  playerLivesCount.textContent = playerLives;
+
   playerScore = 0;
   playerScoreCount.textContent = playerScore;
-  //setTimeout(() => window.alert(text), 100);
 };
 
-cardGenerator();
-//
+function shareScore() {
+  var matched = 0;  
+  document.getElementById("modal-text").innerHTML = ""
+  const allCards = Array.from(document.getElementsByClassName("card"));
+  let array = [];
+  allCards.forEach((item) => {
+    if (item.style.pointerEvents == "none") {
+      array.push("🟩");
+      matched++;
+    } else {
+      array.push("🟥");
+    }
+  });
+  var a = array[0] + array[1] + array[2] + array[3] + array[4];
+  var b = array[5] + array[6] + array[7] + array[8] + array[9];
+  var c = array[10] + array[11] + array[12] + array[13] + array[14];
+  var d = array[15] + array[16] + array[17] + array[18] + array[19];
+  var e = array[20] + array[21] + array[22] + array[23] + array[24];
+  var f = array[25] + array[26] + array[27] + array[28] + array[29];
+  var g = array[30] + array[31] + array[32] + array[33] + array[34];
+  var h = array[35] + array[36] + array[37] + array[38] + array[4];
+
+  var show = a + "\n" + b + "\n" + c + "\n" + d + "\n" + e + "\n" + f + "\n" + g + "\n" + h;
+  console.log("I got " + matched + "/" + allCards.length);
+  console.log("Turns " + turns);
+  console.log(show);
+
+  // When the user clicks on the button, open the modal
+  line1 = document.createElement('p')
+  line1Squares = document.createTextNode(a)
+  line1.appendChild(line1Squares);
+
+  line2 = document.createElement('p')
+  line2Squares = document.createTextNode(b)
+  line2.appendChild(line2Squares);
+
+  line3 = document.createElement('p')
+  line3Squares = document.createTextNode(c)
+  line3.appendChild(line3Squares);
+
+
+  line4 = document.createElement('p')
+  line4Squares = document.createTextNode(d)
+  line4.appendChild(line4Squares);
+
+  line5 = document.createElement('p')
+  line5Squares = document.createTextNode(e)
+  line5.appendChild(line5Squares);
+
+  line6 = document.createElement('p')
+  line6Squares = document.createTextNode(f)
+  line6.appendChild(line6Squares);
+
+
+  line7 = document.createElement('p')
+  line7Squares = document.createTextNode(g)
+  line7.appendChild(line7Squares);
+
+
+  line8 = document.createElement('p') 
+  line8Squares = document.createTextNode(h)
+  line8.appendChild(line8Squares);
+  
+
+
+ 
+  
+  
+
+  // squares = document.createTextNode(show)
+
+  
+  text = document.createTextNode("I got " + matched + "/40 in " + turns + " taps") 
+  // scoreDiv.appendChild(text);  
+  
+  document.getElementById("modal-text").appendChild(line1)
+  document.getElementById("modal-text").appendChild(line2)
+  document.getElementById("modal-text").appendChild(line3)
+  document.getElementById("modal-text").appendChild(line4)
+  document.getElementById("modal-text").appendChild(line5)
+  document.getElementById("modal-text").appendChild(line6)
+  document.getElementById("modal-text").appendChild(line7)
+  document.getElementById("modal-text").appendChild(line8)
+  document.getElementById("modal-text").appendChild(text)
+
+  var x = document.createElement("BUTTON");
+  x.classList.add("shareButton")
+  var t = document.createTextNode("Share");
+  x.appendChild(t);
+  document.getElementById("modal-text").appendChild(x);
+  
+  
+  x.addEventListener("click", (e) => {
+    console.log(navigator.canShare())
+    console.log(e)
+    alert('sharing...')
+  });
+  modal.style.display = "block";
+    
+}
+
+
+
+  // Get the modal
+  var modal = document.getElementById("myModal");
+
+  // Get the button that opens the modal
+  var btn = document.getElementById("myBtn");
+  
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+  
+  
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+  

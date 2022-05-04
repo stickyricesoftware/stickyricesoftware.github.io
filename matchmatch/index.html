@@ -22,8 +22,8 @@
     <title>Match Match</title>
   </head>
   <body>
-    <h1>Match it!</h1>
-    <div class="overlay-text visible">Click to Start</div>
+    <h1>Match Match</h1>
+    <div id="game-start-text" class="overlay-text visible">Click to Start</div>
     <div id="game-over-text" class="overlay-text">
       GAME OVER
       <span class="overlay-text-small">Click to Restart</span>
@@ -32,10 +32,19 @@
       VICTORY
       <span class="overlay-text-small">Click to Restart</span>
     </div>
-    <p>Lives: <span id="playerLivesCount" class="playerLivesCount"></span></p>
     <p>Score: <span id="playerScore" class="playerScore"></span></p>
+    <p>
+      Time Remaining: <span id="timeRemaining" class="timeRemaining"></span>
+    </p>
     <section></section>
-
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="modal-text"></div>
+      </div>
+    </div>
     <script src="/matchmatch/matchmatch.js"></script>
   </body>
 </html>
