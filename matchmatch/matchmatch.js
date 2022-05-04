@@ -232,7 +232,7 @@ function shareScore() {
 
   // squares = document.createTextNode(show)
 
-  
+  shareText = "I got " + matched + "/40 in " + turns + " taps"
   text = document.createTextNode("I got " + matched + "/40 in " + turns + " taps") 
   // scoreDiv.appendChild(text);  
   
@@ -267,7 +267,7 @@ function shareScore() {
       navigator
         .share({
           title: "Match Match",
-          text: text + '\n' + a + '\n' + b + '\n' + c + '\n' + d + '\n' + e + '\n' + f + '\n' + g + '\n' + h + '\n', 
+          text: shareText + '\n' + a + '\n' + b + '\n' + c + '\n' + d + '\n' + e + '\n' + f + '\n' + g + '\n' + h + '\n', 
           url: 'https://bit.ly/39Bzg6x',
         })
         .then(() => {
