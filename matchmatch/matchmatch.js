@@ -24,26 +24,26 @@ overlays.forEach((overlay) => {
 });
 
 const initialiseCards = () => [
-  { imgSrc: "./clubs/t1.svg", name: "MUN" },
-  { imgSrc: "./clubs/t2.svg", name: "LEE" },
-  { imgSrc: "./clubs/t3.svg", name: "ARS" },
-  { imgSrc: "./clubs/t4.svg", name: "NEW" },
-  { imgSrc: "./clubs/t6.svg", name: "TOT" },
-  { imgSrc: "./clubs/t7.svg", name: "AVL" },
-  { imgSrc: "./clubs/t8.svg", name: "CHE" },
-  { imgSrc: "./clubs/t11.svg", name: "EVE" },
-  { imgSrc: "./clubs/t13.svg", name: "LEI" },
-  { imgSrc: "./clubs/t14.svg", name: "LIV" },
-  { imgSrc: "./clubs/t20.svg", name: "SOU" },
-  { imgSrc: "./clubs/t21.svg", name: "WHU" },
-  { imgSrc: "./clubs/t31.svg", name: "CRY" },
-  { imgSrc: "./clubs/t36.svg", name: "BHA" },
-  { imgSrc: "./clubs/t39.svg", name: "WOL" },
-  { imgSrc: "./clubs/t43.svg", name: "MCI" },
-  { imgSrc: "./clubs/t45.svg", name: "NOR" },
-  { imgSrc: "./clubs/t57.svg", name: "WAT" },
-  { imgSrc: "./clubs/t90.svg", name: "BUR" },
-  { imgSrc: "./clubs/t94.svg", name: "BRE" },
+  { imgSrc: "./clubs/MUN.svg", name: "MUN" },
+  { imgSrc: "./clubs/LEE.svg", name: "LEE" },
+  { imgSrc: "./clubs/ARS.svg", name: "ARS" },
+  { imgSrc: "./clubs/NEW.svg", name: "NEW" },
+  { imgSrc: "./clubs/TOT.svg", name: "TOT" },
+  { imgSrc: "./clubs/AVL.svg", name: "AVL" },
+  { imgSrc: "./clubs/CHE.svg", name: "CHE" },
+  { imgSrc: "./clubs/EVE.svg", name: "EVE" },
+  { imgSrc: "./clubs/LEI.svg", name: "LEI" },
+  { imgSrc: "./clubs/LIV.svg", name: "LIV" },
+  { imgSrc: "./clubs/SOU.svg", name: "SOU" },
+  { imgSrc: "./clubs/WHU.svg", name: "WHU" },
+  { imgSrc: "./clubs/CRY.svg", name: "CRY" },
+  { imgSrc: "./clubs/BHA.svg", name: "BHA" },
+  { imgSrc: "./clubs/WOL.svg", name: "WOL" },
+  { imgSrc: "./clubs/MCI.svg", name: "MCI" },
+  { imgSrc: "./clubs/NOR.svg", name: "NOR" },
+  { imgSrc: "./clubs/WAT.svg", name: "WAT" },
+  { imgSrc: "./clubs/BUR.svg", name: "BUR" },
+  { imgSrc: "./clubs/BRE.svg", name: "BRE" },
 ];
 const createBoard = () => {
   //Get array and create matching pairs of each image
@@ -104,6 +104,8 @@ const checkCards = (e) => {
         card.classList.remove("flipped");
         card.style.pointerEvents = "none";
         card.classList.add("matched");
+        hashtag = card.getAttribute("name");
+        showToast('#' + hashtag)
       });
       playerScore++;
       playerScoreCount.textContent = playerScore;
@@ -306,3 +308,15 @@ function shareScore() {
     modal.style.display = "none";
   }
   
+
+
+  function showToast(hashtag) {
+    // Get the snackbar DIV
+    var x = document.getElementById("snackbar");
+    x.innerHTML = hashtag
+    // Add the "show" class to DIV
+    x.className = "show";
+  
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+  }
