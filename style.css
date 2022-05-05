@@ -22,3 +22,24 @@ color: white;
   width: 200px;
   border-radius: 50%;
 }
+
+#projects {
+  display: flex;
+  flex-direction: column;
+  /* display: grid;
+  grid-template-columns: 100%; */
+}
+button{
+  background-color: #383838;
+  color: white;
+  border: none;
+  min-height: 60px;
+  min-width: 120px;  
+  margin-top: 5px;
+}
+.fa{
+  padding-top: 20px;
+  font-size: 2em!important;
+  text-decoration: none;
+  color: #55ACEE;
+}
