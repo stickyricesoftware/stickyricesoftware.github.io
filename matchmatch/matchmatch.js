@@ -1,6 +1,6 @@
 //Get Game Section
 const section = document.querySelector("section");
-const gameTime = 90;
+const gameTime = 10;
 var matched = 0
 var turns = 0;
 
@@ -62,9 +62,12 @@ const randomise = () => {
 };
 
 const cardGenerator = () => {
+  //remove previous HTML cards
+  document.querySelectorAll('.card').forEach(e => e.remove());
+
   //Randomise array
   const cardData = randomise();
-  // Generate the HTML
+  // Generate the new HTML cards
   cardData.forEach((item) => {
     const card = document.createElement("div");
     const face = document.createElement("img");
@@ -95,13 +98,12 @@ const checkCards = (e) => {
   turns++;
   //Logic
   if (flippedCards.length === 2) {
-    if (
-      flippedCards[0].getAttribute("name") ===
-      flippedCards[1].getAttribute("name")
-    ) {
+    if (flippedCards[0].getAttribute("name") === flippedCards[1].getAttribute("name")) 
+    {
       flippedCards.forEach((card) => {
         card.classList.remove("flipped");
         card.style.pointerEvents = "none";
+        card.classList.add("matched");
       });
       playerScore++;
       playerScoreCount.textContent = playerScore;
@@ -148,13 +150,14 @@ const start = () => {
   section.style.pointerEvents = "none";
   cardData.forEach((item, index) => {
     cards[index].classList.remove("toggleCard");
+    cards[index].classList.remove("matched");
     //Randomise
     setTimeout(() => {
       cards[index].style.pointerEvents = "all";
       faces[index].src = item.imgSrc;
       cards[index].setAttribute("name", item.name);
       section.style.pointerEvents = "all";
-    }, 1000);
+    }, 500);
   });
 
   playerScore = 0;
@@ -167,11 +170,11 @@ function shareScore() {
   const allCards = Array.from(document.getElementsByClassName("card"));
   let array = [];
   allCards.forEach((item) => {
-    if (item.style.pointerEvents == "none") {
-      array.push("🟩");
+    if (item.classList.contains('matched')) {
+      array.push("⚽");
       matched++;
     } else {
-      array.push("🟥");
+      array.push("⬜");
     }
   });
   var a = array[0] + array[1] + array[2] + array[3] + array[4];
@@ -184,8 +187,7 @@ function shareScore() {
   var h = array[35] + array[36] + array[37] + array[38] + array[4];
 
   var show = a + "\n" + b + "\n" + c + "\n" + d + "\n" + e + "\n" + f + "\n" + g + "\n" + h;
-  console.log("I got " + matched + "/" + allCards.length);
-  console.log("Turns " + turns);
+
   console.log(show);
 
   // When the user clicks on the button, open the modal
@@ -224,18 +226,15 @@ function shareScore() {
   line8Squares = document.createTextNode(h)
   line8.appendChild(line8Squares);
   
-
-
- 
+  shareText = "I got " + matched + "/40 in " + turns + " flips"
+  title = document.createElement('p')
+  //text = document.createTextNode("I got " + matched + "/40 in " + turns + " taps") 
+  text = document.createTextNode(shareText) 
   
-  
-
-  // squares = document.createTextNode(show)
-
-  shareText = "I got " + matched + "/40 in " + turns + " taps"
-  text = document.createTextNode("I got " + matched + "/40 in " + turns + " taps") 
+  title.appendChild(text) 
+  title.classList.add("modal-title");
   // scoreDiv.appendChild(text);  
-  document.getElementById("modal-text").appendChild(text)
+  document.getElementById("modal-text").appendChild(title)
   document.getElementById("modal-text").appendChild(line1)
   document.getElementById("modal-text").appendChild(line2)
   document.getElementById("modal-text").appendChild(line3)
@@ -248,7 +247,7 @@ function shareScore() {
 
   var x = document.createElement("BUTTON");
   x.classList.add("shareButton")
-  var t = document.createTextNode("Share");
+  var t = document.createTextNode('Share');
   x.appendChild(t);
   document.getElementById("modal-text").appendChild(x);
   
