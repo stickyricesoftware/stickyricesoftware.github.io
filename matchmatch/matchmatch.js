@@ -152,7 +152,6 @@ const start = () => {
   section.style.pointerEvents = "none";
   cardData.forEach((item, index) => {
     cards[index].classList.add("start");   
-
     setTimeout(() => {
       cards[index].classList.remove("start");
     }, 100);
