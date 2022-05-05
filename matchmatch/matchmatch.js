@@ -105,7 +105,7 @@ const checkCards = (e) => {
         card.style.pointerEvents = "none";
         card.classList.add("matched");
         hashtag = card.getAttribute("name");
-        showToast('#' + hashtag)
+        showToast('#' + hashtag + " 👍")
       });
       playerScore++;
       playerScore++;
