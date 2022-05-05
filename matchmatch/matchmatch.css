@@ -26,7 +26,6 @@ section {
 .card {
   position: relative;
   transform-style: preserve-3d;
-
   transition: all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: rgba(0, 0, 0, 0.2) 0px, 5px, 15px;
 }
@@ -46,6 +45,9 @@ section {
 }
 .toggleCard {
   transform: rotateY(180deg);
+}
+.start{
+  transform: rotateY(360deg);
 }
 .face {
   transform: rotateY(-180deg);

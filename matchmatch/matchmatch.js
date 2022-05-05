@@ -151,6 +151,13 @@ const start = () => {
   let cards = document.querySelectorAll(".card");
   section.style.pointerEvents = "none";
   cardData.forEach((item, index) => {
+    cards[index].classList.add("start");   
+
+    setTimeout(() => {
+      cards[index].classList.remove("start");
+    }, 100);
+  });
+  cardData.forEach((item, index) => {
     cards[index].classList.remove("toggleCard");
     cards[index].classList.remove("matched");
     //Randomise
