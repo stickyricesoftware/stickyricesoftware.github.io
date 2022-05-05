@@ -1,6 +1,6 @@
 //Get Game Section
 const section = document.querySelector("section");
-const gameTime = 90;
+const gameTime = 10;
 var matched = 0
 var turns = 0;
 

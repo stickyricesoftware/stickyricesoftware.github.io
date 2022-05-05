@@ -32,6 +32,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/matchmatch/matchmatch.css" />
+    <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
     <title>Match Match</title>
   </head>
   <body>
@@ -45,10 +46,12 @@
       VICTORY
       <span class="overlay-text-small">Click to Restart</span>
     </div>
-    <p>Score: <span id="playerScore" class="playerScore"></span></p>
-    <p>
-      Time Remaining: <span id="timeRemaining" class="timeRemaining"></span>
-    </p>
+    <div class="info">
+      <p class="left">Score: <span id="playerScore" class="playerScore"></span></p>
+      <p class="right">Time: <span id="timeRemaining" class="timeRemaining"></span></p>
+
+    </div>
+
     <section id="section"></section>
     <!-- The Modal -->
     <div id="myModal" class="modal">
