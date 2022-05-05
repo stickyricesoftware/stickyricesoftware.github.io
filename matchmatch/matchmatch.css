@@ -228,3 +228,10 @@ section {
     visibility: hidden;
   }
 }
+
+.fa{
+  padding-top: 20px;
+  font-size: 2em!important;
+  text-decoration: none;
+  color: #55ACEE;
+}
