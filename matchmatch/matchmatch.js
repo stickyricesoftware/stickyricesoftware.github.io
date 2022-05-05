@@ -108,6 +108,7 @@ const checkCards = (e) => {
         showToast('#' + hashtag)
       });
       playerScore++;
+      playerScore++;
       playerScoreCount.textContent = playerScore;
     } else {
       flippedCards.forEach((card) => {
