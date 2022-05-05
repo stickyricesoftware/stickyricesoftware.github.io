@@ -151,12 +151,6 @@ const start = () => {
   let cards = document.querySelectorAll(".card");
   section.style.pointerEvents = "none";
   cardData.forEach((item, index) => {
-    cards[index].classList.add("start");   
-    setTimeout(() => {
-      cards[index].classList.remove("start");
-    }, 100);
-  });
-  cardData.forEach((item, index) => {
     cards[index].classList.remove("toggleCard");
     cards[index].classList.remove("matched");
     //Randomise
@@ -166,6 +160,13 @@ const start = () => {
       cards[index].setAttribute("name", item.name);
       section.style.pointerEvents = "all";
     }, 500);
+  });
+
+  cardData.forEach((item, index) => {
+    cards[index].classList.add("start");   
+    setTimeout(() => {
+      cards[index].classList.remove("start");
+    }, 600);
   });
 
   playerScore = 0;
