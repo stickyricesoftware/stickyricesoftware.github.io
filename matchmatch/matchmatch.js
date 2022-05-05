@@ -123,17 +123,22 @@ const checkCards = (e) => {
 const start = () => { 
   turns = 0;
   timeRemainingCounter.textContent = gameTime;
+  
   cardGenerator();
   var countdown = setInterval(function () {
     const toggleCard = document.querySelectorAll(".toggleCard");
     timeRemaining--;
     timeRemainingCounter.textContent = timeRemaining;
+    if (timeRemaining <= 10) {
+      document.getElementById("right").classList.add("flashing");
+    }
     if (timeRemaining <= 0) {
       clearInterval(countdown);
       setTimeout(() => {
         document.getElementById("game-over-text").classList.add("visible");
         shareScore();
         timeRemaining = gameTime;
+        document.getElementById("right").classList.remove("flashing");
       }, 1000);
     }
     //Run check to see if game has been won
