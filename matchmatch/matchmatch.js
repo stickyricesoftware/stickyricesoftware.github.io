@@ -201,9 +201,9 @@ function shareScore() {
   var g = array[30] + array[31] + array[32] + array[33] + array[34];
   var h = array[35] + array[36] + array[37] + array[38] + array[4];
 
-  var show = a + "\n" + b + "\n" + c + "\n" + d + "\n" + e + "\n" + f + "\n" + g + "\n" + h;
+  var show = "%c" + a + "\n" + b + "\n" + c + "\n" + d + "\n" + e + "\n" + f + "\n" + g + "\n" + h;
 
-  console.log(show);
+  console.log("%cScore\n" + show, "color: white; background-image: linear-gradient(#02884E, #01B559);  padding-bottom:8px; font-size: 2.50em; font-weight: bolder; width: 100%;", "background-color:#00B95C; ");
 
   // When the user clicks on the button, open the modal
   line1 = document.createElement('p')

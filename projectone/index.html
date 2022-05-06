@@ -9,6 +9,22 @@
 </head>
 <body>
     <h1>Project One</h1>
-    <script src="/projectone/"></script>
+    <p>Camera Feed:</p>
+        <!-- The `label` is attached to the hidden file input -->
+        <label for="cameraFileInput">
+            <span class="btn">Open camera</span>
+      
+            <!-- The hidden file `input` for opening the native camera -->
+            <input
+              id="cameraFileInput"
+              type="file"
+              accept="image/*"
+              capture="environment"
+            />
+          </label>
+      
+          <!-- displays the picture uploaded from the native camera -->
+          <img id="pictureFromCamera" />
+    <script src="projectone.js"></script>
 </body>
 </html>
