@@ -1,13 +1,10 @@
-console.warn("BBC NEWS | Mundo");
-const div = document.createElement("div");
-div.setAttribute("id","loader");
-div.innerText = "Loading...";
-document.body.appendChild(div);
+console.error("BBC NEWS | Mundo");
+var API_KEY = config.API_KEY;
 const options = {
   method: "GET",
   headers: {
     "X-RapidAPI-Host": "bbc-news-mundo.p.rapidapi.com",
-    "X-RapidAPI-Key": "5326a3a741msh8a7fd584a716b8bp10e0cejsn223b2338e2fe",
+    "X-RapidAPI-Key": API_KEY,
   },
 };
 
@@ -15,6 +12,8 @@ fetch("https://bbc-news-mundo.p.rapidapi.com/news", options)
   .then((response) => response.json())
   .then((response) => loadNews(response))
   .catch((err) => console.error(err));
+
+
 
 function loadNews(articles) {
   articles.forEach((element) => {
@@ -36,4 +35,7 @@ function loadNews(articles) {
   });
   const element = document.getElementById('loader');
   element.remove();
+  gtag('event', 'User', {
+    'Loaded news articles:' : articles.length
+  });
 }
