@@ -1,0 +1,47 @@
+* {
+  background-color: white;
+  text-align: center;
+  box-sizing: border-box;
+  margin: 0;
+}
+header {
+  width: 100%;
+  background-color: red;
+  display: inline-block;
+  height: 2.5em;
+  padding: 0.5em;
+}
+
+header p {
+  background-color: red;
+  width: 40%;
+  float: right;
+  color: white;
+  text-align: right;
+  padding-top: 0.25em;
+  
+}
+.logo {
+  background-color: red;
+  color: white;
+  fill: white;
+  width: 50%;
+  float: left;
+}
+#loader {
+  font-size: 4em;
+}
+.article {
+  display: grid;
+  padding: 0.5em;
+}
+.headline {
+  text-decoration: none;
+  color: black;
+  font-weight: bolder;
+  font-size: larger;
+}
+.summary {
+  text-align: left;
+  padding-bottom: 1em;
+}
