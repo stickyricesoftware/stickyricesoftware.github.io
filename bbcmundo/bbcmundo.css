@@ -53,13 +53,8 @@ grid-template-columns: 33% 33% 33%
 a {
   text-decoration: none;
 }
-.copy {
-  background-color: #444444;
+#time{
   color: whitesmoke;
-  border: none;
-  border-radius: 5px;
-  padding: 5px;
-  margin-left: 5px;
 }
 #next {
   background-color: var(--bbcred);

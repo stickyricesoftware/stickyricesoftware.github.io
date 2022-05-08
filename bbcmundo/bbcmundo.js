@@ -1,4 +1,4 @@
-console.warn("BBC NEWS | Mundo");
+//console.warn("BBC NEWS | Mundo");
 var articleNumber = 0;
 const counter = document.getElementById('counter')
 
@@ -37,6 +37,9 @@ function loadArticle(articles, number) {
   const headlineEN = document.getElementById('headlineEN')
   headlineEN.innerText = articles[number].title;
 
+  const time = document.getElementById('time')
+  time.innerText = articles[number].timeText;
+
   const link = document.getElementById('link') 
   const url = articles[number].link;
   link.setAttribute('href', url)
@@ -53,40 +56,16 @@ next.addEventListener("click", () => {
   if (articleNumber < data.length) { articleNumber++;}
   if (articleNumber == data.length) { articleNumber--;}
   loadArticle(data, articleNumber);
-
 });
 
 previous.addEventListener("click", () => {
-  if (articleNumber > 0) {
-    articleNumber--;
-  }
+  if (articleNumber > 0) { articleNumber--; }
   loadArticle(data, articleNumber);
-
 });
 
-function selectText(element) {
-  var doc = document
-      , text = doc.getElementById(element)
-      , range, selection
-  ;    
-  if (doc.body.createTextRange) { //ms
-      range = doc.body.createTextRange();
-      range.moveToElementText(text);
-      range.select();
-  } else if (window.getSelection) { //all others
-      selection = window.getSelection();        
-      range = doc.createRange();
-      range.selectNodeContents(text);
-      selection.removeAllRanges();
-      selection.addRange(range);
-  }
 
 
-}
 
-if(dispatchEvent){
-  console.log('Here')
-}
 
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
