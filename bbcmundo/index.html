@@ -22,7 +22,7 @@
     <title>BBC Mundo</title>
   </head>
   <body>
-    <header>
+    <header class="notranslate">
       <svg
         height="24"
         viewBox="0 0 246.2812 24.59"
@@ -55,16 +55,24 @@
       <p>Simplificado</p>
     </header>
     <div id="loader" class="center"></div>
-    <div id="buttons">
-      <button id="previous">Previous</button>
-      <button id="next">Next</button>
-    </div>
+
     <div id="article" class="article">
-      <a id="headline" class="headline"></a>
-      <div id="summary" class="summary"></div>
+      <a id="headline" class="headline notranslate"></a>
+      <div id="summary" class="summary notranslate"></div>
+
+    </div>
+    <div id="articleEN" class="article">
+      <a id="headlineEN" class="headline"></a>
+      <div id="summaryEN" class="summary"></div>
       <a id="link" class="link">Read more</a>
     </div>
-    <div id="counter"></div>
+    <div id="nav" class="notranslate">
+      <button id="previous">Previous</button>
+      <div id="counter"></div>
+      <button id="next">Next</button>
+    </div>
+      <div id="google_translate_element"></div>
     <script src="bbcmundo.js"></script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   </body>
 </html>

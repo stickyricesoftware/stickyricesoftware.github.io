@@ -5,7 +5,7 @@
   margin: 0;
 }
 :root {
-  --bbcred: #B80000;
+  --bbcred: #b80000;
 }
 header {
   width: 100%;
@@ -22,7 +22,6 @@ header p {
   color: white;
   text-align: right;
   padding-top: 0.25em;
-  
 }
 .logo {
   background-color: var(--bbcred);
@@ -31,7 +30,10 @@ header p {
   width: 50%;
   float: left;
 }
-
+#nav{
+display: grid;
+grid-template-columns: 33% 33% 33%
+}
 .article {
   display: grid;
   padding: 0.5em;
@@ -48,38 +50,28 @@ header p {
   padding-top: 2em;
   color: whitesmoke;
 }
-a{
+a {
   text-decoration: none;
 }
 .copy {
   background-color: #444444;
-  color:whitesmoke;
+  color: whitesmoke;
   border: none;
   border-radius: 5px;
   padding: 5px;
   margin-left: 5px;
 }
-#next{
-  opacity:    0.5; 
-  background: #000; 
-  width:      50%;
-  height:     100%; 
-  z-index:    -1;
-  top:        0; 
-  right:       0; 
-  position:   fixed;
-  border: none; 
+#next {
+  background-color: var(--bbcred);
+  border: none;
+  color: white;
+  height: 50px;
 }
-#previous{
-  opacity:    0.5; 
-  background: #000; 
-  width:      50%;
-  height:     100%; 
-  z-index:    -1;
-  top:        0; 
-  left:       0; 
-  position:   fixed;
-  border: none; 
+#previous {
+  background-color: var(--bbcred);
+  border: none;
+  color: white;
+  height: 50px;
 }
 #loader {
   border: 16px solid #f3f3f3; /* Light grey */
@@ -89,18 +81,35 @@ a{
   height: 80px;
   animation: spin 2s linear infinite;
   margin-left: 10em;
-  left:0;
-  right:0;
-  top:200px;
-  bottom:0;
-  position:absolute;
+  left: 0;
+  right: 0;
+  top: 200px;
+  bottom: 0;
+  position: absolute;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-#counter{
+#counter {
   color: whitesmoke;
+}
+
+.skiptranslate {
+  width: 100vw !important;
+
+  
+  z-index: 1!important;
+}
+.goog-te-banner-frame {
+  height: 7vh !important;
+  bottom: 0%!important;
+  background-image: none!important;
+  background-color: #444444!important;
 }

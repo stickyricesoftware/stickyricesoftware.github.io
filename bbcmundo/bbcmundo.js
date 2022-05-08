@@ -28,29 +28,21 @@ fetch("https://bbc-news-mundo.p.rapidapi.com/news", options)
 function loadArticle(articles, number) {
   const summary = document.getElementById('summary')
   summary.innerText = articles[number].summary;
+  const summaryEN = document.getElementById('summaryEN')
+  summaryEN.innerText = articles[number].summary;
+
   const headline = document.getElementById('headline')
-  headline.innerText = articles[number].title;  
+  headline.innerText = articles[number].title;
+  
+  const headlineEN = document.getElementById('headlineEN')
+  headlineEN.innerText = articles[number].title;
+
   const link = document.getElementById('link') 
   const url = articles[number].link;
   link.setAttribute('href', url)
   counter.innerHTML = articleNumber+1 + '/' + articles.length
 
-  const copyHeadline = document.createElement("button");
-  copyHeadline.classList.add('copy')
-  const headlineText = document.createTextNode("Copy"); 
-  copyHeadline.appendChild(headlineText);
-  document.getElementById('headline').appendChild(copyHeadline)
-  copyHeadline.addEventListener("click", () => {
-    selectText('headline')
-  });
-  const copySummary = document.createElement("button");
-  copySummary.classList.add('copy')
-  const summaryText = document.createTextNode("Copy"); 
-  copySummary.appendChild(summaryText);
-  document.getElementById('summary').appendChild(copySummary)
-  copySummary.addEventListener("click", () => {
-    selectText('summary')
-  });
+
 }
 
 let next = document.getElementById("next");
@@ -94,4 +86,12 @@ function selectText(element) {
 
 if(dispatchEvent){
   console.log('Here')
+}
+
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'es',
+    includedLanguages: 'en',
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL,
+  }, 'google_translate_element');
 }
