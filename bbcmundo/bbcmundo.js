@@ -25,9 +25,8 @@ fetch("https://bbc-news-mundo.p.rapidapi.com/news", options)
   .catch((err) => console.error(err));
 
 function loadArticle(articles, number) {
-
-  const articleEN = document.getElementById('articleEN')
-  articleEN.classList.add('hide')
+  const articleEN = document.getElementById("articleEN");
+  articleEN.classList.add("hide");
 
   const summary = document.getElementById("summary");
   summary.innerText = articles[number].summary;
@@ -86,10 +85,22 @@ function googleTranslateElementInit() {
   );
 }
 
+let changeLanguage = document.getElementById("changeLanguage");
 
-let selectLanguage = document.getElementById("google_translate_element");
-console.log(selectLanguage)
-selectLanguage.addEventListener("click", () => {
-  article = document.getElementById('articleEN')
-  article.classList.remove('hide')
+changeLanguage.addEventListener("click", () => {
+  article = document.getElementById("articleEN");
+  article.classList.remove("hide");
 });
+
+setTimeout(() => {
+  let logo = document.getElementsByTagName("iframe");
+
+  let body = logo[0].contentWindow.document.getElementsByTagName("body");
+  console.log(body[0].querySelectorAll("td"))
+  console.log(body[0].querySelectorAll("td")[0]);
+  body[0].querySelectorAll("td")[0].remove();
+  body[0].querySelectorAll("td")[1].remove();
+  body[0].querySelectorAll("td")[2].remove();
+  console.log(body[0].getElementsByClassName('.goog-te-banner-content'))
+body[0].querySelectorAll('span')[2].remove()
+}, 5000);

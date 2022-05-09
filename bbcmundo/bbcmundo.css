@@ -63,6 +63,7 @@ a {
 }
 #time {
   color: whitesmoke;
+  
 }
 #next {
   background-color: var(--bbcred);
@@ -71,6 +72,12 @@ a {
   height: 50px;
 }
 #previous {
+  background-color: var(--bbcred);
+  border: none;
+  color: white;
+  height: 50px;
+}
+#changeLanguage {
   background-color: var(--bbcred);
   border: none;
   color: white;
@@ -113,10 +120,10 @@ a {
 .goog-te-combo {
   background-color: var(--bbcred) !important;
   border: none;
-  min-height: 50px;
+  min-height: 40px;
   color: whitesmoke;
   margin: 0px !important;
-  width: 90%;
+  width: 200px;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   
