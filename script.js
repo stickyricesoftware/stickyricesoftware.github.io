@@ -1,7 +1,7 @@
 BASE_URL = "https://stickyricesoftware.github.io/";
 console.log("sticky rice for life");
 
-projectsArray = [BASE_URL + "matchmatch", BASE_URL + "bbcmundo", BASE_URL + "skr-collection/skr/skr-home", BASE_URL + "skr-collection/skr1/skr1-home",];
+projectsArray = [BASE_URL + "matchmatch", BASE_URL + "bbcmundo", BASE_URL + "skr-collection/skr/skr-home", BASE_URL + "skr-collection/skr1/skr1-home", BASE_URL + "skr-collection/skr2/skr2-home",];
 
 const projects = document.getElementById("projects");
 
