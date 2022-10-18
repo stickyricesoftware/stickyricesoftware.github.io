@@ -2478,13 +2478,3 @@ input[type="color"]::-webkit-color-swatch {
 }
 /*This file was exported by "Export WP Page to Static HTML" plugin which created by ReCorp (https://myrecorp.com) */
 
-.packages{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-}
-.package{
-    border: 2px solid black;
-    margin: 10px;
-}
