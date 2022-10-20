@@ -1,13 +1,100 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing: border-box;
+* {
+  box-sizing: border-box;
+  font-family:Arial, Helvetica, sans-serif;
+  
 }
-.links{
-    display: flex;
-    flex-direction: column;
+:root {
+  --background: #eff2eb;
+  --dark-accent: #a5ae9e;
+  --light-accent: #bf994c;
 }
-button{
-    width: 100px;
-    margin: 20px
+body {
+  margin: 0;
+  background: var(--background);
+  min-height: 100vh;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+footer {
+  width: 100%;
+  background-color: var(--background);
+  bottom: 0;
+  height: 5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.fa {
+    padding: 20px;
+    font-size: 30px;
+    width: 30px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 50%;
+  }
+
+.profile {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px,
+    rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  border-radius: 50%;
+  width: 10em;
+  margin-top: 25px;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+.cards {
+  margin: 0 auto;
+  padding: 8px;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  color: white;
+}
+.card {
+  border-radius: 10px;
+  width: 100%;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px,
+    rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  background-color: var(--dark-accent);
+}
+/* Style the header */
+.header {
+  padding: 10px;
+  text-align: center;
+  font-size: 10px;
+}
+
+/* Container for flexboxes */
+.row {
+  display: -webkit-flex;
+  display: flex;
+}
+
+/* Create three equal columns that sits next to each other */
+.column {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  padding: 10px;
+  min-height: 10em;
+}
+.column img{
+    width: 100%;
+}
+/* Style the footer */
+.card-footer {
+  padding: 10px;
+  text-align: center;
+}
+.card-footer p {
+  margin: 0px;
 }
