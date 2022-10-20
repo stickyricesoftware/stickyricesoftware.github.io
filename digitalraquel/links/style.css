@@ -18,6 +18,8 @@ header {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  text-align: center;
+  font-size: 0.75em;
 }
 footer {
   width: 100%;
@@ -90,12 +92,29 @@ a {
 }
 .column img{
     width: 100%;
+    border-top-left-radius: 10px;
+
+}
+.left{
+padding: 0px;
+box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 10px;
+}
+.right{
+    padding-left: 0px;
+    padding-right: 2px;
+    border-top-right-radius: 10px;
 }
 /* Style the footer */
 .card-footer {
   padding: 10px;
   text-align: center;
+  background-color: var(--light-accent);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+
 }
 .card-footer p {
   margin: 0px;
 }
+
+  
