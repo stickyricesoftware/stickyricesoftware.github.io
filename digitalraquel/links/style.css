@@ -101,7 +101,7 @@ padding: 0px;
 box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 10px;
 }
 .right{
-    padding-left: 0px;
+    padding-left: 2px;
     padding-right: 2px;
     border-top-right-radius: 10px;
 }
