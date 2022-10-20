@@ -60,6 +60,7 @@ a {
   flex-direction: column;
   gap: 15px;
   color: white;
+  max-width: 400px;
 }
 .card {
   border-radius: 10px;
