@@ -1,11 +1,35 @@
 * {
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Poppins;
 }
+
+/* Light mode 
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #EFF2EB;
+    --dark-accent: #a5ae9e;
+    --light-accent: #bf994c;
+    color: black;
+  }
+}
+*/
+
+/* Dark mode 
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: white;
+    --background: #121212 ;
+    --dark-accent: #eff2eb;
+    --light-accent: #bf994c;
+      
+  }
+}
+*/
 :root {
-  --background: #eff2eb;
+  --background: #EFF2EB;
   --dark-accent: #a5ae9e;
   --light-accent: #bf994c;
+  color: black;
 }
 body {
   margin: 0;
@@ -36,6 +60,9 @@ footer {
   gap: 10px;
   margin-top: 50px;
 }
+a{
+  text-decoration: none;
+}
 .fa {
   font-size: 30px;
   width: 30px;
@@ -50,6 +77,7 @@ footer {
   width: 100vw;
   max-width: 400px;
   min-height: 100vh;
+  text-align: center;
 }
 .profile {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px,
@@ -79,9 +107,85 @@ footer {
   border-radius: 5.6px;
   margin-bottom: 26px;
   margin-right: 0px;
-  min-height: 150px;
+  min-height: 20px;
+  margin-top: 20px;
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
 }
+.card-image-top{
+  width: 100%;
+  border-top-left-radius: 5.6px;
+  border-top-right-radius: 5.6px;
+  padding-bottom: 10px;
+}
+.big-card{
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  padding-bottom: 10px;
+}
+.card-image-left{
+  width: 150px;
+  border-top-left-radius: 5.6px;
+  border-bottom-left-radius: 5.6px;
+}
+.card-image-right{
+  width: 150px;
+  border-top-right-radius: 5.6px;
+  border-bottom-right-radius: 5.6px;
+}
+.card-content-right{
+padding: 10px;
+width: 100%;
+display: flex;
+align-items: right;
+justify-content: center;
+flex-direction: column;
+border-top-right-radius: 5.6px;
+border-bottom-right-radius: 5.6px;
+}
+.card-content-left{
+  padding: 10px;
+  width: 100%;
+  display: flex;
+  align-items: left;
+  justify-content: center;
+  flex-direction: column;
+  border-top-left-radius: 5.6px;
+  border-bottom-left-radius: 5.6px;
+
+  }
+  .card-content-left div{
+    text-align: right;
+
+  }
+  .card-content-right div{
+    text-align: left;
+
+  }
+.title{
+  font-weight: bolder;
+}
+.title-card{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.button{
+  color: white;
+  font-weight: bolder;
+  padding: 10px 20px 10px 20px;
+  background-color: var(--light-accent);
+  width: 150px;
+  margin: auto;
+  border-radius: 4px;
+}
+
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 600px) {
   .container {
