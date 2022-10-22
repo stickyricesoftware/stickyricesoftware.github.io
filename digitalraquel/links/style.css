@@ -27,6 +27,7 @@
 */
 :root {
   --background: #EFF2EB;
+  --light-background: #F4EDE7;
   --dark-accent: #a5ae9e;
   --light-accent: #bf994c;
   color: black;
@@ -70,7 +71,7 @@ a{
   text-decoration: none;
   border-radius: 50%;
 }
-.container {
+.links-container {
   background-color: var(--background);
   box-shadow: 0 7px 29px 0 rgba(100, 100, 111, 0.15);
   padding: 2em;
@@ -185,6 +186,27 @@ border-bottom-right-radius: 5.6px;
   margin: auto;
   border-radius: 4px;
 }
+
+
+
+.sales-container {
+  background-color: var(--background);
+  box-shadow: 0 7px 29px 0 rgba(100, 100, 111, 0.15);
+  width: 100vw;
+  max-width: 400px;
+  min-height: 100vh;
+  text-align: center;
+}
+section{
+  background-color: var(--background);
+  height: 100vh;
+}
+section:nth-child(2) {
+  background-color: var(--light-background);
+}
+
+
+
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 600px) {
