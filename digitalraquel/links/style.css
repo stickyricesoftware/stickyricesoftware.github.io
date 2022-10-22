@@ -34,7 +34,7 @@
 }
 body {
   margin: 0;
-  background: var(--background);
+  background-image: linear-gradient(var(--background), var(--dark-accent));
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -76,7 +76,7 @@ a{
   box-shadow: 0 7px 29px 0 rgba(100, 100, 111, 0.15);
   padding: 2em;
   width: 100vw;
-  max-width: 400px;
+  max-width: 533px;
   min-height: 100vh;
   text-align: center;
 }
@@ -186,7 +186,15 @@ border-bottom-right-radius: 5.6px;
   margin: auto;
   border-radius: 4px;
 }
-
+.sales-button{
+  color: white;
+  font-weight: bolder;
+  margin: 10px;
+  padding: 10px 20px 10px 20px;
+  background-color: var(--light-accent);
+  width: 150px;
+  border-radius: 4px;
+}
 
 
 .sales-container {
@@ -198,33 +206,47 @@ border-bottom-right-radius: 5.6px;
   text-align: center;
 }
 section{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
   background-color: var(--background);
   height: 100vh;
 }
 section:nth-child(2) {
-  background-color: var(--light-background);
+  background-color: var(--dark-accent);
+}
+.sales-image{
+  width: 30%
 }
 
 
-
-
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 300px) {
+  .links-container {
+    max-width: 533px;
+    padding: 1em;
+  }
+}
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 600px) {
-  .container {
+  .links-container {
     max-width: 533px;
+    padding: 2em;
   }
 }
 
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 768px) {
-  .container {
+  .links-container {
     max-width: 533px;
+    padding: 2em;
   }
 }
 
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
-  .container {
+  .links-container {
     max-width: 533px;
+    padding: 2em;
   }
 }
