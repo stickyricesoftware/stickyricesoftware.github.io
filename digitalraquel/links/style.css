@@ -322,6 +322,9 @@ section:nth-child(2) {
   .desktop-links-container{
     display: inline;
   }
+  .logo {
+    width: 110px;
+  }
 }
 
 /* Large devices (laptops/desktops, 992px and up) */
@@ -337,6 +340,9 @@ section:nth-child(2) {
   }
   .desktop-links-container{
     display: inline;
+  }
+  .logo {
+    width: 110px;
   }
   .card:hover {
     transform: scale(1.1);
