@@ -71,7 +71,7 @@ a{
   text-decoration: none;
   border-radius: 50%;
 }
-.links-container {
+.mobile-links-container {
   background-color: var(--background);
   box-shadow: 0 7px 29px 0 rgba(100, 100, 111, 0.15);
   padding: 2em;
@@ -113,18 +113,21 @@ a{
   margin-bottom: 20px;
   display: flex;
   flex-direction: row;
+  
 }
 .card-image-top{
   width: 100%;
   border-top-left-radius: 5.6px;
   border-top-right-radius: 5.6px;
   padding-bottom: 10px;
+
 }
 .big-card{
   display: flex;
   flex-direction: column;
   padding: 0px;
   padding-bottom: 10px;
+  max-width: 200px;
 }
 .card-image-left{
   width: 150px;
@@ -220,6 +223,28 @@ section:nth-child(2) {
 }
 
 
+
+.desktop-links-container{
+
+ background-color: var(--background);
+ box-shadow: 0 7px 29px 0 rgba(100, 100, 111, 0.15);
+ padding: 2em;
+ width: 100vw;
+ max-width: 1800px;
+ min-height: 100vh;
+ text-align: center;
+}
+.desktop-links{
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  margin: auto;
+  row-gap: 5px;
+  column-gap: 25px;
+  max-width: max-content;
+  margin-bottom: 200px;
+  
+}
+
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 300px) {
   .links-container {
@@ -233,36 +258,47 @@ section:nth-child(2) {
 }
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 600px) {
-  .links-container {
+  .mobile-links-container {
     max-width: 533px;
     padding: 2em;
   }
   .sales-container {
     max-width: 533px;
     padding: 0;
+  }
+  .desktop-links-container{
+    display: none;
   }
 }
 
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 768px) {
-  .links-container {
+  .mobile-links-container {
     max-width: 533px;
     padding: 2em;
+    display: none;
   }
   .sales-container {
     max-width: 533px;
     padding: 0;
+    display: none;
+  }
+  .desktop-links-container{
+    display: inline;
   }
 }
 
 /* Large devices (laptops/desktops, 992px and up) */
 @media only screen and (min-width: 992px) {
-  .links-container {
+  .mobile-links-container {
     max-width: 533px;
     padding: 2em;
   }
   .sales-container {
     max-width: 533px;
     padding: 0;
+  }
+  .desktop-links-container{
+    display: block;
   }
 }
