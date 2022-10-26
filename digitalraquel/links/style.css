@@ -115,6 +115,23 @@ a{
   flex-direction: row;
   
 }
+
+
+
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
 .card-image-top{
   width: 100%;
   border-top-left-radius: 5.6px;
@@ -129,6 +146,7 @@ a{
   padding-bottom: 10px;
   max-width: fit-content;
 }
+
 .card-image-left{
   width: 150px;
   border-top-left-radius: 5.6px;
@@ -259,6 +277,21 @@ section:nth-child(2) {
   }
 }
 /* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 200px) {
+  .mobile-links-container {
+    max-width: 533px;
+    padding: 2em;
+  }
+  .sales-container {
+    max-width: 533px;
+    padding: 0;
+    display: block
+  }
+  .desktop-links-container{
+    display: none;
+  }
+}
+/* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 600px) {
   .mobile-links-container {
     max-width: 533px;
@@ -267,6 +300,7 @@ section:nth-child(2) {
   .sales-container {
     max-width: 533px;
     padding: 0;
+    display: block
   }
   .desktop-links-container{
     display: none;
@@ -283,7 +317,7 @@ section:nth-child(2) {
   .sales-container {
     max-width: 533px;
     padding: 0;
-    display: none;
+    display: block
   }
   .desktop-links-container{
     display: inline;
@@ -299,8 +333,17 @@ section:nth-child(2) {
   .sales-container {
     max-width: 533px;
     padding: 0;
+    display: block
   }
   .desktop-links-container{
-    display: block;
+    display: inline;
+  }
+  .card:hover {
+    transform: scale(1.1);
+    /* Start the shake animation and make the animation last for 0.5 seconds */
+    animation: shake 0.5s;
+  
+    /* When the animation is finished, start again */
+    animation-iteration-count: infinite;
   }
 }
