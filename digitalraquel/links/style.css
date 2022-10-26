@@ -127,7 +127,7 @@ a{
   flex-direction: column;
   padding: 0px;
   padding-bottom: 10px;
-  max-width: 200px;
+  max-width: fit-content;
 }
 .card-image-left{
   width: 150px;
@@ -240,11 +240,13 @@ section:nth-child(2) {
   margin: auto;
   row-gap: 5px;
   column-gap: 25px;
-  max-width: max-content;
+  max-width: fit-content;
   margin-bottom: 200px;
   
 }
-
+.desktop-links  .big-card{
+  max-width: 200px;
+}
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 300px) {
   .links-container {
