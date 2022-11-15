@@ -2,23 +2,21 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
-  :root{
-    --logo-width: 80px;
-    --logo-height: 80px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
   }
   body{
     background: whitesmoke;
     color: #333333;
   }
   .container{
-    height: 80vh;
+    height: 40vh;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     margin: auto;
     gap: 10px;
+    
 
   }
 
@@ -26,92 +24,47 @@
 .s, .k, .r {
   height: 80px;
   width: 80px;
+  border-left: 40px solid transparent;
+	border-right: 40px solid transparent;
+	border-bottom: 80px solid hotpink;
 
+}
+.letter{
+  color: whitesmoke;
+  font-size: 85px;
+  margin-left: -15px;
+  margin-top: 0px;
+}
+
+#description{
+  padding: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 24px;
 }
 
 
 
-.s-upper{
-  background-color: red;
-  width: 80px;
-  height: 40px;
-  border-bottom-left-radius: 50px;
-  border-top-left-radius: 50px;
-
-}
-.s-lower{
-  background-color: #333333;
-  width: 80px;
-  height: 40px;
-  border-bottom-right-radius: 50px;
-  border-top-right-radius: 50px;
-
-}
-.k{
-  position: relative;
-}
-.k-upper{
-  width: 0;
-  height: 0;
-	border-top: 0px solid transparent;
-	border-left: 80px solid red;
-	border-bottom: 80px solid transparent;
- position: absolute
-}
-.k-lower{
-	width: 0;
-	height: 0;
-	border-left: 0px solid transparent;
-	border-right: 80px solid transparent;
-	border-bottom: 80px solid #333333;  
-  z-index: -1;
-
-}
-.r {
-  position: relative;
-}
-.r-upper{
-  position: absolute;
-  background-color: #333333;
-  width: 80px;
-  height: 40px;
-  border-bottom-right-radius: 50px;
-  border-top-right-radius: 50px;
-  z-index: -1;
 
 
-}
-.r-lower{
-  width: 0;
-	height: 0;
-	border-right: 80px solid transparent;
-	border-bottom: 80px solid red;
-
-}
-
-.animation-s1 {
+.animation-s {
   position: relative;
   animation: from-left 2s ;
+
 }
-.animation-s2 {
+
+.animation-k {
   position: relative;
-  animation: from-left 3s ;
-}
-.animation-k1 {
-  position: absolute;
   animation: from-top 2s ;
+
 }
-.animation-k2 {
-  position: absolute;
-  animation: from-bottom 3s ;
-}
-.animation-r1 {
-  position: absolute;
+.animation-r {
+  position: relative;
   animation: from-right 2s ;
-}
-.animation-r2 {
-  position: absolute;
-  animation: from-right 3s ;
+
 }
 
 @keyframes from-left {
@@ -159,23 +112,29 @@
   }
 }
 
+.rotate{
+  animation: spin 5s infinite linear;
+}
+@keyframes spin {
+ 0% {
+    transform: rotate(0deg)
+  }
+  100% {
+    transform: rotate(360deg)
+  }
+}
+#btn{
+  color: white;
+padding: 15px;
+border: none;
+background-color: #333333;
+border-radius: 10px;
+height: 80px;
+}
 
-#btn1{
-  color: white;
-padding: 15px;
-border: none;
-background-color: #333333;
-border-radius: 10px;
-}
-#btn2{
-  color: white;
-padding: 15px;
-border: none;
-background-color: #333333;
-border-radius: 10px;
-}
 
 .controls{
+  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
