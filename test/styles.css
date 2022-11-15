@@ -1,0 +1,183 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  :root{
+    --logo-width: 80px;
+    --logo-height: 80px;
+  }
+  body{
+    background: whitesmoke;
+    color: #333333;
+  }
+  .container{
+    height: 80vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    gap: 10px;
+
+  }
+
+
+.s, .k, .r {
+  height: 80px;
+  width: 80px;
+
+}
+
+
+
+.s-upper{
+  background-color: red;
+  width: 80px;
+  height: 40px;
+  border-bottom-left-radius: 50px;
+  border-top-left-radius: 50px;
+
+}
+.s-lower{
+  background-color: #333333;
+  width: 80px;
+  height: 40px;
+  border-bottom-right-radius: 50px;
+  border-top-right-radius: 50px;
+
+}
+.k{
+  position: relative;
+}
+.k-upper{
+  width: 0;
+  height: 0;
+	border-top: 0px solid transparent;
+	border-left: 80px solid red;
+	border-bottom: 80px solid transparent;
+ position: absolute
+}
+.k-lower{
+	width: 0;
+	height: 0;
+	border-left: 0px solid transparent;
+	border-right: 80px solid transparent;
+	border-bottom: 80px solid #333333;  
+  z-index: -1;
+
+}
+.r {
+  position: relative;
+}
+.r-upper{
+  position: absolute;
+  background-color: #333333;
+  width: 80px;
+  height: 40px;
+  border-bottom-right-radius: 50px;
+  border-top-right-radius: 50px;
+  z-index: -1;
+
+
+}
+.r-lower{
+  width: 0;
+	height: 0;
+	border-right: 80px solid transparent;
+	border-bottom: 80px solid red;
+
+}
+
+.animation-s1 {
+  position: relative;
+  animation: from-left 2s ;
+}
+.animation-s2 {
+  position: relative;
+  animation: from-left 3s ;
+}
+.animation-k1 {
+  position: absolute;
+  animation: from-top 2s ;
+}
+.animation-k2 {
+  position: absolute;
+  animation: from-bottom 3s ;
+}
+.animation-r1 {
+  position: absolute;
+  animation: from-right 2s ;
+}
+.animation-r2 {
+  position: absolute;
+  animation: from-right 3s ;
+}
+
+@keyframes from-left {
+  0%,
+  100% {
+    right: 0px;
+  }
+
+  0% {
+    
+    right: 200px;
+  }
+}
+@keyframes from-right {
+  0%,
+  100% {
+    left: 0px;
+  }
+
+  0% {
+    
+    left: 200px;
+  }
+}
+@keyframes from-top {
+  0%,
+  100% {
+    top: 0px;
+  }
+
+  0% {
+    
+    top: 200px;
+  }
+}
+@keyframes from-bottom {
+  0%,
+  100% {
+    bottom: 0px;
+  }
+
+  0% {
+    
+    bottom: 200px;
+  }
+}
+
+
+#btn1{
+  color: white;
+padding: 15px;
+border: none;
+background-color: #333333;
+border-radius: 10px;
+}
+#btn2{
+  color: white;
+padding: 15px;
+border: none;
+background-color: #333333;
+border-radius: 10px;
+}
+
+.controls{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
