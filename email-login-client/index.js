@@ -10,7 +10,7 @@ loginButton.addEventListener("click", (e) => {
 
     if (username === "user" && password === "password") {
         alert("You have successfully logged in.");
-        window.location.href("https://stickyricesoftware.github.io/email-login-client/home.html");
+        window.location.relocation("https://stickyricesoftware.github.io/email-login-client/home.html");
     } else {
         loginErrorMsg.style.opacity = 1;
     }
