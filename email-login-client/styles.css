@@ -106,3 +106,25 @@ body {
 }
 
 
+.email-window{
+min-width: 90%;
+min-height: 90vh;
+background-color: white;
+}
+
+.email-window-header{
+  background-color: grey;
+  min-height: 5vh;
+}
+
+.email-window-body{
+  background-color: red;
+  min-height: 80vh;
+  display: flex;
+align-items: center;
+justify-content: center;
+}
+.email-window-footer{
+  background-color: yellow;
+  min-height: 5vh;
+}
