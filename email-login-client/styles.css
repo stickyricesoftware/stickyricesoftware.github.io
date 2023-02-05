@@ -16,10 +16,8 @@
   --colourEight: #caf0f8;
 }
 
-
 html {
   height: 100%;
-  
 }
 body {
   height: 100%;
@@ -30,7 +28,6 @@ body {
   align-items: center;
   background-color: #3a3a3a;
   background-image: url("/email-login-client/Houses-Parliament-Big-Ben-London(1).jpg");
-  
 }
 
 #main-holder {
@@ -100,31 +97,56 @@ body {
   cursor: pointer;
   outline: none;
 }
-.material-icons{
-  font-size: 100px !important;
-  color: var(--colourOne);
+.material-icons {
+  font-size: 36 !important;
+  color: black;
 }
 
-
-.email-window{
-min-width: 90%;
-min-height: 90vh;
-background-color: white;
+.email-window {
+  min-width: 90%;
+  min-height: 90vh;
+  background-color: white;
 }
 
-.email-window-header{
-  background-color: grey;
+.email-window-header {
+  display: grid;
+  grid-template-columns: 95% 5%;
+  background-color: white;
   min-height: 5vh;
+  padding: 10px;
 }
 
-.email-window-body{
-  background-color: red;
+.email-window-body {
+  background-color: white;
   min-height: 80vh;
-  display: flex;
-align-items: center;
-justify-content: center;
+  display: grid;
+  grid-template-columns: 5% 95%;
 }
-.email-window-footer{
+
+.email-menu{
+  display: flex;
+  flex-direction: column;
+}
+.emails{
+  background-color: white;
+}
+.email-window-footer {
   background-color: yellow;
   min-height: 5vh;
+}
+
+ul{
+  list-style: none;
+  
+}
+
+li{
+  padding: 10px;
+}
+
+.email-list {
+  display: grid;
+  grid-template-columns: 5% 5% 80% 5%;
+  padding-left: 2em;
+  border-bottom: 1px grey solid;
 }
