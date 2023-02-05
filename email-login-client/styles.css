@@ -34,7 +34,7 @@ body {
   width: 50%;
   height: 70%;
   display: grid;
-  grid-template-rows: 45% 10% 45%;
+  grid-template-rows: 40% 20% 40%;
   justify-items: center;
   align-items: center;
   background-color: white;
@@ -71,10 +71,12 @@ body {
   display: grid;
   justify-items: center;
   align-items: center;
+  min-width: 80%;
 }
 
 .login-form-field::placeholder {
   color: #3a3a3a;
+
 }
 
 .login-form-field {
@@ -82,8 +84,11 @@ body {
   border-bottom: 1px solid #3a3a3a;
   margin-bottom: 10px;
   border-radius: 3px;
+  min-height: 50px;
   outline: none;
   padding: 0px 0px 5px 5px;
+  width: 100%;
+  
 }
 
 #login-form-submit {
@@ -91,12 +96,15 @@ body {
   padding: 7px;
   border: none;
   border-radius: 5px;
+  min-height: 50px;
   color: white;
   font-weight: bold;
   background-color: #3a3a3a;
   cursor: pointer;
   outline: none;
 }
+
+
 .material-icons {
   font-size: 36 !important;
   color: black;
