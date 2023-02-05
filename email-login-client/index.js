@@ -15,3 +15,20 @@ loginButton.addEventListener("click", (e) => {
         loginErrorMsg.style.opacity = 1;
     }
 })
+
+function emailOne() {
+ alert('email one')
+}
+function emailTwo() {
+  alert('email two')
+ }
+ function emailThree() {
+  alert('email three')
+ }
+ function emailFour() {
+  alert('email four')
+ }
+ function emailFive() {
+  alert('email five')
+ }
+
