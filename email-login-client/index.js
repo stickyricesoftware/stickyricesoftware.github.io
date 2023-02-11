@@ -17,6 +17,8 @@ loginButton.addEventListener("click", (e) => {
   }
 });
 
+
+//EMAILS
 function emailOne() {
   var modal = document.getElementById("email1");
   var span = document.getElementsByClassName("close")[0];
