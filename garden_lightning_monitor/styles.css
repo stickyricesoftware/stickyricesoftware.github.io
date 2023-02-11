@@ -7,136 +7,16 @@
   body{
     background: whitesmoke;
     color: #333333;
-  }
-  .container{
-    height: 40vh;
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin: auto;
-    gap: 10px;
-    
-
   }
-
-
-.s, .k, .r {
-  height: 80px;
-  width: 80px;
-  border-left: 40px solid transparent;
-	border-right: 40px solid transparent;
-	border-bottom: 80px solid hotpink;
-
-}
-.letter{
-  color: whitesmoke;
-  font-size: 85px;
-  margin-left: -15px;
-  margin-top: 0px;
-}
-
-#description{
+.card{
+  width: 90%;
+  background-color: white;
+  text-align: center;
+  border: 1px solid black;
+  border-radius: 25px;
   padding: 20px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 24px;
-}
-
-
-
-
-
-.animation-s {
-  position: relative;
-  animation: from-left 2s ;
-
-}
-
-.animation-k {
-  position: relative;
-  animation: from-top 2s ;
-
-}
-.animation-r {
-  position: relative;
-  animation: from-right 2s ;
-
-}
-
-@keyframes from-left {
-  0%,
-  100% {
-    right: 0px;
-  }
-
-  0% {
-    
-    right: 200px;
-  }
-}
-@keyframes from-right {
-  0%,
-  100% {
-    left: 0px;
-  }
-
-  0% {
-    
-    left: 200px;
-  }
-}
-@keyframes from-top {
-  0%,
-  100% {
-    top: 0px;
-  }
-
-  0% {
-    
-    top: 200px;
-  }
-}
-@keyframes from-bottom {
-  0%,
-  100% {
-    bottom: 0px;
-  }
-
-  0% {
-    
-    bottom: 200px;
-  }
-}
-
-.rotate{
-  animation: spin 5s infinite linear;
-}
-@keyframes spin {
- 0% {
-    transform: rotate(0deg)
-  }
-  100% {
-    transform: rotate(360deg)
-  }
-}
-#btn{
-  color: white;
-padding: 15px;
-border: none;
-background-color: #333333;
-border-radius: 10px;
-height: 80px;
-}
-
-
-.controls{
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  box-shadow: 5px 10px #888888;
 }
