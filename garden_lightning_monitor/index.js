@@ -1,7 +1,7 @@
 var xhttp = new XMLHttpRequest();
-//const URL = "https://fpltoolbox-proxy.onrender.com/http://gardenschool.thormobile3.net/SE0148.xml?ms=" + Date.now()
+const URL = "https://fpltoolbox-proxy.onrender.com/http://gardenschool.thormobile3.net/SE0148.xml?ms=" + Date.now()
 
-const URL = "https://cors-anywhere.herokuapp.com/http://gardenschool.thormobile3.net/SE0148.xml?ms=" + Date.now()
+//const URL = "https://cors-anywhere.herokuapp.com/http://gardenschool.thormobile3.net/SE0148.xml?ms=" + Date.now()
 
 
 xhttp.onreadystatechange = function () {
