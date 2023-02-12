@@ -6,45 +6,47 @@
   }
   body{
     background: whitesmoke;
-    color: #333333;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
 
-  h6{
-    font-size: 0.5em;
-  }
-.card{
+.container{
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 20px;
-  width: 90%;
-  height: 40vh;
-  background-color: white;
-  text-align: center;
-  border: 1px solid black;
-  border-radius: 25px;
-  padding: 20px;
-  box-shadow: 5px 10px #888888;
+  max-width: 768px;
+  width: 100%;
+  padding-left: 10px;
+  
+}
+h6{
+  font-size: 1.5em;
+}
+.status-panel{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px
+}
+.activity-panel{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px
 }
 
-.stat{
-  border: 1px solid black;
+#tab-large{
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #7CEA9C;
 }
-.card-data{
-  font-size: 2em;
-  display: grid;
-  grid-template-columns: 25% 25% 25% 25%;
+
+.tab-small{
+  border-radius: 10px;
+  background-color: lightblue;
+  padding: 10px;
 }
-#alertText{
-  font-size: 3em;
-}
-.info{
-  padding: 20px;
-}
+
 @keyframes blink {50% { color: transparent }}
 .loader__dot { 
   font-size: 64px;
