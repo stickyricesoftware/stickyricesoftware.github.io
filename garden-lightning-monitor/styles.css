@@ -8,6 +8,7 @@
     background: whitesmoke;
     color: #333333;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
   }
@@ -41,7 +42,9 @@
 #alertText{
   font-size: 3em;
 }
-
+.info{
+  padding: 20px;
+}
 @keyframes blink {50% { color: transparent }}
 .loader__dot { 
   font-size: 64px;
