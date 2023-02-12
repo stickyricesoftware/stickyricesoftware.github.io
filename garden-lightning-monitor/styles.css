@@ -12,12 +12,21 @@
     align-items: center;
   }
 .card{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   margin: 20px;
   width: 90%;
+  height: 90vh;
   background-color: white;
   text-align: center;
   border: 1px solid black;
   border-radius: 25px;
   padding: 20px;
   box-shadow: 5px 10px #888888;
+}
+
+.card-data{
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
 }
