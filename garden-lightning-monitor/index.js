@@ -1,8 +1,12 @@
 var xhttp = new XMLHttpRequest();
+var xhttp1 = new XMLHttpRequest();
 const URL =
   "https://custom-proxy.onrender.com/http://gardenschool.thormobile3.net/SE0148.xml?ms=" +
   Date.now();
-//600000 = 10 minutes
+
+  console.log(Date.now() + "    " + (Date.now()-300000))
+//300000 = 5 minutes
+
 xhttp.onreadystatechange = function () {
   if (this.readyState == 4 && this.status == 200) {
     myFunction(this);
@@ -10,6 +14,8 @@ xhttp.onreadystatechange = function () {
 };
 xhttp.open("GET", URL, true);
 xhttp.send();
+
+
 
 function myFunction(xml) {
   console.log(xml.responseXML.all);
@@ -43,4 +49,3 @@ function myFunction(xml) {
   } //Red
 }
 
-//https://coolors.co/b3001b-7cea9c-cba328-797d81-279af1

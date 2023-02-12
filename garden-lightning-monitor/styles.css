@@ -34,12 +34,12 @@
   border: 1px solid black;
 }
 .card-data{
-  font-size: 3.5em;
+  font-size: 2em;
   display: grid;
   grid-template-columns: 25% 25% 25% 25%;
 }
 #alertText{
-  font-size: 5em;
+  font-size: 3em;
 }
 
 @keyframes blink {50% { color: transparent }}
