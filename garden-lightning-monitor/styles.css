@@ -11,13 +11,17 @@
     justify-content: center;
     align-items: center;
   }
+
+  h6{
+    font-size: 0.5em;
+  }
 .card{
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 20px;
   width: 90%;
-  height: 90vh;
+  height: 40vh;
   background-color: white;
   text-align: center;
   border: 1px solid black;
@@ -26,7 +30,21 @@
   box-shadow: 5px 10px #888888;
 }
 
+.stat{
+  border: 1px solid black;
+}
 .card-data{
+  font-size: 3.5em;
   display: grid;
   grid-template-columns: 25% 25% 25% 25%;
 }
+#alertText{
+  font-size: 5em;
+}
+
+@keyframes blink {50% { color: transparent }}
+.loader__dot { 
+  font-size: 64px;
+  animation: 1s blink infinite }
+.loader__dot:nth-child(2) { animation-delay: 250ms }
+.loader__dot:nth-child(3) { animation-delay: 500ms }
