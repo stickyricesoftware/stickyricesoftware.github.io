@@ -21,8 +21,8 @@ function myFunction(xml) {
   console.log(xml.responseXML.all);
   const school = xml.responseXML.all[03].innerHTML;
   
-  const ad = xml.responseXML.all[23].innerHTML;
-  //const ad = 6
+  //const ad = xml.responseXML.all[23].innerHTML;
+  const ad = 1 
   
   const di = xml.responseXML.all[24].innerHTML;  
 
@@ -60,10 +60,10 @@ function myFunction(xml) {
     document.getElementById("status-text").innerHTML = "RED ALERT";
   } //Red
   if(ad == 0){
-    document.getElementById("bar-data").innerHTML = ''
+    
   }
+
   document.getElementById("bar-data").style.width = (100-(ad*10)) + "%"
-  console.log((100-(ad*10)))
   document.getElementById("bar-text").innerHTML = 'When the bar is completely green, an "All Clear" will be signaled';
   
 }
