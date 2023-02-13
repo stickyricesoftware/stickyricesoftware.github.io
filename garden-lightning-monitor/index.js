@@ -20,7 +20,10 @@ xhttp.send();
 function myFunction(xml) {
   console.log(xml.responseXML.all);
   const school = xml.responseXML.all[03].innerHTML;
-  const ad = xml.responseXML.all[23].innerHTML;
+  
+  //const ad = xml.responseXML.all[23].innerHTML;
+  const ad = 8.9
+  
   const di = xml.responseXML.all[24].innerHTML;  
   const lhl = xml.responseXML.all[25].innerHTML;
   const fcc = xml.responseXML.all[26].innerHTML;
@@ -32,7 +35,7 @@ function myFunction(xml) {
   document.getElementById("fcc").innerText = fcc;
 
   if (di < 0.1) {
-    document.getElementById("tab-large").style.backgroundColor = "#7CEA9C";
+    //document.getElementById("tab-large").style.backgroundColor = "#7CEA9C";
     document.getElementById("status-text").innerHTML = "ALL CLEAR";
   } //Green
   if (di > 0 && di < 2.4) {

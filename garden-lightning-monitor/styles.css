@@ -47,28 +47,42 @@ h6 {
 #tab-large {
   border-radius: 10px;
   padding: 10px;
-  background-color: #7cea9c;
+  background: hsla(136, 82%, 72%, 1);
+
+  background: linear-gradient(90deg, hsla(136, 82%, 72%, 1) 0%, hsla(205, 84%, 36%, 1) 100%);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .tab-small {
   border-radius: 10px;
-  background: hsla(280, 84%, 41%, 1);
+background: hsla(214, 92%, 47%, 1);
 
-background: linear-gradient(90deg, hsla(280, 84%, 41%, 1) 0%, hsla(218, 97%, 56%, 1) 100%);
+background: linear-gradient(90deg, hsla(231, 85%, 24%, 1) 0%, hsla(214, 92%, 47%, 1) 100%);
   padding: 10px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .bar {
-  background-color: white;
+
 }
 .bar-data {
-  background: rgb(73, 191, 13);
-  background: linear-gradient(
-    90deg,
-    rgba(73, 191, 13, 1) 0%,
-    rgba(255, 0, 0, 1) 23%
-  );
+background-color: #FF0000;
 }
+
+.bar-scale{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.bar-scale-0{
+  text-align: left;
+  width: 50%;
+}
+.bar-scale-10{
+  text-align: right;
+  width: 50%;
+
 @keyframes blink {
   50% {
     color: transparent;
