@@ -62,6 +62,7 @@ h6 {
 }
 
 .bar {
+  background-color: whitesmoke;
 border-radius: 0px 0px 0px 0px;
 background-image: linear-gradient(to right, #943c22, #e01f2d);
 
@@ -74,6 +75,12 @@ background-image: linear-gradient(to right, #5da92f, #9bd46a);
 border-radius: 0px 0px 0px 0px;
 display: flex;
 flex-direction: row;
+
+animation: progressBar 3s ease-in-out;
+}
+
+#bar-text{
+  padding: 10px 0px 0px 0px;
 }
 
 .bar-scale{
@@ -104,4 +111,9 @@ flex-direction: row;
 }
 .loader__dot:nth-child(3) {
   animation-delay: 500ms;
+}
+
+@keyframes progressBar {
+  0% { width: 0; }
+  100% { width: 100%; }
 }
