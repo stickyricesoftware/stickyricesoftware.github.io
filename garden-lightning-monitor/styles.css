@@ -76,7 +76,7 @@ border-radius: 0px 0px 0px 0px;
 display: flex;
 flex-direction: row;
 
-animation: progressBar 3s ease-in-out;
+animation: progressBar 10s ease-in-out;
 }
 
 #bar-text{
