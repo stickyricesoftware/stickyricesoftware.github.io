@@ -64,7 +64,7 @@ function myFunction(xml) {
   }
 
   document.getElementById("bar-data").style.width = (100-(ad*10)) + "%"
-  document.getElementById("bar-text").innerHTML = 'When the bar is completely green, an "All Clear" will be signaled';
+  document.getElementById("bar-text").innerHTML = 'When the bar is completely green, an "All Clear" status will be signaled';
   
 }
 
