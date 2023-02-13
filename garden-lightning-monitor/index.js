@@ -1,10 +1,10 @@
 var xhttp = new XMLHttpRequest();
-var xhttp1 = new XMLHttpRequest();
+
 const URL =
   "https://custom-proxy.onrender.com/http://gardenschool.thormobile3.net/SE0148.xml?ms=" +
   Date.now();
 
-  console.log(Date.now() + "    " + (Date.now()-300000))
+//console.log(Date.now() + "    " + (Date.now()-300000))
 //300000 = 5 minutes
 
 xhttp.onreadystatechange = function () {
@@ -14,6 +14,7 @@ xhttp.onreadystatechange = function () {
 };
 xhttp.open("GET", URL, true);
 xhttp.send();
+
 
 
 
