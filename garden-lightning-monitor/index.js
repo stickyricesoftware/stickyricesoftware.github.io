@@ -67,3 +67,15 @@ function myFunction(xml) {
   
 }
 
+document.getElementById("lhl-info").addEventListener("click", function() {
+  alert("Percentage chance of lightning/amount of energy within your outer range (12 mile default)")
+});
+document.getElementById("di-info").addEventListener("click", function() {
+  alert("Percentage chance of lightning/amount of energy within your inner range (2 mile default)")
+});
+document.getElementById("ad-info").addEventListener("click", function() {
+  alert("Time since last discharge/lightning strike. Will count down from 10. At zero, an 'All Clear' will be signaled")
+});
+document.getElementById("fcc-info").addEventListener("click", function() {
+  alert("This represents the number of discharges within outer range (12 mile default)")
+});
