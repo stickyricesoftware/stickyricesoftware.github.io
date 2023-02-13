@@ -2,7 +2,7 @@ const d = new Date();
 let day = d.getDay();
 
 //Only run on Fridays
-if (day == 0) {
+if (day == 5) {
   var xhttp = new XMLHttpRequest();
   const URL =
     "https://custom-proxy.onrender.com/http://gardenschool.thormobile3.net/SE0148.xml?ms=" +
