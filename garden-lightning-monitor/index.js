@@ -25,7 +25,7 @@ function myFunction(xml) {
   //const ad = 7.4
   
   const di = xml.responseXML.all[24].innerHTML;  
-  //const di = 3
+
   
   const lhl = xml.responseXML.all[25].innerHTML;
   const fcc = xml.responseXML.all[26].innerHTML;
