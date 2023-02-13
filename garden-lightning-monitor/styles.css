@@ -65,10 +65,13 @@ h6 {
   background-color: whitesmoke;
 border-radius: 0px 0px 0px 0px;
 background-image: linear-gradient(to right, #943c22, #e01f2d);
-
-
-
 }
+
+a {
+  text-decoration: none;
+color: #f8f8f8;
+}
+
 .bar-data {
 background-color: whitesmoke;
 background-image: linear-gradient(to right, #5da92f, #9bd46a);
