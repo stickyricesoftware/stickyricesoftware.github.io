@@ -22,7 +22,7 @@ function myFunction(xml) {
   const school = xml.responseXML.all[03].innerHTML;
   
   const ad = xml.responseXML.all[23].innerHTML;
-  //const ad = 2
+  //const ad = 7.4
   
   const di = xml.responseXML.all[24].innerHTML;  
   //const di = 3
@@ -59,7 +59,9 @@ function myFunction(xml) {
 
     document.getElementById("status-text").innerHTML = "RED ALERT";
   } //Red
-
+  if(ad == 0){
+    document.getElementById("bar-data").innerHTML = 'no_activity'
+  }
   document.getElementById("bar-data").style.width = (ad*10) + "%"
   document.getElementById("bar-text").innerHTML = 'Time since last discharge/lightning strike. Will count down from 10. At zero, an "All Clear" will be signaled';
   
