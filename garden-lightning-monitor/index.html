@@ -25,7 +25,10 @@
         <h6>Status</h6>
         <div class="status-panel">
           <div id="tab-large">
-            <div id="status-text"></div>
+            <span class="material-icons">info</span>
+            <div id="status-text">              <span class="loader__dot">.</span>
+              <span class="loader__dot">.</span>
+              <span class="loader__dot">.</span></div>
             <div id="school"></div>
           </div>
         </div>
@@ -35,7 +38,7 @@
         <div class="activity-panel">
           <div class="tab-small">
             <span class="material-icons">electric_bolt</span>
-            <div id="lhl">
+            <div id="lhl" class="data">
               <span class="loader__dot">.</span>
               <span class="loader__dot">.</span>
               <span class="loader__dot">.</span>
@@ -45,7 +48,7 @@
           </div>
           <div class="tab-small">
             <span class="material-icons">grade</span>
-            <div id="di">
+            <div id="di" class="data">
               <span class="loader__dot">.</span>
               <span class="loader__dot">.</span>
               <span class="loader__dot">.</span>
@@ -54,7 +57,7 @@
           </div>
           <div class="tab-small">
             <span class="material-icons">equalizer</span>
-            <div id="ad">
+            <div id="ad" class="data">
               <span class="loader__dot">.</span>
               <span class="loader__dot">.</span>
               <span class="loader__dot">.</span>
@@ -63,7 +66,7 @@
           </div>
           <div class="tab-small">
             <span class="material-icons">waves</span>
-            <div id="fcc">
+            <div id="fcc" class="data">
               <span class="loader__dot">.</span>
               <span class="loader__dot">.</span>
               <span class="loader__dot">.</span>
@@ -73,9 +76,15 @@
         </div>
       </section>
       <section>
-        <h6>DI</h6>
+        <h6>AD</h6>
         <div class="status-panel">
-          <div id="tab-large"></div>
+          <div id="tab-large">
+            <span class="material-icons">equalizer</span>
+            <div class="bar">
+              <div id="bar-data"" class="bar-data" style="height:2em;"></div>
+            </div>
+            <p class="detail">0 - 10</p>
+          </div>
         </div>
       </section>
       <section>
