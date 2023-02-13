@@ -22,8 +22,8 @@ function myFunction(xml) {
   console.log(xml.responseXML.all);
   const school = xml.responseXML.all[03].innerHTML;
   
-  //const ad = xml.responseXML.all[23].innerHTML;
-  const ad = 1 
+  const ad = xml.responseXML.all[23].innerHTML;
+  //const ad = 1 
   
   const di = xml.responseXML.all[24].innerHTML;  
 
