@@ -38,27 +38,30 @@ function myFunction(xml) {
 
   if (di < 0.1) {
     //document.getElementById("status-tab").style.background = "#7CEA9C";
+    document.getElementById("status-tab").style.backgroundImage = "linear-gradient(to right, #5da92f, #9bd46a)";
     document.getElementById("status-text").innerHTML = "ALL CLEAR";
   } //Green
   if (di > 0 && di < 2.4) {
-    document.getElementById("status-tab").style.background = "#797D81";
+    //document.getElementById("status-tab").style.background = "#797D81";
+    document.getElementById("status-tab").style.backgroundImage = "linear-gradient(to right, #000000, #797D81)";
     document.getElementById("status-text").innerHTML = "CAUTION";
     
   } //Grey
   if (di > 2.3 && di < 3.0) {
-    document.getElementById("status-tab").style.background = "#CBA328";
+    //document.getElementById("status-tab").style.background = "#CBA328";
+    document.getElementById("status-tab").style.backgroundImage = "linear-gradient(to right, #ec8235, #f4d941)";
+    
     document.getElementById("status-text").innerHTML = "WARNING";
   } //Yellow
   if (di > 2.9) {
-    document.getElementById("status-tab").style.background = "#B3001B";
+    //document.getElementById("status-tab").style.background = "#B3001B";
+    document.getElementById("status-tab").style.backgroundImage = "linear-gradient(to right, #943c22, #e01f2d)";
+
     document.getElementById("status-text").innerHTML = "RED ALERT";
   } //Red
-  if (ad > 0){
-    document.getElementById("bar-text").innerHTML = 'Time since last discharge/lightning strike. Will count down from 10. At zero, an "All Clear" will be signaled';
-  }
-  document.getElementById("bar-data").style.width = (ad*10) + "%"
 
+  document.getElementById("bar-data").style.width = (ad*10) + "%"
+  document.getElementById("bar-text").innerHTML = 'Time since last discharge/lightning strike. Will count down from 10. At zero, an "All Clear" will be signaled';
   
 }
 
-//
