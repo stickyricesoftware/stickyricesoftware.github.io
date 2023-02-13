@@ -79,3 +79,6 @@ document.getElementById("ad-info").addEventListener("click", function() {
 document.getElementById("fcc-info").addEventListener("click", function() {
   alert("This represents the number of discharges within outer range (12 mile default)")
 });
+document.getElementById("status-tab").addEventListener("click", function() {
+  alert("You are viewing Thor Guard Lightning Prediction data remotely. The Thor Guard Lightning Prediction data represented is meant only for a specific range. Do not interpret this data as life saving or life threatening since your location relative to the specified Thor Guard range is unknown to this program")
+});
