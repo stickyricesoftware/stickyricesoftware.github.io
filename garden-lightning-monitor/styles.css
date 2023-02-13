@@ -62,12 +62,16 @@ h6 {
 }
 
 .bar {
-border-radius: 10px;
+border-radius: 0px 0px 0px 0px;
+background-image: linear-gradient(to right, #943c22, #e01f2d);
+
+
 
 }
 .bar-data {
 background-color: whitesmoke;
-border-radius: 10px;
+background-image: linear-gradient(to right, #5da92f, #9bd46a);
+border-radius: 0px 0px 0px 0px;
 display: flex;
 flex-direction: row;
 }

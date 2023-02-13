@@ -22,7 +22,7 @@ function myFunction(xml) {
   const school = xml.responseXML.all[03].innerHTML;
   
   const ad = xml.responseXML.all[23].innerHTML;
-  //const ad = 7.4
+  //const ad = 6
   
   const di = xml.responseXML.all[24].innerHTML;  
 
@@ -60,10 +60,11 @@ function myFunction(xml) {
     document.getElementById("status-text").innerHTML = "RED ALERT";
   } //Red
   if(ad == 0){
-    document.getElementById("bar-data").innerHTML = 'no_activity'
+    document.getElementById("bar-data").innerHTML = ''
   }
-  document.getElementById("bar-data").style.width = (ad*10) + "%"
-  document.getElementById("bar-text").innerHTML = 'Time since last discharge/lightning strike. Will count down from 10. At zero, an "All Clear" will be signaled';
+  document.getElementById("bar-data").style.width = (100-(ad*10)) + "%"
+  console.log((100-(ad*10)))
+  document.getElementById("bar-text").innerHTML = 'When the bar is completely green, a an "All Clear" will be signaled';
   
 }
 
