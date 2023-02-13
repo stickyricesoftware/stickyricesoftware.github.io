@@ -36,6 +36,7 @@ h6 {
   display: grid;
   grid-template-columns: 1fr;
   gap: 5px;
+  color: whitesmoke;
 }
 .activity-panel {
   display: grid;
@@ -44,29 +45,32 @@ h6 {
   color: whitesmoke;
 }
 
-#tab-large {
+
+.status-tab {
   border-radius: 10px;
   padding: 10px;
-  background: hsla(136, 82%, 72%, 1);
-
-  background: linear-gradient(90deg, hsla(136, 82%, 72%, 1) 0%, hsla(205, 84%, 36%, 1) 100%);
+  background: hsla(231, 85%, 24%, 1);
+  background: linear-gradient(90deg, hsla(231, 85%, 24%, 1) 0%,  hsla(214, 92%, 47%, 1) 100%);
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .tab-small {
   border-radius: 10px;
-background: hsla(214, 92%, 47%, 1);
-
-background: linear-gradient(90deg, hsla(231, 85%, 24%, 1) 0%, hsla(214, 92%, 47%, 1) 100%);
+  background: hsla(231, 85%, 24%, 1);
+  background: linear-gradient(90deg, hsla(231, 85%, 24%, 1) 0%,  hsla(214, 92%, 47%, 1) 100%);
   padding: 10px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .bar {
+border-radius: 10px;
 
 }
 .bar-data {
-background-color: #FF0000;
+background-color: whitesmoke;
+border-radius: 10px;
+display: flex;
+flex-direction: row;
 }
 
 .bar-scale{
@@ -82,7 +86,7 @@ background-color: #FF0000;
 .bar-scale-10{
   text-align: right;
   width: 50%;
-
+}
 @keyframes blink {
   50% {
     color: transparent;
