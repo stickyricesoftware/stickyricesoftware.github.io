@@ -21,8 +21,6 @@ function myFunction(xml) {
   console.log(xml.responseXML.all);
   const school = xml.responseXML.all[03].innerHTML;
   const ad = xml.responseXML.all[23].innerHTML;
-
-
   const di = xml.responseXML.all[24].innerHTML;  
   const lhl = xml.responseXML.all[25].innerHTML;
   const fcc = xml.responseXML.all[26].innerHTML;
@@ -46,11 +44,10 @@ function myFunction(xml) {
     document.getElementById("status-text").innerHTML = "WARNING";
   } //Yellow
   if (di > 2.9) {
-    document.getElementById("tab-large").style.backgroundColor = "#B3001B";
+    document.getElementById("tab-large").style.background = "#B3001B";
     document.getElementById("status-text").innerHTML = "RED ALERT";
   } //Red
 
-  document.getElementById("bar-data").style.width = ad + "%"
+  document.getElementById("bar-data").style.width = (ad*10) + "%"
   
 }
-

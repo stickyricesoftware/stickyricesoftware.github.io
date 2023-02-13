@@ -41,6 +41,7 @@ h6 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 5px;
+  color: whitesmoke;
 }
 
 #tab-large {
@@ -51,7 +52,9 @@ h6 {
 
 .tab-small {
   border-radius: 10px;
-  background-color: lightblue;
+  background: hsla(280, 84%, 41%, 1);
+
+background: linear-gradient(90deg, hsla(280, 84%, 41%, 1) 0%, hsla(218, 97%, 56%, 1) 100%);
   padding: 10px;
 }
 
