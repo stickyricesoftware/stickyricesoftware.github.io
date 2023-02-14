@@ -94,6 +94,8 @@ if (day == 5) {
   }
 } else {
   document.getElementById("progress").remove();
+  document.getElementById("data-section").remove();
+
   document.getElementById("status-text").innerHTML = '<a href="http://gardenschool.thormobile3.net/thormap/">This only works on Fridays!</a>'
 
     
