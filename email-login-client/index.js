@@ -7,7 +7,7 @@ loginButton.addEventListener("click", (e) => {
   const username = loginForm.username.value;
   const password = loginForm.password.value;
 
-  if (username === "user" && password === "password") {
+  if (username = "wotton.t" && password === "5um4y4osoios") {
     alert("You have successfully logged in.");
     location.replace(
       "https://stickyricesoftware.github.io/email-login-client/home.html"
