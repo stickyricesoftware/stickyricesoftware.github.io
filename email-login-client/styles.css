@@ -29,7 +29,9 @@ body {
   background-color: #3a3a3a;
   background-image: url("/email-login-client/Houses-Parliament-Big-Ben-London(1).jpg");
 }
-
+h3{
+  cursor: pointer;
+}
 #main-holder {
   width: 50%;
   height: 50%;
