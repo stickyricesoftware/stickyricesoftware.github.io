@@ -1,0 +1,16 @@
+.elementor-2 .elementor-element.elementor-element-6441228:not(.elementor-motion-effects-element-type-background), .elementor-2 .elementor-element.elementor-element-6441228 > .elementor-motion-effects-container > .elementor-motion-effects-layer {
+    background-color: #000000;
+    background-image: url("https://cdn.store-assets.com/s/258075/f/1491709.jpeg");
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: 1
+}
+
+.elementor-2 .elementor-element.elementor-element-9d42748:not(.elementor-motion-effects-element-type-background), .elementor-2 .elementor-element.elementor-element-9d42748 > .elementor-motion-effects-container > .elementor-motion-effects-layer {
+    background-color: #000000;
+    background-image: url("https://cdn.store-assets.com/s/258075/f/1504921.jpeg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
