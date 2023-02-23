@@ -1,9 +1,9 @@
 const quotes = [
   "Louis, I think this is the beginning of a beautiful content idea. - Casablanca (1942)",
-  "Show me the content idea! - Jerry Maguire (1996)",
+  "Show me the content! - Jerry Maguire (1996)",
   "You're gonna need a bigger content idea. - Jaws (1948)",
   "Keep your friends close, but your content ideas closer. - The God Father Part II (1974)",
-  "Say 'hello' to my little IG post! - Scarface (1983)",
+  "Say 'hello' to my little content idea! - Scarface (1983)",
   "A content idea. Shaken, not stirred. - Goldfinger (1964)",
   "I feel the need—the need for content! - Top Gun (1986)",
   "Nobody puts Content in a corner. - Dirty Dancing (1987)",
@@ -23,7 +23,7 @@ const events = [
     "day": "01",
     "month": "Jan",
     "type": "d",
-    "name": "pancake day",
+    "name": "sunny day",
     "education": "blah blah edu",
     "promo": "blah blah promo",
     "entertainment": "blah blah entertain",
@@ -139,7 +139,7 @@ events.forEach(e => {
   card.setAttribute("id",e.id);
   card.className += "card";
   weeksmonths.appendChild(card);
-  
+
   
     }
   
@@ -166,6 +166,17 @@ document.querySelectorAll('.card').forEach(function(item) {
         info.appendChild(card);
         info.scrollIntoView()
           }
+
+
+               
+
+
     });
   });
    });
+
+
+
+
+
+
