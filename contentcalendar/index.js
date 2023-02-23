@@ -19,6 +19,7 @@ q.appendChild(randomQuote);
 
 const events = [
   {
+    "id": 001,
     "day": "01",
     "month": "Jan",
     "type": "d",
@@ -28,6 +29,7 @@ const events = [
     "entertainment": "blah blah entertain",
   },
   {
+    "id": 002,
     "day": "01",
     "month": "Jan",
     "type": "d",
@@ -37,6 +39,7 @@ const events = [
     "entertainment": "blah blah entertain",
   },
   {
+    "id": 003,
     "day": "01",
     "month": "Jan",
     "type": "d",
@@ -46,6 +49,7 @@ const events = [
     "entertainment": "blah blah entertain",
   },
   {
+    "id": 004,
     "day": "01",
     "month": "Jan",
     "type": "d",
@@ -55,6 +59,7 @@ const events = [
     "entertainment": "blah blah entertain",
   },
   {
+    "id": 005,
     "day": "01",
     "month": "Jan",
     "type": "m",
@@ -64,6 +69,7 @@ const events = [
     "entertainment": "blah blah entertain",
   },
   {
+    "id": 006,
     "day": "01",
     "month": "Jan",
     "type": "d",
@@ -73,6 +79,7 @@ const events = [
     "entertainment": "blah blah entertain",
   },
   {
+    "id": 007,
     "day": "01",
     "month": "Jan",
     "type": "m",
@@ -82,6 +89,7 @@ const events = [
     "entertainment": "blah blah entertain",
   },
   {
+    "id": 007,
     "day": "01",
     "month": "Jan",
     "type": "w",
@@ -98,6 +106,7 @@ events.forEach(e => {
 const days = document.getElementById("days")
 const card = document.createElement("div");
 card.innerText = e.name;
+card.setAttribute("id",e.id);
 card.className += "card";
 days.appendChild(card);
 
@@ -112,6 +121,7 @@ if(e.type === "w"){
 const weeksmonths = document.getElementById("weeks")
 const card = document.createElement("div");
 card.innerText = e.name;
+card.setAttribute("id",e.id);
 card.className += "card";
 weeksmonths.appendChild(card);
 
@@ -126,6 +136,7 @@ events.forEach(e => {
   const weeksmonths = document.getElementById("months")
   const card = document.createElement("div");
   card.innerText = e.name;
+  card.setAttribute("id",e.id);
   card.className += "card";
   weeksmonths.appendChild(card);
   
@@ -134,4 +145,27 @@ events.forEach(e => {
   
     
   });
+// const eventName = document.getElementById("card")
+// document.addEventListener("click", () => {
+//   console.log(eventName)
+// })
 
+document.querySelectorAll('.card').forEach(function(item) {
+  
+  item.addEventListener('click', function() {
+    const info = document.getElementById("info").innerHTML = "<h2>Info</h2>"
+    events.forEach(e => {
+
+
+      if(item.innerHTML === e.name){
+        const info = document.getElementById("info")
+        const card = document.createElement("div");
+        card.innerText = e.name;
+        card.setAttribute("id",e.id);
+        card.className += "card";
+        info.appendChild(card);
+        info.scrollIntoView()
+          }
+    });
+  });
+   });
