@@ -1,51 +1,137 @@
-function myFunction1() {
-    const s1 = document.getElementById("s");
-    const k1 = document.getElementById("k");
-    const r1 = document.getElementById("r");
-    const randomColor = Math.floor(Math.random() * 16777215).toString(16);
-    s1.style.borderBottom = "80px solid " + "#" + randomColor;
-    k1.style.borderBottom = "80px solid " + "#" + randomColor;
-    r1.style.borderBottom = "80px solid " + "#" + randomColor;
-    console.log(randomColor);
+const quotes = [
+  "Louis, I think this is the beginning of a beautiful content idea. - Casablanca (1942)",
+  "Show me the content idea! - Jerry Maguire (1996)",
+  "You're gonna need a bigger content idea. - Jaws (1948)",
+  "Keep your friends close, but your content ideas closer. - The God Father Part II (1974)",
+  "Say 'hello' to my little IG post! - Scarface (1983)",
+  "A content idea. Shaken, not stirred. - Goldfinger (1964)",
+  "I feel the need—the need for content! - Top Gun (1986)",
+  "Nobody puts Content in a corner. - Dirty Dancing (1987)",
+  "A boy's best friend is his content idea. - Psycho (1960)"
+]
+
+const q = document.getElementById("quote")
+const randomQuote = document.createElement("p");
+randomQuote.innerText = quotes[Math.floor(Math.random()*quotes.length)];
+
+q.appendChild(randomQuote);
+
+
+const events = [
+  {
+    "day": "01",
+    "month": "Jan",
+    "type": "d",
+    "name": "pancake day",
+    "education": "blah blah edu",
+    "promo": "blah blah promo",
+    "entertainment": "blah blah entertain",
+  },
+  {
+    "day": "01",
+    "month": "Jan",
+    "type": "d",
+    "name": "bob day",
+    "education": "blah blah edu",
+    "promo": "blah blah promo",
+    "entertainment": "blah blah entertain",
+  },
+  {
+    "day": "01",
+    "month": "Jan",
+    "type": "d",
+    "name": "skr day",
+    "education": "blah blah edu",
+    "promo": "blah blah promo",
+    "entertainment": "blah blah entertain",
+  },
+  {
+    "day": "01",
+    "month": "Jan",
+    "type": "d",
+    "name": "ken day",
+    "education": "blah blah edu",
+    "promo": "blah blah promo",
+    "entertainment": "blah blah entertain",
+  },
+  {
+    "day": "01",
+    "month": "Jan",
+    "type": "m",
+    "name": "haribo month",
+    "education": "blah blah edu",
+    "promo": "blah blah promo",
+    "entertainment": "blah blah entertain",
+  },
+  {
+    "day": "01",
+    "month": "Jan",
+    "type": "d",
+    "name": "raquel day",
+    "education": "blah blah edu",
+    "promo": "blah blah promo",
+    "entertainment": "blah blah entertain",
+  },
+  {
+    "day": "01",
+    "month": "Jan",
+    "type": "m",
+    "name": "chocoloate month",
+    "education": "blah blah edu",
+    "promo": "blah blah promo",
+    "entertainment": "blah blah entertain",
+  },
+  {
+    "day": "01",
+    "month": "Jan",
+    "type": "w",
+    "name": "cat week",
+    "education": "blah blah edu",
+    "promo": "blah blah promo",
+    "entertainment": "blah blah entertain",
+  },
+]
+
+
+events.forEach(e => {
+  if(e.type === "d"){
+const days = document.getElementById("days")
+const card = document.createElement("div");
+card.innerText = e.name;
+card.className += "card";
+days.appendChild(card);
+
+
   }
-  function myFunction2() {
-    const s1 = document.getElementById("s");
-    const k1 = document.getElementById("k");
-    const r1 = document.getElementById("r");
-    s1.classList.add("rotate");
-    k1.classList.add("rotate");
-    r1.classList.add("rotate");
-    setTimeout(()=> {
-      s1.classList.remove("rotate");
-      k1.classList.remove("rotate");
-      r1.classList.remove("rotate");
-    }, 5000);
+
+  
+});
+
+events.forEach(e => {
+if(e.type === "w"){
+const weeksmonths = document.getElementById("weeks")
+const card = document.createElement("div");
+card.innerText = e.name;
+card.className += "card";
+weeksmonths.appendChild(card);
+
+
   }
-  function myFunction3() {
-    const d = document.getElementById("box");
-    const s1 = document.getElementById("letters");
-    const k1 = document.getElementById("letterk");
-    const r1 = document.getElementById("letterr");
-    if (d.style.backgroundColor == "black") {
-      d.style.backgroundColor = "whiteSmoke";
-      s1.style.color = "whiteSmoke"  
-      k1.style.color = "whiteSmoke" 
-      r1.style.color = "whiteSmoke"         
-    } else {
-      d.style.backgroundColor = "black";
-      s1.style.color = "black"  
-      k1.style.color = "black" 
-      r1.style.color = "black"  
+
+  
+});
+
+events.forEach(e => {
+  if(e.type === "m"){
+  const weeksmonths = document.getElementById("months")
+  const card = document.createElement("div");
+  card.innerText = e.name;
+  card.className += "card";
+  weeksmonths.appendChild(card);
+  
+  
     }
-  }
-  function myFunction4() {
-    const response = [
-      "Who pressed that? Was it you, K?",
-      "I know it was you, R!",
-      "The button literally says 'Do Not Press'",
-      "Absolutely shameless",
-      "Back to work please",
-      "Seriously? Again?",
-    ];
-    alert(response[Math.floor(Math.random() * 5)]);
-  }
+  
+    
+  });
+
