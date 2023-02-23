@@ -130,3 +130,10 @@
     border-color: #80cdc0;
 }
 
+.mobile_menu_wrapper {
+    background-color:#80cdc0;
+}
+
+.mobile_menu_wrapper li a {
+    color: #1A3853;
+}
