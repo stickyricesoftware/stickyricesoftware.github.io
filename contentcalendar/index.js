@@ -23,24 +23,28 @@ const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Sa
 const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 
-var optionsDay = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+var optionsDayandMonth = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 var today  = new Date();
 
 const dateDiv = document.getElementById("date");
 const dateNow = document.createElement("p");
-dateNow.innerText = today.toLocaleDateString("en-US", optionsDay)
+dateNow.innerText = today.toLocaleDateString("en-US", optionsDayandMonth)
 
 dateDiv.appendChild(dateNow);
 
 var optionsMonth = { month: 'long',};
-document.getElementById("display-month").innerHTML = today.toLocaleDateString("en-US", optionsMonth); 
+var formattedMonth = today.toLocaleDateString("en-US", optionsMonth); 
+document.getElementById("display-month").innerHTML = formattedMonth
+
+var optionsDay = { day: 'numeric' };
+var formattedDay = today.toLocaleDateString("en-US", optionsDay); 
 
 
 const events = [
   {
     id: 001,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "d",
     name: "World Tapir Day",
     education:
@@ -52,8 +56,8 @@ const events = [
   },
   {
     id: 002,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "d",
     name: "Tell A Story Day",
     education:
@@ -65,8 +69,8 @@ const events = [
   },
   {
     id: 003,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "d",
     name: "Geologist Day",
     education:
@@ -78,8 +82,8 @@ const events = [
   },
   {
     id: 004,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "d",
     name: "National Tea Day",
     education:
@@ -91,8 +95,8 @@ const events = [
   },
   {
     id: 005,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "m",
     name: "Stress Awareness Month",
     education:
@@ -104,8 +108,8 @@ const events = [
   },
   {
     id: 006,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "w",
     name: "Go Diaper Free Week",
     education:
@@ -117,8 +121,8 @@ const events = [
   },
   {
     id: 007,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "w",
     name: "Coin Week",
     education:
@@ -130,8 +134,8 @@ const events = [
   },
   {
     id: 008,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "w",
     name: "National Stationery Week",
     education:
@@ -143,8 +147,8 @@ const events = [
   },
   {
     id: 009,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "m",
     name: "National Poetry Month",
     education:
@@ -156,8 +160,8 @@ const events = [
   },
   {
     id: 010,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "m",
     name: "National Jazz Appreciation Month",
     education:
@@ -169,8 +173,8 @@ const events = [
   },
   {
     id: 011,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "d",
     name: "World Cat Day",
     education:
@@ -182,8 +186,8 @@ const events = [
   },
   {
     id: 012,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "d",
     name: "World Dog Day",
     education:
@@ -195,8 +199,8 @@ const events = [
   },
   {
     id: 013,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "m",
     name: "National Car Month",
     education:
@@ -208,8 +212,8 @@ const events = [
   },
   {
     id: 014,
-    day: "01",
-    month: "Jan",
+    day: formattedDay,
+    month: formattedMonth,
     type: "m",
     name: "National Bike Month",
     education:
