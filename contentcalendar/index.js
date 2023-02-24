@@ -14,8 +14,23 @@ const quotes = [
 const q = document.getElementById("quote");
 const randomQuote = document.createElement("p");
 randomQuote.innerText = quotes[Math.floor(Math.random() * quotes.length)];
-
 q.appendChild(randomQuote);
+
+const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const dayToday = new Date();
+
+
+const dateDiv = document.getElementById("date");
+const dateNow = document.createElement("p");
+dateNow.innerText = dayToday
+
+dateDiv.appendChild(dateNow);
+
+
+
+
 
 const events = [
   {
@@ -203,15 +218,18 @@ document.querySelectorAll(".card").forEach(function (item) {
         eventIdeas.innerHTML = "";
         ideaOption.innerHTML = "";
         const promoButton = document.createElement("button");
-        promoButton.setAttribute("class", "material-icons");
+        // promoButton.setAttribute("class", "material-icons");
         const eduButton = document.createElement("button");
-        eduButton.setAttribute("class", "material-icons");
+        // eduButton.setAttribute("class", "material-icons");
         const entertainmentButton = document.createElement("button");
-        entertainmentButton.setAttribute("class", "material-icons");
+        // entertainmentButton.setAttribute("class", "material-icons");
 
-        promoButton.innerHTML = "menu_book";
-        eduButton.innerHTML = "paid";
-        entertainmentButton.innerHTML = "movie";
+        // promoButton.innerHTML = "paid";
+        // eduButton.innerHTML = "menu_book";
+        // entertainmentButton.innerHTML = "movie";
+        promoButton.innerHTML = "💵";
+        eduButton.innerHTML = "📚";
+        entertainmentButton.innerHTML = "🎥";
 
         promoButton.onclick = function () {
           eventIdeas.innerHTML = "Promotional Idea: " + e.promo
@@ -225,10 +243,6 @@ document.querySelectorAll(".card").forEach(function (item) {
         ideaOption.append(promoButton);
         ideaOption.append(eduButton);
         ideaOption.append(entertainmentButton);
-
-        // ideaOption.innerHTML = "<button onClick='idea()'><span class='material-icons'>menu_book</span></button>" +
-        // "<button><span class='material-icons'>paid</span></button>" +
-        // "<button><span class='material-icons'>movie</span></button>"
 
         eventInfo.append(e.day + " " + e.month);
         eventDescription.append(
@@ -245,20 +259,12 @@ document.querySelectorAll(".card").forEach(function (item) {
 });
 
 function openModal() {
-  // Get the modal
   var modal = document.getElementById("myModal");
-
-  // Get the <span> element that closes the modal
   var span = document.getElementsByClassName("close")[0];
-
   modal.style.display = "block";
-
-  // When the user clicks on <span> (x), close the modal
   span.onclick = function () {
     modal.style.display = "none";
   };
-
-  // When the user clicks anywhere outside of the modal, close it
   window.onclick = function (event) {
     if (event.target == modal) {
       modal.style.display = "none";
