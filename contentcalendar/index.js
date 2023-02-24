@@ -9,7 +9,6 @@ const quotes = [
   "Nobody puts Content in a corner. - Dirty Dancing (1987)",
   "A boy's best friend is his content idea. - Psycho (1960)",
   "I'm going to make him a content idea he can't refuse. - The God Father (1972)",
-
 ];
 
 const q = document.getElementById("quote");
@@ -189,27 +188,59 @@ events.forEach((e) => {
   }
 });
 
-
 document.querySelectorAll(".card").forEach(function (item) {
   item.addEventListener("click", function () {
     events.forEach((e) => {
       if (item.innerHTML === e.name) {
-        const eventInfo = document.getElementById("event-info")
-        const eventDescription = document.getElementById("event-description")
-        const eventTitle = document.getElementById("event-title")
-        const eventIdeas = document.getElementById("event-ideas")
-        const ideaOption = document.getElementById("idea-option")
-        eventInfo.innerHTML = ""
-        eventDescription.innerHTML = ""
-        eventTitle.innerHTML = ""
-        eventIdeas.innerHTML = ""
-        ideaOption.innerHTML = "<button>EDUCATION</button><button>PROMOTIONAL</button><button>ENTERTAINMENT</button>"
-        eventInfo.append(e.day + " " + e.month)
-        eventDescription.append(e.name + " is Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate." )
-        eventTitle.append(e.name)
+        const eventInfo = document.getElementById("event-info");
+        const eventDescription = document.getElementById("event-description");
+        const eventTitle = document.getElementById("event-title");
+        const eventIdeas = document.getElementById("event-ideas");
+        const ideaOption = document.getElementById("idea-option");
+        eventInfo.innerHTML = "";
+        eventDescription.innerHTML = "";
+        eventTitle.innerHTML = "";
+        eventIdeas.innerHTML = "";
+        ideaOption.innerHTML = "";
+        const promoButton = document.createElement("button");
+        promoButton.setAttribute("class", "material-icons");
+        const eduButton = document.createElement("button");
+        eduButton.setAttribute("class", "material-icons");
+        const entertainmentButton = document.createElement("button");
+        entertainmentButton.setAttribute("class", "material-icons");
+
+        promoButton.innerHTML = "menu_book";
+        eduButton.innerHTML = "paid";
+        entertainmentButton.innerHTML = "movie";
+
+        promoButton.onclick = function () {
+          eventIdeas.innerHTML = "Promotional Idea: " + e.promo
+        };
+        eduButton.onclick = function () {
+          eventIdeas.innerHTML = "Educational Idea: " + e.education
+        };
+        entertainmentButton.onclick = function () {
+          eventIdeas.innerHTML = "Entertainment: " + e.entertainment
+        };
+        ideaOption.append(promoButton);
+        ideaOption.append(eduButton);
+        ideaOption.append(entertainmentButton);
+
+        // ideaOption.innerHTML = "<button onClick='idea()'><span class='material-icons'>menu_book</span></button>" +
+        // "<button><span class='material-icons'>paid</span></button>" +
+        // "<button><span class='material-icons'>movie</span></button>"
+
+        eventInfo.append(e.day + " " + e.month);
+        eventDescription.append(
+          e.name +
+            " is Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate."
+        );
+        eventTitle.append(e.name);
         openModal();
       }
     });
+
+
   });
 });
 
