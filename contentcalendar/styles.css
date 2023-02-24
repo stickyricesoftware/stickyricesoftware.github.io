@@ -88,9 +88,17 @@ header{
 border-radius: 15px;
   padding: 20px;
   margin-bottom: 5px;
+
+}
+.day{
   background-color: var(--green);
 }
-
+.week{
+  background-color: var(--pink);
+}
+.month{
+  background-color: var(--light-blue);
+}
 
 #event-info{
 
