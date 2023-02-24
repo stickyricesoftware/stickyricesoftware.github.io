@@ -22,22 +22,17 @@ body {
   min-height: 60px;
   border: 1px solid black;
 }
+
+/* Create two equal columns that floats next to each other */
 .column1 {
   float: left;
-  width: 30%;
+  width: 60%;
   padding: 10px;
   margin-bottom: 10px;
 }
-/* Create two equal columns that floats next to each other */
 .column2 {
   float: left;
   width: 40%;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-.column3 {
-  float: left;
-  width: 30%;
   padding: 10px;
   margin-bottom: 10px;
 }
