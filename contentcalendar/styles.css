@@ -5,7 +5,7 @@
   --yellow: #F5D560;
   --green: #47888E;
   --dark-blue: #1375B2;
-  --black: #343A3C
+  --black: #343A3C;
 }
 * {
   margin: 0;
@@ -14,18 +14,24 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 body {
-  background: whitesmoke;
-  color: #333333;
+  background: var(--black);
+  color: whitesmoke;
 }
 #calendar{
-  background-color: red;
   width: 100%;
-  min-height: 50vh;
+}
+.nav{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50%;
 }
 .days-of-the-month{
   display: grid;
   grid-template-columns: auto auto auto auto auto auto auto;
   padding: 10px;
+  background-color: var(--yellow);
+  color: var(--black);
 }
 .each-day{
   min-height: 60px;
@@ -70,6 +76,7 @@ body {
 border-radius: 15px;
   padding: 20px;
   margin-bottom: 5px;
+  background-color: var(--green);
 }
 
 
@@ -99,7 +106,7 @@ font-size: 2em;
 
 /* Modal Content/Box */
 .modal-content {
-  background-color: #fefefe;
+  background-color: var(--black);
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
   border: 1px solid #888;

@@ -8,6 +8,8 @@ const quotes = [
   "I feel the need—the need for content! - Top Gun (1986)",
   "Nobody puts Content in a corner. - Dirty Dancing (1987)",
   "A boy's best friend is his content idea. - Psycho (1960)",
+  "I'm going to make him a content idea he can't refuse. - The God Father (1972)",
+
 ];
 
 const q = document.getElementById("quote");
