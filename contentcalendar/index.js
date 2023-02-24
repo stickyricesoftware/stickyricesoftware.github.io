@@ -7,7 +7,7 @@ const quotes = [
   "A content idea. Shaken, not stirred. - Goldfinger (1964)",
   "I feel the need—the need for content! - Top Gun (1986)",
   "Nobody puts Content in a corner. - Dirty Dancing (1987)",
-  "A boy's best friend is his content idea. - Psycho (1960)",
+  "A boy's best friend is his content calendar. - Psycho (1960)",
   "I'm going to make him a content idea he can't refuse. - The God Father (1972)",
 ];
 
@@ -19,17 +19,18 @@ q.appendChild(randomQuote);
 const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-const dayToday = new Date();
 
+var optionsDay = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+var today  = new Date();
 
 const dateDiv = document.getElementById("date");
 const dateNow = document.createElement("p");
-dateNow.innerText = dayToday
+dateNow.innerText = today.toLocaleDateString("en-US", optionsDay)
 
 dateDiv.appendChild(dateNow);
 
-
-
+var optionsMonth = { month: 'long',};
+document.getElementById("display-month").innerHTML = today.toLocaleDateString("en-US", optionsMonth); 
 
 
 const events = [
@@ -204,7 +205,9 @@ events.forEach((e) => {
 });
 
 document.querySelectorAll(".card").forEach(function (item) {
-  item.addEventListener("click", function () {
+
+    //item.style.backgroundImage="url(https://picsum.photos/200/300)"; // specify the image path here
+  item.addEventListener("click", function () {    
     events.forEach((e) => {
       if (item.innerHTML === e.name) {
         const eventInfo = document.getElementById("event-info");
