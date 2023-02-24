@@ -187,12 +187,13 @@ document.querySelectorAll(".card").forEach(function (item) {
   item.addEventListener("click", function () {
     events.forEach((e) => {
       if (item.innerHTML === e.name) {
-        console.log(e)
-        const modal = document.getElementById("event-info")
-        modal.innerHTML = ""
-        modal.append(e.day + " " + e.month)
-        modal.append("\n" + e.name)
-
+        const eventInfo = document.getElementById("event-info")
+        const eventIdea = document.getElementById("event-idea")
+        eventInfo.innerHTML = ""
+        eventIdea.innerHTML = ""
+        eventInfo.append(e.day + " " + e.month)
+        eventInfo.append(e.name)
+        eventIdea.append(e.education)
         openModal();
       }
     });
