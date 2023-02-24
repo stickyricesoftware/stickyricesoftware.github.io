@@ -9,6 +9,9 @@ const quotes = [
   "Nobody puts Content in a corner. - Dirty Dancing (1987)",
   "A boy's best friend is his content calendar. - Psycho (1960)",
   "I'm going to make him a content idea he can't refuse. - The God Father (1972)",
+  "Reach for the content calendar!. - Toy Story (1995)",
+  "All we have to decide is what to do with the content idea that is given to us. - The Fellowship of the Ring (2001)",
+
 ];
 
 const q = document.getElementById("quote");
