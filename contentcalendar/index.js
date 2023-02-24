@@ -197,13 +197,13 @@ document.querySelectorAll(".card").forEach(function (item) {
         const eventInfo = document.getElementById("event-info")
         const eventDescription = document.getElementById("event-description")
         const eventTitle = document.getElementById("event-title")
-        const eventIdea = document.getElementById("event-idea")
+        const eventIdeas = document.getElementById("event-ideas")
         const ideaOption = document.getElementById("idea-option")
         eventInfo.innerHTML = ""
         eventDescription.innerHTML = ""
         eventTitle.innerHTML = ""
-        eventIdea.innerHTML = ""
-        ideaOption.innerHTML = ""
+        eventIdeas.innerHTML = ""
+        ideaOption.innerHTML = "<button>EDUCATION</button><button>PROMOTIONAL</button><button>ENTERTAINMENT</button>"
         eventInfo.append(e.day + " " + e.month)
         eventDescription.append(e.name + " is Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate." )
         eventTitle.append(e.name)

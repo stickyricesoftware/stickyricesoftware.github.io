@@ -19,6 +19,8 @@ body {
 }
 #calendar{
   width: 100%;
+  padding: 10px;
+
 }
 header{
   display: flex;
@@ -40,6 +42,7 @@ header{
   background-color: var(--yellow);
   color: var(--black);
   gap: 5px;
+  border-radius: 15px;
 }
 .each-day{
   display: flex;
@@ -98,6 +101,12 @@ border-radius: 15px;
 }
 .month{
   background-color: var(--light-blue);
+}
+
+
+button{
+  margin: 10px;
+  padding: 20px;
 }
 
 #event-info{
