@@ -1,3 +1,12 @@
+:root {
+  --pink: #F88372;
+  --light-blue: #78A9D2;
+  --grey: #C0C5CB;
+  --yellow: #F5D560;
+  --green: #47888E;
+  --dark-blue: #1375B2;
+  --black: #343A3C
+}
 * {
   margin: 0;
   padding: 0;
@@ -63,6 +72,16 @@ border-radius: 15px;
   margin-bottom: 5px;
 }
 
+
+#event-info{
+
+}
+#event-idea{
+
+}
+#event-title{
+font-size: 2em;
+}
 
 /* The Modal (background) */
 .modal {

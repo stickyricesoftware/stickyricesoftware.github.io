@@ -189,11 +189,13 @@ document.querySelectorAll(".card").forEach(function (item) {
       if (item.innerHTML === e.name) {
         const eventInfo = document.getElementById("event-info")
         const eventIdea = document.getElementById("event-idea")
+        const eventTitle = document.getElementById("event-title")
         eventInfo.innerHTML = ""
         eventIdea.innerHTML = ""
+        eventTitle.innerHTML = ""
         eventInfo.append(e.day + " " + e.month)
-        eventInfo.append(e.name)
         eventIdea.append(e.education)
+        eventTitle.append(e.name)
         openModal();
       }
     });
