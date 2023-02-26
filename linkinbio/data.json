@@ -1,0 +1,26 @@
+{
+    "myProjects": [
+        {
+            "name": "FPL Toolbox.",
+            "url": "https://www.fpltoolbox.com",
+            "img": "https://picsum.photos/150/150"
+        },
+        {
+            "name": "Match Match.",
+            "url": "https://www.fpltoolbox.com/matchmatch",
+            "img": "https://picsum.photos/150/150"
+        }
+    ],
+    "externalProjects": [
+        {
+            "name": "FPL Toolbox.",
+            "url": "https://www.fpltoolbox.com",
+            "img": "https://picsum.photos/150/150"
+        },
+        {
+            "name": "Match Match.",
+            "url": "https://www.fpltoolbox.com/matchmatch",
+            "img": "https://picsum.photos/150/150"
+        }
+    ]
+}

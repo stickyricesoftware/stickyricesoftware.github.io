@@ -4,32 +4,89 @@
   box-sizing: border-box;
   font-family: "Poppins", Tahoma, Geneva, Verdana, sans-serif;
 }
+:root {
+    --primary-color: #302AE6;
+    --secondary-color: #536390;
+    --font-color: #424242;
+    --bg-color: #fff;
+    --heading-color: #292922;
+}
+[data-theme="dark"] {
+    --primary-color: #9A97F3;
+    --secondary-color: #818cab;
+    --font-color: #e1e1ff;
+    --bg-color: #161625;
+    --heading-color: #818cab;
+}
+html{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 body {
-
-  background: whitesmoke;
-  color: #333333;
+  background: var(--bg-color);
+  color:var(--font-color);
+  width: 100%;
+  max-width: 600px;
+  border-left: 1px solid;
+  border-right: 1px solid;
 }
 
 header{
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  align-items: right;
+  justify-content: right;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+  max-width: 600px;
+  padding: .5em;
 }
 footer{
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+
 }
-#grid {
+
+#link-title{
+  position: absolute;
+  margin-top: -40px;
+  transform: rotate(-10deg);
+}
+.links{
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+gap: 10px;
+padding: .5em;
+
+}
+.links>.link {
+  font-size: 2em;
+  padding: .5em;
+  border-radius: 20px;
+ /*  border: 1px solid ; */
+  text-align: center;
+  min-height: 100px;
+  width: 100%;
+  margin-bottom: 1em;
+background-color: var(--secondary-color);
+}
+a{
+  color: inherit;
+  text-decoration: none;
+}
+#responsive-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-gap: 10px;
   padding: 10px;
 }
 
-#grid>div {
+#responsive-grid>div {
   font-size: 30px;
   padding: .5em;
   color: black;
@@ -37,4 +94,97 @@ footer{
   border: 1px solid black;
   text-align: center;
   min-height: 100px;
+}
+
+
+#rain-container {
+  left: 0px;
+  top: -100px;
+  height: calc(100vh + 100px);
+  overflow: hidden;
+  position: relative;
+  max-width: 600px;
+}
+
+#animate{
+  margin: 0 auto;
+  width: 20px;
+  overflow: visible;
+  position: relative;
+}
+
+#all{
+  overflow: hidden;
+  height: 100vh;
+  width: 100%;
+  position: fixed;
+}
+
+.bio{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 3em;
+}
+.profile-pic{
+  border-radius: 50%;
+}
+
+
+
+/*Simple css to style it like a toggle switch*/
+.theme-switch-wrapper {
+  display: flex;
+  align-items: center;
+
+}
+.theme-switch {
+  display: inline-block;
+  height: 34px;
+  position: relative;
+  width: 60px;
+}
+
+.theme-switch input {
+  display:none;
+}
+
+.slider {
+  background-color: #ccc;
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+}
+
+.slider:before {
+  background-color: #fff;
+  bottom: 4px;
+  content: "";
+  height: 26px;
+  left: 4px;
+  position: absolute;
+  transition: .4s;
+  width: 26px;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }

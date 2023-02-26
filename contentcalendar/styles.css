@@ -18,7 +18,13 @@ body {
   color: whitesmoke;
 
 }
-
+.container{
+  max-width: 1200px;
+}
+.center {
+  margin: auto;
+  width: 100%;
+}
 #calendar{
   width: 100%;
   padding: 10px;
