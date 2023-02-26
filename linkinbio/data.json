@@ -3,24 +3,34 @@
         {
             "name": "FPL Toolbox.",
             "url": "https://www.fpltoolbox.com",
-            "img": "https://picsum.photos/150/150"
+            "img": "https://picsum.photos/100/100",
+            "description": "FPL Toolbox is a site that can help you compare your Fantasy Premier League team with other teams in your mini-league."
         },
         {
             "name": "Match Match.",
             "url": "https://www.fpltoolbox.com/matchmatch",
-            "img": "https://picsum.photos/150/150"
+            "img": "https://picsum.photos/100/100",
+            "description": "How well do you know your Premier League team badges? Turn over two cards at a time and find a match!"
+
         }
     ],
     "externalProjects": [
         {
-            "name": "FPL Toolbox.",
-            "url": "https://www.fpltoolbox.com",
-            "img": "https://picsum.photos/150/150"
+            "name": "Coming Soon.",
+            "url": "#",
+            "img": "https://picsum.photos/100/100",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt orci quis nisl consequat, in congue ligula tempus. Nunc fermentum ipsum sed mollis fringilla. Sed facilisis, magna vel eleifend auctor, mauris nisi fringilla lorem, ut suscipit diam neque nec orci. Nullam efficitur, neque at pretium dictum, lectus diam ornare urna, eu mollis nisi justo vel velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Quisque commodo lacus ut pretium feugiat. Duis maximus cursus porttitor. Morbi laoreet tortor quis pharetra sollicitudin."
+
         },
         {
-            "name": "Match Match.",
-            "url": "https://www.fpltoolbox.com/matchmatch",
-            "img": "https://picsum.photos/150/150"
+            "name": "Coming Soon.",
+            "url": "#",
+            "img": "https://picsum.photos/100/100",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt orci quis nisl consequat, in congue ligula tempus. Nunc fermentum ipsum sed mollis fringilla. Sed facilisis, magna vel eleifend auctor, mauris nisi fringilla lorem, ut suscipit diam neque nec orci. Nullam efficitur, neque at pretium dictum, lectus diam ornare urna, eu mollis nisi justo vel velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Quisque commodo lacus ut pretium feugiat. Duis maximus cursus porttitor. Morbi laoreet tortor quis pharetra sollicitudin."
+
         }
+    ],
+    "profileImages": [
+        "./images/profile.jpg", "./images/profile1.jpg"
     ]
 }

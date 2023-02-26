@@ -9,14 +9,18 @@
     href="https://fonts.googleapis.com/icon?family=Material+Icons"
     rel="stylesheet"
   />
-  
-    <title>Sunny</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kalam&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 
+    <title>☀ Sunny</title>
   </head>
 
   <body>     
 
     <header>
-      <div class="theme-switch-wrapper">
+      <div class="theme-switch-wrapper slide-left">
         <label class="theme-switch" for="checkbox">
             <input type="checkbox" id="checkbox" />
             <div class="slider round"></div>
@@ -28,15 +32,26 @@
 
     </header>
 <section class="bio">
-<img class="profile-pic" src="https://picsum.photos/150/150" alt="">
-<h1>Hi, I'm Sunny</h1>
-<p>I like to make stuff on the web</p>
+  <div class="bio-background"></div>
+  <div class="module-border-wrap">
+    <a  href="http://instagram.com"><img id="profile-pic" src="/linkinbio/images/profile.jpg" alt=""></a>
 
+  </div>
+
+<h1 >Hi, I'm Sunny. ☀</h1>
+<p>I like to make stuff on the web.</p>
+<div class="contact">
+  <a href="https://www.instagram.com"><i class="fa fa-instagram"></i></a>
+  <a href="mailto:sunieljolly@gmail.com"><i class="fa fa-envelope"></i></a>
+  <a href="https://www.twitter.com"><i class="fa fa-twitter"></i></a>
+  <a href="https://www.sunieljolly.com"><i class="fa fa-home"></i></a>
+</div>
 </section>
-    <div id="container" class="container">
+<section id="container" class="container">
       
-      <div id="my-projects" class="links"></div>
-      <div id="external-projects" class="links"></div>
+      <div id="my-projects" class="links"><h4 id="heading">Personal Projects...</h4></div>
+      
+      <div id="external-projects" class="links"><h4 id="heading">Projects For Others...</h4></div>
       
       <!-- <div id="responsive-grid">
         <div>1</div>
@@ -49,8 +64,8 @@
         <div>8</div>
       </div> -->
 
-    </div>
-    <footer>Footer</footer> 
+</section>
+<footer>Footer</footer> 
        
   </body>
 <script type="module" src="/linkinbio/index.js"></script>
