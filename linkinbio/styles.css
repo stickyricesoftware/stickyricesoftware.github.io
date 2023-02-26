@@ -38,9 +38,9 @@ header {
 }
 footer {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  align-items: right;
+  justify-content: right;
+  flex-direction: row;
 }
 i {
   font-size: 2em !important;
