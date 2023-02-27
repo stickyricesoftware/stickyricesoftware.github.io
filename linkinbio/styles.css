@@ -163,6 +163,14 @@ a {
 #profile-pic {
   border-radius: 50%;
   max-width: 100px;
+  
+}
+
+.grow:hover { 
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2,1.2);
+  -ms-transform: scale(1.2,1.2); /* IE 9 */
+  -webkit-transform: scale(1.2,1.2); /* Safari and Chrome */
 }
 .bio > p {
   font-family: Arial, Helvetica, sans-serif;
