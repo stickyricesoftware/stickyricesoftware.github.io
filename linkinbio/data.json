@@ -4,7 +4,7 @@
             "name": "FPL Toolbox.",
             "url": "https://www.fpltoolbox.com",
             "img": "https://picsum.photos/100/100",
-            "description": "FPL Toolbox is a site that can help you compare your Fantasy Premier League team with other teams in your mini-league."
+            "description": "FPL Toolbox is a webapp that can help you compare your Fantasy Premier League team with other teams in your mini-league."
         },
         {
             "name": "Match Match.",
@@ -19,18 +19,33 @@
             "name": "Coming Soon.",
             "url": "#",
             "img": "https://picsum.photos/100/100",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt orci quis nisl consequat, in congue ligula tempus. Nunc fermentum ipsum sed mollis fringilla. Sed facilisis, magna vel eleifend auctor, mauris nisi fringilla lorem, ut suscipit diam neque nec orci. Nullam efficitur, neque at pretium dictum, lectus diam ornare urna, eu mollis nisi justo vel velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Quisque commodo lacus ut pretium feugiat. Duis maximus cursus porttitor. Morbi laoreet tortor quis pharetra sollicitudin."
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt orci quis nisl consequat, in congue ligula tempus."
 
-        },
+        }
+    ],
+    "websiteProjects": [
         {
             "name": "Coming Soon.",
             "url": "#",
             "img": "https://picsum.photos/100/100",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt orci quis nisl consequat, in congue ligula tempus. Nunc fermentum ipsum sed mollis fringilla. Sed facilisis, magna vel eleifend auctor, mauris nisi fringilla lorem, ut suscipit diam neque nec orci. Nullam efficitur, neque at pretium dictum, lectus diam ornare urna, eu mollis nisi justo vel velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Quisque commodo lacus ut pretium feugiat. Duis maximus cursus porttitor. Morbi laoreet tortor quis pharetra sollicitudin."
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt orci quis nisl consequat, in congue ligula tempus."
 
         }
     ],
-    "profileImages": [
-        "./images/profile.jpg", "./images/profile1.jpg"
+    "myLinks": [
+        {
+            "name": "Let's chat!",
+            "url": "mailto:sunieljolly@gmail.com",
+            "img": "https://picsum.photos/100/100",
+            "description": "If you need a website, or want to update or make improvements to your existing website, I'd love to hear from you!"
+
+        },
+        {
+            "name": "Let's chat!",
+            "url": "mailto:sunieljolly@gmail.com",
+            "img": "https://picsum.photos/100/100",
+            "description": "If you need a website, or want to update or make improvements to your existing website, I'd love to hear from you!"
+
+        }
     ]
 }

@@ -10,7 +10,7 @@
   --bg-color: #fff;
 }
 [data-theme="dark"] {
-  --highlight-color: #38002e;
+  --highlight-color: #5E183A;
   --font-color: #f2e7fe;
   --bg-color: #161625;
 }
@@ -45,6 +45,28 @@ footer {
 i {
   font-size: 2em !important;
   margin: 5px;
+}
+
+/* #my-projects{
+  background-color: lightgrey;
+}
+#external-projects{
+  background-color: grey;
+}
+#website-projects{
+  background-color: lightgrey;
+} */
+
+#my-links-title{
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+
+}
+
+
+#my-links-description{
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #link-title-left {
   position: absolute;
@@ -82,7 +104,6 @@ i {
   font-size: 2em;
   padding: 0.5em;
   border-radius: 20px;
-  /*  border: 1px solid ; */
   text-align: center;
   min-height: 100px;
   width: 100%;
@@ -92,10 +113,25 @@ i {
 .link > p {
   font-size: 0.5em;
 }
+.links > .my-link {
+  font-size: 2em;
+  padding: 0.5em;
+  border-radius: 20px;
+  text-align: center;
+  min-height: 100px;
+  width: 100%;
+  margin-bottom: 0.1em;
+  box-shadow: 1px 1px 1px 1px var(--font-color);
+}
+.my-link > p {
+  font-size: 0.5em;
+}
 a {
+  
   color: inherit;
   text-decoration: none;
 }
+
 #link-description {
   padding-top: 1.75em;
   text-align: left;
@@ -108,45 +144,12 @@ a {
   justify-content: left;
   padding-bottom: 1.5em;
 }
-#responsive-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-gap: 10px;
-  padding: 10px;
-}
-
-#responsive-grid > div {
-  font-size: 30px;
-  padding: 0.5em;
-  color: black;
-  border-radius: 15px;
-  border: 1px solid black;
-  text-align: center;
-  min-height: 100px;
-}
-
-#rain-container {
-  left: 0px;
-  top: -100px;
-  height: calc(100vh + 100px);
-  overflow: hidden;
-  position: relative;
-  max-width: 600px;
-}
-
-#animate {
-  margin: 0 auto;
-  width: 20px;
-  overflow: visible;
-  position: relative;
-}
-
-#all {
-  overflow: hidden;
-  height: 100vh;
+#first-heading{
   width: 100%;
-  position: fixed;
+  align-items: left;
+  justify-content: left;
 }
+
 
 .bio {
   display: flex;
@@ -277,3 +280,5 @@ input:checked + .slider:before {
     transform: translateX(0);
   }
 }
+
+
