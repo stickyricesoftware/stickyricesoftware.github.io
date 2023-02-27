@@ -81,9 +81,6 @@ function myProjects() {
     }
     project.setAttribute("class", "link");
     project.setAttribute("href", e.url);
-    // project.style.backgroundImage = "url('" + e.img + "')";
-    // project.style.backgroundRepeat = "no-repeat";
-    // project.style.backgroundSize = "auto";
 
     const projectName = document.createElement("p");
     projectName.innerHTML = e.name;
@@ -95,9 +92,16 @@ function myProjects() {
     projectDesc.setAttribute("id", "link-description");
     project.append(projectDesc);
 
-    // const projectImg = document.createElement("img");
-    // projectImg.setAttribute("src", e.img);
-    // project.append(projectImg);
+
+    const imgSpan = document.createElement("span");
+    imgSpan.setAttribute('id', "link-img-span")
+    const projectImg = document.createElement("img");
+    projectImg.setAttribute("class", 'link-image');    
+    projectImg.setAttribute("src", e.img);
+    imgSpan.append(projectImg)
+    project.append(imgSpan);
+
+    
     projects.append(project);
   });
 }
@@ -118,9 +122,7 @@ function externalProjects() {
     }
     project.setAttribute("class", "link");
     project.setAttribute("href", e.url);
-    // project.style.backgroundImage = "url('" + e.img + "')";
-    // project.style.backgroundRepeat = "no-repeat";
-    // project.style.backgroundSize = "auto";
+
 
     const projectName = document.createElement("p");
     projectName.innerHTML = e.name;
@@ -132,9 +134,13 @@ function externalProjects() {
     projectDesc.setAttribute("id", "link-description");
     project.append(projectDesc);
 
-    // const projectImg = document.createElement("img");
-    // projectImg.setAttribute("src", e.img);
-    // project.append(projectImg);
+    const imgSpan = document.createElement("span");
+    imgSpan.setAttribute('id', "link-img-span")
+    const projectImg = document.createElement("img");
+    projectImg.setAttribute("class", 'link-image');    
+    projectImg.setAttribute("src", e.img);
+    imgSpan.append(projectImg)
+    project.append(imgSpan);
     projects.append(project);
   });
 }
@@ -155,9 +161,7 @@ function websiteProjects() {
     }
     project.setAttribute("class", "link");
     project.setAttribute("href", e.url);
-    // project.style.backgroundImage = "url('" + e.img + "')";
-    // project.style.backgroundRepeat = "no-repeat";
-    // project.style.backgroundSize = "auto";
+
 
     const projectName = document.createElement("p");
     projectName.innerHTML = e.name;
@@ -169,9 +173,13 @@ function websiteProjects() {
     projectDesc.setAttribute("id", "link-description");
     project.append(projectDesc);
 
-    // const projectImg = document.createElement("img");
-    // projectImg.setAttribute("src", e.img);
-    // project.append(projectImg);
+    const imgSpan = document.createElement("span");
+    imgSpan.setAttribute('id', "link-img-span")
+    const projectImg = document.createElement("img");
+    projectImg.setAttribute("class", 'link-image');    
+    projectImg.setAttribute("src", e.img);
+    imgSpan.append(projectImg)
+    project.append(imgSpan);
     projects.append(project);
   });
 }

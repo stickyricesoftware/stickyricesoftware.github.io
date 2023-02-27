@@ -67,6 +67,7 @@ i {
 #my-links-description{
   text-align: left;
   font-family: Arial, Helvetica, sans-serif;
+
 }
 #link-title-left {
   position: absolute;
@@ -101,6 +102,8 @@ i {
   padding: 0.5em;
 }
 .links > .link {
+  display: grid;
+  grid-template-columns: 75% 25%;
   font-size: 2em;
   padding: 0.5em;
   border-radius: 20px;
@@ -136,6 +139,7 @@ a {
   padding-top: 1.75em;
   text-align: left;
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.45em;
 }
 
 #heading {
@@ -163,9 +167,18 @@ a {
 #profile-pic {
   border-radius: 50%;
   max-width: 100px;
+
   
 }
-
+#link-img-span{
+display: flex;
+justify-content: right;
+align-items: center;
+}
+.link-image{
+  border-radius: 20px;
+  max-width: 2.5em;
+}
 .grow:hover { 
   -webkit-transform: scale(1.2);
   transform: scale(1.2,1.2);
