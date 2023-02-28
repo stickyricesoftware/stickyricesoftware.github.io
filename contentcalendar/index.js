@@ -22,7 +22,13 @@ q.appendChild(randomQuote);
 const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-
+const monthCalendar = [
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+]
+console.log(monthCalendar)
 var optionsDayandMonth = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 var today  = new Date();
 
@@ -38,6 +44,18 @@ document.getElementById("display-month").innerHTML = formattedMonth
 
 var optionsDay = { day: 'numeric' };
 var formattedDay = today.toLocaleDateString("en-US", optionsDay); 
+
+
+const months =  document.getElementById("days-of-the-month")
+
+monthCalendar[2].forEach(element => {
+  const oneDay = document.createElement('div')
+oneDay.setAttribute('class', 'each-day')
+oneDay.innerHTML = element
+oneDay.onclick = function() { alert('One step at a time please.'); };
+months.append(oneDay)
+});
+
 
 
 const events = [
@@ -198,7 +216,7 @@ const events = [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
   },
 ];
-
+//days
 events.forEach((e) => {
   if (e.type === "d") {
     const days = document.getElementById("days");
@@ -211,7 +229,7 @@ events.forEach((e) => {
     days.appendChild(card);
   }
 });
-
+//weeks
 events.forEach((e) => {
   if (e.type === "w") {
     const weeksmonths = document.getElementById("weeks");
@@ -224,7 +242,7 @@ events.forEach((e) => {
     weeksmonths.appendChild(card);
   }
 });
-
+//months
 events.forEach((e) => {
   if (e.type === "m") {
     const weeksmonths = document.getElementById("months");
