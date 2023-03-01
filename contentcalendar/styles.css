@@ -15,8 +15,8 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 body {
-  background: var(--black);
-  color: #f8f8f8
+  background: var(--cream);
+  color: var(--black)
 
 }
 .container{
@@ -133,6 +133,7 @@ button{
 }
 #event-description{
 font-size: 0.75em;
+color: var(--cream);
 }
 #event-title{
 font-size: 2em;
@@ -145,8 +146,8 @@ font-size: 2em;
 
 }
 #event-ideas{
-  background-color: #f8f8f8;
-  color: #343A3C;
+  background-color: var(--cream);
+  color: var(--black);
   font-size: 0.75em;
   padding: 10px;
   border-radius: 15px;
