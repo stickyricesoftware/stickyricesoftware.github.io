@@ -26,7 +26,15 @@ const monthCalendar = [
   [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
   [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],
   [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
-  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30, 31],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30, 31]
 ]
 console.log(monthCalendar)
 var optionsDayandMonth = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -39,16 +47,62 @@ dateNow.innerText = today.toLocaleDateString("en-US", optionsDayandMonth)
 dateDiv.appendChild(dateNow);
 
 var optionsMonth = { month: 'long',};
-var formattedMonth = today.toLocaleDateString("en-US", optionsMonth); 
-document.getElementById("display-month").innerHTML = formattedMonth
+var formattedMonth = today.toLocaleDateString("en-US", optionsMonth);
+
+var optionsMonthNumberTest = { month: 'numeric',};
+var monthNumberTest = today.toLocaleDateString("en-US", optionsMonthNumberTest); 
+var monthNumber = (monthNumberTest-1)
+document.getElementById("display-month").innerHTML = month[monthNumber]
 
 var optionsDay = { day: 'numeric' };
 var formattedDay = today.toLocaleDateString("en-US", optionsDay); 
 
 
-const months =  document.getElementById("days-of-the-month")
 
-monthCalendar[2].forEach(element => {
+
+const months =  document.getElementById("days-of-the-month")
+function forwardMonth(){
+  if (!monthCalendar[monthNumber+1]){
+    alert("It's December - Merry Christmas")
+    return
+  }
+
+  months.innerHTML = ""
+  monthNumber++
+  document.getElementById("display-month").innerHTML = month[monthNumber]
+  monthCalendar[monthNumber].forEach(element => {
+   
+    const oneDay = document.createElement('div')
+
+  oneDay.setAttribute('class', 'each-day')
+  oneDay.innerHTML = element
+  oneDay.onclick = function() { alert('One step at a time please.'); };
+  months.append(oneDay)
+  });
+}
+function backMonth(){
+  if (!monthCalendar[monthNumber-1]){
+    alert("It's January - Happy New Year")
+    return
+  }
+  
+
+  months.innerHTML = ""
+  monthNumber--
+  document.getElementById("display-month").innerHTML = month[monthNumber]
+  monthCalendar[monthNumber].forEach(element => {
+   
+    const oneDay = document.createElement('div')
+
+  oneDay.setAttribute('class', 'each-day')
+  oneDay.innerHTML = element
+  oneDay.onclick = function() { alert('One step at a time please.'); };
+  months.append(oneDay)
+  });
+}
+//TO DO - currentMonth needs to be defined
+
+monthCalendar[monthNumber].forEach(element => {
   const oneDay = document.createElement('div')
 oneDay.setAttribute('class', 'each-day')
 oneDay.innerHTML = element
