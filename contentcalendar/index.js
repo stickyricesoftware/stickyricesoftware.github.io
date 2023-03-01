@@ -335,9 +335,9 @@ document.querySelectorAll(".card").forEach(function (item) {
         // promoButton.innerHTML = "paid";
         // eduButton.innerHTML = "menu_book";
         // entertainmentButton.innerHTML = "movie";
-        promoButton.innerHTML = "💵";
-        eduButton.innerHTML = "📚";
-        entertainmentButton.innerHTML = "🎥";
+        promoButton.innerHTML = "Promotional💵";
+        eduButton.innerHTML = "Educational📚";
+        entertainmentButton.innerHTML = "Entertainment🎥";
 
         promoButton.onclick = function () {
           eventIdeas.innerHTML = "Promotional Idea: " + e.promo
