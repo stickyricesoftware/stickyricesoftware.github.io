@@ -335,9 +335,9 @@ document.querySelectorAll(".card").forEach(function (item) {
         // promoButton.innerHTML = "paid";
         // eduButton.innerHTML = "menu_book";
         // entertainmentButton.innerHTML = "movie";
-        promoButton.innerHTML = "Promotional💵";
-        eduButton.innerHTML = "Educational📚";
-        entertainmentButton.innerHTML = "Entertainment🎥";
+        promoButton.innerHTML = "💵";
+        eduButton.innerHTML = "📚";
+        entertainmentButton.innerHTML = "🎥";
 
         promoButton.onclick = function () {
           eventIdeas.innerHTML = "Promotional Idea: " + e.promo
@@ -346,7 +346,7 @@ document.querySelectorAll(".card").forEach(function (item) {
           eventIdeas.innerHTML = "Educational Idea: " + e.education
         };
         entertainmentButton.onclick = function () {
-          eventIdeas.innerHTML = "Entertainment: " + e.entertainment
+          eventIdeas.innerHTML = "Entertainment Idea: " + e.entertainment
         };
         ideaOption.append(promoButton);
         ideaOption.append(eduButton);
@@ -370,12 +370,18 @@ function openModal() {
   var modal = document.getElementById("myModal");
   var span = document.getElementsByClassName("close")[0];
   modal.style.display = "block";
+  document.body.style.overflow = "hidden"; // ADD THIS LINE
+  document.body.style.height = "100%"; // ADD THIS LINE
   span.onclick = function () {
     modal.style.display = "none";
+    document.body.style.overflow = "auto"; // ADD THIS LINE
+    document.body.style.height = "auto"; // ADD THIS LINE
   };
   window.onclick = function (event) {
     if (event.target == modal) {
       modal.style.display = "none";
+      document.body.style.overflow = "auto"; // ADD THIS LINE
+      document.body.style.height = "auto"; // ADD THIS LINE
     }
   };
 }

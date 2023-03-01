@@ -144,7 +144,12 @@ font-size: 2em;
 
 }
 #event-ideas{
+  background-color: #f8f8f8;
+  color: #343A3C;
   font-size: 0.75em;
+  padding: 10px;
+  border-radius: 15px;
+
 }
 /* The Modal (background) */
 .modal {
