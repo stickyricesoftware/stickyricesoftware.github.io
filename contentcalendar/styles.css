@@ -6,7 +6,7 @@
   --green: #47888E;
   --dark-blue: #1375B2;
   --black: #343A3C;
-  --cream: #f9e5bc;
+  --cream: #FFFDD0;
 }
 * {
   margin: 0;
@@ -15,8 +15,8 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 body {
-  background: var(--cream);
-  color: var(--black);
+  background: var(--black);
+  color: #f8f8f8
 
 }
 .container{
