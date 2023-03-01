@@ -129,7 +129,7 @@ button{
 }
 
 #event-info{
-
+  color: var(--cream);
 }
 #event-description{
 font-size: 0.75em;
@@ -137,6 +137,7 @@ color: var(--cream);
 }
 #event-title{
 font-size: 2em;
+color: var(--cream);
 }
 #idea-option{
   display: flex;
