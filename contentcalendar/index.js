@@ -115,6 +115,7 @@ months.append(oneDay)
 const events = [
   {
     id: 1001,
+    calendarDate: "2023-03-01",
     day: formattedDay,
     month: formattedMonth,
     type: "d",
@@ -128,6 +129,8 @@ const events = [
   },
   {
     id: 1002,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "d",
@@ -141,6 +144,8 @@ const events = [
   },
   {
     id: 1003,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "d",
@@ -154,6 +159,8 @@ const events = [
   },
   {
     id: 1004,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "d",
@@ -167,6 +174,8 @@ const events = [
   },
   {
     id: 1005,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "m",
@@ -180,6 +189,8 @@ const events = [
   },
   {
     id: 1006,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "w",
@@ -193,6 +204,8 @@ const events = [
   },
   {
     id: 1007,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "m",
@@ -206,6 +219,8 @@ const events = [
   },
   {
     id: 1008,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "m",
@@ -219,6 +234,8 @@ const events = [
   },
   {
     id: 1009,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "d",
@@ -232,6 +249,8 @@ const events = [
   },
   {
     id: 1010,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "d",
@@ -245,6 +264,8 @@ const events = [
   },
   {
     id: 1012,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "m",
@@ -258,6 +279,8 @@ const events = [
   },
   {
     id: 1013,
+    calendarDate: "2023-03-01",
+
     day: formattedDay,
     month: formattedMonth,
     type: "m",
@@ -279,7 +302,6 @@ events.forEach((e) => {
     card.setAttribute("id", e.id);
     card.className += "card";
     card.className += " day";
-
     days.appendChild(card);
   }
 });
@@ -309,6 +331,7 @@ events.forEach((e) => {
   }
 });
 
+
 document.querySelectorAll(".card").forEach(function (item) {
 
     //item.style.backgroundImage="url(https://picsum.photos/200/300)"; // specify the image path here
@@ -320,16 +343,28 @@ document.querySelectorAll(".card").forEach(function (item) {
         const eventTitle = document.getElementById("event-title");
         const eventIdeas = document.getElementById("event-ideas");
         const ideaOption = document.getElementById("idea-option");
+        const testButton = document.getElementById("test-button");
+
+        testButton.setAttribute('name', e.name)
+        console.log(e.calendarDate)
+        testButton.setAttribute('startDate', e.calendarDate )
+        testButton.setAttribute('description', "Visit CCC for a great content creation idea - Don't forget to tag us in your post and use the hashtag #madewithCCC to be in with a chance of being featured on our page!!"  )
+
+        
+
+
         eventInfo.innerHTML = "";
         eventDescription.innerHTML = "";
         eventTitle.innerHTML = "";
         eventIdeas.innerHTML = "";
         ideaOption.innerHTML = "";
+
         const promoButton = document.createElement("button");
         // promoButton.setAttribute("class", "material-icons");
         const eduButton = document.createElement("button");
         // eduButton.setAttribute("class", "material-icons");
         const entertainmentButton = document.createElement("button");
+        
         // entertainmentButton.setAttribute("class", "material-icons");
 
         // promoButton.innerHTML = "paid";
