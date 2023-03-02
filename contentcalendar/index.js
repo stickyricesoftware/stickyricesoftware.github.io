@@ -9,9 +9,13 @@ const quotes = [
   "Nobody puts Content in a corner. - Dirty Dancing (1987)",
   "A boy's best friend is his content calendar. - Psycho (1960)",
   "I'm going to make him a content idea he can't refuse. - The God Father (1972)",
-  "Reach for the content calendar!. - Toy Story (1995)",
+  "Reach for the content calendar! - Toy Story (1995)",
   "All we have to decide is what to do with the content idea that is given to us. - The Fellowship of the Ring (2001)",
-
+  "My mom always said life was like a box of Content Ideas. You never know what you're gonna get. - Forest Gump (1994)",
+  "To Content Ideas and beyond! -Toy Story (1995)",
+  "May the Content be with you. - Star Wars  (1977)",
+"Houston, we have a content idea. - Apollo 13 (1995)",
+"Doc, you don't just walk into a store and buy content ideas! - Back to the future (1985)"
 ];
 
 const q = document.getElementById("quote");
@@ -121,11 +125,11 @@ const events = [
     type: "d",
     name: "World Tapir Day",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1002,
@@ -136,11 +140,11 @@ const events = [
     type: "d",
     name: "Tell A Story Day",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1003,
@@ -151,11 +155,11 @@ const events = [
     type: "d",
     name: "Geologist Day",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1004,
@@ -166,11 +170,11 @@ const events = [
     type: "d",
     name: "National Tea Day",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1005,
@@ -181,11 +185,11 @@ const events = [
     type: "m",
     name: "Stress Awareness Month",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1006,
@@ -196,11 +200,11 @@ const events = [
     type: "w",
     name: "National Stationery Week",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1007,
@@ -211,11 +215,11 @@ const events = [
     type: "m",
     name: "National Poetry Month",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1008,
@@ -226,11 +230,11 @@ const events = [
     type: "m",
     name: "National Jazz Appreciation Month",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1009,
@@ -241,11 +245,11 @@ const events = [
     type: "d",
     name: "World Cat Day",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1010,
@@ -256,11 +260,11 @@ const events = [
     type: "d",
     name: "World Dog Day",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1012,
@@ -271,11 +275,11 @@ const events = [
     type: "m",
     name: "National Car Month",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
   {
     id: 1013,
@@ -286,11 +290,11 @@ const events = [
     type: "m",
     name: "National Bike Month",
     education:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     promo:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
     entertainment:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate.",
+      "Coming Soon",
   },
 ];
 //days
@@ -346,9 +350,9 @@ document.querySelectorAll(".card").forEach(function (item) {
         const testButton = document.getElementById("test-button");
 
         testButton.setAttribute('name', e.name)
-        console.log(e.calendarDate)
         testButton.setAttribute('startDate', e.calendarDate )
         testButton.setAttribute('description', "Visit CCC for a great content creation idea - Don't forget to tag us in your post and use the hashtag #madewithCCC to be in with a chance of being featured on our page!!"  )
+        testButton.setAttribute('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone)
 
         
 
