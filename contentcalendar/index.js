@@ -15,7 +15,16 @@ const quotes = [
   "To Content Ideas and beyond! -Toy Story (1995)",
   "May the Content be with you. - Star Wars  (1977)",
 "Houston, we have a content idea. - Apollo 13 (1995)",
-"Doc, you don't just walk into a store and buy content ideas! - Back to the future (1985)"
+"Doc, you don't just walk into a store and buy content ideas! - Back to the future (1985)",
+"Eat my content. - The Breakfast Club (1985)",
+"Bend... and create! - Legally Blonde (2001)",
+"Keep the content, ya filthy animal. - Home Alone (1990)",
+"This one time, at content creation camp... - American Pie (1999)",
+"We get the content and we hold the world ransom for… one million dollars. - Austin Powers: International Man of Mystery (1997)",
+"That's why her content is so big. It's full of secrets. - Mean Girls (2004)" 
+
+
+
 ];
 
 const q = document.getElementById("quote");
