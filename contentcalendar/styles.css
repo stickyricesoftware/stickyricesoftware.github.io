@@ -117,7 +117,18 @@ border-radius: 15px;
 .month{
   background-color: var(--light-blue);
 }
-
+#quote{
+  font-size: 1rem;
+  background-color: #f8f8f8;
+  border: 1px solid black;
+  padding: 1rem;
+  width: 75%;
+  margin-top: 20px;
+  border-radius: 15px;
+  -webkit-transform: rotate(-5deg);
+  -ms-transform: rotate(-5deg);
+  transform: rotate(-5deg);
+}
 
 
 button{
