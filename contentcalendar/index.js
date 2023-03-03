@@ -34,7 +34,7 @@ q.appendChild(randomQuote);
 
 
 const toolName = [
-"Fetchea", "Fetchi", "Trigidea", "IDEAGO", "Contendar", 
+"Fetchea 💡", "Fetchi 🐕", "Trigidea 📆", "IDEAGO 💪", "Contendar 📆", 
 ]
 const tn = document.getElementById("tool-name");
 
