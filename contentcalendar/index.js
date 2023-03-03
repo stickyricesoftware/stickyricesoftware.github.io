@@ -32,6 +32,19 @@ const randomQuote = document.createElement("p");
 randomQuote.innerText = quotes[Math.floor(Math.random() * quotes.length)];
 q.appendChild(randomQuote);
 
+
+const toolName = [
+"Fetchea", "Fetchi", "Trigidea", "IDEAGO", "Contendar", 
+]
+const tn = document.getElementById("tool-name");
+
+tn.innerText = toolName[Math.floor(Math.random() * toolName.length)];
+
+
+
+
+
+
 const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
