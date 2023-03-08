@@ -136,7 +136,152 @@ oneDay.onclick = function() { alert('One step at a time please.'); };
 months.append(oneDay)
 });
 
+const events1 = [
+  {
+    id: 1001,
+    calendarDate: "2023-04-01",
+    day: formattedDay,
+    month: formattedMonth,
+    type: "d",
+    name: "Fun day",
+    idea: [ 
+      { 
+        category: "edu",
+        description: "Host a virtual dance party - Invite followers to join in a live, interactive dance party. Ask followers to submit their favorite dance playlist to get the party started and assign different followers to be the designated DJs for the event. "
+      },
+      { 
+        category: "edu",
+        description: "Create a virtual scavenger hunt - Ask followers to find objects in their homes that match the clues that you provide. They can then post pictures of their finds on social media with a special hashtag so that everyone can follow along with their progress.",
 
+      },
+      { 
+        category: "ent",
+        description:   "Create a “Fun Day-themed” challenge – Ask your audience to come up with their own “Fun Day-themed” challenge and post it with a hashtag. Ask your followers to get creative and come up with their own unique challenge for others to complete."
+      },
+      { 
+        category: "ent",
+        description:   "Host a virtual dance party – Invite your audience to join you for a virtual dance session. Play some fun music and provide instructions on how to dance along. This would be a great way to let go and have some fun while engaging with your followers."
+      },
+      { 
+        category: "pro",
+        description:   "Partner with a local charity or organization to host a Fun Day themed event. Ask your customers to donate to the organization and then come out and join the event to celebrate Fun Day. Offer special discounts to anyone who participates in the event. This is a great way to help out a worthy cause while also encouraging your customers to get out and have some Fun Day fun."
+      },
+            { 
+        category: "pro",
+        description:   "Create a ‘Create Your Own Fun’ campaign. Collaborate with influencers and customers to create curated videos and images that show off all the ways they celebrated Fun Day with your brand. Ask customers to share their own content, tagging your brand and using a special hashtag, and reward the most creative content with a special Fun Day prize."
+      },     
+
+    ]
+  },
+  {
+    id: 1002,
+    calendarDate: "2023-04-01",
+    day: formattedDay,
+    month: formattedMonth,
+    type: "d",
+    name: "Reading Is Funny Day",
+    idea: [ 
+      { 
+        category: "edu",
+        description: "Host a virtual dance party - Invite followers to join in a live, interactive dance party. Ask followers to submit their favorite dance playlist to get the party started and assign different followers to be the designated DJs for the event. "
+      },
+      { 
+        category: "edu",
+        description: "Create a virtual scavenger hunt - Ask followers to find objects in their homes that match the clues that you provide. They can then post pictures of their finds on social media with a special hashtag so that everyone can follow along with their progress.",
+
+      },
+      { 
+        category: "ent",
+        description:   "Create a “Fun Day-themed” challenge – Ask your audience to come up with their own “Fun Day-themed” challenge and post it with a hashtag. Ask your followers to get creative and come up with their own unique challenge for others to complete."
+      },
+      { 
+        category: "ent",
+        description:   "Host a virtual dance party – Invite your audience to join you for a virtual dance session. Play some fun music and provide instructions on how to dance along. This would be a great way to let go and have some fun while engaging with your followers."
+      },
+      { 
+        category: "pro",
+        description:   "Partner with a local charity or organization to host a Fun Day themed event. Ask your customers to donate to the organization and then come out and join the event to celebrate Fun Day. Offer special discounts to anyone who participates in the event. This is a great way to help out a worthy cause while also encouraging your customers to get out and have some Fun Day fun."
+      },
+            { 
+        category: "pro",
+        description:   "Create a ‘Create Your Own Fun’ campaign. Collaborate with influencers and customers to create curated videos and images that show off all the ways they celebrated Fun Day with your brand. Ask customers to share their own content, tagging your brand and using a special hashtag, and reward the most creative content with a special Fun Day prize."
+      },     
+
+    ]
+  },
+  {
+    id: 1002,
+    calendarDate: "2023-04-01",
+    day: formattedDay,
+    month: formattedMonth,
+    type: "w",
+    name: "Reading Is Funny Week",
+    idea: [ 
+      { 
+        category: "edu",
+        description: "Host a virtual dance party - Invite followers to join in a live, interactive dance party. Ask followers to submit their favorite dance playlist to get the party started and assign different followers to be the designated DJs for the event. "
+      },
+      { 
+        category: "edu",
+        description: "Create a virtual scavenger hunt - Ask followers to find objects in their homes that match the clues that you provide. They can then post pictures of their finds on social media with a special hashtag so that everyone can follow along with their progress.",
+
+      },
+      { 
+        category: "ent",
+        description:   "Create a “Fun Day-themed” challenge – Ask your audience to come up with their own “Fun Day-themed” challenge and post it with a hashtag. Ask your followers to get creative and come up with their own unique challenge for others to complete."
+      },
+      { 
+        category: "ent",
+        description:   "Host a virtual dance party – Invite your audience to join you for a virtual dance session. Play some fun music and provide instructions on how to dance along. This would be a great way to let go and have some fun while engaging with your followers."
+      },
+      { 
+        category: "pro",
+        description:   "Partner with a local charity or organization to host a Fun Day themed event. Ask your customers to donate to the organization and then come out and join the event to celebrate Fun Day. Offer special discounts to anyone who participates in the event. This is a great way to help out a worthy cause while also encouraging your customers to get out and have some Fun Day fun."
+      },
+            { 
+        category: "pro",
+        description:   "Create a ‘Create Your Own Fun’ campaign. Collaborate with influencers and customers to create curated videos and images that show off all the ways they celebrated Fun Day with your brand. Ask customers to share their own content, tagging your brand and using a special hashtag, and reward the most creative content with a special Fun Day prize."
+      },     
+
+    ]
+  },
+  {
+    id: 1002,
+    calendarDate: "2023-04-01",
+    day: formattedDay,
+    month: formattedMonth,
+    type: "m",
+    name: "Reading Is Funny Month",
+    idea: [ 
+      { 
+        category: "edu",
+        description: "Host a virtual dance party - Invite followers to join in a live, interactive dance party. Ask followers to submit their favorite dance playlist to get the party started and assign different followers to be the designated DJs for the event. "
+      },
+      { 
+        category: "edu",
+        description: "Create a virtual scavenger hunt - Ask followers to find objects in their homes that match the clues that you provide. They can then post pictures of their finds on social media with a special hashtag so that everyone can follow along with their progress.",
+
+      },
+      { 
+        category: "ent",
+        description:   "Create a “Fun Day-themed” challenge – Ask your audience to come up with their own “Fun Day-themed” challenge and post it with a hashtag. Ask your followers to get creative and come up with their own unique challenge for others to complete."
+      },
+      { 
+        category: "ent",
+        description:   "Host a virtual dance party – Invite your audience to join you for a virtual dance session. Play some fun music and provide instructions on how to dance along. This would be a great way to let go and have some fun while engaging with your followers."
+      },
+      { 
+        category: "pro",
+        description:   "Partner with a local charity or organization to host a Fun Day themed event. Ask your customers to donate to the organization and then come out and join the event to celebrate Fun Day. Offer special discounts to anyone who participates in the event. This is a great way to help out a worthy cause while also encouraging your customers to get out and have some Fun Day fun."
+      },
+            { 
+        category: "pro",
+        description:   "Create a ‘Create Your Own Fun’ campaign. Collaborate with influencers and customers to create curated videos and images that show off all the ways they celebrated Fun Day with your brand. Ask customers to share their own content, tagging your brand and using a special hashtag, and reward the most creative content with a special Fun Day prize."
+      },     
+
+    ]
+  },
+]
 
 const events = [
   {
@@ -157,6 +302,7 @@ const events = [
     id: 1002,
     calendarDate: "2023-03-01",
 
+
     day: formattedDay,
     month: formattedMonth,
     type: "d",
@@ -172,6 +318,8 @@ const events = [
     id: 1003,
     calendarDate: "2023-03-01",
 
+
+
     day: formattedDay,
     month: formattedMonth,
     type: "d",
@@ -186,6 +334,8 @@ const events = [
   {
     id: 1004,
     calendarDate: "2023-03-01",
+
+
 
     day: formattedDay,
     month: formattedMonth,
@@ -320,7 +470,7 @@ const events = [
   },
 ];
 //days
-events.forEach((e) => {
+events1.forEach((e) => {
   if (e.type === "d") {
     const days = document.getElementById("days");
     const card = document.createElement("div");
@@ -332,7 +482,7 @@ events.forEach((e) => {
   }
 });
 //weeks
-events.forEach((e) => {
+events1.forEach((e) => {
   if (e.type === "w") {
     const weeksmonths = document.getElementById("weeks");
     const card = document.createElement("div");
@@ -345,7 +495,7 @@ events.forEach((e) => {
   }
 });
 //months
-events.forEach((e) => {
+events1.forEach((e) => {
   if (e.type === "m") {
     const weeksmonths = document.getElementById("months");
     const card = document.createElement("div");
@@ -357,77 +507,135 @@ events.forEach((e) => {
   }
 });
 
+// Original
+// document.querySelectorAll(".card").forEach(function (item) {
+
+//     //item.style.backgroundImage="url(https://picsum.photos/200/300)"; // specify the image path here
+//   item.addEventListener("click", function () {    
+//     events.forEach((e) => {
+//       if (item.innerHTML === e.name) {
+//         const eventInfo = document.getElementById("event-info");
+//         const eventDescription = document.getElementById("event-description");
+//         const eventTitle = document.getElementById("event-title");
+//         const eventIdeas = document.getElementById("event-ideas");
+//         const ideaOption = document.getElementById("idea-option");
+//         const testButton = document.getElementById("test-button");
+
+//         testButton.setAttribute('name', e.name)
+//         testButton.setAttribute('startDate', e.calendarDate )
+//         testButton.setAttribute('description', "Visit CCC for a great content creation idea - Don't forget to tag us in your post and use the hashtag #madewithCCC to be in with a chance of being featured on our page!!"  )
+//         testButton.setAttribute('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone)
+
+        
+
+
+//         eventInfo.innerHTML = "";
+//         eventDescription.innerHTML = "";
+//         eventTitle.innerHTML = "";
+//         eventIdeas.innerHTML = "";
+//         ideaOption.innerHTML = "";
+
+//         const promoButton = document.createElement("button");
+//         // promoButton.setAttribute("class", "material-icons");
+//         const eduButton = document.createElement("button");
+//         // eduButton.setAttribute("class", "material-icons");
+//         const entertainmentButton = document.createElement("button");
+        
+//         // entertainmentButton.setAttribute("class", "material-icons");
+
+//         // promoButton.innerHTML = "paid";
+//         // eduButton.innerHTML = "menu_book";
+//         // entertainmentButton.innerHTML = "movie";
+//         promoButton.innerHTML = "💵";
+//         eduButton.innerHTML = "📚";
+//         entertainmentButton.innerHTML = "🎥";
+
+//         promoButton.onclick = function () {
+//           eventIdeas.innerHTML = "Promotional Idea: " + e.promo
+//         };
+//         eduButton.onclick = function () {
+//           eventIdeas.innerHTML = "Educational Idea: " + e.education
+//         };
+//         entertainmentButton.onclick = function () {
+//           eventIdeas.innerHTML = "Entertainment Idea: " + e.entertainment
+//         };
+//         ideaOption.append(promoButton);
+//         ideaOption.append(eduButton);
+//         ideaOption.append(entertainmentButton);
+
+//         eventInfo.append(e.day + " " + e.month);
+//         eventDescription.append(
+//           e.name +
+//             " is Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate."
+//         );
+
+
+//         eventTitle.append(e.name);
+
+//         openModal();
+//       }
+//     });
+
+
+//   });
+// });
+
 
 document.querySelectorAll(".card").forEach(function (item) {
 
-    //item.style.backgroundImage="url(https://picsum.photos/200/300)"; // specify the image path here
-  item.addEventListener("click", function () {    
-    events.forEach((e) => {
-      if (item.innerHTML === e.name) {
-        const eventInfo = document.getElementById("event-info");
-        const eventDescription = document.getElementById("event-description");
-        const eventTitle = document.getElementById("event-title");
-        const eventIdeas = document.getElementById("event-ideas");
-        const ideaOption = document.getElementById("idea-option");
-        const testButton = document.getElementById("test-button");
+  //item.style.backgroundImage="url(https://picsum.photos/200/300)"; // specify the image path here
+item.addEventListener("click", function () {    
+  events1.forEach((e) => {
+    if (item.innerHTML === e.name) {
+      const eventInfo = document.getElementById("event-info");
+      const eventDescription = document.getElementById("event-description");
+      const eventTitle = document.getElementById("event-title");
+      const eventIdeas = document.getElementById("event-ideas");
+      const ideaOption = document.getElementById("idea-option");
+      const testButton = document.getElementById("test-button");
 
-        testButton.setAttribute('name', e.name)
-        testButton.setAttribute('startDate', e.calendarDate )
-        testButton.setAttribute('description', "Visit CCC for a great content creation idea - Don't forget to tag us in your post and use the hashtag #madewithCCC to be in with a chance of being featured on our page!!"  )
-        testButton.setAttribute('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone)
+      testButton.setAttribute('name', e.name)
+      testButton.setAttribute('startDate', e.calendarDate )
+      testButton.setAttribute('description', "Visit CCC for a great content creation idea - Don't forget to tag us in your post and use the hashtag #madewithCCC to be in with a chance of being featured on our page!!"  )
+      testButton.setAttribute('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone)
 
-        
-
-
-        eventInfo.innerHTML = "";
-        eventDescription.innerHTML = "";
-        eventTitle.innerHTML = "";
-        eventIdeas.innerHTML = "";
-        ideaOption.innerHTML = "";
-
-        const promoButton = document.createElement("button");
-        // promoButton.setAttribute("class", "material-icons");
-        const eduButton = document.createElement("button");
-        // eduButton.setAttribute("class", "material-icons");
-        const entertainmentButton = document.createElement("button");
-        
-        // entertainmentButton.setAttribute("class", "material-icons");
-
-        // promoButton.innerHTML = "paid";
-        // eduButton.innerHTML = "menu_book";
-        // entertainmentButton.innerHTML = "movie";
-        promoButton.innerHTML = "💵";
-        eduButton.innerHTML = "📚";
-        entertainmentButton.innerHTML = "🎥";
-
-        promoButton.onclick = function () {
-          eventIdeas.innerHTML = "Promotional Idea: " + e.promo
-        };
-        eduButton.onclick = function () {
-          eventIdeas.innerHTML = "Educational Idea: " + e.education
-        };
-        entertainmentButton.onclick = function () {
-          eventIdeas.innerHTML = "Entertainment Idea: " + e.entertainment
-        };
-        ideaOption.append(promoButton);
-        ideaOption.append(eduButton);
-        ideaOption.append(entertainmentButton);
-
-        eventInfo.append(e.day + " " + e.month);
-        eventDescription.append(
-          e.name +
-            " is Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate."
-        );
+      
 
 
-        eventTitle.append(e.name);
+      eventInfo.innerHTML = "";
+      eventDescription.innerHTML = "";
+      eventTitle.innerHTML = "";
+      eventIdeas.innerHTML = "";
+      ideaOption.innerHTML = "";
 
-        openModal();
-      }
-    });
+      const ideaButton = document.createElement("button");
+      
+
+      ideaButton.innerHTML = "💡";
+      
+
+      ideaButton.onclick = function () {
+        eventIdeas.innerHTML = "Idea: " + e.idea[Math.floor(Math.random() * (e.idea).length)].description
+
+      };
+      
+      ideaOption.append(ideaButton);
+
+      eventInfo.append(e.day + " " + e.month);
+      eventDescription.append(
+        e.name +
+          " is Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Fames ac turpis egestas integer eget aliquet nibh. Venenatis urna cursus eget nunc scelerisque. Amet nulla facilisi morbi tempus iaculis urna id volutpat. Aliquam purus sit amet luctus venenatis lectus magna. Tristique senectus et netus et malesuada fames. Nunc congue nisi vitae suscipit tellus mauris a. In egestas erat imperdiet sed. Euismod lacinia at quis risus sed vulputate."
+      );
 
 
+      eventTitle.append(e.name);
+
+      openModal();
+    }
   });
+
+
+});
 });
 
 function openModal() {
