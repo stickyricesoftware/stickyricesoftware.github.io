@@ -1,0 +1,40 @@
+{
+  "myLinks": [
+    {
+      "name": "Let's chat!",
+      "url": "mailto:sunieljolly@gmail.com",
+      "img": "https://picsum.photos/100/100",
+      "description": "If you need a website, or want to update or make improvements to your existing website, I'd love to hear from you!"
+    }
+  ],
+  "myProjects": [
+    {
+      "name": "FPL Toolbox.",
+      "url": "https://www.fpltoolbox.com",
+      "img": "./images/fpl.png",
+      "description": "FPL Toolbox is a webapp that can help you compare your Fantasy Premier League team with other teams in your mini-league."
+    },
+    {
+      "name": "Match Match.",
+      "url": "https://www.fpltoolbox.com/matchmatch",
+      "img": "",
+      "description": "How well do you know your Premier League team badges from the 2021/22 season? Turn over two cards at a time and look for a match! Share your score with me if you think you've done well!"
+    }
+  ],
+  "externalProjects": [
+    {
+      "name": "Coming Soon.",
+      "url": "#",
+      "img": "https://picsum.photos/100/100",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt orci quis nisl consequat, in congue ligula tempus."
+    }
+  ],
+  "websiteProjects": [
+    {
+      "name": "Coming Soon.",
+      "url": "#",
+      "img": "https://picsum.photos/100/100",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt orci quis nisl consequat, in congue ligula tempus."
+    }
+  ]
+}

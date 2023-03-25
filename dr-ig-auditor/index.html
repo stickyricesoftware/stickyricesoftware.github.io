@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/dr-ig-auditor/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kalam&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="/dr-ig-auditor/images/favicon.ico"
+    />
+    <title>DR IG Auditor</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <form action="">
+        <label for="ig-username">Username</label>
+        <input id="ig-username" type="text" />
+        <label for="number-of-posts">Number of posts</label>
+        <input id="number-of-posts" type="text" />
+        <label for="number-of-followers">Followers</label>
+        <input id="number-of-followers" type="text" />
+        <label for="number-following">Following</label>
+        <input id="number-following" type="text" />
+        <label for="bio">Bio</label>
+        <textarea id="bio" type="text"></textarea>
+        <input type="submit" value="Compile Report" />
+      </form>
+
+      <button class="btn btn-primary" id="download">download pdf</button>
+      <div class="report-container">
+        <div class="card" id="report">
+          <div class="report-header">
+            <h6 class="">Ingstagram Audit Lite</h6>
+          </div>
+          <div class="report-body">
+            <table>
+              <tr>
+                <th>IG</th>
+                <th>posts</th>
+                <th>Followers</th>
+                <th>Following</th>
+              </tr>
+              <tr>
+                <td id="handle">Sunny</td>
+                <td id="posts">345</td>
+                <td id="followers">34553</td>
+                <td id="following">532</td>
+
+              </tr>
+
+            </table>
+            
+            </div>
+          <div class="report-footer">+10 289 2905 | DIIGITALRAQUEL.COM/LINKS | HELLO@DIGITALRAQUEL.COM</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/dr-ig-auditor/index.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+  </body>
+</html>
