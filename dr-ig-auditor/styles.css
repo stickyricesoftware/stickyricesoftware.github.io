@@ -19,7 +19,6 @@
   flex-direction: column;
   background-color: var(--cream);
   padding: 10px;
-  height: 100vh;
 }
 
 button {
