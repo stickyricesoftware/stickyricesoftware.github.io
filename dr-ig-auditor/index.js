@@ -257,7 +257,8 @@ function collateData() {
 }
 
 function download() {
-  const report = this.document.getElementById("report");
+  alert("Give me 2 secs while I generate the audit. It should download automatically")
+const report = this.document.getElementById("report");
   console.log(window);
   var opt = {
     margin: [0, 0],
