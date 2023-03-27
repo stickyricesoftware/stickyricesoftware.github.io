@@ -252,12 +252,12 @@ function collateData() {
     obs.append(avgTotalTipDiv);
   }
   presentEngagement();
-
+ alert("Give me 2 secs while I generate the audit. It should download automatically")
   setTimeout(download, 2000);
 }
 
 function download() {
-  alert("Give me 2 secs while I generate the audit. It should download automatically")
+ 
 const report = this.document.getElementById("report");
   console.log(window);
   var opt = {
