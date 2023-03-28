@@ -32,9 +32,19 @@ button {
 }
 input {
   padding: 10px;
+  border: none;
+  background-color: #f8f8f8;
 }
 .textarea {
   line-height: 150%;
+}
+#bio{
+  border: none;
+  background-color: #f8f8f8;
+}
+#notes{
+  border: none;
+  background-color: #f8f8f8;
 }
 #ig-data {
   display: grid;

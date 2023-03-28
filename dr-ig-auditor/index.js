@@ -256,6 +256,9 @@ function collateData() {
   setTimeout(download, 2000);
 }
 
+
+
+
 function download() {
  
 const report = this.document.getElementById("report");
