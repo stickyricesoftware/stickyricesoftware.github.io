@@ -193,6 +193,7 @@ privateFolder.addEventListener("click", function () {
     openWindow(0);
   } else {
     alert("Incorrect");
+
   }
 });
 
@@ -202,6 +203,7 @@ recordingsFolder.addEventListener("click", function () {
   if (password == "Ransom") {
     openWindow(1);
   } else {
-    alert("Incorrect");
+    alert("Password incorrect");
+	openWindow(9);
   }
 });
