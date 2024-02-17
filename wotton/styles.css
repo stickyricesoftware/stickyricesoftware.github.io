@@ -97,7 +97,7 @@ input, select {
 	position: fixed;
 	height: 100%;
 	width: 100%;
-	background: #CCC;
+	background: #92B6F4;
 	overflow: hidden;
 	overflow: auto;
 	top: 0;
@@ -274,7 +274,7 @@ input, select {
 }
 
 #icons a:hover {
-	background: #000;
+	background: #2D38AF;
 	color: #FFF;
 }
 
@@ -383,8 +383,8 @@ input, select {
 }
 
 .fa{
-
-	color: red;
+font-size: 24px;
+	color: lightgoldenrodyellow;
 	padding: 25px;
 }
 

@@ -189,11 +189,11 @@ loginButton.addEventListener("click", (e) => {
 const privateFolder = document.getElementById("private-folder");
 privateFolder.addEventListener("click", function () {
   let password = prompt("Please enter password:", "");
-  if (password == "Sunny") {
+  if (password == "TopDog") {
     openWindow(0);
   } else {
-    alert("Incorrect");
-
+    alert("Password incorrect");
+	openWindow(10);
   }
 });
 
