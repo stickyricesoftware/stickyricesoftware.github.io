@@ -10,7 +10,7 @@ loginButton.addEventListener("click", (e) => {
   if (username === "wotton.t" && password === "5um4y4osoios") {
     alert("You have successfully logged in.");
     location.replace(
-      "https://stickyricesoftware.github.io/email-login-client/desktop.html"
+      "https://stickyricesoftware.github.io/wooton-desktop/desktop.html"
     );
   } else {
     loginErrorMsg.style.opacity = 1;
