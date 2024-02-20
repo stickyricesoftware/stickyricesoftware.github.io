@@ -232,3 +232,33 @@ recordingsFolder.addEventListener("click", function () {
     }
   }
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  let but = document.getElementById("but");
+  let video = document.getElementById("vid");
+  let vidBox = document.getElementById("vid-box");
+  let mediaDevices = navigator.mediaDevices;
+  vid.muted = true;
+  but.addEventListener("click", () => {
+    vidBox.setAttribute("style", "display: block")
+    setTimeout(function(){
+      vidBox.setAttribute("style", "display: none")
+      alert("FACE NOT RECOGNISED")
+  }, 4000);
+      // Accessing the user camera and video.
+      mediaDevices
+          .getUserMedia({
+              video: true,
+              audio: true,
+          })
+          .then((stream) => {
+              // Changing the source of video to current stream.
+              video.srcObject = stream;
+              video.addEventListener("loadedmetadata", () => {
+                  video.play();
+              });
+          })
+          .catch(alert);
+  });
+});

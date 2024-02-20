@@ -516,7 +516,7 @@ gap: 50px;
 	font-size: 19px;
 	font-family: "Arial Black", Gadget, sans-serif;
 	width: 100%;
-	margin-bottom: 10px;
+	margin-bottom: 30px;
   }
   .form-border{
 	align-self: center;
@@ -590,18 +590,100 @@ gap: 10px;
 	padding: 0px;
 	}
 
-
-
-
-#popup {
-    width:50%;
-    height:80px;
-    padding:20px;
-    background-color:gray;    
-	position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    display:none;
+video {
+	width: 200px;
+	height:200px;
+	object-fit: cover;
+	border-radius: 100%;
 }
+#vid{
+	padding: 10px;
+	background: red;
+}
+
+#vid-box {
+	margin-bottom: -300px;
+	padding: 30px;
+	display: none;
+	outline-offset:10px;
+	position:relative;
+  }
+  #vid-box::before {
+	z-index: 45;
+	content:"";
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:0;
+	width:20px;
+	background:#18c89b;
+	box-shadow:0 0 70px 20px #18c89b;
+	clip-path:inset(0);
+	animation:
+	  x 0.5s ease-in-out infinite alternate,
+	  y 1s   ease-in-out infinite;
+  }
+  
+  @keyframes x {
+	to {
+	  transform:translateX(-100%);
+	  left:100%;
+	}
+  }
+  
+  @keyframes y {
+	 33% {
+	   clip-path:inset(0 0 0 -100px);    
+	 }
+	 50% {
+	   clip-path:inset(0 0 0 0);    
+	 }
+	 83%{
+	   clip-path:inset(0 -100px 0 0); 
+	 }
+  }
+
+  .blink{
+	animation: blink 2s infinite;
+  }
+  @keyframes blink{
+	0% {
+	  background: red;
+	}
+	20% {
+	  background: black;
+	}
+	40% {
+	  background: red;
+	}
+	60% {
+	  background: black;
+	}
+	80% {
+	  background: red;
+	}
+	100% {
+	  background: black;
+	}
+  }
+  
+  @-webkit-keyframes blink{
+	0% {
+		background: red;
+	  }
+	  20% {
+		background: black;
+	  }
+	  40% {
+		background: red;
+	  }
+	  60% {
+		background: black;
+	  }
+	  80% {
+		background: red;
+	  }
+	  100% {
+		background: black;
+	  }
+  }
