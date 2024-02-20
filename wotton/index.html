@@ -1,356 +1,425 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta content="ie=edge" http-equiv="x-ua-compatible">
-	<meta content="width=device-width, initial-scale=1" name="viewport">
-	<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
-	<link href="https://html5-templates.com/" rel="canonical">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="ie=edge" http-equiv="x-ua-compatible" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <link
+      href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+      rel="stylesheet"
+    />
+    <link href="https://html5-templates.com/" rel="canonical" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
 
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-	<script src="https://code.jquery.com/jquery-1.12.4.js">
-	</script>
-	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js">
-	</script>
+    <link href="/wotton/styles.css" rel="stylesheet" type="text/css" />
 
-	<link href="/wotton/styles.css" rel="stylesheet" type="text/css">
+    <title>WOTTON</title>
+  </head>
 
-	<title>WOTTON</title>
-</head>
+  <body>
+    <!-- The Desktop -->
+    <div id="desktop">
+      <div class="window closed" data-title="Private">
+        <a class="email-list">
+          <i class="fa fa-file"></i>
+          IMG00451
+        </a>
+        <a class="email-list">
+          <i class="fa fa-file"></i>
+          CONFIRMATION
+        </a>
+        <a class="email-list">
+          <i class="fa fa-file"></i>
+          RECEIPT
+        </a>
+        <a class="email-list openWindow" data-id="7">
+          <i class="fa fa-file"></i>
+          MEDICAL REPORT
+        </a>
+        <a class="email-list">
+          <i class="fa fa-file"></i>
+          VIDEOS
+        </a>
+        <a class="email-list">
+          <i class="fa fa-file"></i>
+          IMG00454
+        </a>
+        <a class="email-list">
+          <i class="fa fa-file"></i>
+          IMG00453
+        </a>
+      </div>
 
-<body>
+      <div class="window closed" data-title="Recordings">
+        <a class="email-list"> <i class="fa fa-file"></i>RANDOM FILE </a>
 
-	<!-- The Desktop -->
-	<div id="desktop">
-		<div class="window closed" data-title="Private">
-			<a class="email-list">
-				<i class="fa fa-file"></i>
-				IMG00451
-			</a>
-			<a class="email-list">
-				<i class="fa fa-file"></i>
-				CONFIRMATION
-			</a>
-			<a class="email-list">
-				<i class="fa fa-file"></i>
-				RECEIPT
-			</a>
-			<a class="email-list openWindow" data-id="7">
-				<i class="fa fa-file"></i>
-				MEDICAL REPORT
-			</a>
-			<a class="email-list">
-				<i class="fa fa-file"></i>
-				VIDEOS
-			</a>
-			<a class="email-list">
-				<i class="fa fa-file"></i>
-				IMG00454
-			</a>
-			<a class="email-list">
-				<i class="fa fa-file"></i>
-				IMG00453
-			</a>
+        <div class="recording">
+          <i class="fa fa-file-audio-o"></i>
+          <h3>Patrice Moreau - 001</h3>
+          <audio controls>
+            <source src="/wotton/recordings/001.mp3" type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
 
-		</div>
+        <a class="email-list"> <i class="fa fa-file"></i>RANDOM FILE </a>
+        <div class="recording">
+          <i class="fa fa-file-audio-o"></i>
+          <h3>Patrice Moreau - 002</h3>
+          <audio controls>
+            <source src="/wotton/recordings/002.mp3" type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        <a class="email-list openWindow" data-id="8">
+          <i class="fa fa-file"></i>BANK STATEMENTS
+        </a>
+        <div class="recording">
+          <i class="fa fa-file-audio-o"></i>
+          <h3>Patrice Moreau - 003</h3>
+          <audio controls>
+            <source src="/wotton/recordings/003.mp3" type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        <a class="email-list"> <i class="fa fa-file"></i>RANDOM FILE </a>
+        <a class="email-list"> <i class="fa fa-file"></i>RANDOM FILE </a>
+        <a class="email-list"> <i class="fa fa-file"></i>RANDOM FILE </a>
+        <div class="recording">
+          <i class="fa fa-file-audio-o"></i>
+          <h3>Patrice Moreau - 004</h3>
+          <audio controls>
+            <source src="/wotton/recordings/004.mp3" type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        <a class="email-list"> <i class="fa fa-file"></i>RANDOM FILE </a>
+        <a class="email-list"> <i class="fa fa-file"></i>RANDOM FILE </a>
+        <div class="recording">
+          <i class="fa fa-file-audio-o"></i>
+          <h3>Patrice Moreau - 005</h3>
+          <audio controls>
+            <source src="/wotton/recordings/005.mp3" type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      </div>
 
-		<div class="window closed" data-title="Recordings">
+      <div class="window closed" data-title="Emails">
+        <div class="emails">
+          <ul>
+            <li>
+              <a class="email-list openWindow" data-id="3">
+                <i class="fa fa-check"></i><i class="fa fa-star"></i>
+                <h3>K Bakshi - Dinner Tonight</h3>
+                <p style="text-align: right">15/02/2023 - 12:37pm</p>
+              </a>
+            </li>
 
+            <li>
+              <a class="email-list openWindow" data-id="4">
+                <i class="fa fa-check"></i><i class="fa fa-star"></i>
+                <h3>
+                  Atlantic Airlines - Important Information: Confirmation of
+                  Flight Cancellation
+                </h3>
+                <p style="text-align: right">15/02/2023 - 11:15am</p>
+              </a>
+            </li>
 
+            <li class="email-list">
+              <i class="fa fa-check"></i><i class="fa fa-star"></i>
+              <p>Karl Hayes - Cabinet Meeting</p>
+              <p style="text-align: right">13/02/2023 - 06:27am</p>
+            </li>
+            <li class="email-list">
+              <i class="fa fa-check"></i><i class="fa fa-star"></i>
+              <p>Sebastian Cambell-Willis - Morning Briefing</p>
+              <p style="text-align: right">09/02/2023 - 21:37pm</p>
+            </li>
+            <li class="email-list">
+              <i class="fa fa-check"></i><i class="fa fa-star"></i>
+              <p>Louna Alvarez - Meeting of Green Committee</p>
+              <p style="text-align: right">07/02/2023 - 15.53pm</p>
+            </li>
 
-			<a class="email-list">
-				<i class="fa fa-file"></i>RANDOM FILE
-			</a>
+            <li>
+              <a class="email-list openWindow" data-id="5">
+                <i class="fa fa-check"></i><i class="fa fa-star"></i>
+                <h3>
+                  Atlantic Airlines - Booking Number: AN638LW1, Flight
+                  Confirmation
+                </h3>
+                <p style="text-align: right">03/01/2023 - 10:03am</p>
+              </a>
+            </li>
 
-			<div class="recording">
-				<i class="fa fa-file-audio-o"></i>
-				<h3>Patrice Moreau - 001</h3>
-				<audio controls>
-					<source src="/wotton/recordings/001.mp3" type="audio/mpeg">
-				  Your browser does not support the audio element.
-				  </audio>
-			</div>
+            <li>
+              <a class="email-list openWindow" data-id="6">
+                <i class="fa fa-check"></i><i class="fa fa-star"></i>
+                <h3>
+                  Antigua and Barbuda Villas - Congratulations: Completion of
+                  your purchase
+                </h3>
+                <p style="text-align: right">12/12/2022 - 19:47pm</p>
+              </a>
+            </li>
 
-			<a class="email-list">
-				<i class="fa fa-file"></i>RANDOM FILE
-			</a>
-			<div class="recording">
-				<i class="fa fa-file-audio-o"></i>
-				<h3>Patrice Moreau - 002</h3>
-				<audio controls>
-					<source src="/wotton/recordings/002.mp3" type="audio/mpeg">
-				  Your browser does not support the audio element.
-				  </audio>
-			</div>
-			<a class="email-list openWindow" data-id="8">
-				<i class="fa fa-file"></i>BANK STATEMENTS
-			</a>
-			<div class="recording">
-				<i class="fa fa-file-audio-o"></i>
-				<h3>Patrice Moreau - 003</h3>
-				<audio controls>
-					<source src="/wotton/recordings/003.mp3" type="audio/mpeg">
-				  Your browser does not support the audio element.
-				  </audio>
-			</div>
-			<a class="email-list">
-				<i class="fa fa-file"></i>RANDOM FILE
-			</a>
-			<a class="email-list">
-				<i class="fa fa-file"></i>RANDOM FILE
-			</a>
-			<a class="email-list">
-				<i class="fa fa-file"></i>RANDOM FILE
-			</a>
-			<div class="recording">
-				<i class="fa fa-file-audio-o"></i>
-				<h3>Patrice Moreau - 004</h3>
-				<audio controls>
-					<source src="/wotton/recordings/004.mp3" type="audio/mpeg">
-				  Your browser does not support the audio element.
-				  </audio>
-			</div>
-			<a class="email-list">
-				<i class="fa fa-file"></i>RANDOM FILE
-			</a>
-			<a class="email-list">
-				<i class="fa fa-file"></i>RANDOM FILE
-			</a>
-			<div class="recording">
-				<i class="fa fa-file-audio-o"></i>
-				<h3>Patrice Moreau - 005</h3>
-				<audio controls>
-					<source src="/wotton/recordings/005.mp3" type="audio/mpeg">
-				  Your browser does not support the audio element.
-				  </audio>
-			</div>
+            <li class="email-list">
+              <i class="fa fa-check"></i><i class="fa fa-star"></i>
+              <p>Sebastian Cambell-Willis - Monthly Report</p>
+              <p style="text-align: right">30/11/2022 - 21:37pm</p>
+            </li>
+          </ul>
+        </div>
+      </div>
 
-		</div>
+      <div class="window closed" data-title="K Bakshi">
+        <div class="email">
+          <div class="email-content">
+            <div class="email-header">
+              <p>Sender: K Bakshi</p>
+              <p>Subject: Dinner Tonight</p>
+            </div>
+            <div class="email-body">
+              <p>
+                Darling, I've tried your phone but there was no answer. I'm
+                hoping that I've got more of a chance of reaching you here.
+              </p>
+              <br />
 
-		<div class="window closed" data-title="Emails">
-			<div class="emails">
-				<ul>
-					<li>
-					<a class="email-list openWindow" data-id="3">
-						<i class="fa fa-check"></i><i class="fa fa-star"></i><h3 >K Bakshi - Dinner Tonight</h3><p style="text-align: right;">15/02/2023 - 12:37pm</p>
-					</a>
-					</li>
+              <p>
+                I know how full your schedule is but it would mean a lot to me
+                if you were there tonight - you know how I am with farewells!
+              </p>
+              <br />
 
-					<li>
-						<a class="email-list openWindow" data-id="4">
-							<i class="fa fa-check"></i><i class="fa fa-star"></i><h3 >Atlantic Airlines - Important Information: Confirmation of Flight Cancellation</h3><p style="text-align: right;">15/02/2023 - 11:15am</p>
-						</a>
-					</li>
-	
-					<li class="email-list"><i class="fa fa-check"></i><i class="fa fa-star"></i><p>Karl Hayes - Cabinet Meeting</p><p style="text-align: right;">13/02/2023 - 06:27am</p></li>
-					<li class="email-list"><i class="fa fa-check"></i><i class="fa fa-star"></i><p>Sebastian Cambell-Willis - Morning Briefing</p><p style="text-align: right;">09/02/2023 - 21:37pm</p></li>
-					<li class="email-list"><i class="fa fa-check"></i><i class="fa fa-star"></i><p>Louna Alvarez - Meeting of Green Committee</p><p style="text-align: right;">07/02/2023 - 15.53pm</p></li>
-	
-	
-					<li>
-						<a class="email-list openWindow" data-id="5">
-							<i class="fa fa-check"></i><i class="fa fa-star"></i><h3 >Atlantic Airlines - Booking Number: AN638LW1, Flight Confirmation</h3><p style="text-align: right;">03/01/2023 - 10:03am</p>
-						</a>
-					</li>
-	
-					<li>
-						<a class="email-list openWindow" data-id="6">
-							<i class="fa fa-check"></i><i class="fa fa-star"></i><h3 >Antigua and Barbuda Villas - Congratulations: Completion of your purchase</h3><p style="text-align: right;">12/12/2022 - 19:47pm</p>
-						</a>
-					</li>				
-					
-					<li class="email-list"><i class="fa fa-check"></i><i class="fa fa-star"></i><p>Sebastian Cambell-Willis - Monthly Report</p><p style="text-align: right;">30/11/2022 - 21:37pm</p></li>
+              <p>
+                Our new life is everything I have ever wanted. We're so close
+                now. We deserve it. Just your announcement and then we're free.
+                I can hardly wait!
+              </p>
+              <br />
 
-				</ul>
-			</div>
-		</div>
+              <p>
+                But that doesn't make saying goodbye to these people and
+                everything I've worked for any easier. I could really do with
+                your support.
+              </p>
+              <p>Please. This is really important to me.</p>
+              <br />
 
+              <p>K</p>
+              <p>x</p>
+              <br />
 
-		<div class="window closed" data-title="K Bakshi">
-			<div class="email">
-				<div class="email-content">
-				  <div class="email-header">
-					<p>Sender: K Bakshi</p>
-					<p>Subject: Dinner Tonight</p>
-				  </div>
-				  <div class="email-body">
-					<p>Darling, I've tried your phone but there was no answer.
-						I'm hoping that I've got more of a chance of reaching you here.</p><br>
-			
-					<p>I know how full your schedule is but it would mean a lot to me if you were there tonight - you know how I am with farewells! </p><br>
-					
-					
-					<p>Our new life is everything I have ever wanted. We're so close now. We deserve it. Just your announcement and then we're free. I can hardly wait!</p><br>            
-					
-					<p>But that doesn't make saying goodbye to these people and everything I've worked for any easier. I could really do with your support.
-					</p> 
-					<p>Please. This is really important to me. </p><br>
-						
-					<p>K</p> 
-					<p>x</p> <br>  
-						
-					<p>Ps: I’ve also pre-ordered the steak for you.  </p>
-				  </div>
-				  <div class="email-footer">
-					<p>Date: 15/02/2023 - 12:37pm</p>
-				  </div>
-				</div>
-			  
-			  </div>
-		</div>
+              <p>Ps: I’ve also pre-ordered the steak for you.</p>
+            </div>
+            <div class="email-footer">
+              <p>Date: 15/02/2023 - 12:37pm</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-		<div class="window closed" data-title="Atlantic Airlines">
-			<div class="email">
-				<div class="email">
-				  <div class="email-header">
-					<p>Sender: Atlantic Airlines</p>
-					<p>Subject: Important Information: Confirmation of Flight Cancellation</p>
-				  </div>
-				  <div class="email-body">
-					<img src="/wotton/img/Atlantic Airlines - Cancellation.png" alt="" srcset="" width="500"><br>
-			
-				  </div>
-				  <div class="email-footer">
-					<p>Date: 15/02/2023 - 11:15am</p>
-				  </div>
-				</div>
-			  
-			  </div>
-		</div>
+      <div class="window closed" data-title="Atlantic Airlines">
+        <div class="email">
+          <div class="email">
+            <div class="email-header">
+              <p>Sender: Atlantic Airlines</p>
+              <p>
+                Subject: Important Information: Confirmation of Flight
+                Cancellation
+              </p>
+            </div>
+            <div class="email-body">
+              <img
+                src="/wotton/img/Atlantic Airlines - Cancellation.png"
+                alt=""
+                srcset=""
+                width="500"
+              /><br />
+            </div>
+            <div class="email-footer">
+              <p>Date: 15/02/2023 - 11:15am</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-		<div class="window closed" data-title="Atlantic Airlinest">
-			<div class="email">
-				<div class="email-content">
-				  <div class="email-header">
-					<p>Sender: Atlantic Airlines</p>
-					<p>Subject: Booking Number: AN638LW1, Flight Confirmation</p>
-				  </div>
-				  <div class="email-body">
-					<img src="/wotton/img/Atlantic Airlines - Reservation.png" alt="" srcset="" width="500"><br>
-				  </div>
-				  <div class="email-footer">
-					<p>Date: 03/01/2023 - 10:03am
-					</p>
-				  </div>
-				</div>
-			  
-			  </div>
-		</div>
+      <div class="window closed" data-title="Atlantic Airlinest">
+        <div class="email">
+          <div class="email-content">
+            <div class="email-header">
+              <p>Sender: Atlantic Airlines</p>
+              <p>Subject: Booking Number: AN638LW1, Flight Confirmation</p>
+            </div>
+            <div class="email-body">
+              <img
+                src="/wotton/img/Atlantic Airlines - Reservation.png"
+                alt=""
+                srcset=""
+                width="500"
+              /><br />
+            </div>
+            <div class="email-footer">
+              <p>Date: 03/01/2023 - 10:03am</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-		<div class="window closed" data-title="Antigua and Barbuda Villas">
-			<div class="email">
-				<div class="email-content">
-				  <div class="email-header">
-					<p>Sender: Antigua and Barbuda Villas</p>
-					<p>Subject: Congratulations: Completion of your purchase</p>
-				  </div>
-				  <div class="email-body">
-					<p>Dear Mr Wotton, </p><br>
-			
-					<p>Greetings from Antigua and Barbuda. </p><br>
-					<p>We can confirm that the deposit funds have now been transferred to our company accounts 
-						- Martinique Central Bank approved the transfer last night.
-					</p><br>      
-					<p>All we need to do now is arrange for you to collect the keys to the villa and sign the </p>
-					<p>
-					 documents in the presence of a witness. Please inform us once you have booked your flight so that we can begin the paperwork for this process.
-			
-					</p><br>       
-				   <img src="/wotton/img/Villa Image.png" alt="" srcset="" width="500"><br>
-				   <p>We wish you hearty congratulations on the completion of your purchase and hope you and your family every happiness in your new home. </p><br>
-				   <p>Best wishes,
-				</p><br>
-				   <p>Antigua and Barbuda Villas - Sales Team
-				</p><br>
-				  </div>
-				  <div class="email-footer">
-					<p>Date: 12/12/2022 - 19:47pm
-					</p>
-				  </div>
-				</div>
-			  
-			  </div>
-		</div>
+      <div class="window closed" data-title="Antigua and Barbuda Villas">
+        <div class="email">
+          <div class="email-content">
+            <div class="email-header">
+              <p>Sender: Antigua and Barbuda Villas</p>
+              <p>Subject: Congratulations: Completion of your purchase</p>
+            </div>
+            <div class="email-body">
+              <p>Dear Mr Wotton,</p>
+              <br />
 
-		<div class="window closed" data-title="Medical Screen Report">
-			<img src="/wotton/img/medical.jpg" alt="" srcset="" width="800"><br>
-		</div>
+              <p>Greetings from Antigua and Barbuda.</p>
+              <br />
+              <p>
+                We can confirm that the deposit funds have now been transferred
+                to our company accounts - Martinique Central Bank approved the
+                transfer last night.
+              </p>
+              <br />
+              <p>
+                All we need to do now is arrange for you to collect the keys to
+                the villa and sign the
+              </p>
+              <p>
+                documents in the presence of a witness. Please inform us once
+                you have booked your flight so that we can begin the paperwork
+                for this process.
+              </p>
+              <br />
+              <img
+                src="/wotton/img/Villa Image.png"
+                alt=""
+                srcset=""
+                width="500"
+              /><br />
+              <p>
+                We wish you hearty congratulations on the completion of your
+                purchase and hope you and your family every happiness in your
+                new home.
+              </p>
+              <br />
+              <p>Best wishes,</p>
+              <br />
+              <p>Antigua and Barbuda Villas - Sales Team</p>
+              <br />
+            </div>
+            <div class="email-footer">
+              <p>Date: 12/12/2022 - 19:47pm</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-		<div class="window closed" data-title="Bank Statement">
-			<img src="/wotton/img/statements.jpg" alt="" srcset="" width="800"><br>
-		</div>
+      <div class="window closed" data-title="Medical Screen Report">
+        <img src="/wotton/img/medical.jpg" alt="" srcset="" width="800" /><br />
+      </div>
 
-		<div class="window closed" data-title="Hint">
-			<img src="/wotton/img/hint1.png" alt="" srcset="" width="500"><br>
-		</div>
+      <div class="window closed" data-title="Bank Statement">
+        <img
+          src="/wotton/img/statements.jpg"
+          alt=""
+          srcset=""
+          width="800"
+        /><br />
+      </div>
 
-		<div class="window closed" data-title="Hint">
-			<img src="/wotton/img/hint2.png" alt="" srcset="" width="500"><br>
-		</div>
+      <div class="window closed" data-title="Hint">
+        <img src="/wotton/img/hint1.png" alt="" srcset="" width="500" /><br />
+      </div>
 
-		<div id="taskbar">
-		</div>
+      <div class="window closed" data-title="Hint">
+        <img src="/wotton/img/hint2.png" alt="" srcset="" width="500" /><br />
+      </div>
 
+      <div id="taskbar"></div>
 
-		<div id="icons">
-			<a id="private-folder" data-id="0"> <div><i class="fa fa-folder"></i> <p>Private</p> </div></a>
-			<a id="recordings" data-id="1"><div><i class="fa fa-folder"></i><p>PM</p> </div></a>
-			<a class="openWindow" data-id="2"><div><i class="fa fa-envelope"></i><p>Emails</p> </div></a>
+      <div id="icons">
+        <a id="private-folder" data-id="0">
+          <div>
+            <i class="fa fa-folder"></i>
+            <p>Private</p>
+          </div></a
+        >
+        <a id="recordings" data-id="1"
+          ><div>
+            <i class="fa fa-folder"></i>
+            <p>PM</p>
+          </div></a
+        >
+        <a class="openWindow" data-id="2"
+          ><div>
+            <i class="fa fa-envelope"></i>
+            <p>Emails</p>
+          </div></a
+        >
+      </div>
+    </div>
 
-		</div>
+    <!-- The overlay -->
+    <div id="myNav" class="overlay">
+      <!-- Overlay content -->
 
+      <div class="overlay-content">
+        <div class="log-in-screen">
+          <div class="form-border">
+            <div id="login-header">Government Login Client</div>
+            <form id="login-form">
+              <label for="username-field">Username</label>
+              <input
+                type="text"
+                name="username"
+                id="username-field"
+                class="login-form-field"
+                value="wotton.t"
+              />
+              <label for="username-field">Password</label>
+              <input
+                type="password"
+                name="password"
+                id="password-field"
+                class="login-form-field"
+                placeholder="Password"
+              />
+              <input type="submit" value="Login" id="login-form-submit" />
+            </form>
+          </div>
 
+          <div id="login-error-msg-holder">
+            <p id="login-error-msg">
+              Invalid username and/or password<span id="error-msg-second-line">
+                <br />
+                Hint: <br />
+                0=o <br />
+                1=i <br />
+                5=s <br />
+                A=4 <br />
+                S=5 <br />
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-
-
-		  
-	</div>
-
-
-					<!-- The overlay -->
-					<div id="myNav" class="overlay">
-			  
-						<!-- Overlay content -->
-						
-						<div class="overlay-content">
-			
-							<div class="log-in-screen">      
-															
-
-									  
-							
-										<div class="form-border">
-												
-										<div id="login-header">Government Login Client</div>
-											<form id="login-form">
-												<label for="username-field">Username</label>
-												<input type="text" name="username" id="username-field" class="login-form-field" value="wotton.t">
-												<label for="username-field">Password</label>
-												<input type="password" name="password" id="password-field" class="login-form-field" placeholder="Password">
-												<input type="submit" value="Login" id="login-form-submit">
-											  </form>
-										</div>
-
-									  <div id="login-error-msg-holder">
-										<p id="login-error-msg">Invalid username and/or password<span id="error-msg-second-line">
-											<br>
-											Hint: <br>
-											0=o <br>
-											1=i <br>
-											5=s <br>
-											A=4 <br>
-											S=5 <br>
-										</span></p>
-									  </div>
-							</div>
-			
-						</div>
-
-					  </div>
-
-					  <script src="/wotton/index.js">
-					</script>
-</body>
+    <script src="/wotton/index.js"></script>
+  </body>
 </html>
