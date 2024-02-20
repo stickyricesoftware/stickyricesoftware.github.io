@@ -168,9 +168,23 @@ input, select {
 }
 
 .windowHeader>span.winclose:hover {
+	background: transparent;
+}
+.windowHeader>span.winclose {
 	background: #f15454;
 }
-
+.windowHeader>span.winmaximize {
+	background: #31C146;
+}
+.windowHeader>span.winmaximize:hover {
+	background: transparent;
+}
+.windowHeader>span.winminimize {
+	background: #F5B63E;
+}
+.windowHeader>span.winminimize:hover {
+	background: transparent;
+}
 .windowHeader>span>span {
 	display: inline-block;
 	height: 8px;
@@ -185,6 +199,7 @@ input, select {
 }
 
 .winmaximize>span {
+
 	border: 2px solid #000;
 	border-top: 3px solid #000;
 }
@@ -378,12 +393,26 @@ input, select {
 .email-list {
 	display: grid;
 	grid-template-columns: 5% 5% 75% 10%;
-	border-bottom: 10px red;
+	border-bottom: 1px solid darkgray;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	align-items: center;
+
 
 }
-
+.email-list > .fa{
+	color: darkgray;
+	font-size: 24px;
+	padding: 0px;
+}
+.email-list.openWindow{
+	cursor: pointer;
+}
+.email-list.openWindow > .fa{
+	color: gold;
+}
 .fa{
-font-size: 24px;
+font-size: 48px;
 	color: lightgoldenrodyellow;
 	padding: 25px;
 }
@@ -392,7 +421,7 @@ font-size: 24px;
 .overlay {
 	/* Height & width depends on how you want to reveal the overlay (see JS below) */   
 	height: 100%;
-	width: 100%;
+	width: 1%;
 	position: fixed; /* Stay in place */
 	z-index: 1000; /* Sit on top */
 	left: 0;
@@ -479,13 +508,40 @@ gap: 50px;
   #error-msg-second-line {
 	display: block;
   }
-  
-  #login-form {
+  #login-header{
+	text-align: left;
+	color: black;
+	background-color: #8888D6;
+	padding: 10px;
+	font-size: 19px;
+	font-family: "Arial Black", Gadget, sans-serif;
+	width: 100%;
+	margin-bottom: 10px;
+  }
+  .form-border{
 	align-self: center;
 	display: grid;
 	justify-items: center;
 	align-items: center;
+	border-bottom: 5px double black;
+	border-left: 5px double black;
+	border-right: 5px double black;
+	border-top: 5px double black;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+  background-color: #CCC;
+  border-radius: 5px;
+}
+  #login-form {
+	align-self: center;
+	display: grid;
+	justify-items: left;
+	align-items: left;	
 	width: 400px;
+	gap: 10px;
+	color: #000;
+
   }
   
   .login-form-field::placeholder {
@@ -522,8 +578,30 @@ gap: 50px;
 display: flex;
 flex-direction: row;
 align-items: center;
-justify-content: center;
-border: 1px solid black;
-padding: 10p;
+justify-content: left;
+gap: 10px;
+
+
 }
 
+.recording > i{
+	font-size: 24px;
+	color: gold;
+	padding: 0px;
+	}
+
+
+
+
+#popup {
+    width:50%;
+    height:80px;
+    padding:20px;
+    background-color:gray;    
+	position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    display:none;
+}

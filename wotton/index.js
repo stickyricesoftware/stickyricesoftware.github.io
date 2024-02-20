@@ -186,24 +186,49 @@ loginButton.addEventListener("click", (e) => {
   }
 });
 
+
 const privateFolder = document.getElementById("private-folder");
 privateFolder.addEventListener("click", function () {
-  let password = prompt("Please enter password:", "");
-  if (password == "TopDog") {
-    openWindow(0);
-  } else {
-    alert("Password incorrect");
-	openWindow(10);
+  // loop three times
+  for (let i = 3; i > 0; i--) {
+    let password = prompt("Please enter password:", "");
+    // if it's the correct answer then alert and break the loop
+    if (password == "TopDog") {
+      alert("Access Granted!");
+      openWindow(0);
+      break;
+      // if it's not, and the tries has elapsed, then alert and break the loop
+    } else if (i == 1) {
+      alert("You need to try harder!");
+      openWindow(10);
+      break;
+      // if it's not but the tries have not elapsed, then loop again
+    } else {
+      alert("Try again - Attempts remaing: " + (i - 1));
+    }
   }
 });
 
+
+
 const recordingsFolder = document.getElementById("recordings");
 recordingsFolder.addEventListener("click", function () {
-  let password = prompt("Please enter password:", "");
-  if (password == "Ransom") {
-    openWindow(1);
-  } else {
-    alert("Password incorrect");
-	openWindow(9);
+  // loop three times
+  for (let i = 3; i > 0; i--) {
+    let password = prompt("Please enter password:", "");
+    // if it's the correct answer then alert and break the loop
+    if (password == "Ransom") {
+      alert("Access Granted!");
+      openWindow(1);
+      break;
+      // if it's not, and the tries has elapsed, then alert and break the loop
+    } else if (i == 1) {
+      alert("You need to try harder!");
+      openWindow(9);
+      break;
+      // if it's not but the tries have not elapsed, then loop again
+    } else {
+      alert("Try again - Attempts remaing: " + (i - 1));
+    }
   }
 });
