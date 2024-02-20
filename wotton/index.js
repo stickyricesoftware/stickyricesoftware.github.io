@@ -244,8 +244,8 @@ document.addEventListener("DOMContentLoaded", () => {
     vidBox.setAttribute("style", "display: block")
     setTimeout(function(){
       vidBox.setAttribute("style", "display: none")
-      alert("FACE NOT RECOGNISED")
-  }, 4000);
+      alert("FACE NOT RECOGNISED - Please type password instead.")
+  }, 400000);
       // Accessing the user camera and video.
       mediaDevices
           .getUserMedia({

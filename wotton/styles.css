@@ -534,6 +534,7 @@ gap: 50px;
   border-radius: 5px;
 }
   #login-form {
+	font-family: "Arial Black", Gadget, sans-serif;
 	align-self: center;
 	display: grid;
 	justify-items: left;
@@ -550,6 +551,7 @@ gap: 50px;
   }
   
   .login-form-field {
+	font-family: "Arial Black", Gadget, sans-serif;
 	border: none;
 	border-bottom: 1px solid #3a3a3a;
 	margin-bottom: 10px;
@@ -602,6 +604,8 @@ video {
 }
 
 #vid-box {
+	width: 400px;
+	margin: auto;
 	margin-bottom: -300px;
 	padding: 30px;
 	display: none;
