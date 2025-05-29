@@ -146,7 +146,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
   // Show a custom button to the user
   const installBtn = document.createElement('button');
-  installBtn.textContent = "Add to Home Screen";
+  installBtn.textContent = "Install as app";
   installBtn.className = "install-button";
   document.body.appendChild(installBtn);
 
