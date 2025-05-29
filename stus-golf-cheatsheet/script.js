@@ -129,3 +129,37 @@ function showToast(message) {
   // Animate in
   setTimeout(() => toast.classList.add("show"), 100);
 }
+
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(() => {
+    console.log("Service Worker registered");
+  });
+}
+
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent the mini-infobar from appearing
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Show a custom button to the user
+  const installBtn = document.createElement('button');
+  installBtn.textContent = "Add to Home Screen";
+  installBtn.className = "install-button";
+  document.body.appendChild(installBtn);
+
+  installBtn.addEventListener('click', () => {
+    installBtn.remove();
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      deferredPrompt = null;
+    });
+  });
+});
