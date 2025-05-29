@@ -1,52 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Golf Distance Calculator</title>
     <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <h1>Golf Distance Calculator</h1>
-        <label class="toggle">
-            <span>Metres</span>
-            <input type="checkbox" id="unitToggle" checked/>
-            <span class="slider"></span>
-            <span>Yards</span>
-        </label>
+      <h1>Golf Distance Calculator</h1>
+      <label class="toggle">
+        <span>Metres</span>
+        <input type="checkbox" id="unitToggle" checked />
+        <span class="slider"></span>
+        <span>Yards</span>
+      </label>
     </header>
 
     <main>
-        <div class="distance-container">
-            <div class="distance-box">
-                <h2>Carry</h2>
-                <p id="carryValue">--</p>
-            </div>
-            <div class="distance-box">
-                <h2>Rollout</h2>
-                <p id="rolloutValue">--</p>
-            </div>
+      <div class="distance-container">
+        <div class="distance-box">
+          <h2>Carry</h2>
+          <p id="carryValue">--</p>
         </div>
+        <div class="distance-box">
+          <h2>Rollout</h2>
+          <p id="rolloutValue">--</p>
+        </div>
+      </div>
 
-<div class="buttons-group">
-    <h3>Irons</h3>
-    <div class="buttons" id="ironButtons"></div>
-</div>
-<div class="buttons-group">
-    <h3>Wedges</h3>
-    <div class="buttons" id="wedgeButtons"></div>
-</div>
-<div class="buttons-group">
-    <h3>Medium Partial</h3>
-    <div class="buttons" id="mediumPartialButtons"></div>
-</div>
-<div class="buttons-group">
-    <h3>Small Partial</h3>
-    <div class="buttons" id="smallPartialButtons"></div>
-</div>
+      <div class="buttons-group">
+        <h3>Irons</h3>
+        <div class="buttons" id="ironButtons"></div>
+      </div>
+      <div class="buttons-group">
+        <h3>Wedges</h3>
+        <div class="buttons" id="wedgeButtons"></div>
+      </div>
+      <div class="collapsible-group">
+        <button class="toggle-btn">Show Medium Partial</button>
+        <div class="buttons-group" style="display: none">
+          <h3>Medium Partial</h3>
+          <div class="buttons" id="mediumPartialButtons"></div>
+        </div>
+      </div>
+
+      <div class="collapsible-group">
+        <button class="toggle-btn">Show Small Partial</button>
+        <div class="buttons-group" style="display: none">
+          <h3>Small Partial</h3>
+          <div class="buttons" id="smallPartialButtons"></div>
+        </div>
+      </div>
     </main>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

@@ -44,8 +44,8 @@ function displayDistance(club) {
     const carry = useYards ? metresToYards(club.carry) : club.carry;
     const rollout = useYards ? metresToYards(club.rollout) : club.rollout;
 
-    carryEl.textContent = carry + (useYards ? " yd" : " m");
-    rolloutEl.textContent = rollout + (useYards ? " yd" : " m");
+    carryEl.innerHTML = carry + (useYards ? " <span>yd</span>" : " <span>m</span>");
+    rolloutEl.innerHTML = rollout + (useYards ? " <span>yd</span>" : " <span>m</span>");
 }
 
 clubs.forEach(club => {
@@ -78,3 +78,15 @@ toggle.addEventListener("change", () => {
     }
 });
 
+
+// Toggle logic for collapsible groups
+document.querySelectorAll(".collapsible-group").forEach(group => {
+    const button = group.querySelector(".toggle-btn");
+    const content = group.querySelector(".buttons-group");
+
+    button.addEventListener("click", () => {
+        const isHidden = content.style.display === "none";
+        content.style.display = isHidden ? "block" : "none";
+        button.textContent = `${isHidden ? "Hide" : "Show"} ${content.querySelector("h3").textContent}`;
+    });
+});

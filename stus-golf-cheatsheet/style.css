@@ -81,7 +81,14 @@ main {
     margin-top: 0;
     font-size: 1.2rem;
 }
-
+.distance-box p{
+    font-size: 1.5rem;
+    margin: 0.5rem 0;
+    color: #00796b;
+}
+.distance-box span{
+    font-size: 0.8rem;
+}
 .buttons-group {
     margin-bottom: 1.5rem;
     text-align: center;
@@ -113,4 +120,22 @@ main {
     transition: background 0.3s;
     width: 100%; /* Make buttons fill the parent width */
     box-sizing: border-box;
+}
+
+
+.toggle-btn {
+    background: #004d40;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+.toggle-btn:hover {
+    background: #00695c;
 }
