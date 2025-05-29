@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimal Currency Converter</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Rowdies:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="manifest" href="/currency-converter/manifest.json" />
+    <meta name="theme-color" content="#121212" />
+    <link rel="stylesheet" href="/currency-converter/style.css">
+
+  </head>
+  <!-- Google tag (gtag.js) -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-0L5RNGKJ43"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-0L5RNGKJ43");
+  </script>
+  <body>
+    <div class="container py-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Currency Converter</h1>
+        <div>
+          <select id="themeSelector" class="form-select form-select-sm w-auto">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="blue">Blue</option>
+            <option value="red">Red</option>
+            <option value="charcoal">Charcoal</option>
+            <option value="green">Green</option>
+            <option value="amber">Amber</option>
+            <option value="purple">Purple</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="alertContainer"></div>
+      <div class="d-flex flex-row justify-content-end">
+        <div
+          class="d-flex flex-column align-items-center p-2 mb-2 w-75"
+          id="convertedCurrenciesRow"
+        >
+          <!-- Converted currencies will appear here -->
+        </div>
+
+        <div class="d-flex flex-column p-2 justify-content-start">
+          <label class="form-label"></label>
+          <div id="targetCurrencySelectors" class="justify-content-start"></div>
+          <button
+            id="addTargetCurrency"
+            class="btn btn-primary btn-sm mt-2"
+            type="button"
+          >
+            Add Target Currency
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="baseCurrency" class="form-label">Base Currency</label>
+        <select id="baseCurrency" class="form-select"></select>
+      </div>
+
+      <div class="mb-3">
+        <label for="amount" class="form-label"></label>
+        <input
+          type="number"
+          id="amount"
+          class="form-control"
+          placeholder="Enter amount"
+          aria-label="Large"
+          aria-describedby="inputGroup-sizing-sm"
+        />
+      </div>
+    </div>
+<button id="install-btn" style="display:none;">Add to Home Screen</button>
+<script src="/currency-converter/script.js"></script>
+  </body>
+</html>
