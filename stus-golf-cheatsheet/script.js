@@ -86,6 +86,10 @@ clubs.forEach((club) => {
         Math.floor(Math.random() * wordsOfEncouragement.length)
       ];
     showToast(quote);
+    fetch('https://ntfy.sunny.bz/stus-golf-app', {
+  method: 'POST', // PUT works too
+  body: 'Distance Checked'
+})
     displayDistance(club);
   });
 
