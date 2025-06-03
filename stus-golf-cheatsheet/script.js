@@ -88,7 +88,7 @@ clubs.forEach((club) => {
     showToast(quote);
     fetch('https://ntfy.sunny.bz/stus-golf-app', {
   method: 'POST', // PUT works too
-  body: 'Distance Checked'
+  body: 'Distance Checked for ' + club.name
 })
     displayDistance(club);
   });
