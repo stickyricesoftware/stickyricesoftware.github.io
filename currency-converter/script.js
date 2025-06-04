@@ -171,6 +171,8 @@ const convertedRow = document.getElementById("convertedCurrenciesRow");
 const addTargetBtn = document.getElementById("addTargetCurrency");
 const themeSelector = document.getElementById("themeSelector");
 
+const userName = document.getElementById("userName");
+
 let targetCurrencies =
   JSON.parse(localStorage.getItem("targetCurrencies")) || [];
 let baseCurrency = localStorage.getItem("baseCurrency") || "MYR";
@@ -326,10 +328,11 @@ window.onload = () => {
   updateTargetCurrencySelectors();
   initTheme();
   fetchRates();
-  checkAndAskForUserName()
+  checkAndAskForUserName();
+
   fetch("https://ntfy.sunny.bz/currency-converter-app", {
     method: "POST",
-    body: `Converter App Just opened by ` + localStorage.getItem('userName'),
+    body: `Converter App Just opened by ` + localStorage.getItem("userName"),
   });
 };
 if ("serviceWorker" in navigator) {
@@ -357,27 +360,28 @@ window.addEventListener("beforeinstallprompt", (e) => {
   });
 });
 
-
 function checkAndAskForUserName() {
-      if (localStorage.getItem('userName')) return;
+  if (localStorage.getItem("userName")) {
+    userName.innerText = localStorage.getItem("userName");
+    return;
+  }
 
-      const overlay = document.createElement('div');
-      overlay.id = 'nameOverlay';
-      overlay.innerHTML = `
+  const overlay = document.createElement("div");
+  overlay.id = "nameOverlay";
+  overlay.innerHTML = `
         <h2>Welcome! What's your name?</h2>
         <input type="text" id="userNameInput" placeholder="Enter your name" />
         <button id="saveUserNameBtn">Continue</button>
       `;
-      document.body.appendChild(overlay);
+  document.body.appendChild(overlay);
 
-      document.getElementById('saveUserNameBtn').onclick = function () {
-        const nameInput = document.getElementById('userNameInput').value.trim();
-        if (nameInput) {
-          localStorage.setItem('userName', nameInput);
-          overlay.remove();
-         
-        } else {
-          alert("Please enter your name.");
-        }
-      };
+  document.getElementById("saveUserNameBtn").onclick = function () {
+    const nameInput = document.getElementById("userNameInput").value.trim();
+    if (nameInput) {
+      localStorage.setItem("userName", nameInput);
+      overlay.remove();
+    } else {
+      alert("Please enter your name.");
     }
+  };
+}
