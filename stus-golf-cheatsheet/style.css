@@ -174,23 +174,16 @@ main {
   z-index: 1000;
 }
 
-#longpress-popup {
-  position: fixed;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  color: #00796b;
-  border: 2px solid #00796b;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  font-size: 1.2rem;
-  text-align: center;
+.longpress-popup {
+  position: absolute;
+  background: #222;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  white-space: nowrap;
   z-index: 1000;
-  display: none;
-}
-
-#longpress-popup.show {
-  display: block;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
 }

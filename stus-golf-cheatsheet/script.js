@@ -78,21 +78,77 @@ function displayDistance(club) {
 clubs.forEach((club) => {
   const btn = document.createElement("button");
   btn.textContent = club.name;
-  btn.addEventListener("click", () => {
+
+  let longPressTimer;
+  let longPressTriggered = false;
+
+  const showPopup = () => {
+    const carry = useYards ? metresToYards(club.carry) : club.carry;
+    const rollout = useYards ? metresToYards(club.rollout) : club.rollout;
+
+    const popup = document.createElement("div");
+    popup.className = "longpress-popup";
+    popup.innerHTML = `
+      <strong>${club.name}</strong><br>
+      Carry: ${carry}${useYards ? " yd" : " m"}<br>
+      Rollout: ${rollout}${useYards ? " yd" : " m"}
+    `;
+
+    const rect = btn.getBoundingClientRect();
+    popup.style.top = `${rect.top + window.scrollY - 80}px`;
+    popup.style.left = `${rect.left + rect.width / 2}px`;
+
+    document.body.appendChild(popup);
+
+    setTimeout(() => {
+      popup.remove();
+    }, 2000);
+  };
+
+  const handleShortClick = () => {
+    if (longPressTriggered) return;
     clearActiveButtons();
     btn.classList.add("active");
-    // const quote =
-    //   wordsOfEncouragement[
-    //     Math.floor(Math.random() * wordsOfEncouragement.length)
-    //   ];
-    // showToast(quote);
+
     fetch("https://ntfy.sunny.bz/stus-golf-app", {
-      method: "POST", // PUT works too
+      method: "POST",
       body: "Distance Checked for " + club.name,
     });
+
     displayDistance(club);
+  };
+
+  btn.addEventListener("mousedown", (e) => {
+    longPressTriggered = false;
+    longPressTimer = setTimeout(() => {
+      longPressTriggered = true;
+      showPopup();
+    }, 500);
   });
 
+  btn.addEventListener("mouseup", () => {
+    clearTimeout(longPressTimer);
+    handleShortClick();
+  });
+
+  btn.addEventListener("mouseleave", () => {
+    clearTimeout(longPressTimer);
+  });
+
+  btn.addEventListener("touchstart", () => {
+    longPressTriggered = false;
+    longPressTimer = setTimeout(() => {
+      longPressTriggered = true;
+      showPopup();
+    }, 500);
+  });
+
+  btn.addEventListener("touchend", () => {
+    clearTimeout(longPressTimer);
+    handleShortClick();
+  });
+
+  // Place button in correct group
   if (club.type === "iron") {
     ironButtons.appendChild(btn);
   } else if (club.type === "wedge") {
@@ -103,6 +159,7 @@ clubs.forEach((club) => {
     smallPartialButtons.appendChild(btn);
   }
 });
+
 
 toggle.addEventListener("change", () => {
   useYards = toggle.checked;
