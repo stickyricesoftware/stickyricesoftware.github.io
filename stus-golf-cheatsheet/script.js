@@ -42,10 +42,6 @@ const wedgeButtons = document.getElementById("wedgeButtons");
 const mediumPartialButtons = document.getElementById("mediumPartialButtons");
 const smallPartialButtons = document.getElementById("smallPartialButtons");
 
-const popup = document.getElementById("longpress-popup");
-let longPressTimer;
-let longPressTriggered = false;
-
 let useYards = true;
 
 // Reset class 'active' only on relevant group
@@ -78,94 +74,24 @@ function displayDistance(club) {
   rolloutEl.innerHTML =
     rollout + (useYards ? " <br><span>yd</span>" : " <br><span>m</span>");
 }
-function showLongPressPopup(club) {
-  const carry = useYards ? metresToYards(club.carry) : club.carry;
-  const rollout = useYards ? metresToYards(club.rollout) : club.rollout;
-  const unit = useYards ? "yd" : "m";
-
-  popup.innerHTML = `
-    <strong>${club.name}</strong><br>
-    Carry: ${carry} ${unit}<br>
-    Rollout: ${rollout} ${unit}
-  `;
-  popup.classList.add("show");
-}
-
-function hideLongPressPopup() {
-  popup.classList.remove("show");
-}
 
 clubs.forEach((club) => {
   const btn = document.createElement("button");
   btn.textContent = club.name;
-btn.addEventListener("click", () => {
-  if (longPressTriggered) {
-    // Prevent click logic from running if long press already triggered
-    return;
-  }
-
-  clearActiveButtons();
-  btn.classList.add("active");
-
-  fetch("https://ntfy.sunny.bz/stus-golf-app", {
-    method: "POST",
-    body: "Distance Checked for " + club.name,
+  btn.addEventListener("click", () => {
+    clearActiveButtons();
+    btn.classList.add("active");
+    // const quote =
+    //   wordsOfEncouragement[
+    //     Math.floor(Math.random() * wordsOfEncouragement.length)
+    //   ];
+    // showToast(quote);
+    fetch("https://ntfy.sunny.bz/stus-golf-app", {
+      method: "POST", // PUT works too
+      body: "Distance Checked for " + club.name,
+    });
+    displayDistance(club);
   });
-
-  displayDistance(club);
-});
-
-
-// Handle long press (press-and-hold) for distance popup
-btn.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  longPressTimer = setTimeout(() => {
-    showLongPressPopup(club);
-  }, 500); // 500ms hold
-});
-
-btn.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  longPressTimer = setTimeout(() => {
-    longPressTriggered = true;
-    showLongPressPopup(club);
-  }, 500);
-});
-
-btn.addEventListener("touchend", () => {
-  clearTimeout(longPressTimer);
-  if (longPressTriggered) {
-    hideLongPressPopup();
-    setTimeout(() => longPressTriggered = false, 0);
-  }
-});
-
-btn.addEventListener("mousedown", (e) => {
-  e.preventDefault();
-  longPressTimer = setTimeout(() => {
-    longPressTriggered = true;
-    showLongPressPopup(club);
-  }, 500);
-});
-
-btn.addEventListener("mouseup", () => {
-  clearTimeout(longPressTimer);
-  if (longPressTriggered) {
-    hideLongPressPopup();
-    setTimeout(() => longPressTriggered = false, 0);
-  }
-});
-
-btn.addEventListener("mouseleave", () => {
-  clearTimeout(longPressTimer);
-  if (longPressTriggered) {
-    hideLongPressPopup();
-    setTimeout(() => longPressTriggered = false, 0);
-  }
-});
-
-
-
 
   if (club.type === "iron") {
     ironButtons.appendChild(btn);
@@ -240,7 +166,4 @@ window.addEventListener("beforeinstallprompt", (e) => {
     });
   });
 });
-
-
-
 
