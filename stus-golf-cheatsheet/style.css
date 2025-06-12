@@ -121,7 +121,9 @@ main {
     width: 100%; /* Make buttons fill the parent width */
     box-sizing: border-box;
 }
-
+#wedgeButtons > button{
+    padding:  30px;
+}
 .toast-popup {
   position: fixed;
   bottom: 1rem;
@@ -172,3 +174,23 @@ main {
   z-index: 1000;
 }
 
+#longpress-popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  color: #00796b;
+  border: 2px solid #00796b;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  font-size: 1.2rem;
+  text-align: center;
+  z-index: 1000;
+  display: none;
+}
+
+#longpress-popup.show {
+  display: block;
+}
