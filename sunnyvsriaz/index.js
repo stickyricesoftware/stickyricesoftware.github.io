@@ -1,5 +1,5 @@
-let PLAYER_ONE_SCORE = 6
-let PLAYER_TWO_SCORE = 2
+let PLAYER_ONE_SCORE = 11
+let PLAYER_TWO_SCORE = 6
 
 let a = 0;
 const score1 = document.getElementById('score1');
