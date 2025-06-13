@@ -86,6 +86,9 @@ clubs.forEach((club) => {
     const carry = useYards ? metresToYards(club.carry) : club.carry;
     const rollout = useYards ? metresToYards(club.rollout) : club.rollout;
 
+    if (navigator.vibrate) {
+      navigator.vibrate(50); // vibrate for 50ms
+    }
     const popup = document.createElement("div");
     popup.className = "longpress-popup";
     popup.innerHTML = `
@@ -160,7 +163,6 @@ clubs.forEach((club) => {
   }
 });
 
-
 toggle.addEventListener("change", () => {
   useYards = toggle.checked;
   const selected = document.querySelector(".buttons button.active");
@@ -223,4 +225,3 @@ window.addEventListener("beforeinstallprompt", (e) => {
     });
   });
 });
-
