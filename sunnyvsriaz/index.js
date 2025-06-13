@@ -1,3 +1,8 @@
+fetch("https://ntfy.sunny.bz/sunnyvsriaz", {
+      method: "POST",
+      body: "Page Loaded",
+});
+
 let PLAYER_ONE_SCORE = 11
 let PLAYER_TWO_SCORE = 6
 
