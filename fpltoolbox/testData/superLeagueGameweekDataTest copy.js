@@ -1,6 +1,6 @@
 const superLeagueAddingGameweekDataTest = {
   "type": "FPLToolbox Test Data",
-  "leagueName": "Test League 12 Teams",
+  "leagueName": "Test League",
    "standings": [
     {
       id: 1450135,

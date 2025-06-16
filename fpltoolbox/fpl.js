@@ -8,7 +8,7 @@ import bootstrapTest from "./testData/bootsatrapTest.js";
 import superLeagueTest from "./testData/superLeagueTest.js";
 import superLeagueAddingManagerDataTest from "./testData/superLeagueAddingManagerDataTest.js";
 import superLeagueAddingGameweekDataTest from "./testData/superLeagueGameweekDataTest copy.js";
-import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
+import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js"
 
 let testMode = true; // Set to true to use test data
 window.FPLToolboxLeagueDataReady = false;
@@ -571,6 +571,17 @@ function getMaxPagesForUser() {
   }
 }
 
+
+function sliceStandingsForUser(standings) {
+  if (userHasAccess([12])) {
+    return standings; // Max access: full list
+  } else if (userHasAccess([10])) {
+    return standings.slice(0, 20); // Pro access
+  } else {
+    return standings.slice(0, 10); // Free access
+  }
+}
+
 async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
   onStatusUpdate("started");
 
@@ -582,7 +593,7 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
       return {
         type: superLeagueTest.type,
         leagueName: superLeagueTest.leagueName,
-        standings: superLeagueTest.standings,
+        standings: sliceStandingsForUser(superLeagueTest.standings),
       };
     }
 
@@ -611,7 +622,7 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
 
     return {
       leagueName,
-      standings,
+      standings: sliceStandingsForUser(standings),
       type: "Live League",
     };
   } catch (err) {
@@ -628,7 +639,11 @@ function handleLeagueCreation(result) {
   };
 }
 
+
+
 async function processLeague(standings) {
+  
+
   if (userHasAccess([1, 10, 12])) {
     await addManagerDetailsToLeague(standings, null);
     await addGameweeksToLeague(standings, null);
@@ -681,7 +696,7 @@ async function addManagerDetailsToLeague(standings, div) {
     );
 
     window.FPLToolboxLeagueData.standings =
-      superLeagueAddingManagerDataTest.standings;
+      sliceStandingsForUser(superLeagueAddingManagerDataTest.standings)
     console.log(
       "%c TEST MODE - NO API CALL MADE - Adding Manager Details",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
@@ -730,7 +745,7 @@ async function addGameweeksToLeague(standings, div) {
     );
 
     window.FPLToolboxLeagueData.standings =
-      superLeagueAddingGameweekDataTest.standings;
+      sliceStandingsForUser(superLeagueAddingGameweekDataTest.standings);
     console.log(
       "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
@@ -847,7 +862,7 @@ async function addDetailedGameweeksToLeague(standings, div) {
     );
 
     window.FPLToolboxLeagueData.standings =
-      superLeagueAddingGameweekDataTest.standings;
+      sliceStandingsForUser(superLeagueAddingGameweekDataTest.standings);
     console.log(
       "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
@@ -973,7 +988,7 @@ async function addDetailedGameweeksToLeague(standings, div) {
 }
 async function weeklyPicksForSuperLeague(standings, div) {
   console.time("Weekly Picks Fetch");
-  if (testMode) {
+    if (testMode) {
     console.log(
       "%c TEST MODE - NO API CALL MADE - Adding Weekly Picks",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
@@ -982,7 +997,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
     );
 
     window.FPLToolboxLeagueData.standings =
-      superLeagueAddWeeklyPicksTest.standings;
+      sliceStandingsForUser(superLeagueAddWeeklyPicksTest.standings);
     console.log(
       "%c TEST MODE - NO API CALL MADE - Adding Weekly Picks",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
@@ -1184,7 +1199,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
 
 async function testFunction() {
   alert("working");
-  console.log(window.FPLToolboxLeagueData);
+  console.log(window.FPLToolboxLeagueData)
 }
 async function richListNew() {
   console.log(theUser);
@@ -1322,62 +1337,24 @@ async function showCaptaincyPointsLeague() {
 
   const tableBody = document.createElement("tbody");
 
-const fullStandings = FPLToolboxLeagueData.standings;
-const limit = fullStandings.length;
+  FPLToolboxLeagueData.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
 
-let standingsToShow = [];
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
 
-if (userHasAccess([12])) {
-  standingsToShow = fullStandings; // show all
-} else if (userHasAccess([10])) {
-  standingsToShow = fullStandings.slice(0, 20); // up to 20
-} else {
-  standingsToShow = fullStandings.slice(0, 5); // free: top 5
-}
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamNameCell);
 
-// Render real accessible rows
-standingsToShow.forEach((team, index) => {
-  const row = document.createElement("tr");
+    const captaincyPointsCell = document.createElement("td");
+    captaincyPointsCell.innerText = team.total_captaincy_points || 0;
+    captaincyPointsCell.classList.add("text-end");
+    row.appendChild(captaincyPointsCell);
 
-  const rowNumberCell = document.createElement("td");
-  rowNumberCell.innerText = index + 1;
-  row.appendChild(rowNumberCell);
-
-  const teamNameCell = document.createElement("td");
-  teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
-  row.appendChild(teamNameCell);
-
-  const captaincyPointsCell = document.createElement("td");
-  captaincyPointsCell.innerText = team.total_captaincy_points || 0;
-  captaincyPointsCell.classList.add("text-end");
-  row.appendChild(captaincyPointsCell);
-
-  tableBody.appendChild(row);
-});
-
-// Add dummy rows to fill remaining slots
-const lockedCount = limit - standingsToShow.length;
-
-for (let i = 0; i < lockedCount; i++) {
-  const row = document.createElement("tr");
-  row.classList.add("table-secondary", "text-muted");
-
-  const rowNumberCell = document.createElement("td");
-  rowNumberCell.innerText = standingsToShow.length + i + 1;
-  row.appendChild(rowNumberCell);
-
-  const teamNameCell = document.createElement("td");
-  teamNameCell.innerHTML = `<em><a href="/upgrade" style="text-decoration: none;">Subscribe to unlock</a></em>`;
-  row.appendChild(teamNameCell);
-
-  const captaincyPointsCell = document.createElement("td");
-  captaincyPointsCell.innerText = "🔒";
-  captaincyPointsCell.classList.add("text-end");
-  row.appendChild(captaincyPointsCell);
-
-  tableBody.appendChild(row);
-}
-
+    tableBody.appendChild(row);
+  });
 
   table.appendChild(tableBody);
   leagueTable.appendChild(table);
@@ -1460,14 +1437,14 @@ function convertChipName(chip) {
 // Make getFootballerObject return a Promise
 function getFootballerObject(playerId) {
   return new Promise((resolve, reject) => {
-    const player = bootstrap.elements.find((el) => el.id == playerId);
+    const player = bootstrap.elements.find(el => el.id == playerId);
 
     if (!player) {
       reject(`Player with ID ${playerId} not found.`);
       return;
     }
 
-    const team = bootstrap.teams.find((t) => t.id == player.team);
+    const team = bootstrap.teams.find(t => t.id == player.team);
 
     const footballer = {
       web_name: player.web_name,
@@ -1498,11 +1475,13 @@ function getFootballerObject(playerId) {
   });
 }
 
+
 // Make getPlayerWebName async
 async function getPlayerWebName(playerId) {
   const footballer = await getFootballerObject(playerId); // Store the returned object
   return footballer.web_name;
 }
+
 
 function getTeamName(teamCode) {
   for (var i = 0; i < bootstrap.teams.length; i++) {
