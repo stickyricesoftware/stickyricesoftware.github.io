@@ -77,3 +77,136 @@ padding: 20px!important;
 #modal-popup .modal-confirm-btn.hidden {
   display: none;
 }
+
+
+.my-player-name,
+.my-captain-name,
+.my-vice-captain-name,
+.my-triple-captain-name {
+  text-align: center;
+  width: 100%;
+  padding: 0px;
+  background: #f5f3fc;
+  color: #37003c;
+  font-size: 0.5em;
+  text-wrap: nowrap;
+  font-weight: bolder;
+  margin-top: -5px;
+  margin-bottom: 0px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.my-player-xp {
+  text-align: center;
+  width: 100%;
+  padding: 0px;
+  background: #37003c;
+  color: #f5f3fc;
+  font-size: 0.5em;
+  font-weight: bolder;
+  margin-top: -5px;
+  margin-bottom: -5px !important;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+
+
+#watermark-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  padding: 10px;
+}
+#watermark-logo {
+  max-width: 40px;
+  max-height: 40px;
+  border-radius: 100%;
+}
+#watermark-text {
+  color: white;
+  font-size: 0.6rem;
+}
+#meme-loader-container {
+  display: flex; /* Enable Flexbox */
+  flex-wrap: wrap; /* Allows items to wrap */
+  gap: 20px; /* Space between child elements */
+  padding: 20px;
+}
+#meme-loader {
+  min-height: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: grey;
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+}
+#meme-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-content: center;
+  padding: 20px;
+  min-width: 100%;
+}
+.custom-meme {
+  max-width: 500px;
+  background-color: black;
+  font-weight: bold;
+  font-family: "Inter", sans-serif;
+}
+#meme-text {
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: white;
+  padding: none;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  margin-bottom: -10px;
+}
+
+.meme-header {
+  display: flex;
+  flex-direction: row;
+}
+.meme-header,
+.meme-footer {
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+#meme-image-container > div > .player {
+  background-color: #0d9959;
+  padding: 5px 5px 0px 5px;
+  border: 1px solid #ffffff !important;
+}
+
+.meme-footer > div > .player {
+  background-color: #0d9959;
+  padding: 5px 5px 0px 5px;
+  border: 1px solid #ffffff !important;
+}
+
+.skeleton {
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(200, 20%, 80%);
+  }
+  100% {
+    background-color: hsl(200, 20%, 95%);
+  }
+}
