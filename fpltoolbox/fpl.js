@@ -6,12 +6,16 @@ const BASE_URL =
 import eventStatusTest from "./testData/eventStatusTest.js";
 import bootstrapTest from "./testData/bootsatrapTest.js";
 import superLeagueTest from "./testData/superLeagueTest.js";
-import superLeagueAddingManagerDataTest from "./testData/superLeagueAddingManagerDataTest.js";
-import superLeagueAddingGameweekDataTest from "./testData/superLeagueGameweekDataTest copy.js";
+import superLeagueManagerDataTest from "./testData/superLeagueManagerDataTest.js";
+import superLeagueGameweekDataTest from "./testData/superLeagueGameweekDataTest.js";
+import superLeagueDetailedGameweekDataTest from "./testData/superLeagueDetailedGameweekDataTest.js";
 import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js"
+
 
 let testMode = true; // Set to true to use test data
 window.FPLToolboxLeagueDataReady = false;
+window.FPLToolboxProLeagueDataReady = false;
+window.FPLToolboxMaxLeagueDataReady = false;
 
 window.FPLToolboxLeagueData = {
   leagueName: null,
@@ -213,7 +217,7 @@ function toolsScreen() {
       label: "My Team",
       action: renderMyTeamScreen,
       tier: "free",
-      requiresData: false,
+      requiresData: true,
     },
     {
       icon: "bi-sliders",
@@ -234,36 +238,42 @@ function toolsScreen() {
       label: "GW Memes",
       action: handleStatsClick,
       tier: "free",
+      requiresData: true,
     },
     {
       icon: "bi-bar-chart",
       label: "GW Stats",
       action: handleStatsClick,
       tier: "free",
+      requiresData: true,
     },
     {
       icon: "bi-graph-up-arrow",
       label: "Season Stats",
       action: handleStatsClick,
       tier: "pro",
+      requiresData: true,
     },
     {
       icon: "bi-people",
       label: "Benched Points League",
-      action: handleStatsClick,
+      action: showBenchedPointsLeague,
       tier: "pro",
+      requiresData: true,
     },
     {
       icon: "bi-cash-coin",
       label: "Rich List League",
       action: richListNew,
       tier: "pro",
+      requiresData: true,
     },
     {
       icon: "bi-exclamation-triangle",
       label: "The Dirty League",
       action: handleStatsClick,
       tier: "pro",
+      requiresData: true,
     },
     {
       icon: "bi-trophy",
@@ -277,111 +287,135 @@ function toolsScreen() {
       label: "Golden Boot League",
       action: handleStatsClick,
       tier: "pro",
+      requiresData: true,
     },
     {
       icon: "bi-person-check",
       label: "Catch A Copycat",
       action: handleStatsClick,
       tier: "pro",
+      requiresData: true,
     },
     {
       icon: "bi-arrow-repeat",
       label: "GW Transfer Summaries",
       action: handleStatsClick,
       tier: "free",
+      requiresData: true,
     },
     {
       icon: "bi-boxes",
       label: "Chip Usage",
       action: handleStatsClick,
       tier: "free",
+      requiresData: true,
     },
     {
       icon: "bi-compass",
       label: "Captain Picks",
       action: handleStatsClick,
       tier: "free",
+      requiresData: true,
     },
     {
       icon: "bi-binoculars",
       label: "Rival Comparison",
       action: handleStatsClick,
       tier: "free",
+      requiresData: true,
     },
     {
       icon: "bi-award",
       label: "Season Summary",
       action: handleStatsClick,
       tier: "free",
+      requiresData: true,
     },
     {
       icon: "bi-speedometer2",
       label: "Max Dashboard",
       action: handleStatsClick,
       tier: "max",
+      requiresData: true,
     },
     {
       icon: "bi-calculator",
       label: "Rivals Transfer Calculator",
       action: handleStatsClick,
       tier: "pro",
+      requiresData: true,
     },
   ];
 
-  features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
-    const needsData = requiresData && !window.FPLToolboxLeagueDataReady;
+features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
+  const featureId = `feature-btn-${i}`;
+  const col = document.createElement("div");
+  col.className = "col-4 p-2";
 
-    const featureId = `feature-btn-${i}`;
+  const button = document.createElement("div");
+  button.id = featureId;
+  button.className =
+    "btn btn-light w-100 feature-icon d-flex flex-column align-items-center justify-content-center text-center position-relative";
+  button.style.height = "120px";
 
-    const col = document.createElement("div");
-    col.className = "col-4 p-2";
+  // Determine data readiness based on tier
+  let dataReady = true;
 
-    const button = document.createElement("div");
-    button.id = featureId;
-    button.className =
-      "btn btn-light w-100 feature-icon d-flex flex-column align-items-center justify-content-center text-center position-relative";
-    button.style.height = "120px";
-
-    if (needsData) {
-      button.innerHTML = `
-        <div class="spinner-border text-secondary mb-2" role="status" style="width: 1.5rem; height: 1.5rem;">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <small>${label}</small>
-      `;
-      button.classList.add("disabled");
-      button.style.opacity = "0.5";
-    } else {
-      button.innerHTML = `
-        <i class="bi ${icon} fs-2 mb-1"></i>
-        <small>${label}</small>
-      `;
-      button.addEventListener("click", action);
-    }
-
-    // Tier badge
-    const badge = document.createElement("span");
-    badge.className = "badge position-absolute top-0 end-0 m-1";
-    badge.style.fontSize = "0.6rem";
-    badge.style.padding = "0.25em 0.5em";
-    badge.textContent = tier.toUpperCase();
-
+  if (requiresData) {
     switch (tier) {
       case "free":
-        badge.classList.add("bg-success", "text-light");
+        dataReady = !!window.FPLToolboxLeagueDataReady;
         break;
       case "pro":
-        badge.classList.add("bg-warning", "text-dark");
+        dataReady = !!window.FPLToolboxProLeagueDataReady;
         break;
       case "max":
-        badge.classList.add("bg-danger", "text-light");
+        dataReady = !!window.FPLToolboxMaxLeagueDataReady;
         break;
     }
+  }
 
-    button.appendChild(badge);
-    col.appendChild(button);
-    row.appendChild(col);
-  });
+  if (!dataReady) {
+    button.innerHTML = `
+      <div class="spinner-border text-secondary mb-2" role="status" style="width: 1.5rem; height: 1.5rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <small>${label}</small>
+    `;
+    button.classList.add("disabled");
+    button.style.opacity = "0.5";
+  } else {
+    button.innerHTML = `
+      <i class="bi ${icon} fs-2 mb-1"></i>
+      <small>${label}</small>
+    `;
+    button.addEventListener("click", action);
+  }
+
+  // Tier badge
+  const badge = document.createElement("span");
+  badge.className = "badge position-absolute top-0 end-0 m-1";
+  badge.style.fontSize = "0.6rem";
+  badge.style.padding = "0.25em 0.5em";
+  badge.textContent = tier.toUpperCase();
+
+  switch (tier) {
+    case "free":
+      badge.classList.add("bg-success", "text-light");
+      break;
+    case "pro":
+      badge.classList.add("bg-warning", "text-dark");
+      break;
+    case "max":
+      badge.classList.add("bg-danger", "text-light");
+      break;
+  }
+
+  button.appendChild(badge);
+  col.appendChild(button);
+  row.appendChild(col);
+});
+
 
   container.appendChild(row);
   homeScreen.appendChild(container);
@@ -587,7 +621,8 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
 
   try {
     if (testMode) {
-      await sleep(500); // Simulate test delay
+    console.log("simulating delay")
+    await sleep(1000);
       onStatusUpdate("fetching test data");
 
       return {
@@ -610,12 +645,13 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
         `${BASE_URL}leagues-classic/${leagueID}/standings?page_standings=${i}`
       );
       const data = await res.json();
-
+      
       if (i === 1) leagueName = data.league.name;
       standings.push(...(data.standings?.results ?? []));
 
       if (!data.standings?.has_next) break;
       if (i < maxPages) await sleep(250);
+
     }
 
     onStatusUpdate("fetched", standings.length);
@@ -625,6 +661,7 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
       standings: sliceStandingsForUser(standings),
       type: "Live League",
     };
+    
   } catch (err) {
     onStatusUpdate("error", err);
     throw err;
@@ -642,21 +679,30 @@ function handleLeagueCreation(result) {
 
 
 async function processLeague(standings) {
-  
-
+  // Free Tier
   if (userHasAccess([1, 10, 12])) {
     await addManagerDetailsToLeague(standings, null);
     await addGameweeksToLeague(standings, null);
     window.FPLToolboxLeagueDataReady = true;
+    toolsScreen(); // Re-render for free features
   }
 
+  // Pro Tier
   if (userHasAccess([10, 12])) {
-    window.FPLToolboxLeagueDataReady = false;
     await addDetailedGameweeksToLeague(standings, null);
+    window.FPLToolboxProLeagueDataReady = true;
+    toolsScreen(); // Re-render for pro features
+  }
+
+  // Max Tier (only user 12)
+  if (userHasAccess([12])) {
     await weeklyPicksForSuperLeague(standings, null);
-    window.FPLToolboxLeagueDataReady = true;
+    window.FPLToolboxMaxLeagueDataReady = true;
+    toolsScreen(); // Re-render for max features
   }
 }
+
+
 async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
   try {
     const result = await createSelectedLeague(leagueId, onStatusUpdate);
@@ -671,19 +717,33 @@ async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
 }
 
 async function renderToolsScreenWithLeague(leagueId = theUser.info.league_id) {
-  // Step 1: Initial render to show UI (spinners if data not ready)
+  // Step 1: Show initial screen (spinners if needed)
   toolsScreen();
 
-  // Step 2: Check if data is already available (e.g. cached)
-  if (window.FPLToolboxLeagueData?.standings?.length) return;
+  const hasStandings = window.FPLToolboxLeagueData?.standings?.length;
+  const needsPro = userHasAccess([10]);
+  const needsMax = userHasAccess([12]);
 
-  // Step 3: Fetch and re-render after processing
-  await fetchAndProcessLeague(leagueId, (status, data) => {
+  const proReady = window.FPLToolboxProLeagueDataReady;
+  const maxReady = window.FPLToolboxMaxLeagueDataReady;
+
+  // Step 2: Skip fetch if all required data is already ready
+  if (
+    hasStandings &&
+    (!needsPro || proReady) &&
+    (!needsMax || maxReady)
+  ) {
+    return;
+  }
+
+  // Step 3: Fetch league and process it
+  await fetchAndProcessLeague(leagueId, (status) => {
     if (status === "complete") {
-      toolsScreen(); // Re-render after league data is ready
+      toolsScreen(); // Re-render after final data load
     }
   });
 }
+
 
 async function addManagerDetailsToLeague(standings, div) {
   const startTime = Date.now(); // Start the timer
@@ -696,13 +756,15 @@ async function addManagerDetailsToLeague(standings, div) {
     );
 
     window.FPLToolboxLeagueData.standings =
-      sliceStandingsForUser(superLeagueAddingManagerDataTest.standings)
+      sliceStandingsForUser(superLeagueManagerDataTest.standings)
     console.log(
       "%c TEST MODE - NO API CALL MADE - Adding Manager Details",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
       "New Data",
       window.FPLToolboxLeagueData.standings
     );
+    console.log("simulating delay")
+    await sleep(3000);
 
     return; // Skip live fetching
   }
@@ -732,7 +794,7 @@ async function addManagerDetailsToLeague(standings, div) {
     "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
     standings
   );
-  console.log(standings);
+
 }
 async function addGameweeksToLeague(standings, div) {
   const startTime = Date.now(); // Start the timer
@@ -745,14 +807,15 @@ async function addGameweeksToLeague(standings, div) {
     );
 
     window.FPLToolboxLeagueData.standings =
-      sliceStandingsForUser(superLeagueAddingGameweekDataTest.standings);
+      sliceStandingsForUser(superLeagueGameweekDataTest.standings);
     console.log(
       "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
       "New Data",
       window.FPLToolboxLeagueData.standings
     );
-
+    console.log("simulating delay")
+    await sleep(3000);
     return; // Skip live fetching
   }
   const gwFetches = standings.map(async (team) => {
@@ -852,24 +915,25 @@ async function addGameweeksToLeague(standings, div) {
 
 async function addDetailedGameweeksToLeague(standings, div) {
   const startTime = Date.now(); // Start the timer
-  console.log(`Searching database for Gameweek stats`);
+  console.log(`Searching database for Detailed Gameweek stats`);
   if (testMode) {
     console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
+      "%c TEST MODE - NO API CALL MADE - Adding Detailed Gameweek Details",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
       "Old Data",
       window.FPLToolboxLeagueData.standings
     );
 
     window.FPLToolboxLeagueData.standings =
-      sliceStandingsForUser(superLeagueAddingGameweekDataTest.standings);
+      sliceStandingsForUser(superLeagueDetailedGameweekDataTest.standings);
     console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
+      "%c TEST MODE - NO API CALL MADE - Adding Detailed Gameweek Details",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
       "New Data",
       window.FPLToolboxLeagueData.standings
     );
-
+    console.log("simulating delay")
+    await sleep(3000);
     return; // Skip live fetching
   }
   const allGwFetches = standings.map(async (team) => {
@@ -985,6 +1049,11 @@ async function addDetailedGameweeksToLeague(standings, div) {
   console.log(
     `All current weeks data added in ${(endTime - startTime) / 1000} seconds.`
   );
+    console.log(
+    "%c API CALL MADE - Adding Detailed Gameweek Details",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
 }
 async function weeklyPicksForSuperLeague(standings, div) {
   console.time("Weekly Picks Fetch");
@@ -1004,7 +1073,8 @@ async function weeklyPicksForSuperLeague(standings, div) {
       "New Data",
       window.FPLToolboxLeagueData.standings
     );
-
+    console.log("simulating longer delay")
+    await sleep(5000);
     return; // Skip live fetching
   }
   const cache = new Map();
@@ -1193,7 +1263,11 @@ async function weeklyPicksForSuperLeague(standings, div) {
 
     console.log(`Add all gameweek picks for ${team.entry_name}.`);
   }
-
+    console.log(
+    "%c API CALL MADE - Weekly Picks Added",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
   console.timeEnd("Weekly Picks Fetch");
 }
 
@@ -1391,10 +1465,10 @@ async function showCaptaincyPointsLeague() {
   const shareButton = document.createElement("button");
   shareButton.innerText = "Share League";
   shareButton.classList.add("btn", "btn-primary", "mt-3");
-  shareButton.onclick = shareTopTen;
+  shareButton.onclick = shareLeague;
   leagueTable.appendChild(shareButton);
 
-  function shareTopTen() {
+  function shareLeague() {
     const rows = Array.from(tableBody.querySelectorAll("tr"));
     let shareMessage = `${FPLToolboxLeagueData.leagueName}\nCaptaincy Points Leaderboard:\n`;
     rows.forEach((row, index) => {
@@ -1419,6 +1493,143 @@ async function showCaptaincyPointsLeague() {
     }
   }
 }
+async function showBenchedPointsLeague() {
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  // Add back button (styled with Bootstrap)
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  console.log(FPLToolboxLeagueData);
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  container.appendChild(leagueTable);
+
+  // Header
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${FPLToolboxLeagueData.leagueName} \n Benched Points Leaderboard`;
+  tableDescription.classList.add("text-center", "mb-3");
+  leagueTable.appendChild(tableDescription);
+
+  // Create table with Bootstrap classes
+  const table = document.createElement("table");
+  table.classList.add("table", "table-striped", "table-hover", "table-bordered");
+
+  // Detect dark mode if applicable
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  // Table header
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  const headers = ["#", "Team Name", "TOT"];
+  headers.forEach((headerText, index) => {
+    const th = document.createElement("th");
+    th.innerText = headerText;
+
+    if (headerText === "TOT") {
+      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
+    }
+
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  FPLToolboxLeagueData.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
+
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamNameCell);
+
+    const benchedPointsCell = document.createElement("td");
+    benchedPointsCell.innerText = team.totalPointsOnBench || 0;
+    benchedPointsCell.classList.add("text-end");
+    row.appendChild(benchedPointsCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  // Sort logic
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((rowA, rowB) => {
+      const pointsA = parseFloat(rowA.cells[2].innerText);
+      const pointsB = parseFloat(rowB.cells[2].innerText);
+      return ascending ? pointsA - pointsB : pointsB - pointsA;
+    });
+
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+      tableBody.appendChild(row);
+    });
+
+    const sortIndicator = document.getElementById("sort-indicator");
+    sortIndicator.innerText = ascending ? "▲" : "▼";
+  };
+
+  // Initial sort
+  sortTable(false);
+
+  // Toggle sort on header click
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
+    sortTable(!isAscending);
+  });
+
+  // Share Button
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share League";
+  shareButton.classList.add("btn", "btn-primary", "mt-3");
+  shareButton.onclick = shareLeague;
+  leagueTable.appendChild(shareButton);
+
+  function shareLeague() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareMessage = `${FPLToolboxLeagueData.leagueName}\nBenched Points Leaderboard:\n`;
+    rows.forEach((row, index) => {
+      const teamName = row.cells[1].innerText.split("\n")[0];
+      const benchedPoints = row.cells[2].innerText;
+      shareMessage += `${index + 1}. ${teamName} - Benched Points: ${benchedPoints}\n`;
+    });
+
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareMessage,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
+
+
+
+
+
 
 //HELPERS
 // Convert FPL chip name to user-friendly chip names
@@ -1539,3 +1750,4269 @@ function getPlayerPhoto(playerId) {
   getFootballerObject(playerId);
   return footballer.photo;
 }
+
+
+// function compareObjects(obj1, obj2) {
+//   const keys1 = Object.keys(obj1);
+//   const keys2 = Object.keys(obj2);
+
+//   const allKeys = new Set([...keys1, ...keys2]);
+//   let hasDifferences = false;
+
+//   allKeys.forEach((key) => {
+//     if (!(key in obj1)) {
+//       console.log(`❌ Key "${key}" is missing in the first object`);
+//       hasDifferences = true;
+//     } else if (!(key in obj2)) {
+//       console.log(`❌ Key "${key}" is missing in the second object`);
+//       hasDifferences = true;
+//     } else if (obj1[key] !== obj2[key]) {
+//       console.log(`❌ Value mismatch for key "${key}": ${obj1[key]} !== ${obj2[key]}`);
+//       hasDifferences = true;
+//     }
+//   });
+
+//   if (!hasDifferences) {
+//     console.log("✅ Objects are the same");
+//   }
+// }
+
+// const object1 = {
+//     "id": 1450135,
+//     "event_total": 62,
+//     "player_name": "Lovro Budišin",
+//     "rank": 1,
+//     "last_rank": 1,
+//     "rank_sort": 1,
+//     "total": 2810,
+//     "entry": 235307,
+//     "entry_name": "Aina Krafth Bree*",
+//     "has_played": true,
+//     "managerDetails": {
+//         "id": 235307,
+//         "joined_time": "2024-07-17T14:46:58.321789Z",
+//         "started_event": 1,
+//         "favourite_team": null,
+//         "player_first_name": "Lovro",
+//         "player_last_name": "Budišin",
+//         "player_region_id": 97,
+//         "player_region_name": "Croatia",
+//         "player_region_iso_code_short": "HR",
+//         "player_region_iso_code_long": "HRV",
+//         "years_active": 5,
+//         "summary_overall_points": 2810,
+//         "summary_overall_rank": 1,
+//         "summary_event_points": 62,
+//         "summary_event_rank": 1551968,
+//         "current_event": 38,
+//         "leagues": {
+//             "classic": [
+//                 {
+//                     "id": 117,
+//                     "name": "Croatia",
+//                     "short_name": "region-97",
+//                     "created": "2024-07-17T11:51:47.131578Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2513318,
+//                     "cup_qualified": true,
+//                     "rank_count": 29689,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 117,
+//                             "rank_count": 29689,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 301,
+//                             "last_rank": 215,
+//                             "rank_sort": 301,
+//                             "total": 254,
+//                             "league_id": 117,
+//                             "rank_count": 29689,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 276,
+//                     "name": "Gameweek 1",
+//                     "short_name": "event-1",
+//                     "created": "2024-07-17T11:51:48.316462Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": false,
+//                     "cup_league": null,
+//                     "cup_qualified": null,
+//                     "rank_count": 8569336,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 276,
+//                             "rank_count": 8569336,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 68319,
+//                             "last_rank": 40767,
+//                             "rank_sort": 68398,
+//                             "total": 254,
+//                             "league_id": 276,
+//                             "rank_count": 8569236,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 314,
+//                     "name": "Overall",
+//                     "short_name": "overall",
+//                     "created": "2024-07-17T11:51:48.594925Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2421396,
+//                     "cup_qualified": true,
+//                     "rank_count": 11433197,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 314,
+//                             "rank_count": 11433197,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 71744,
+//                             "last_rank": 43296,
+//                             "rank_sort": 71823,
+//                             "total": 254,
+//                             "league_id": 314,
+//                             "rank_count": 11433093,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 319,
+//                     "name": "Arena Sport League",
+//                     "short_name": "brd-arenasport",
+//                     "created": "2024-07-17T11:51:48.631418Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2484678,
+//                     "cup_qualified": true,
+//                     "rank_count": 138790,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 319,
+//                             "rank_count": 138790,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 1328,
+//                             "last_rank": 950,
+//                             "rank_sort": 1328,
+//                             "total": 254,
+//                             "league_id": 319,
+//                             "rank_count": 138789,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 321,
+//                     "name": "Second Chance",
+//                     "short_name": "sc",
+//                     "created": "2024-07-17T11:51:48.646333Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 21,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": false,
+//                     "cup_league": null,
+//                     "cup_qualified": null,
+//                     "rank_count": 11433186,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 105,
+//                             "last_rank": 80,
+//                             "rank_sort": 105,
+//                             "total": 1373,
+//                             "league_id": 321,
+//                             "rank_count": 11433186,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 71744,
+//                             "last_rank": 43296,
+//                             "rank_sort": 71823,
+//                             "total": 254,
+//                             "league_id": 321,
+//                             "rank_count": 11433089,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 105,
+//                     "entry_last_rank": 80
+//                 },
+//                 {
+//                     "id": 1194,
+//                     "name": "youtube.com/letstalkfpl 📽️",
+//                     "short_name": null,
+//                     "created": "2024-07-17T13:32:58.932145Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 24,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2498395,
+//                     "cup_qualified": true,
+//                     "rank_count": 127321,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 1194,
+//                             "rank_count": 127321,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 4261,
+//                             "last_rank": 2560,
+//                             "rank_sort": 4278,
+//                             "total": 254,
+//                             "league_id": 1194,
+//                             "rank_count": 127321,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 5020,
+//                     "name": "youtube.com/FPLRaptor",
+//                     "short_name": null,
+//                     "created": "2024-07-17T13:38:25.352331Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 746,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2505430,
+//                     "cup_qualified": true,
+//                     "rank_count": 51201,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 5020,
+//                             "rank_count": 51201,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 2054,
+//                             "last_rank": 1199,
+//                             "rank_sort": 2066,
+//                             "total": 254,
+//                             "league_id": 5020,
+//                             "rank_count": 51201,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 8719,
+//                     "name": "FPL Caffe",
+//                     "short_name": null,
+//                     "created": "2024-07-17T13:43:26.210823Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 44153,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2538948,
+//                     "cup_qualified": true,
+//                     "rank_count": 1490,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 8719,
+//                             "rank_count": 1490,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 49,
+//                             "last_rank": 34,
+//                             "rank_sort": 49,
+//                             "total": 254,
+//                             "league_id": 8719,
+//                             "rank_count": 1490,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 31758,
+//                     "name": "youtube.com/FPLMate 🏆",
+//                     "short_name": null,
+//                     "created": "2024-07-17T14:19:36.491790Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 96,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2505436,
+//                     "cup_qualified": true,
+//                     "rank_count": 64404,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 31758,
+//                             "rank_count": 64404,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 2003,
+//                             "last_rank": 1166,
+//                             "rank_sort": 2008,
+//                             "total": 254,
+//                             "league_id": 31758,
+//                             "rank_count": 64404,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 50794,
+//                     "name": "Tribina.hr",
+//                     "short_name": null,
+//                     "created": "2024-07-17T15:09:52.467119Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 263845,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2539005,
+//                     "cup_qualified": true,
+//                     "rank_count": 1242,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 50794,
+//                             "rank_count": 1242,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 22,
+//                             "last_rank": 25,
+//                             "rank_sort": 22,
+//                             "total": 254,
+//                             "league_id": 50794,
+//                             "rank_count": 1242,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 59293,
+//                     "name": "FPLXperti - FREE LIGA ⚽️💥",
+//                     "short_name": null,
+//                     "created": "2024-07-17T15:40:31.154182Z",
+//                     "closed": true,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 103992,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2539016,
+//                     "cup_qualified": true,
+//                     "rank_count": 1804,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 59293,
+//                             "rank_count": 1804,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 49,
+//                             "last_rank": 33,
+//                             "rank_sort": 49,
+//                             "total": 254,
+//                             "league_id": 59293,
+//                             "rank_count": 1804,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 63048,
+//                     "name": "YouTube.com/FPLFocal",
+//                     "short_name": null,
+//                     "created": "2024-07-17T15:55:12.068915Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 1301,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2505440,
+//                     "cup_qualified": true,
+//                     "rank_count": 55824,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 63048,
+//                             "rank_count": 55824,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 2006,
+//                             "last_rank": 1100,
+//                             "rank_sort": 2011,
+//                             "total": 254,
+//                             "league_id": 63048,
+//                             "rank_count": 55824,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 81846,
+//                     "name": "Hrvatski Fantazisti",
+//                     "short_name": null,
+//                     "created": "2024-07-17T17:15:13.588900Z",
+//                     "closed": true,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 6793,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2534880,
+//                     "cup_qualified": true,
+//                     "rank_count": 2454,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 81846,
+//                             "rank_count": 2454,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 65,
+//                             "last_rank": 53,
+//                             "rank_sort": 65,
+//                             "total": 254,
+//                             "league_id": 81846,
+//                             "rank_count": 2454,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 155246,
+//                     "name": "Strajina liga",
+//                     "short_name": null,
+//                     "created": "2024-07-18T09:14:11.496849Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 849613,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2513365,
+//                     "cup_qualified": true,
+//                     "rank_count": 19278,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 155246,
+//                             "rank_count": 19278,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 299,
+//                             "last_rank": 206,
+//                             "rank_sort": 299,
+//                             "total": 254,
+//                             "league_id": 155246,
+//                             "rank_count": 19278,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 409645,
+//                     "name": "Amigo",
+//                     "short_name": null,
+//                     "created": "2024-07-24T16:35:02.354058Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 130607,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 3274335,
+//                     "cup_qualified": true,
+//                     "rank_count": 6,
+//                     "entry_percentile_rank": 20,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 409645,
+//                             "rank_count": 6,
+//                             "entry_percentile_rank": 20
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 254,
+//                             "league_id": 409645,
+//                             "rank_count": 6,
+//                             "entry_percentile_rank": 20
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 438288,
+//                     "name": "Dama pije sama",
+//                     "short_name": null,
+//                     "created": "2024-07-25T17:21:02.662656Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 2283701,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 3297087,
+//                     "cup_qualified": true,
+//                     "rank_count": 6,
+//                     "entry_percentile_rank": 20,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 438288,
+//                             "rank_count": 6,
+//                             "entry_percentile_rank": 20
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 254,
+//                             "league_id": 438288,
+//                             "rank_count": 6,
+//                             "entry_percentile_rank": 20
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 461668,
+//                     "name": "Liga Ikona - Poklon Studio",
+//                     "short_name": null,
+//                     "created": "2024-07-26T17:15:54.440777Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 2092534,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2530757,
+//                     "cup_qualified": true,
+//                     "rank_count": 5246,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 461668,
+//                             "rank_count": 5246,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 97,
+//                             "last_rank": 72,
+//                             "rank_sort": 97,
+//                             "total": 254,
+//                             "league_id": 461668,
+//                             "rank_count": 5246,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 905297,
+//                     "name": "the OFFSIDE",
+//                     "short_name": null,
+//                     "created": "2024-08-10T09:46:00.685493Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 4236582,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2535128,
+//                     "cup_qualified": true,
+//                     "rank_count": 3698,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 905297,
+//                             "rank_count": 3698,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 52,
+//                             "last_rank": 39,
+//                             "rank_sort": 52,
+//                             "total": 254,
+//                             "league_id": 905297,
+//                             "rank_count": 3698,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 1169492,
+//                     "name": "KLC fantaziranje",
+//                     "short_name": null,
+//                     "created": "2024-08-13T11:30:05.783847Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 5308147,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 3798207,
+//                     "cup_qualified": true,
+//                     "rank_count": 4,
+//                     "entry_percentile_rank": 25,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 1169492,
+//                             "rank_count": 4,
+//                             "entry_percentile_rank": 25
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 254,
+//                             "league_id": 1169492,
+//                             "rank_count": 4,
+//                             "entry_percentile_rank": 25
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 1289672,
+//                     "name": "Behzinga Championship",
+//                     "short_name": null,
+//                     "created": "2024-08-14T10:10:53.245175Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 1215424,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2505455,
+//                     "cup_qualified": true,
+//                     "rank_count": 42731,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 1289672,
+//                             "rank_count": 42731,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 391,
+//                             "last_rank": 227,
+//                             "rank_sort": 391,
+//                             "total": 254,
+//                             "league_id": 1289672,
+//                             "rank_count": 42730,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 1768929,
+//                     "name": "THE PRIME FPL CHAMPIONSHIP",
+//                     "short_name": null,
+//                     "created": "2024-08-16T12:46:28.310161Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 141594,
+//                     "start_event": 1,
+//                     "entry_can_leave": true,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2484684,
+//                     "cup_qualified": false,
+//                     "rank_count": 144611,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 1768929,
+//                             "rank_count": 144611,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 2055,
+//                             "last_rank": 1195,
+//                             "rank_sort": 2062,
+//                             "total": 254,
+//                             "league_id": 1768929,
+//                             "rank_count": 144610,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 }
+//             ],
+//             "h2h": [],
+//             "cup": {
+//                 "matches": [],
+//                 "status": {
+//                     "qualification_event": null,
+//                     "qualification_numbers": null,
+//                     "qualification_rank": null,
+//                     "qualification_state": null
+//                 },
+//                 "cup_league": null
+//             },
+//             "cup_matches": [
+//                 {
+//                     "id": 112394128,
+//                     "entry_1_entry": 1242386,
+//                     "entry_1_name": "MyBoys",
+//                     "entry_1_player_name": "Tyson Webster",
+//                     "entry_1_points": 135,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 134,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2498395,
+//                     "winner": 1242386,
+//                     "seed_value": null,
+//                     "event": 24,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 32768"
+//                 },
+//                 {
+//                     "id": 114552940,
+//                     "entry_1_entry": 4738591,
+//                     "entry_1_name": "Khaled",
+//                     "entry_1_player_name": "Khaled Ammar",
+//                     "entry_1_points": 97,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 86,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2421396,
+//                     "winner": 4738591,
+//                     "seed_value": null,
+//                     "event": 25,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 16384"
+//                 },
+//                 {
+//                     "id": 115132012,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 86,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 6308696,
+//                     "entry_2_name": "ZVIBABA FC",
+//                     "entry_2_player_name": "Tendai Nigel",
+//                     "entry_2_points": 95,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2505430,
+//                     "winner": 6308696,
+//                     "seed_value": null,
+//                     "event": 25,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 16384"
+//                 },
+//                 {
+//                     "id": 115465544,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 86,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 4309825,
+//                     "entry_2_name": "Chewrassic Park",
+//                     "entry_2_player_name": "Brandon Chew",
+//                     "entry_2_points": 115,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2505440,
+//                     "winner": 4309825,
+//                     "seed_value": null,
+//                     "event": 25,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 16384"
+//                 },
+//                 {
+//                     "id": 115486068,
+//                     "entry_1_entry": 9931521,
+//                     "entry_1_name": "Okocha",
+//                     "entry_1_player_name": "Marin Jovanović",
+//                     "entry_1_points": 94,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 86,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2513318,
+//                     "winner": 9931521,
+//                     "seed_value": null,
+//                     "event": 25,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 16384"
+//                 },
+//                 {
+//                     "id": 120214541,
+//                     "entry_1_entry": 7340261,
+//                     "entry_1_name": "TmPA",
+//                     "entry_1_player_name": "Tor Mahtte Anti",
+//                     "entry_1_points": 53,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 49,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2505455,
+//                     "winner": 7340261,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 120235302,
+//                     "entry_1_entry": 5691853,
+//                     "entry_1_name": "Kolibri United",
+//                     "entry_1_player_name": "Miloš Dragutinović",
+//                     "entry_1_points": 61,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 49,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2484678,
+//                     "winner": 5691853,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 120291620,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 49,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 866887,
+//                     "entry_2_name": "Kudos to you",
+//                     "entry_2_player_name": "Callum Laver",
+//                     "entry_2_points": 67,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2505436,
+//                     "winner": 866887,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 120461457,
+//                     "entry_1_entry": 3688328,
+//                     "entry_1_name": "Montana Junior",
+//                     "entry_1_player_name": "Nikola Nanusevski",
+//                     "entry_1_points": 54,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 49,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2513365,
+//                     "winner": 3688328,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 121035664,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 49,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 2568167,
+//                     "entry_2_name": "Marojko_Herc",
+//                     "entry_2_player_name": "Tony Glibo",
+//                     "entry_2_points": 57,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2530757,
+//                     "winner": 2568167,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 123139843,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 62,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 6421114,
+//                     "entry_2_name": "Proud to be Croat",
+//                     "entry_2_player_name": "Toni Celic",
+//                     "entry_2_points": 69,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2534880,
+//                     "winner": 6421114,
+//                     "seed_value": null,
+//                     "event": 28,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 2048"
+//                 },
+//                 {
+//                     "id": 123328143,
+//                     "entry_1_entry": 5842040,
+//                     "entry_1_name": "Pickle's Team",
+//                     "entry_1_player_name": "Pavle Vuković",
+//                     "entry_1_points": 63,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 62,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2535128,
+//                     "winner": 5842040,
+//                     "seed_value": null,
+//                     "event": 28,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 2048"
+//                 },
+//                 {
+//                     "id": 123388162,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 62,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 6457163,
+//                     "entry_2_name": "Debeli Ronaldo",
+//                     "entry_2_player_name": "Čedomir Došenović",
+//                     "entry_2_points": 75,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2538948,
+//                     "winner": 6457163,
+//                     "seed_value": null,
+//                     "event": 28,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 2048"
+//                 },
+//                 {
+//                     "id": 123525557,
+//                     "entry_1_entry": 320728,
+//                     "entry_1_name": "Konavljanin",
+//                     "entry_1_player_name": "Ante Bezelj",
+//                     "entry_1_points": 74,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 62,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2539005,
+//                     "winner": 320728,
+//                     "seed_value": null,
+//                     "event": 28,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 2048"
+//                 },
+//                 {
+//                     "id": 132149865,
+//                     "entry_1_entry": 3541225,
+//                     "entry_1_name": "Kalimanova Glava",
+//                     "entry_1_player_name": "Dimitar Rashko",
+//                     "entry_1_points": 92,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 86,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2539016,
+//                     "winner": 3541225,
+//                     "seed_value": null,
+//                     "event": 34,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 32"
+//                 },
+//                 {
+//                     "id": 148321444,
+//                     "entry_1_entry": 2334463,
+//                     "entry_1_name": "N.T",
+//                     "entry_1_player_name": "Niko Tomašević",
+//                     "entry_1_points": 51,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 58,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 3297087,
+//                     "winner": 235307,
+//                     "seed_value": null,
+//                     "event": 38,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Final"
+//                 },
+//                 {
+//                     "id": 148362900,
+//                     "entry_1_entry": 130607,
+//                     "entry_1_name": "Žamal",
+//                     "entry_1_player_name": "Marko Matijašić",
+//                     "entry_1_points": 34,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 58,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 3274335,
+//                     "winner": 235307,
+//                     "seed_value": null,
+//                     "event": 38,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Final"
+//                 },
+//                 {
+//                     "id": 148834447,
+//                     "entry_1_entry": 4235387,
+//                     "entry_1_name": "Kičma noge ruke noge",
+//                     "entry_1_player_name": "Gordan Manojlovic",
+//                     "entry_1_points": 33,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 58,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 3798207,
+//                     "winner": 235307,
+//                     "seed_value": null,
+//                     "event": 38,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Final"
+//                 }
+//             ]
+//         },
+//         "name": "Aina Krafth Bree*",
+//         "name_change_blocked": false,
+//         "entered_events": [
+//             1,
+//             2,
+//             3,
+//             4,
+//             5,
+//             6,
+//             7,
+//             8,
+//             9,
+//             10,
+//             11,
+//             12,
+//             13,
+//             14,
+//             15,
+//             16,
+//             17,
+//             18,
+//             19,
+//             20,
+//             21,
+//             22,
+//             23,
+//             24,
+//             25,
+//             26,
+//             27,
+//             28,
+//             29,
+//             30,
+//             31,
+//             32,
+//             33,
+//             34,
+//             35,
+//             36,
+//             37,
+//             38
+//         ],
+//         "kit": "{\"kit_shirt_type\":\"plain\",\"kit_shirt_base\":\"#E1E1E1\",\"kit_shirt_sleeves\":\"#E1E1E1\",\"kit_shirt_secondary\":\"#E1E1E1\",\"kit_shirt_logo\":\"none\",\"kit_shorts\":\"#E1E1E1\",\"kit_socks_type\":\"plain\",\"kit_socks_base\":\"#E1E1E1\",\"kit_socks_secondary\":\"#E1E1E1\"}",
+//         "last_deadline_bank": 11,
+//         "last_deadline_value": 1061,
+//         "last_deadline_total_transfers": 37
+//     },
+//     "everyGw": [
+//         {
+//             "percentile_rank": 5,
+//             "bank": 10,
+//             "gameweek": 1,
+//             "points": 80,
+//             "rank": 321537,
+//             "overall_rank": 321537,
+//             "value": 1000,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 35,
+//             "bank": 10,
+//             "gameweek": 2,
+//             "points": 77,
+//             "rank": 2985611,
+//             "overall_rank": 483707,
+//             "value": 1002,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 5
+//         },
+//         {
+//             "percentile_rank": 25,
+//             "bank": 24,
+//             "gameweek": 3,
+//             "points": 78,
+//             "rank": 2046702,
+//             "overall_rank": 492850,
+//             "value": 1003,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 5
+//         },
+//         {
+//             "percentile_rank": 100,
+//             "bank": 24,
+//             "gameweek": 4,
+//             "points": 23,
+//             "rank": 10068255,
+//             "overall_rank": 2882863,
+//             "value": 1004,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 10
+//         },
+//         {
+//             "percentile_rank": 15,
+//             "bank": 18,
+//             "gameweek": 5,
+//             "points": 73,
+//             "rank": 1311833,
+//             "overall_rank": 1907804,
+//             "value": 1005,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 1
+//         },
+//         {
+//             "percentile_rank": 20,
+//             "bank": 4,
+//             "gameweek": 6,
+//             "points": 67,
+//             "rank": 1765717,
+//             "overall_rank": 1020101,
+//             "value": 1010,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 7
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 11,
+//             "gameweek": 7,
+//             "points": 65,
+//             "rank": 766193,
+//             "overall_rank": 407232,
+//             "value": 1010,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 9
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 15,
+//             "gameweek": 8,
+//             "points": 65,
+//             "rank": 97946,
+//             "overall_rank": 78101,
+//             "value": 1010,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 0
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 16,
+//             "gameweek": 9,
+//             "points": 87,
+//             "rank": 34799,
+//             "overall_rank": 15218,
+//             "value": 1012,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 12,
+//             "gameweek": 10,
+//             "points": 59,
+//             "rank": 512148,
+//             "overall_rank": 7256,
+//             "value": 1016,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 26
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 33,
+//             "gameweek": 11,
+//             "points": 71,
+//             "rank": 741530,
+//             "overall_rank": 4622,
+//             "value": 1021,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 6,
+//             "gameweek": 12,
+//             "points": 83,
+//             "rank": 149885,
+//             "overall_rank": 886,
+//             "value": 1020,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 8
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 6,
+//             "gameweek": 13,
+//             "points": 91,
+//             "rank": 363738,
+//             "overall_rank": 436,
+//             "value": 1028,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 40,
+//             "bank": 16,
+//             "gameweek": 14,
+//             "points": 64,
+//             "rank": 3895677,
+//             "overall_rank": 593,
+//             "value": 1034,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 8
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 11,
+//             "gameweek": 15,
+//             "points": 73,
+//             "rank": 687542,
+//             "overall_rank": 226,
+//             "value": 1036,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 11,
+//             "gameweek": 16,
+//             "points": 68,
+//             "rank": 451060,
+//             "overall_rank": 84,
+//             "value": 1041,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 5
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 9,
+//             "gameweek": 17,
+//             "points": 106,
+//             "rank": 73186,
+//             "overall_rank": 23,
+//             "value": 1041,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 19
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 9,
+//             "gameweek": 18,
+//             "points": 80,
+//             "rank": 151494,
+//             "overall_rank": 8,
+//             "value": 1044,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 7
+//         },
+//         {
+//             "percentile_rank": 50,
+//             "bank": 13,
+//             "gameweek": 19,
+//             "points": 69,
+//             "rank": 5036747,
+//             "overall_rank": 21,
+//             "value": 1049,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 24
+//         },
+//         {
+//             "percentile_rank": 60,
+//             "bank": 16,
+//             "gameweek": 20,
+//             "points": 58,
+//             "rank": 6199029,
+//             "overall_rank": 66,
+//             "value": 1050,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 1
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 7,
+//             "gameweek": 21,
+//             "points": 93,
+//             "rank": 207110,
+//             "overall_rank": 17,
+//             "value": 1053,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 7
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 7,
+//             "gameweek": 22,
+//             "points": 69,
+//             "rank": 361033,
+//             "overall_rank": 4,
+//             "value": 1058,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 7
+//         },
+//         {
+//             "percentile_rank": 15,
+//             "bank": 0,
+//             "gameweek": 23,
+//             "points": 73,
+//             "rank": 1304008,
+//             "overall_rank": 4,
+//             "value": 1063,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 4
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 1,
+//             "gameweek": 24,
+//             "points": 134,
+//             "rank": 937768,
+//             "overall_rank": 5,
+//             "value": 1057,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 5
+//         },
+//         {
+//             "percentile_rank": 35,
+//             "bank": 1,
+//             "gameweek": 25,
+//             "points": 86,
+//             "rank": 3550057,
+//             "overall_rank": 10,
+//             "value": 1056,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 4
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 39,
+//             "gameweek": 26,
+//             "points": 108,
+//             "rank": 31401,
+//             "overall_rank": 3,
+//             "value": 1056,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 2
+//         },
+//         {
+//             "percentile_rank": 70,
+//             "bank": 19,
+//             "gameweek": 27,
+//             "points": 49,
+//             "rank": 7780909,
+//             "overall_rank": 6,
+//             "value": 1055,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 6
+//         },
+//         {
+//             "percentile_rank": 30,
+//             "bank": 19,
+//             "gameweek": 28,
+//             "points": 62,
+//             "rank": 3120804,
+//             "overall_rank": 8,
+//             "value": 1058,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 19,
+//             "gameweek": 29,
+//             "points": 71,
+//             "rank": 601987,
+//             "overall_rank": 2,
+//             "value": 1053,
+//             "transfers": 3,
+//             "transfers_cost": 4,
+//             "bench_points": 0
+//         },
+//         {
+//             "percentile_rank": 50,
+//             "bank": 4,
+//             "gameweek": 30,
+//             "points": 45,
+//             "rank": 5555363,
+//             "overall_rank": 2,
+//             "value": 1047,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 15
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 4,
+//             "gameweek": 31,
+//             "points": 70,
+//             "rank": 49309,
+//             "overall_rank": 1,
+//             "value": 1053,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 12
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 4,
+//             "gameweek": 32,
+//             "points": 87,
+//             "rank": 765727,
+//             "overall_rank": 1,
+//             "value": 1056,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 11
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 13,
+//             "gameweek": 33,
+//             "points": 90,
+//             "rank": 293208,
+//             "overall_rank": 1,
+//             "value": 1058,
+//             "transfers": 3,
+//             "transfers_cost": 0,
+//             "bench_points": 0
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 13,
+//             "gameweek": 34,
+//             "points": 86,
+//             "rank": 369923,
+//             "overall_rank": 1,
+//             "value": 1061,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 11
+//         },
+//         {
+//             "percentile_rank": 15,
+//             "bank": 36,
+//             "gameweek": 35,
+//             "points": 56,
+//             "rank": 1147275,
+//             "overall_rank": 1,
+//             "value": 1058,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 12
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 0,
+//             "gameweek": 36,
+//             "points": 83,
+//             "rank": 30479,
+//             "overall_rank": 1,
+//             "value": 1056,
+//             "transfers": 2,
+//             "transfers_cost": 4,
+//             "bench_points": 9
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 4,
+//             "gameweek": 37,
+//             "points": 61,
+//             "rank": 695743,
+//             "overall_rank": 1,
+//             "value": 1057,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 12
+//         },
+//         {
+//             "percentile_rank": 15,
+//             "bank": 11,
+//             "gameweek": 38,
+//             "points": 62,
+//             "rank": 1551968,
+//             "overall_rank": 1,
+//             "value": 1061,
+//             "transfers": 2,
+//             "transfers_cost": 4,
+//             "bench_points": 6
+//         }
+//     ],
+//     "totalTransfers": 37,
+//     "totalMinusPoints": 12,
+//     "totalPointsOnBench": 276,
+//     "bestWeek": {
+//         "event": 24,
+//         "points": 134,
+//         "total_points": 1806,
+//         "rank": 937768,
+//         "rank_sort": 938907,
+//         "overall_rank": 5,
+//         "percentile_rank": 10,
+//         "bank": 1,
+//         "value": 1057,
+//         "event_transfers": 2,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 5
+//     },
+//     "worstWeek": {
+//         "event": 4,
+//         "points": 23,
+//         "total_points": 258,
+//         "rank": 10068255,
+//         "rank_sort": 10068566,
+//         "overall_rank": 2882863,
+//         "percentile_rank": 100,
+//         "bank": 24,
+//         "value": 1004,
+//         "event_transfers": 0,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 10
+//     },
+//     "bestOverallRankWeek": {
+//         "event": 4,
+//         "points": 23,
+//         "total_points": 258,
+//         "rank": 10068255,
+//         "rank_sort": 10068566,
+//         "overall_rank": 2882863,
+//         "percentile_rank": 100,
+//         "bank": 24,
+//         "value": 1004,
+//         "event_transfers": 0,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 10
+//     },
+//     "worstOverallRankWeek": {
+//         "event": 31,
+//         "points": 70,
+//         "total_points": 2293,
+//         "rank": 49309,
+//         "rank_sort": 49792,
+//         "overall_rank": 1,
+//         "percentile_rank": 1,
+//         "bank": 4,
+//         "value": 1053,
+//         "event_transfers": 0,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 12
+//     },
+//     "highestValueWeek": {
+//         "event": 23,
+//         "points": 73,
+//         "total_points": 1672,
+//         "rank": 1304008,
+//         "rank_sort": 1305722,
+//         "overall_rank": 4,
+//         "percentile_rank": 15,
+//         "bank": 0,
+//         "value": 1063,
+//         "event_transfers": 1,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 4
+//     },
+//     "chips": [
+//         {
+//             "name": "wildcard",
+//             "time": "2024-11-21T10:15:44.506529Z",
+//             "gw": 12
+//         },
+//         {
+//             "name": "manager",
+//             "time": "2025-02-01T10:01:33.909883Z",
+//             "gw": 24
+//         },
+//         {
+//             "name": "wildcard",
+//             "time": "2025-04-01T15:09:46.880868Z",
+//             "gw": 30
+//         },
+//         {
+//             "name": "3xc",
+//             "time": "2025-04-12T09:53:15.401294Z",
+//             "gw": 32
+//         },
+//         {
+//             "name": "bboost",
+//             "time": "2025-04-19T11:50:01.936765Z",
+//             "gw": 33
+//         },
+//         {
+//             "name": "freehit",
+//             "time": "2025-04-20T08:19:43.399373Z",
+//             "gw": 34
+//         }
+//     ],
+//     "past": [
+//         {
+//             "season_name": "2020/21",
+//             "total_points": 1830,
+//             "rank": 4231523
+//         },
+//         {
+//             "season_name": "2021/22",
+//             "total_points": 1434,
+//             "rank": 7769696
+//         },
+//         {
+//             "season_name": "2022/23",
+//             "total_points": 2306,
+//             "rank": 1466498
+//         },
+//         {
+//             "season_name": "2023/24",
+//             "total_points": 2371,
+//             "rank": 508866
+//         },
+//         {
+//             "season_name": "2024/25",
+//             "total_points": 2810,
+//             "rank": 1
+//         }
+//     ],
+//     "seasons": 5,
+//     "seasons_managed": "2020/21",
+//     "previousRank": 1
+// }
+
+
+// const object2 = {
+//     "id": 1450135,
+//     "event_total": 62,
+//     "player_name": "Lovro Budišin",
+//     "rank": 1,
+//     "last_rank": 1,
+//     "rank_sort": 1,
+//     "total": 2810,
+//     "entry": 235307,
+//     "entry_name": "Aina Krafth Bree*",
+//     "has_played": true,
+//     "managerDetails": {
+//         "id": 235307,
+//         "joined_time": "2024-07-17T14:46:58.321789Z",
+//         "started_event": 1,
+//         "favourite_team": null,
+//         "player_first_name": "Lovro",
+//         "player_last_name": "Budišin",
+//         "player_region_id": 97,
+//         "player_region_name": "Croatia",
+//         "player_region_iso_code_short": "HR",
+//         "player_region_iso_code_long": "HRV",
+//         "years_active": 5,
+//         "summary_overall_points": 2810,
+//         "summary_overall_rank": 1,
+//         "summary_event_points": 62,
+//         "summary_event_rank": 1551968,
+//         "current_event": 38,
+//         "leagues": {
+//             "classic": [
+//                 {
+//                     "id": 117,
+//                     "name": "Croatia",
+//                     "short_name": "region-97",
+//                     "created": "2024-07-17T11:51:47.131578Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2513318,
+//                     "cup_qualified": true,
+//                     "rank_count": 29689,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 117,
+//                             "rank_count": 29689,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 301,
+//                             "last_rank": 215,
+//                             "rank_sort": 301,
+//                             "total": 254,
+//                             "league_id": 117,
+//                             "rank_count": 29689,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 276,
+//                     "name": "Gameweek 1",
+//                     "short_name": "event-1",
+//                     "created": "2024-07-17T11:51:48.316462Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": false,
+//                     "cup_league": null,
+//                     "cup_qualified": null,
+//                     "rank_count": 8569336,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 276,
+//                             "rank_count": 8569336,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 68319,
+//                             "last_rank": 40767,
+//                             "rank_sort": 68398,
+//                             "total": 254,
+//                             "league_id": 276,
+//                             "rank_count": 8569236,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 314,
+//                     "name": "Overall",
+//                     "short_name": "overall",
+//                     "created": "2024-07-17T11:51:48.594925Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2421396,
+//                     "cup_qualified": true,
+//                     "rank_count": 11433197,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 314,
+//                             "rank_count": 11433197,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 71744,
+//                             "last_rank": 43296,
+//                             "rank_sort": 71823,
+//                             "total": 254,
+//                             "league_id": 314,
+//                             "rank_count": 11433093,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 319,
+//                     "name": "Arena Sport League",
+//                     "short_name": "brd-arenasport",
+//                     "created": "2024-07-17T11:51:48.631418Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2484678,
+//                     "cup_qualified": true,
+//                     "rank_count": 138790,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 319,
+//                             "rank_count": 138790,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 1328,
+//                             "last_rank": 950,
+//                             "rank_sort": 1328,
+//                             "total": 254,
+//                             "league_id": 319,
+//                             "rank_count": 138789,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 321,
+//                     "name": "Second Chance",
+//                     "short_name": "sc",
+//                     "created": "2024-07-17T11:51:48.646333Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "s",
+//                     "scoring": "c",
+//                     "admin_entry": null,
+//                     "start_event": 21,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": false,
+//                     "cup_league": null,
+//                     "cup_qualified": null,
+//                     "rank_count": 11433186,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 105,
+//                             "last_rank": 80,
+//                             "rank_sort": 105,
+//                             "total": 1373,
+//                             "league_id": 321,
+//                             "rank_count": 11433186,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 71744,
+//                             "last_rank": 43296,
+//                             "rank_sort": 71823,
+//                             "total": 254,
+//                             "league_id": 321,
+//                             "rank_count": 11433089,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 105,
+//                     "entry_last_rank": 80
+//                 },
+//                 {
+//                     "id": 1194,
+//                     "name": "youtube.com/letstalkfpl 📽️",
+//                     "short_name": null,
+//                     "created": "2024-07-17T13:32:58.932145Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 24,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2498395,
+//                     "cup_qualified": true,
+//                     "rank_count": 127321,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 1194,
+//                             "rank_count": 127321,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 4261,
+//                             "last_rank": 2560,
+//                             "rank_sort": 4278,
+//                             "total": 254,
+//                             "league_id": 1194,
+//                             "rank_count": 127321,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 5020,
+//                     "name": "youtube.com/FPLRaptor",
+//                     "short_name": null,
+//                     "created": "2024-07-17T13:38:25.352331Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 746,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2505430,
+//                     "cup_qualified": true,
+//                     "rank_count": 51201,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 5020,
+//                             "rank_count": 51201,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 2054,
+//                             "last_rank": 1199,
+//                             "rank_sort": 2066,
+//                             "total": 254,
+//                             "league_id": 5020,
+//                             "rank_count": 51201,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 8719,
+//                     "name": "FPL Caffe",
+//                     "short_name": null,
+//                     "created": "2024-07-17T13:43:26.210823Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 44153,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2538948,
+//                     "cup_qualified": true,
+//                     "rank_count": 1490,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 8719,
+//                             "rank_count": 1490,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 49,
+//                             "last_rank": 34,
+//                             "rank_sort": 49,
+//                             "total": 254,
+//                             "league_id": 8719,
+//                             "rank_count": 1490,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 31758,
+//                     "name": "youtube.com/FPLMate 🏆",
+//                     "short_name": null,
+//                     "created": "2024-07-17T14:19:36.491790Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 96,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2505436,
+//                     "cup_qualified": true,
+//                     "rank_count": 64404,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 31758,
+//                             "rank_count": 64404,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 2003,
+//                             "last_rank": 1166,
+//                             "rank_sort": 2008,
+//                             "total": 254,
+//                             "league_id": 31758,
+//                             "rank_count": 64404,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 50794,
+//                     "name": "Tribina.hr",
+//                     "short_name": null,
+//                     "created": "2024-07-17T15:09:52.467119Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 263845,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2539005,
+//                     "cup_qualified": true,
+//                     "rank_count": 1242,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 50794,
+//                             "rank_count": 1242,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 22,
+//                             "last_rank": 25,
+//                             "rank_sort": 22,
+//                             "total": 254,
+//                             "league_id": 50794,
+//                             "rank_count": 1242,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 59293,
+//                     "name": "FPLXperti - FREE LIGA ⚽️💥",
+//                     "short_name": null,
+//                     "created": "2024-07-17T15:40:31.154182Z",
+//                     "closed": true,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 103992,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2539016,
+//                     "cup_qualified": true,
+//                     "rank_count": 1804,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 59293,
+//                             "rank_count": 1804,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 49,
+//                             "last_rank": 33,
+//                             "rank_sort": 49,
+//                             "total": 254,
+//                             "league_id": 59293,
+//                             "rank_count": 1804,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 63048,
+//                     "name": "YouTube.com/FPLFocal",
+//                     "short_name": null,
+//                     "created": "2024-07-17T15:55:12.068915Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 1301,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2505440,
+//                     "cup_qualified": true,
+//                     "rank_count": 55824,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 63048,
+//                             "rank_count": 55824,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 2006,
+//                             "last_rank": 1100,
+//                             "rank_sort": 2011,
+//                             "total": 254,
+//                             "league_id": 63048,
+//                             "rank_count": 55824,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 81846,
+//                     "name": "Hrvatski Fantazisti",
+//                     "short_name": null,
+//                     "created": "2024-07-17T17:15:13.588900Z",
+//                     "closed": true,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 6793,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2534880,
+//                     "cup_qualified": true,
+//                     "rank_count": 2454,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 81846,
+//                             "rank_count": 2454,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 65,
+//                             "last_rank": 53,
+//                             "rank_sort": 65,
+//                             "total": 254,
+//                             "league_id": 81846,
+//                             "rank_count": 2454,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 155246,
+//                     "name": "Strajina liga",
+//                     "short_name": null,
+//                     "created": "2024-07-18T09:14:11.496849Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 849613,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2513365,
+//                     "cup_qualified": true,
+//                     "rank_count": 19278,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 155246,
+//                             "rank_count": 19278,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 299,
+//                             "last_rank": 206,
+//                             "rank_sort": 299,
+//                             "total": 254,
+//                             "league_id": 155246,
+//                             "rank_count": 19278,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 409645,
+//                     "name": "Amigo",
+//                     "short_name": null,
+//                     "created": "2024-07-24T16:35:02.354058Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 130607,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 3274335,
+//                     "cup_qualified": true,
+//                     "rank_count": 6,
+//                     "entry_percentile_rank": 20,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 409645,
+//                             "rank_count": 6,
+//                             "entry_percentile_rank": 20
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 254,
+//                             "league_id": 409645,
+//                             "rank_count": 6,
+//                             "entry_percentile_rank": 20
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 438288,
+//                     "name": "Dama pije sama",
+//                     "short_name": null,
+//                     "created": "2024-07-25T17:21:02.662656Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 2283701,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 3297087,
+//                     "cup_qualified": true,
+//                     "rank_count": 6,
+//                     "entry_percentile_rank": 20,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 438288,
+//                             "rank_count": 6,
+//                             "entry_percentile_rank": 20
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 254,
+//                             "league_id": 438288,
+//                             "rank_count": 6,
+//                             "entry_percentile_rank": 20
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 461668,
+//                     "name": "Liga Ikona - Poklon Studio",
+//                     "short_name": null,
+//                     "created": "2024-07-26T17:15:54.440777Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 2092534,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2530757,
+//                     "cup_qualified": true,
+//                     "rank_count": 5246,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 461668,
+//                             "rank_count": 5246,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 97,
+//                             "last_rank": 72,
+//                             "rank_sort": 97,
+//                             "total": 254,
+//                             "league_id": 461668,
+//                             "rank_count": 5246,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 905297,
+//                     "name": "the OFFSIDE",
+//                     "short_name": null,
+//                     "created": "2024-08-10T09:46:00.685493Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 4236582,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2535128,
+//                     "cup_qualified": true,
+//                     "rank_count": 3698,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 905297,
+//                             "rank_count": 3698,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 52,
+//                             "last_rank": 39,
+//                             "rank_sort": 52,
+//                             "total": 254,
+//                             "league_id": 905297,
+//                             "rank_count": 3698,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 1169492,
+//                     "name": "KLC fantaziranje",
+//                     "short_name": null,
+//                     "created": "2024-08-13T11:30:05.783847Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 5308147,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 3798207,
+//                     "cup_qualified": true,
+//                     "rank_count": 4,
+//                     "entry_percentile_rank": 25,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 1169492,
+//                             "rank_count": 4,
+//                             "entry_percentile_rank": 25
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 254,
+//                             "league_id": 1169492,
+//                             "rank_count": 4,
+//                             "entry_percentile_rank": 25
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 1289672,
+//                     "name": "Behzinga Championship",
+//                     "short_name": null,
+//                     "created": "2024-08-14T10:10:53.245175Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 1215424,
+//                     "start_event": 1,
+//                     "entry_can_leave": false,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2505455,
+//                     "cup_qualified": true,
+//                     "rank_count": 42731,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 1289672,
+//                             "rank_count": 42731,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 391,
+//                             "last_rank": 227,
+//                             "rank_sort": 391,
+//                             "total": 254,
+//                             "league_id": 1289672,
+//                             "rank_count": 42730,
+//                             "entry_percentile_rank": 1
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 },
+//                 {
+//                     "id": 1768929,
+//                     "name": "THE PRIME FPL CHAMPIONSHIP",
+//                     "short_name": null,
+//                     "created": "2024-08-16T12:46:28.310161Z",
+//                     "closed": false,
+//                     "rank": null,
+//                     "max_entries": null,
+//                     "league_type": "x",
+//                     "scoring": "c",
+//                     "admin_entry": 141594,
+//                     "start_event": 1,
+//                     "entry_can_leave": true,
+//                     "entry_can_admin": false,
+//                     "entry_can_invite": false,
+//                     "has_cup": true,
+//                     "cup_league": 2484684,
+//                     "cup_qualified": false,
+//                     "rank_count": 144611,
+//                     "entry_percentile_rank": 1,
+//                     "active_phases": [
+//                         {
+//                             "phase": 1,
+//                             "rank": 1,
+//                             "last_rank": 1,
+//                             "rank_sort": 1,
+//                             "total": 2810,
+//                             "league_id": 1768929,
+//                             "rank_count": 144611,
+//                             "entry_percentile_rank": 1
+//                         },
+//                         {
+//                             "phase": 11,
+//                             "rank": 2055,
+//                             "last_rank": 1195,
+//                             "rank_sort": 2062,
+//                             "total": 254,
+//                             "league_id": 1768929,
+//                             "rank_count": 144610,
+//                             "entry_percentile_rank": 5
+//                         }
+//                     ],
+//                     "entry_rank": 1,
+//                     "entry_last_rank": 1
+//                 }
+//             ],
+//             "h2h": [],
+//             "cup": {
+//                 "matches": [],
+//                 "status": {
+//                     "qualification_event": null,
+//                     "qualification_numbers": null,
+//                     "qualification_rank": null,
+//                     "qualification_state": null
+//                 },
+//                 "cup_league": null
+//             },
+//             "cup_matches": [
+//                 {
+//                     "id": 112394128,
+//                     "entry_1_entry": 1242386,
+//                     "entry_1_name": "MyBoys",
+//                     "entry_1_player_name": "Tyson Webster",
+//                     "entry_1_points": 135,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 134,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2498395,
+//                     "winner": 1242386,
+//                     "seed_value": null,
+//                     "event": 24,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 32768"
+//                 },
+//                 {
+//                     "id": 114552940,
+//                     "entry_1_entry": 4738591,
+//                     "entry_1_name": "Khaled",
+//                     "entry_1_player_name": "Khaled Ammar",
+//                     "entry_1_points": 97,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 86,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2421396,
+//                     "winner": 4738591,
+//                     "seed_value": null,
+//                     "event": 25,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 16384"
+//                 },
+//                 {
+//                     "id": 115132012,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 86,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 6308696,
+//                     "entry_2_name": "ZVIBABA FC",
+//                     "entry_2_player_name": "Tendai Nigel",
+//                     "entry_2_points": 95,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2505430,
+//                     "winner": 6308696,
+//                     "seed_value": null,
+//                     "event": 25,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 16384"
+//                 },
+//                 {
+//                     "id": 115465544,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 86,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 4309825,
+//                     "entry_2_name": "Chewrassic Park",
+//                     "entry_2_player_name": "Brandon Chew",
+//                     "entry_2_points": 115,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2505440,
+//                     "winner": 4309825,
+//                     "seed_value": null,
+//                     "event": 25,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 16384"
+//                 },
+//                 {
+//                     "id": 115486068,
+//                     "entry_1_entry": 9931521,
+//                     "entry_1_name": "Okocha",
+//                     "entry_1_player_name": "Marin Jovanović",
+//                     "entry_1_points": 94,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 86,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2513318,
+//                     "winner": 9931521,
+//                     "seed_value": null,
+//                     "event": 25,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 16384"
+//                 },
+//                 {
+//                     "id": 120214541,
+//                     "entry_1_entry": 7340261,
+//                     "entry_1_name": "TmPA",
+//                     "entry_1_player_name": "Tor Mahtte Anti",
+//                     "entry_1_points": 53,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 49,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2505455,
+//                     "winner": 7340261,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 120235302,
+//                     "entry_1_entry": 5691853,
+//                     "entry_1_name": "Kolibri United",
+//                     "entry_1_player_name": "Miloš Dragutinović",
+//                     "entry_1_points": 61,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 49,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2484678,
+//                     "winner": 5691853,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 120291620,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 49,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 866887,
+//                     "entry_2_name": "Kudos to you",
+//                     "entry_2_player_name": "Callum Laver",
+//                     "entry_2_points": 67,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2505436,
+//                     "winner": 866887,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 120461457,
+//                     "entry_1_entry": 3688328,
+//                     "entry_1_name": "Montana Junior",
+//                     "entry_1_player_name": "Nikola Nanusevski",
+//                     "entry_1_points": 54,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 49,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2513365,
+//                     "winner": 3688328,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 121035664,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 49,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 2568167,
+//                     "entry_2_name": "Marojko_Herc",
+//                     "entry_2_player_name": "Tony Glibo",
+//                     "entry_2_points": 57,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2530757,
+//                     "winner": 2568167,
+//                     "seed_value": null,
+//                     "event": 27,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 4096"
+//                 },
+//                 {
+//                     "id": 123139843,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 62,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 6421114,
+//                     "entry_2_name": "Proud to be Croat",
+//                     "entry_2_player_name": "Toni Celic",
+//                     "entry_2_points": 69,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2534880,
+//                     "winner": 6421114,
+//                     "seed_value": null,
+//                     "event": 28,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 2048"
+//                 },
+//                 {
+//                     "id": 123328143,
+//                     "entry_1_entry": 5842040,
+//                     "entry_1_name": "Pickle's Team",
+//                     "entry_1_player_name": "Pavle Vuković",
+//                     "entry_1_points": 63,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 62,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2535128,
+//                     "winner": 5842040,
+//                     "seed_value": null,
+//                     "event": 28,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 2048"
+//                 },
+//                 {
+//                     "id": 123388162,
+//                     "entry_1_entry": 235307,
+//                     "entry_1_name": "Aina Krafth Bree*",
+//                     "entry_1_player_name": "Lovro Budišin",
+//                     "entry_1_points": 62,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 6457163,
+//                     "entry_2_name": "Debeli Ronaldo",
+//                     "entry_2_player_name": "Čedomir Došenović",
+//                     "entry_2_points": 75,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2538948,
+//                     "winner": 6457163,
+//                     "seed_value": null,
+//                     "event": 28,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 2048"
+//                 },
+//                 {
+//                     "id": 123525557,
+//                     "entry_1_entry": 320728,
+//                     "entry_1_name": "Konavljanin",
+//                     "entry_1_player_name": "Ante Bezelj",
+//                     "entry_1_points": 74,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 62,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2539005,
+//                     "winner": 320728,
+//                     "seed_value": null,
+//                     "event": 28,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 2048"
+//                 },
+//                 {
+//                     "id": 132149865,
+//                     "entry_1_entry": 3541225,
+//                     "entry_1_name": "Kalimanova Glava",
+//                     "entry_1_player_name": "Dimitar Rashko",
+//                     "entry_1_points": 92,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 86,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 2539016,
+//                     "winner": 3541225,
+//                     "seed_value": null,
+//                     "event": 34,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Round of 32"
+//                 },
+//                 {
+//                     "id": 148321444,
+//                     "entry_1_entry": 2334463,
+//                     "entry_1_name": "N.T",
+//                     "entry_1_player_name": "Niko Tomašević",
+//                     "entry_1_points": 51,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 58,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 3297087,
+//                     "winner": 235307,
+//                     "seed_value": null,
+//                     "event": 38,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Final"
+//                 },
+//                 {
+//                     "id": 148362900,
+//                     "entry_1_entry": 130607,
+//                     "entry_1_name": "Žamal",
+//                     "entry_1_player_name": "Marko Matijašić",
+//                     "entry_1_points": 34,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 58,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 3274335,
+//                     "winner": 235307,
+//                     "seed_value": null,
+//                     "event": 38,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Final"
+//                 },
+//                 {
+//                     "id": 148834447,
+//                     "entry_1_entry": 4235387,
+//                     "entry_1_name": "Kičma noge ruke noge",
+//                     "entry_1_player_name": "Gordan Manojlovic",
+//                     "entry_1_points": 33,
+//                     "entry_1_win": 0,
+//                     "entry_1_draw": 0,
+//                     "entry_1_loss": 0,
+//                     "entry_1_total": 0,
+//                     "entry_2_entry": 235307,
+//                     "entry_2_name": "Aina Krafth Bree*",
+//                     "entry_2_player_name": "Lovro Budišin",
+//                     "entry_2_points": 58,
+//                     "entry_2_win": 0,
+//                     "entry_2_draw": 0,
+//                     "entry_2_loss": 0,
+//                     "entry_2_total": 0,
+//                     "is_knockout": true,
+//                     "league": 3798207,
+//                     "winner": 235307,
+//                     "seed_value": null,
+//                     "event": 38,
+//                     "tiebreak": null,
+//                     "is_bye": false,
+//                     "knockout_name": "Final"
+//                 }
+//             ]
+//         },
+//         "name": "Aina Krafth Bree*",
+//         "name_change_blocked": false,
+//         "entered_events": [
+//             1,
+//             2,
+//             3,
+//             4,
+//             5,
+//             6,
+//             7,
+//             8,
+//             9,
+//             10,
+//             11,
+//             12,
+//             13,
+//             14,
+//             15,
+//             16,
+//             17,
+//             18,
+//             19,
+//             20,
+//             21,
+//             22,
+//             23,
+//             24,
+//             25,
+//             26,
+//             27,
+//             28,
+//             29,
+//             30,
+//             31,
+//             32,
+//             33,
+//             34,
+//             35,
+//             36,
+//             37,
+//             38
+//         ],
+//         "kit": "{\"kit_shirt_type\":\"plain\",\"kit_shirt_base\":\"#E1E1E1\",\"kit_shirt_sleeves\":\"#E1E1E1\",\"kit_shirt_secondary\":\"#E1E1E1\",\"kit_shirt_logo\":\"none\",\"kit_shorts\":\"#E1E1E1\",\"kit_socks_type\":\"plain\",\"kit_socks_base\":\"#E1E1E1\",\"kit_socks_secondary\":\"#E1E1E1\"}",
+//         "last_deadline_bank": 11,
+//         "last_deadline_value": 1061,
+//         "last_deadline_total_transfers": 37
+//     },
+//     "everyGw": [
+//         {
+//             "percentile_rank": 5,
+//             "bank": 10,
+//             "gameweek": 1,
+//             "points": 80,
+//             "rank": 321537,
+//             "overall_rank": 321537,
+//             "value": 1000,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 35,
+//             "bank": 10,
+//             "gameweek": 2,
+//             "points": 77,
+//             "rank": 2985611,
+//             "overall_rank": 483707,
+//             "value": 1002,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 5
+//         },
+//         {
+//             "percentile_rank": 25,
+//             "bank": 24,
+//             "gameweek": 3,
+//             "points": 78,
+//             "rank": 2046702,
+//             "overall_rank": 492850,
+//             "value": 1003,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 5
+//         },
+//         {
+//             "percentile_rank": 100,
+//             "bank": 24,
+//             "gameweek": 4,
+//             "points": 23,
+//             "rank": 10068255,
+//             "overall_rank": 2882863,
+//             "value": 1004,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 10
+//         },
+//         {
+//             "percentile_rank": 15,
+//             "bank": 18,
+//             "gameweek": 5,
+//             "points": 73,
+//             "rank": 1311833,
+//             "overall_rank": 1907804,
+//             "value": 1005,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 1
+//         },
+//         {
+//             "percentile_rank": 20,
+//             "bank": 4,
+//             "gameweek": 6,
+//             "points": 67,
+//             "rank": 1765717,
+//             "overall_rank": 1020101,
+//             "value": 1010,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 7
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 11,
+//             "gameweek": 7,
+//             "points": 65,
+//             "rank": 766193,
+//             "overall_rank": 407232,
+//             "value": 1010,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 9
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 15,
+//             "gameweek": 8,
+//             "points": 65,
+//             "rank": 97946,
+//             "overall_rank": 78101,
+//             "value": 1010,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 0
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 16,
+//             "gameweek": 9,
+//             "points": 87,
+//             "rank": 34799,
+//             "overall_rank": 15218,
+//             "value": 1012,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 12,
+//             "gameweek": 10,
+//             "points": 59,
+//             "rank": 512148,
+//             "overall_rank": 7256,
+//             "value": 1016,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 26
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 33,
+//             "gameweek": 11,
+//             "points": 71,
+//             "rank": 741530,
+//             "overall_rank": 4622,
+//             "value": 1021,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 6,
+//             "gameweek": 12,
+//             "points": 83,
+//             "rank": 149885,
+//             "overall_rank": 886,
+//             "value": 1020,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 8
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 6,
+//             "gameweek": 13,
+//             "points": 91,
+//             "rank": 363738,
+//             "overall_rank": 436,
+//             "value": 1028,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 40,
+//             "bank": 16,
+//             "gameweek": 14,
+//             "points": 64,
+//             "rank": 3895677,
+//             "overall_rank": 593,
+//             "value": 1034,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 8
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 11,
+//             "gameweek": 15,
+//             "points": 73,
+//             "rank": 687542,
+//             "overall_rank": 226,
+//             "value": 1036,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 11,
+//             "gameweek": 16,
+//             "points": 68,
+//             "rank": 451060,
+//             "overall_rank": 84,
+//             "value": 1041,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 5
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 9,
+//             "gameweek": 17,
+//             "points": 106,
+//             "rank": 73186,
+//             "overall_rank": 23,
+//             "value": 1041,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 19
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 9,
+//             "gameweek": 18,
+//             "points": 80,
+//             "rank": 151494,
+//             "overall_rank": 8,
+//             "value": 1044,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 7
+//         },
+//         {
+//             "percentile_rank": 50,
+//             "bank": 13,
+//             "gameweek": 19,
+//             "points": 69,
+//             "rank": 5036747,
+//             "overall_rank": 21,
+//             "value": 1049,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 24
+//         },
+//         {
+//             "percentile_rank": 60,
+//             "bank": 16,
+//             "gameweek": 20,
+//             "points": 58,
+//             "rank": 6199029,
+//             "overall_rank": 66,
+//             "value": 1050,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 1
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 7,
+//             "gameweek": 21,
+//             "points": 93,
+//             "rank": 207110,
+//             "overall_rank": 17,
+//             "value": 1053,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 7
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 7,
+//             "gameweek": 22,
+//             "points": 69,
+//             "rank": 361033,
+//             "overall_rank": 4,
+//             "value": 1058,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 7
+//         },
+//         {
+//             "percentile_rank": 15,
+//             "bank": 0,
+//             "gameweek": 23,
+//             "points": 73,
+//             "rank": 1304008,
+//             "overall_rank": 4,
+//             "value": 1063,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 4
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 1,
+//             "gameweek": 24,
+//             "points": 134,
+//             "rank": 937768,
+//             "overall_rank": 5,
+//             "value": 1057,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 5
+//         },
+//         {
+//             "percentile_rank": 35,
+//             "bank": 1,
+//             "gameweek": 25,
+//             "points": 86,
+//             "rank": 3550057,
+//             "overall_rank": 10,
+//             "value": 1056,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 4
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 39,
+//             "gameweek": 26,
+//             "points": 108,
+//             "rank": 31401,
+//             "overall_rank": 3,
+//             "value": 1056,
+//             "transfers": 2,
+//             "transfers_cost": 0,
+//             "bench_points": 2
+//         },
+//         {
+//             "percentile_rank": 70,
+//             "bank": 19,
+//             "gameweek": 27,
+//             "points": 49,
+//             "rank": 7780909,
+//             "overall_rank": 6,
+//             "value": 1055,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 6
+//         },
+//         {
+//             "percentile_rank": 30,
+//             "bank": 19,
+//             "gameweek": 28,
+//             "points": 62,
+//             "rank": 3120804,
+//             "overall_rank": 8,
+//             "value": 1058,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 3
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 19,
+//             "gameweek": 29,
+//             "points": 71,
+//             "rank": 601987,
+//             "overall_rank": 2,
+//             "value": 1053,
+//             "transfers": 3,
+//             "transfers_cost": 4,
+//             "bench_points": 0
+//         },
+//         {
+//             "percentile_rank": 50,
+//             "bank": 4,
+//             "gameweek": 30,
+//             "points": 45,
+//             "rank": 5555363,
+//             "overall_rank": 2,
+//             "value": 1047,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 15
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 4,
+//             "gameweek": 31,
+//             "points": 70,
+//             "rank": 49309,
+//             "overall_rank": 1,
+//             "value": 1053,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 12
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 4,
+//             "gameweek": 32,
+//             "points": 87,
+//             "rank": 765727,
+//             "overall_rank": 1,
+//             "value": 1056,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 11
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 13,
+//             "gameweek": 33,
+//             "points": 90,
+//             "rank": 293208,
+//             "overall_rank": 1,
+//             "value": 1058,
+//             "transfers": 3,
+//             "transfers_cost": 0,
+//             "bench_points": 0
+//         },
+//         {
+//             "percentile_rank": 5,
+//             "bank": 13,
+//             "gameweek": 34,
+//             "points": 86,
+//             "rank": 369923,
+//             "overall_rank": 1,
+//             "value": 1061,
+//             "transfers": 0,
+//             "transfers_cost": 0,
+//             "bench_points": 11
+//         },
+//         {
+//             "percentile_rank": 15,
+//             "bank": 36,
+//             "gameweek": 35,
+//             "points": 56,
+//             "rank": 1147275,
+//             "overall_rank": 1,
+//             "value": 1058,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 12
+//         },
+//         {
+//             "percentile_rank": 1,
+//             "bank": 0,
+//             "gameweek": 36,
+//             "points": 83,
+//             "rank": 30479,
+//             "overall_rank": 1,
+//             "value": 1056,
+//             "transfers": 2,
+//             "transfers_cost": 4,
+//             "bench_points": 9
+//         },
+//         {
+//             "percentile_rank": 10,
+//             "bank": 4,
+//             "gameweek": 37,
+//             "points": 61,
+//             "rank": 695743,
+//             "overall_rank": 1,
+//             "value": 1057,
+//             "transfers": 1,
+//             "transfers_cost": 0,
+//             "bench_points": 12
+//         },
+//         {
+//             "percentile_rank": 15,
+//             "bank": 11,
+//             "gameweek": 38,
+//             "points": 62,
+//             "rank": 1551968,
+//             "overall_rank": 1,
+//             "value": 1061,
+//             "transfers": 2,
+//             "transfers_cost": 4,
+//             "bench_points": 6
+//         }
+//     ],
+//     "totalTransfers": 37,
+//     "totalMinusPoints": 12,
+//     "totalPointsOnBench": 276,
+//     "bestWeek": {
+//         "event": 24,
+//         "points": 134,
+//         "total_points": 1806,
+//         "rank": 937768,
+//         "rank_sort": 938907,
+//         "overall_rank": 5,
+//         "percentile_rank": 10,
+//         "bank": 1,
+//         "value": 1057,
+//         "event_transfers": 2,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 5
+//     },
+//     "worstWeek": {
+//         "event": 4,
+//         "points": 23,
+//         "total_points": 258,
+//         "rank": 10068255,
+//         "rank_sort": 10068566,
+//         "overall_rank": 2882863,
+//         "percentile_rank": 100,
+//         "bank": 24,
+//         "value": 1004,
+//         "event_transfers": 0,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 10
+//     },
+//     "bestOverallRankWeek": {
+//         "event": 4,
+//         "points": 23,
+//         "total_points": 258,
+//         "rank": 10068255,
+//         "rank_sort": 10068566,
+//         "overall_rank": 2882863,
+//         "percentile_rank": 100,
+//         "bank": 24,
+//         "value": 1004,
+//         "event_transfers": 0,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 10
+//     },
+//     "worstOverallRankWeek": {
+//         "event": 31,
+//         "points": 70,
+//         "total_points": 2293,
+//         "rank": 49309,
+//         "rank_sort": 49792,
+//         "overall_rank": 1,
+//         "percentile_rank": 1,
+//         "bank": 4,
+//         "value": 1053,
+//         "event_transfers": 0,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 12
+//     },
+//     "highestValueWeek": {
+//         "event": 23,
+//         "points": 73,
+//         "total_points": 1672,
+//         "rank": 1304008,
+//         "rank_sort": 1305722,
+//         "overall_rank": 4,
+//         "percentile_rank": 15,
+//         "bank": 0,
+//         "value": 1063,
+//         "event_transfers": 1,
+//         "event_transfers_cost": 0,
+//         "points_on_bench": 4
+//     },
+//     "chips": [
+//         {
+//             "name": "wildcard",
+//             "time": "2024-11-21T10:15:44.506529Z",
+//             "gw": 12
+//         },
+//         {
+//             "name": "manager",
+//             "time": "2025-02-01T10:01:33.909883Z",
+//             "gw": 24
+//         },
+//         {
+//             "name": "wildcard",
+//             "time": "2025-04-01T15:09:46.880868Z",
+//             "gw": 30
+//         },
+//         {
+//             "name": "3xc",
+//             "time": "2025-04-12T09:53:15.401294Z",
+//             "gw": 32
+//         },
+//         {
+//             "name": "bboost",
+//             "time": "2025-04-19T11:50:01.936765Z",
+//             "gw": 33
+//         },
+//         {
+//             "name": "freehit",
+//             "time": "2025-04-20T08:19:43.399373Z",
+//             "gw": 34
+//         }
+//     ],
+//     "past": [
+//         {
+//             "season_name": "2020/21",
+//             "total_points": 1830,
+//             "rank": 4231523
+//         },
+//         {
+//             "season_name": "2021/22",
+//             "total_points": 1434,
+//             "rank": 7769696
+//         },
+//         {
+//             "season_name": "2022/23",
+//             "total_points": 2306,
+//             "rank": 1466498
+//         },
+//         {
+//             "season_name": "2023/24",
+//             "total_points": 2371,
+//             "rank": 508866
+//         },
+//         {
+//             "season_name": "2024/25",
+//             "total_points": 2810,
+//             "rank": 1
+//         }
+//     ],
+//     "seasons": 5,
+//     "seasons_managed": "2020/21",
+//     "previousRank": 1
+// }
+
+
+// compareObjects(object1, object2);
