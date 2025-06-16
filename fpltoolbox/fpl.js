@@ -8,8 +8,10 @@ import bootstrapTest from "./testData/bootsatrapTest.js";
 import superLeagueTest from "./testData/superLeagueTest.js";
 import superLeagueAddingManagerDataTest from "./testData/superLeagueAddingManagerDataTest.js";
 import superLeagueAddingGameweekDataTest from "./testData/superLeagueGameweekDataTest copy.js";
+import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
 
 let testMode = true; // Set to true to use test data
+window.FPLToolboxLeagueDataReady = false;
 
 window.FPLToolboxLeagueData = {
   leagueName: null,
@@ -110,8 +112,6 @@ function injectUI() {
 
   injectDynamicStyles();
   setupTabListeners();
-  
-
 }
 document.getElementById("nav-container").addEventListener("click", (e) => {
   const tab = e.target.closest(".nav-tab");
@@ -329,8 +329,8 @@ function toolsScreen() {
   ];
 
   features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
-    const needsData =
-      requiresData && !window.FPLToolboxLeagueData?.standings?.length;
+    const needsData = requiresData && !window.FPLToolboxLeagueDataReady;
+
     const featureId = `feature-btn-${i}`;
 
     const col = document.createElement("div");
@@ -390,8 +390,6 @@ function toolsScreen() {
   const pendingButtons = features
     .map((f, i) => ({ ...f, index: i }))
     .filter((f) => f.requiresData);
-
-
 }
 
 function injectDynamicStyles() {
@@ -412,6 +410,13 @@ function injectDynamicStyles() {
   buttons.forEach((btn) => {
     btn.classList.toggle("btn-dark", darkMode);
     btn.classList.toggle("btn-light", !darkMode);
+  });
+
+  // Update table theme
+  const tables = document.querySelectorAll("table");
+  tables.forEach((table) => {
+    table.classList.remove("table-dark", "table-light");
+    table.classList.add(darkMode ? "table-dark" : "table-light");
   });
 }
 
@@ -590,7 +595,9 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
     for (let i = 1; i <= maxPages; i++) {
       onStatusUpdate("fetching", i);
 
-      const res = await fetch(`${BASE_URL}leagues-classic/${leagueID}/standings?page_standings=${i}`);
+      const res = await fetch(
+        `${BASE_URL}leagues-classic/${leagueID}/standings?page_standings=${i}`
+      );
       const data = await res.json();
 
       if (i === 1) leagueName = data.league.name;
@@ -607,13 +614,11 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
       standings,
       type: "Live League",
     };
-
   } catch (err) {
     onStatusUpdate("error", err);
     throw err;
   }
 }
-
 
 function handleLeagueCreation(result) {
   window.FPLToolboxLeagueData = {
@@ -624,16 +629,18 @@ function handleLeagueCreation(result) {
 }
 
 async function processLeague(standings) {
-if (userHasAccess([1, 10, 12])) {
-  await addManagerDetailsToLeague(standings, null);
-  await addGameweeksToLeague(standings, null);
+  if (userHasAccess([1, 10, 12])) {
+    await addManagerDetailsToLeague(standings, null);
+    await addGameweeksToLeague(standings, null);
+    window.FPLToolboxLeagueDataReady = true;
+  }
 
-}
-
-if (userHasAccess([10, 12])) {
-  await addDetailedGameweeksToLeague(standings, null);
-  await weeklyPicksForSuperLeague(standings, null)
-}
+  if (userHasAccess([10, 12])) {
+    window.FPLToolboxLeagueDataReady = false;
+    await addDetailedGameweeksToLeague(standings, null);
+    await weeklyPicksForSuperLeague(standings, null);
+    window.FPLToolboxLeagueDataReady = true;
+  }
 }
 async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
   try {
@@ -642,15 +649,11 @@ async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
     await processLeague(result.standings);
 
     onStatusUpdate("complete", result); // Only mark complete after all done
-
-   
   } catch (err) {
     onStatusUpdate("error", err);
     console.error("❌ Failed to fetch and process league:", err);
   }
 }
-
-
 
 async function renderToolsScreenWithLeague(leagueId = theUser.info.league_id) {
   // Step 1: Initial render to show UI (spinners if data not ready)
@@ -666,9 +669,6 @@ async function renderToolsScreenWithLeague(leagueId = theUser.info.league_id) {
     }
   });
 }
-
-
-
 
 async function addManagerDetailsToLeague(standings, div) {
   const startTime = Date.now(); // Start the timer
@@ -712,11 +712,11 @@ async function addManagerDetailsToLeague(standings, div) {
   console.log(
     `Manager details added to league ${(endTime - startTime) / 1000} seconds.`
   );
-      console.log(
-      "%c API CALL MADE - Adding Manager Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-      standings
-    );
+  console.log(
+    "%c API CALL MADE - Adding Manager Details",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
   console.log(standings);
 }
 async function addGameweeksToLeague(standings, div) {
@@ -826,11 +826,11 @@ async function addGameweeksToLeague(standings, div) {
       (endTime - startTime) / 1000
     } seconds.`
   );
-      console.log(
-      "%c API CALL MADE - Adding Gameweek Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-      standings
-    );
+  console.log(
+    "%c API CALL MADE - Adding Gameweek Details",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
 
   return standings;
 }
@@ -838,7 +838,7 @@ async function addGameweeksToLeague(standings, div) {
 async function addDetailedGameweeksToLeague(standings, div) {
   const startTime = Date.now(); // Start the timer
   console.log(`Searching database for Gameweek stats`);
-    if (testMode) {
+  if (testMode) {
     console.log(
       "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
@@ -873,7 +873,9 @@ async function addDetailedGameweeksToLeague(standings, div) {
             }))
         );
         await sleep(1000); // Add small delay between requests
-        console.log(`Calculating detailed stats about FPL Gameweek ${gw} for your league`);
+        console.log(
+          `Calculating detailed stats about FPL Gameweek ${gw} for your league`
+        );
       }
 
       // Wait for all gameweek data to resolve
@@ -971,7 +973,25 @@ async function addDetailedGameweeksToLeague(standings, div) {
 }
 async function weeklyPicksForSuperLeague(standings, div) {
   console.time("Weekly Picks Fetch");
+  if (testMode) {
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Weekly Picks",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "Old Data",
+      window.FPLToolboxLeagueData.standings
+    );
 
+    window.FPLToolboxLeagueData.standings =
+      superLeagueAddWeeklyPicksTest.standings;
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Weekly Picks",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "New Data",
+      window.FPLToolboxLeagueData.standings
+    );
+
+    return; // Skip live fetching
+  }
   const cache = new Map();
 
   for (let i = 0; i < standings.length; i++) {
@@ -1015,7 +1035,9 @@ async function weeklyPicksForSuperLeague(standings, div) {
             fetch(apiUrl).then((res) => res.json())
           );
         }
-        console.log(`Gathering detailed gameweek starting 11 for ${team.entry_name}.`);
+        console.log(
+          `Gathering detailed gameweek starting 11 for ${team.entry_name}.`
+        );
       }
     }
 
@@ -1162,9 +1184,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
 
 async function testFunction() {
   alert("working");
-  const superLeague = await createSelectedLeague(314);
-  let standings = superLeague.standings;
-  console.log(superLeague);
+  console.log(window.FPLToolboxLeagueData);
 }
 async function richListNew() {
   console.log(theUser);
@@ -1228,7 +1248,7 @@ function renderMyTeamScreen() {
 }
 
 async function testFunction2() {
-    if (!userHasAccess([12])) {
+  if (!userHasAccess([12])) {
     showModal({
       title: "Pro Feature",
       body: "This feature is only available to <strong>Pro members</strong>. <br><br>Upgrade to unlock!",
@@ -1239,55 +1259,59 @@ async function testFunction2() {
     });
     return;
   }
-  
+
   if (window.FPLToolboxLeagueData?.standings?.length) {
     console.log(window.FPLToolboxLeagueData);
   }
 }
 
-
-// Most Captaincy Points League
 async function showCaptaincyPointsLeague() {
   const container = document.getElementById("screen-tools");
-  container.innerHTML = ""; // clear previous content
+  container.innerHTML = "";
 
-  // Add back button
+  // Add back button (styled with Bootstrap)
   const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
   container.appendChild(backBtn);
 
-
-
-
   console.log(FPLToolboxLeagueData);
-  
 
   const leagueTable = document.createElement("div");
   leagueTable.setAttribute("id", "league-table");
   container.appendChild(leagueTable);
-  leagueTable.innerHTML = "";
 
-  // Add a header above the table
+  // Header
   const tableDescription = document.createElement("h6");
   tableDescription.innerText = `${FPLToolboxLeagueData.leagueName} \n Captaincy Points Leaderboard`;
-  tableDescription.style.textAlign = "center";
+  tableDescription.classList.add("text-center", "mb-3");
   leagueTable.appendChild(tableDescription);
 
-  // Create table
+  // Create table with Bootstrap classes
   const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered"
+  );
+
+  // Detect dark mode if applicable
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  // Table header
   const tableHeader = document.createElement("thead");
   const tableHeaderRow = document.createElement("tr");
 
-  // Column headers
   const headers = ["#", "Team Name", "TOT"];
   headers.forEach((headerText, index) => {
     const th = document.createElement("th");
     th.innerText = headerText;
 
-    // Add sorting to "Total Captaincy Points" column
     if (headerText === "TOT") {
       th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
-      th.style.cursor = "pointer"; // Make it look clickable
-      th.style.textAlign = "right"; // Set text alignment to right
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
     }
 
     tableHeaderRow.appendChild(th);
@@ -1298,33 +1322,67 @@ async function showCaptaincyPointsLeague() {
 
   const tableBody = document.createElement("tbody");
 
-  // Add rows for each team
-  FPLToolboxLeagueData.standings.forEach((team, index) => {
-    const row = document.createElement("tr");
+const fullStandings = FPLToolboxLeagueData.standings;
+const limit = fullStandings.length;
 
-    // Row number cell
-    const rowNumberCell = document.createElement("td");
-    rowNumberCell.innerText = index + 1;
-    row.appendChild(rowNumberCell);
+let standingsToShow = [];
 
-    // Team name cell
-    const teamNameCell = document.createElement("td");
-    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br>${team.player_name}`;
-    row.appendChild(teamNameCell);
+if (userHasAccess([12])) {
+  standingsToShow = fullStandings; // show all
+} else if (userHasAccess([10])) {
+  standingsToShow = fullStandings.slice(0, 20); // up to 20
+} else {
+  standingsToShow = fullStandings.slice(0, 5); // free: top 5
+}
 
-    // Total captaincy points cell
-    const captaincyPointsCell = document.createElement("td");
-    captaincyPointsCell.innerText = team.total_captaincy_points || 0;
-    captaincyPointsCell.style.textAlign = "right"; // Set text alignment to right
-    row.appendChild(captaincyPointsCell);
+// Render real accessible rows
+standingsToShow.forEach((team, index) => {
+  const row = document.createElement("tr");
 
-    tableBody.appendChild(row);
-  });
+  const rowNumberCell = document.createElement("td");
+  rowNumberCell.innerText = index + 1;
+  row.appendChild(rowNumberCell);
+
+  const teamNameCell = document.createElement("td");
+  teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+  row.appendChild(teamNameCell);
+
+  const captaincyPointsCell = document.createElement("td");
+  captaincyPointsCell.innerText = team.total_captaincy_points || 0;
+  captaincyPointsCell.classList.add("text-end");
+  row.appendChild(captaincyPointsCell);
+
+  tableBody.appendChild(row);
+});
+
+// Add dummy rows to fill remaining slots
+const lockedCount = limit - standingsToShow.length;
+
+for (let i = 0; i < lockedCount; i++) {
+  const row = document.createElement("tr");
+  row.classList.add("table-secondary", "text-muted");
+
+  const rowNumberCell = document.createElement("td");
+  rowNumberCell.innerText = standingsToShow.length + i + 1;
+  row.appendChild(rowNumberCell);
+
+  const teamNameCell = document.createElement("td");
+  teamNameCell.innerHTML = `<em><a href="/upgrade" style="text-decoration: none;">Subscribe to unlock</a></em>`;
+  row.appendChild(teamNameCell);
+
+  const captaincyPointsCell = document.createElement("td");
+  captaincyPointsCell.innerText = "🔒";
+  captaincyPointsCell.classList.add("text-end");
+  row.appendChild(captaincyPointsCell);
+
+  tableBody.appendChild(row);
+}
+
 
   table.appendChild(tableBody);
   leagueTable.appendChild(table);
 
-  // Sort the table by Total Captaincy Points in descending order initially
+  // Sort logic
   const sortTable = (ascending = false) => {
     const rows = Array.from(tableBody.querySelectorAll("tr"));
     rows.sort((rowA, rowB) => {
@@ -1333,37 +1391,35 @@ async function showCaptaincyPointsLeague() {
       return ascending ? pointsA - pointsB : pointsB - pointsA;
     });
 
-    // Append rows in sorted order
     rows.forEach((row, index) => {
-      row.cells[0].innerText = index + 1; // Update row numbers after sorting
+      row.cells[0].innerText = index + 1;
       tableBody.appendChild(row);
     });
 
-    // Update the sorting indicator
     const sortIndicator = document.getElementById("sort-indicator");
     sortIndicator.innerText = ascending ? "▲" : "▼";
   };
 
-  // Sort in descending order initially
+  // Initial sort
   sortTable(false);
 
-  // Add event listener for sorting when clicking the "Total Captaincy Points" header
+  // Toggle sort on header click
   tableHeaderRow.children[2].addEventListener("click", () => {
     const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
     tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
     sortTable(!isAscending);
   });
 
-  // Add share button after table
+  // Share Button
   const shareButton = document.createElement("button");
   shareButton.innerText = "Share League";
+  shareButton.classList.add("btn", "btn-primary", "mt-3");
   shareButton.onclick = shareTopTen;
   leagueTable.appendChild(shareButton);
 
-  // Function to share top 10 results using navigator.share
   function shareTopTen() {
     const rows = Array.from(tableBody.querySelectorAll("tr"));
-    let shareMessage = `${FPLToolboxLeagueData.leagueName}\n Captaincy Points Leaderboard:\n`;
+    let shareMessage = `${FPLToolboxLeagueData.leagueName}\nCaptaincy Points Leaderboard:\n`;
     rows.forEach((row, index) => {
       const teamName = row.cells[1].innerText.split("\n")[0];
       const captaincyPoints = row.cells[2].innerText;
@@ -1372,11 +1428,8 @@ async function showCaptaincyPointsLeague() {
       }. ${teamName} - Captaincy Points: ${captaincyPoints}\n`;
     });
 
-    // Add a URL to the bottom of the message
-    const url = "https://fpltoolbox.com/fpl-toolbox-pro";
-    shareMessage += `\nView your own league right here:\n ${url}`;
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
 
-    // Use navigator.share if available
     if (navigator.share) {
       navigator
         .share({
@@ -1389,7 +1442,6 @@ async function showCaptaincyPointsLeague() {
     }
   }
 }
-
 
 //HELPERS
 // Convert FPL chip name to user-friendly chip names
@@ -1407,49 +1459,48 @@ function convertChipName(chip) {
 
 // Make getFootballerObject return a Promise
 function getFootballerObject(playerId) {
- let footballer
   return new Promise((resolve, reject) => {
-    let footballer_team_id;
-    for (var i = 0; i < bootstrap.elements.length; i++) {
-      if (bootstrap.elements[i].id == playerId) {
-        footballer.web_name = bootstrap.elements[i].web_name;
-        footballer.first_name = bootstrap.elements[i].first_name;
-        footballer.second_name = bootstrap.elements[i].second_name;
-        footballer.event_points = bootstrap.elements[i].event_points;
-        footballer.dreamteam = bootstrap.elements[i].in_dreamteam;
-        footballer.points_per_game = bootstrap.elements[i].points_per_game;
-        footballer_team_id = bootstrap.elements[i].team;
-        footballer.transfers_in = bootstrap.elements[i].transfers_in;
-        footballer.transfers_in_event =
-          bootstrap.elements[i].transfers_in_event;
-        footballer.transfers_out = bootstrap.elements[i].transfers_out;
-        footballer.transfers_out_event =
-          bootstrap.elements[i].transfers_out_event;
-        footballer.price_change = bootstrap.elements[i].cost_change_event;
-        footballer.news = bootstrap.elements[i].news;
-        footballer.team_code = bootstrap.elements[i].team_code;
-        footballer.element_type = bootstrap.elements[i].element_type;
-        footballer.ep_this = bootstrap.elements[i].ep_this;
-        footballer.ep_next = bootstrap.elements[i].ep_next;
-        footballer.photo = bootstrap.elements[i].photo;
-        footballer.total_points = bootstrap.elements[i].total_points;
-        footballer.goals_scored = bootstrap.elements[i].goals_scored;
-        footballer.assists = bootstrap.elements[i].assists;
-        footballer.type = bootstrap.elements[i].element_type;
-      }
+    const player = bootstrap.elements.find((el) => el.id == playerId);
+
+    if (!player) {
+      reject(`Player with ID ${playerId} not found.`);
+      return;
     }
-    for (var i = 0; i < bootstrap.teams.length; i++) {
-      if (bootstrap.teams[i].id == footballer_team_id) {
-        footballer.team = bootstrap.teams[i].name;
-      }
-    }
+
+    const team = bootstrap.teams.find((t) => t.id == player.team);
+
+    const footballer = {
+      web_name: player.web_name,
+      first_name: player.first_name,
+      second_name: player.second_name,
+      event_points: player.event_points,
+      dreamteam: player.in_dreamteam,
+      points_per_game: player.points_per_game,
+      transfers_in: player.transfers_in,
+      transfers_in_event: player.transfers_in_event,
+      transfers_out: player.transfers_out,
+      transfers_out_event: player.transfers_out_event,
+      price_change: player.cost_change_event,
+      news: player.news,
+      team_code: player.team_code,
+      element_type: player.element_type,
+      ep_this: player.ep_this,
+      ep_next: player.ep_next,
+      photo: player.photo,
+      total_points: player.total_points,
+      goals_scored: player.goals_scored,
+      assists: player.assists,
+      type: player.element_type,
+      team: team ? team.name : "Unknown",
+    };
+
     resolve(footballer);
   });
 }
 
 // Make getPlayerWebName async
 async function getPlayerWebName(playerId) {
-  await getFootballerObject(playerId); // Wait for the footballer data to be populated
+  const footballer = await getFootballerObject(playerId); // Store the returned object
   return footballer.web_name;
 }
 
@@ -1468,8 +1519,6 @@ function getTeamShortName(teamCode) {
     }
   }
 }
-
-
 
 function getPlayerScore(playerId) {
   getFootballerObject(playerId);
