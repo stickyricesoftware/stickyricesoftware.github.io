@@ -210,3 +210,593 @@ padding: 20px!important;
     background-color: hsl(200, 20%, 95%);
   }
 }
+
+
+
+#player-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 60% 40%;
+  text-align: left;
+  border-radius: 20px;
+  padding: 20px;
+  padding-left: 0px;
+  padding-bottom: 0px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  width: 300px;
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/09/card-background-compressed.webp");
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+  position: relative;
+}
+.cardLeft {
+  display: flex;
+  flex-direction: column;
+}
+.cardLeft > img {
+  max-width: 200px;
+}
+
+.cardRight {
+  text-align: right;
+}
+.cardRight > p {
+  font-size: 1em;
+  color: #f5f3fc;
+  font-weight: bold;
+  margin-bottom: -15px;
+  text-align: right;
+}
+
+.cardLeft > h6 {
+  font-size: 2em;
+  color: #f5f3fc;
+  font-weight: bolder;
+  padding-left: 20px;
+}
+
+.xP {
+  font-size: 2em;
+  color: #f5f3fc;
+}
+
+@media only screen and (max-width: 800px) {
+  #player-card {
+    width: 100%;
+  }
+}
+
+/* Light mode pitch background */
+.pitch-light {
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png");
+  background-color: #01BA5C; /* light green */
+}
+
+/* Dark mode pitch background */
+.pitch-dark {
+  background-color: #2C3034; /* dark green */
+}
+
+
+#pitch,
+#pitch1,
+#pitch2 {
+  /* background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png"); */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  max-width: 500px;
+  padding-bottom: 20px;
+}
+#pitches {
+  max-width: 100%;
+  display: flex;
+  padding: 0px;
+}
+#pitch1,
+#pitch2 {
+  max-width: 50%;
+  padding: 2px;
+}
+
+#pitch > #my-keeper,
+#my-defenders,
+#my-midfielders,
+#my-strikers,
+#my-bench {
+  justify-content: space-evenly !important;
+  gap: auto;
+}
+
+#my-bench1 {
+  justify-content: space-evenly !important;
+}
+
+@media only screen and (min-width: 800px) {
+  #pitch1 > div {
+    transform: scale(0.9);
+  }
+  #pitch2 > div {
+    transform: scale(0.9);
+  }
+}
+
+#my-keeper,
+#my-defenders,
+#my-midfielders,
+#my-strikers,
+#my-bench,
+#my-keeper2,
+#my-defenders2,
+#my-midfielders2,
+#my-strikers2,
+#my-bench2 {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+}
+#my-bench,
+#my-bench2 {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+.player {
+  min-width: 50px;
+  max-width: 50px;
+  padding-top: 5px;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border-radius: 5px;
+}
+.player-new > img {
+  margin-bottom: -10px;
+}
+.my-player-name,
+.my-captain-name,
+.my-vice-captain-name,
+.my-triple-captain-name {
+  text-align: center;
+  width: 100%;
+  padding: 0px;
+  background: #f5f3fc;
+  color: #37003c;
+  font-size: 0.5em;
+  text-wrap: nowrap;
+  font-weight: bolder;
+  margin-top: -5px;
+  margin-bottom: 0px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.captain-badge,
+.my-vice-captain-badge,
+.my-triple-captain-badge {
+  width: 10px;
+  height: 10px;
+  margin-bottom: -10px;
+  z-index: 20;
+  position: absolute;
+}
+
+.player-search-img {
+  width: 100%;
+}
+.player-search {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.my-player-xp {
+  text-align: center;
+  width: 100%;
+  padding: 0px;
+  background: #37003c;
+  color: #f5f3fc;
+  font-size: 0.5em;
+  font-weight: bolder;
+  margin-top: -5px;
+  margin-bottom: -5px !important;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+#player-search-card-background > .player-search {
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png");
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  padding: 50px;
+  border-radius: 0px;
+  margin: 5px;
+}
+#player-search-card-background > .player-search .my-player-xp {
+  font-size: large;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-weight: bold;
+  margin-bottom: 0px;
+  padding: 5px;
+  max-width: 400px;
+}
+#player-search-card-background > .player-search .my-player-name {
+  font-size: 2rem;
+  margin-bottom: 0px;
+  padding: 5px;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-weight: bold;
+  max-width: 400px;
+}
+#player-search-card-background
+  > .player-search
+  .up-coming-fixtures
+  > .fixtureDiv
+  > .homeawaygame {
+  display: flex;
+  font-size: 1rem;
+}
+#player-search-card-background
+  > .player-search
+  .up-coming-fixtures
+  > .fixtureDiv
+  > .homeaway {
+  font-size: 1rem;
+  margin-top: 10px;
+}
+#player-search-card-background > .player-search .up-coming-fixtures > div {
+  min-width: 50px;
+  min-height: 50px;
+  max-width: 15px;
+  max-height: 15px;
+  border-radius: 3px;
+  font-weight: bolder;
+  font-size: 1.5rem;
+}
+#player-search-card-background {
+  background-color: black;
+  width: 100%;
+}
+
+#player-search-card-background > .player-search > .additional-stats > div {
+  font-size: 1.5rem;
+}
+
+#players-played {
+  font-size: 12px;
+}
+#rank-change {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+#green-arrow,
+#red-arrow {
+  color: white;
+  font-size: 44px;
+  border-radius: 100%;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#green-arrow {
+  background-color: #05fa87;
+}
+#red-arrow {
+  background-color: #fc2c80;
+}
+#first-panel {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+}
+#middle-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  position: absolute; /* Removes the middle panel from the flex layout */
+  left: 50%; /* Pushes the middle panel to the center of the container */
+  transform: translateX(
+    -50%
+  ); /* Adjusts the middle panel to be exactly centered */
+}
+#third-panel {
+  text-align: right;
+}
+#score-panel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+  position: relative;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  border-radius: 15px;
+  padding: 30px;
+}
+#score-panel p {
+  padding: 0px !important;
+  margin: 2px;
+}
+
+#my-score,
+#my-score2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  font-weight: bolder;
+  padding: 10px;
+}
+.comparison-score {
+  background: #37003c;
+  color: #f5f3fc;
+  max-width: 100px;
+
+  border-radius: 5px;
+}
+#actual-points {
+  font-size: 2.5rem;
+  margin-bottom: 0px;
+}
+#expected-points {
+  font-size: 1rem;
+}
+
+#gameweek-identifier {
+  font-size: 1rem;
+}
+.rank-difference {
+  font-size: 16px;
+}
+#comparison-text,
+#comparison-heading {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.captain-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px 20px 0px 20px;
+}
+.captain-row > .pos {
+  display: flex;
+  flex-direction: row;
+}
+.captain-row > .player {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: left;
+  text-align: left;
+}
+.captain-row > .player > div {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.captain-row:nth-child(odd) {
+  background-color: #f0f0f0;
+}
+
+.captains {
+  display: flex;
+  flex-direction: row;
+}
+.captain {
+  max-height: 75px;
+  width: 75px;
+  z-index: 2;
+  margin-top: 25px;
+}
+
+.vice-captain {
+  width: 50px;
+  z-index: 1;
+  max-height: 50px;
+  margin-left: -20px;
+  margin-top: 50px;
+}
+
+.additional-stats {
+  display: none;
+  flex-direction: row;
+  gap: 1px;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  padding-right: 3px;
+  padding-left: 9px;
+  z-index: 21;
+}
+.additional-stats > div {
+  display: flex;
+  flex-direction: row;
+  border-radius: 3px;
+  min-height: 3px;
+  margin-left: -2px;
+  padding: 0px;
+  font-size: 0.7rem;
+}
+
+.breakdown-stats {
+  display: flex;
+  flex-direction: row;
+  margin-left: -4px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.transfer-stats {
+  display: none;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  padding-right: 3px;
+  padding-left: 3px;
+  color: white;
+}
+.transfer-stats > div {
+  border-radius: 3px;
+  min-height: 3px;
+  padding: 0px;
+  font-size: 0.6rem;
+}
+
+.xp-stats {
+  display: none;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  padding-right: 3px;
+  padding-left: 3px;
+  color: black;
+}
+.xp-stats > div {
+  border-radius: 3px;
+  min-height: 3px;
+  padding: 0px;
+  font-size: 0.6rem;
+}
+
+.up-coming-fixtures {
+  display: flex;
+  flex-direction: row;
+  background-color: black;
+  margin-top: 2px;
+  gap: 2px;
+  background: transparent;
+  align-self: center;
+  justify-content: center;
+}
+.fixtureDiv {
+  min-width: 10px;
+  min-height: 10px;
+  border-radius: 3px;
+  display: flex !important;
+  flex-direction: column !important;
+  text-align: center;
+}
+.fixtureDiv > div {
+  font-size: 8px;
+}
+.fixtureDiv > div:first-child {
+  font-size: 8px;
+  margin-bottom: -10px;
+  margin-top: -5px;
+}
+.homeawaygame {
+  display: none;
+}
+.homeaway {
+  display: flex;
+  margin-top: -5px;
+  margin-bottom: -10px;
+  padding-bottom: 5px;
+}
+.season-summary {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+#season-container {
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+}
+
+.player-fixture-img {
+  width: 75px;
+  height: 75px;
+}
+
+.up-coming-season-fixtures {
+  display: flex;
+  flex-direction: row;
+  background-color: black;
+  margin-top: 2px;
+  gap: 2px;
+  background: transparent;
+}
+.up-coming-season-fixtures > div {
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: 3px;
+}
+#season-fixtures:nth-last-child(-n + 4) {
+  background-color: #66ce99;
+}
+#season-fixtures,
+#season-fixtures-non-owned > img {
+  background-color: transparent;
+}
+
+
+
+/* Floating widget styling */
+.floating-widget {
+  position: fixed;
+  bottom: 30%;
+  right: 20px;
+  z-index: 1000;
+}
+.widget-button {
+  background-color: #05fa87;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+  color: #37003c;
+}
+.widget-button:hover {
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+}
+.widget-menu {
+  display: none;
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  font-size: 1.1rem;
+  width: 45vw;
+}
+.widget-menu a {
+  padding: 10px;
+  color: #333;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s;
+}
+.widget-menu a:hover {
+  background-color: #f0f0f0;
+}
