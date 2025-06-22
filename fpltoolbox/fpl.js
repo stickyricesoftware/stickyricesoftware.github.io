@@ -3,6 +3,7 @@ const BASE_URL =
 //  const BASE_URL =
 //  "http://fantasy.premierleague.com/api/";
 
+import managerDataTest from "./testData/managerDataTest.js";
 import eventStatusTest from "./testData/eventStatusTest.js";
 import bootstrapTest from "./testData/bootsatrapTest.js";
 import superLeagueTest from "./testData/superLeagueTest.js";
@@ -64,6 +65,21 @@ async function getEventStatus() {
 }
 getEventStatus();
 async function getManagerData(teamID) {
+  
+    if (testMode) {
+     managerData = managerDataTest;
+      console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Manager Data Details",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+    managerData
+    );
+
+    console.log("simulating delay");
+    await sleep(addDelaySimulationTime);
+    return; // Skip live fetching
+  }
+
+  
   try {
     const res = await fetch(BASE_URL + "/entry/" + teamID + "/");
     const data = await res.json();
