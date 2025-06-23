@@ -334,6 +334,13 @@ function toolsScreen() {
   const features = [
     {
       icon: "bi-person-badge",
+      label: "Team Name Generator",
+      action: generateTeamName,
+      tier: "free",
+      requiresData: false,
+    },
+    {
+      icon: "bi-person-badge",
       label: "My Team",
       action: showMyTeam,
       tier: "free",
@@ -1590,6 +1597,775 @@ async function testFunction2() {
   if (window.FPLToolboxLeagueData?.standings?.length) {
     console.log(window.FPLToolboxLeagueData);
   }
+}
+
+function generateTeamName() {
+  // Inject HTML
+  const app = document.getElementById("screen-tools");
+
+  const teamNamesForGenerator = [
+    // Arsenal
+    { name: "Livin' Saliba Loca", tags: ["arsenal", "music"] },
+
+    { name: "Old Havertz Kai Hard", tags: ["arsenal"] },
+    { name: "Ødegaardians of the Galaxy", tags: ["arsenal"] },
+    { name: "Curious Jorginho", tags: ["arsenal"] },
+    { name: "Major League Saka", tags: ["arsenal"] },
+    { name: "The Cesc Pistols", tags: ["classic", "arsenal", "music"] },
+    { name: "Trossard Marks", tags: ["arsenal"] },
+    { name: "You Gotta Havertz", tags: ["arsenal", "chelsea"] },
+    { name: "Arteta-tete", tags: ["arsenal"] },
+    { name: "The Arteta's Apprentice", tags: ["arsenal"] },
+    {
+      name: "Havertz Your Way",
+      tags: ["classic", "arsenal", "chelsea", "music"],
+    },
+
+    // Aston Villa
+    { name: "Stranger Mings", tags: ["aston-villa", "TV & Film"] },
+    { name: "Come Digne With Me", tags: ["aston-villa"] },
+    { name: "Out on Bailey", tags: ["aston-villa"] },
+    { name: "Put a Dendonck on it", tags: ["aston-villa"] },
+    { name: "Tea for the Tielemans", tags: ["aston-villa"] },
+    {
+      name: "Bangers and Rashford",
+      tags: ["classic", "aston-villa", "manchester-united"],
+    },
+    { name: "Aston Village People", tags: ["aston-villa", "music"] },
+    { name: "Rubber Digne Rapids", tags: ["aston-villa"] },
+    { name: "Matty Cash Hoes", tags: ["aston-villa", "music"] },
+    { name: "MattyCashInTheAttic", tags: ["aston-villa", "music"] },
+    { name: "McGinn and Tonic", tags: ["aston-villa"] },
+    { name: "Comme Ci Konsa", tags: ["aston-villa"] },
+
+    // Brentford
+    { name: "Throwing Schade", tags: ["brentford"] },
+    { name: "Mee, Myself and I", tags: ["brentford"] },
+    { name: "Dasilva Lining", tags: ["brentford"] },
+    { name: "Thomas The Frank Engine", tags: ["brentford", "TV & Film"] },
+    { name: "Kinder Mbeumo", tags: ["brentford"] },
+    { name: "Mbeumo No.5", tags: ["classic", "brentford", "music"] },
+    { name: "Wissa Khalifa", tags: ["classic", "brentford", "TV & Film"] },
+
+    // Bournemouth
+    { name: "El Vina Did Flow", tags: ["bournemouth"] },
+    { name: "Dango Unchained", tags: ["bournemouth", "TV & Film"] },
+    { name: "Back of the Neto", tags: ["bournemouth"] },
+    { name: "High Faivre", tags: ["bournemouth"] },
+    { name: "Billing Me Softly", tags: ["bournemouth", "music"] },
+
+    // Brighton
+    { name: "Gilmour Girls", tags: ["brighton", "TV & Film"] },
+    { name: "Dunkytown", tags: ["brighton"] },
+    { name: "Moder on the Dancefloor", tags: ["brighton"] },
+    { name: "Boys In Dahoud", tags: ["brighton", "TV & Film"] },
+    { name: "Estupiña Colada", tags: ["brighton"] },
+    { name: "Groß Misconduct", tags: ["classic", "brighton"] },
+    { name: "Estupina Colada", tags: ["brighton"] },
+    { name: "Kids See Groß", tags: ["classic", "brighton"] },
+
+    // Chelsea
+    { name: "I'm Sorry Nic Jackson", tags: ["chelsea", "music"] },
+    { name: "Stuck in the Mudryk", tags: ["chelsea"] },
+    { name: "Under My Cucurella", tags: ["chelsea", "music"] },
+    { name: "Reece's Set Pieces", tags: ["chelsea"] },
+    { name: "Palmer Violets", tags: ["chelsea"] },
+    { name: "Chilwell Soon", tags: ["chelsea"] },
+    { name: "Petr Cech Yourself", tags: ["classic", "chelsea"] },
+    { name: "Mudryk To Life", tags: ["classic", "chelsea"] },
+    { name: "Malo Gusto: Bad Fart", tags: ["chelsea"] },
+
+    // Crystal Palace
+    { name: "Hakuna Mateta", tags: ["crystal-palace", "music", "TV & Film"] },
+    { name: "Ayew Kidding Me", tags: ["crystal-palace"] },
+    { name: "Jairoglyphics", tags: ["crystal-palace"] },
+    { name: "Schlupptown Funk", tags: ["crystal-palace", "music"] },
+    { name: "Eze Come Eze Go", tags: ["crystal-palace"] },
+    { name: "Bacuna Mateta", tags: ["crystal-palace", "TV & Film"] },
+    { name: "Ayew Being Served", tags: ["crystal-palace"] },
+
+    // Everton
+    { name: "Raiders of the Lost Tark", tags: ["everton", "TV & Film"] },
+    { name: "Taking the Mykolenko", tags: ["everton"] },
+    { name: "Roll the Dyche", tags: ["everton"] },
+    { name: "Tesco McNeil Deal", tags: ["everton"] },
+    { name: "Torn DCL", tags: ["everton"] },
+    {
+      name: "Backstreet Moyes",
+      tags: [
+        "everton",
+        "classic",
+        "manchester-united",
+        "west-ham-united",
+        "music",
+      ],
+    },
+    { name: "Gueye Pride", tags: ["everton"] },
+
+    // Fulham
+    { name: "Iwobi Wan-Kenobi", tags: ["fulham"] },
+    { name: "That's So Craven", tags: ["fulham"] },
+    { name: "I Like To Muniz Muniz", tags: ["fulham", "music"] },
+    { name: "Willian The Conqueror", tags: ["fulham"] },
+    { name: "Diop It Like It's Hot", tags: ["fulham", "music"] },
+    { name: "Smith Rowe Your Boat", tags: ["fulham", "arsenal"] },
+
+    // Ipswich Town
+    { name: "Hungry like the Woolf", tags: ["ipswich-town"] },
+    { name: "Morsy Code", tags: ["ipswich-town"] },
+    { name: "Starsky and Hutchinson", tags: ["ipswich-town"] },
+    { name: "Burgess and Fries", tags: ["ipswich-town"] },
+    { name: "Leif Blower", tags: ["ipswich-town"] },
+    { name: "Hawk Tuanzebe", tags: ["ipswich-town"] },
+
+    // Leicester City
+    { name: "Hey, Wout's Wrong With You", tags: ["leicester-city"] },
+    { name: "Yes Ndidi", tags: ["leicester-city"] },
+    { name: "That's Soumare", tags: ["leicester-city"] },
+    { name: "Champagne Coopernova", tags: ["leicester-city"] },
+    { name: "House of Vards", tags: ["leicester-city", "classic"] },
+    { name: "Vardy Boys FC", tags: ["leicester-city", "classic"] },
+    { name: "Egg On Your Faes", tags: ["classic", "leicester-city"] },
+
+    // Liverpool
+    { name: "Alisson Wonderland", tags: ["liverpool"] },
+    { name: "The 40 Year Old Virgil", tags: ["liverpool", "TV & Film"] },
+    { name: "Pain in Diaz", tags: ["liverpool"] },
+    { name: "The Konate Kid", tags: ["liverpool"] },
+    { name: "Slot Machine", tags: ["liverpool"] },
+    { name: "Haven't Jota Clue", tags: ["liverpool"] },
+    { name: "Salah-vation Army", tags: ["liverpool"] },
+    { name: "Darwinning FC", tags: ["liverpool"] },
+    { name: "Alisson Blunderland", tags: ["liverpool", "TV & Film"] },
+    { name: "Arne Hole's A Goal", tags: ["liverpool"] },
+    { name: "When Harry Met Salah", tags: ["classic", "liverpool"] },
+    { name: "DropItLikeIt'sSlot", tags: ["liverpool", "music"] },
+    { name: "The Salah Doink", tags: ["liverpool"] },
+    { name: "ChickenTikkaMoSalah", tags: ["classic", "liverpool"] },
+    { name: "Darwin Theory", tags: ["classic", "liverpool"] },
+    { name: "Jota than the Son", tags: ["liverpool"] },
+    { name: "Endo Story", tags: ["liverpool", "TV & Film"] },
+    { name: "Szoboszlai 4 Now", tags: ["liverpool"] },
+
+    // Manchester City
+    { name: "Haalandaise Sauce", tags: ["manchester-city"] },
+    { name: "Ake Breaky Heart", tags: ["manchester-city"] },
+    { name: "Gvardiols of the Galaxy", tags: ["manchester-city", "TV & Film"] },
+    { name: "Silva Surfer", tags: ["manchester-city"] },
+    { name: "De Bruyne Ultimatum", tags: ["manchester-city", "TV & Film"] },
+    { name: "Cameroon Diaz", tags: ["manchester-city"] },
+    { name: "Luke Kyle Walker", tags: ["classic", "manchester-city"] },
+    { name: "Judy Haaland", tags: ["manchester-city"] },
+    { name: "Haaland Oates", tags: ["manchester-city"] },
+    { name: "Haalandaise Sauce", tags: ["manchester-city"] },
+    {
+      name: "Diaz Nother Day",
+      tags: ["manchester-city", "classic", "TV & Film"],
+    },
+
+    { name: "Ederson Ake & Palmer", tags: ["manchester-city"] },
+
+    // Manchester United
+    { name: "Bruno Dos Tres", tags: ["manchester-united"] },
+    { name: "Onana, What's My Name?", tags: ["manchester-united"] },
+    { name: "How Dalot Can You Go", tags: ["manchester-united"] },
+    { name: "Shaw and Order", tags: ["manchester-united", "TV & Film"] },
+    { name: "Ten Hag's Army", tags: ["manchester-united", "classic"] },
+    { name: "Mount Rushmore", tags: ["manchester-united"] },
+    { name: "BrokebackMount10", tags: ["manchester-united", "TV & Film"] },
+    { name: "Zirkzee Top Boy", tags: ["manchester-united", "classic"] },
+    {
+      name: "Shaw Shank Redemption",
+      tags: ["manchester-united", "classic", "TV & Film"],
+    },
+    { name: "Earth Wind & Maguire", tags: ["manchester-united", "music"] },
+    { name: "The Shaw Thing", tags: ["manchester-united"] },
+    { name: "Cheesy Garnachos", tags: ["classic", "manchester-united"] },
+    { name: "Garnacho Chips", tags: ["classic", "manchester-united"] },
+    { name: "Afternoon De Ligt", tags: ["manchester-united"] },
+    { name: "It'sOffToZirkzeeGo", tags: ["manchester-united"] },
+
+    // Newcastle United
+    { name: "Botman Begins", tags: ["newcastle-united", "TV & Film"] },
+    { name: "Abra Dubravka", tags: ["newcastle-united"] },
+    { name: "Burn Baby Burn", tags: ["newcastle-united", "music"] },
+    { name: "Krafth Dinner", tags: ["newcastle-united"] },
+    { name: "Trippier on Acid", tags: ["newcastle-united"] },
+    { name: "Born in a Barnes", tags: ["newcastle-united"] },
+    { name: "Botman and Robin", tags: ["newcastle-united"] },
+    { name: "AbraDubravka", tags: ["newcastle-united"] },
+    { name: "A Night In Lascelles", tags: ["newcastle-united"] },
+    { name: "Hall In One", tags: ["classic", "newcastle-united"] },
+    { name: "Not Isakly Sure", tags: ["newcastle-united"] },
+
+    // Nottingham Forest
+    { name: "Duel of the Yates", tags: ["nottingham-forest"] },
+    { name: "Boly and Clyde", tags: ["nottingham-forest"] },
+    { name: "Matz Sels Sea Shells", tags: ["nottingham-forest"] },
+    { name: "Finding Neco", tags: ["nottingham-forest", "TV & Film"] },
+    { name: "MacAwoniyi Cheese", tags: ["nottingham-forest"] },
+    {
+      name: "What the Elanga?",
+      tags: ["nottingham-forest", "manchester-united"],
+    },
+    {
+      name: "Boly Pocket",
+      tags: ["classic", "wolves", "nottingham-forest", "TV & Film"],
+    },
+
+    // Southampton
+    { name: "Escape from Alcaraz", tags: ["southampton"] },
+    { name: "Aribo Tangfastics", tags: ["southampton"] },
+    { name: "Onuachu (Bless you)", tags: ["southampton"] },
+    { name: "Heinz Bella-Kotchap", tags: ["southampton"] },
+    { name: "Lallanas in Pyjamas", tags: ["southampton"] },
+
+    // Spurs
+    { name: "Losing My Reguilon", tags: ["spurs", "music"] },
+    { name: "House of the Dragusin", tags: ["spurs"] },
+    { name: "Van de Ven Diagram", tags: ["spurs"] },
+    { name: "Empire of the Son", tags: ["spurs"] },
+    { name: "Los Porro Hermanos", tags: ["spurs"] },
+    { name: "Sonny and Schar", tags: ["spurs", "newcastle-united"] },
+    { name: "Men with Van De Ven", tags: ["spurs"] },
+    { name: "Ange Management", tags: ["spurs"] },
+    { name: "Son of a Gun", tags: ["spurs"] },
+    { name: "Son-sational", tags: ["spurs"] },
+    { name: "Son's Out, Guns Out", tags: ["spurs"] },
+
+    // West Ham United
+    { name: "Soucek Yourself", tags: ["west-ham-united"] },
+    { name: "WHU Tang Clan", tags: ["west-ham-united"] },
+    { name: "Paqueta Crisps", tags: ["west-ham-united"] },
+    { name: "Bad to the Bowen", tags: ["west-ham-united", "music"] },
+    { name: "Areola Grande", tags: ["west-ham-united", "music"] },
+
+    { name: "Bowen 747", tags: ["west-ham-united"] },
+    { name: "Bowen Arrow", tags: ["west-ham-united"] },
+    { name: "Exposed Areola", tags: ["west-ham-united"] },
+    { name: "Bad to the Bowen", tags: ["west-ham-united", "music"] },
+
+    // Wolves
+    { name: "Purple Rayan", tags: ["wolves", "music"] },
+    { name: "Pedro Lima Bean", tags: ["wolves"] },
+    { name: "Mama, Just Kilman", tags: ["wolves", "music"] },
+    { name: "Cunha Get Any Worse?", tags: ["wolves", "manchester-united"] },
+    { name: "Podence Dence Revolution", tags: ["wolves"] },
+    { name: "Ruthless Toothless Wolves", tags: ["wolves"] },
+    { name: "Ait Nouri Geller", tags: ["wolves"] },
+
+    // Classics
+
+    { name: "Absolutely Fabregas", tags: ["arsenal", "classic", "TV & Film"] },
+    { name: "Baines on Toast", tags: ["everton", "classic"] },
+    {
+      name: "Crouch Potato",
+      tags: ["classic", "spurs", "southampton", "liverpool"],
+    },
+    { name: "Ruud Health", tags: ["classic", "chelsea"] },
+    {
+      name: "How I Met Your Mata",
+      tags: ["manchester-united", "classic", "TV & Film"],
+    },
+    { name: "Two's Kompany", tags: ["classic", "manchester-city", "burnley"] },
+    { name: "Men Behaving Chadli", tags: ["classic", "spurs"] },
+    {
+      name: "3 Men and a Bebe",
+      tags: ["classic", "manchester-united", "TV & Film"],
+    },
+    { name: "50ShadesOfAndyGray", tags: ["classic", "TV & Film"] },
+    { name: "ABCDE FC", tags: ["classic"] },
+
+    { name: "Blink 1-Eto'o", tags: ["classic", "chelsea"] },
+
+    { name: "Cesc and the City", tags: ["classic", "arsenal"] },
+    { name: "Ctrl + Alt + De Laet", tags: ["classic"] },
+    { name: "Delph & Safety", tags: ["classic"] },
+    { name: "Dzeko & the Bunnymen", tags: ["classic", "music"] },
+    { name: "Fiddler on the Huth", tags: ["classic", "TV & Film"] },
+    { name: "Flying Without Ings", tags: ["classic", "music"] },
+    { name: "Game Of Throw-Ins", tags: ["classic"] },
+    { name: "Gangsters Allardyce", tags: ["classic", "music"] },
+    {
+      name: "Giroud Awakening",
+      tags: ["classic", "arsenal", "chelsea", "music"],
+    },
+    { name: "HuttonDressedAsLahm", tags: ["classic"] },
+
+    { name: "Klopps and Robbos", tags: ["classic", "liverpool"] },
+    { name: "Krul and the Gang", tags: ["classic"] },
+    { name: "Le Saux Solid Crew", tags: ["classic", "music"] },
+    { name: "Löw Island", tags: ["classic"] },
+
+    {
+      name: "Michu at De Gea Ba",
+      tags: ["classic", "manchester-united", "music"],
+    },
+    { name: "Neville Wears Prada", tags: ["classic", "TV & Film"] },
+    { name: "Norfolk n' Good", tags: ["classic"] },
+    { name: "Obi 1 Kenobi 0", tags: ["classic", "TV & Film"] },
+    { name: "Pjanic! At The Disco", tags: ["classic", "music"] },
+    {
+      name: "Smack My Bilic Up",
+      tags: ["classic", "west-ham-united", "music"],
+    },
+    { name: "Sound of the Lloris", tags: ["classic", "TV & Film", "music"] },
+    { name: "TAA Very Much", tags: ["classic", "liverpool"] },
+    {
+      name: "The Martial Mata LP",
+      tags: ["classic", "manchester-united", "music"],
+    },
+    { name: "Tinchy Sneijder", tags: ["classic", "music"] },
+    { name: "Who Ate All Depays?", tags: ["classic", "manchester-united"] },
+
+    { name: "Bellerin Than Out", tags: ["classic"] },
+    { name: "Better Call Saúl", tags: ["classic", "chelsea"] },
+
+    { name: "Elneny and the Jets", tags: ["classic", "arsenal"] },
+
+    { name: "GuardianOfTheGulasci", tags: ["classic", "TV & Film"] },
+
+    { name: "Hotel? Thiago", tags: ["classic", "chelsea"] },
+    { name: "Howe Toon Is Now", tags: ["classic"] },
+    { name: "Isco Inferno", tags: ["classic"] },
+
+    { name: "Just 1 Cornet 0", tags: ["classic"] },
+    { name: "Klich and Collect", tags: ["classic"] },
+    { name: "Kodja and Maja", tags: ["classic"] },
+    { name: "Krafth Beer", tags: ["classic"] },
+    { name: "MacAwoniyi Cheese", tags: ["classic"] },
+
+    { name: "ModerOnTheDancefloor", tags: ["classic"] },
+
+    { name: "NotMikeDeanForever", tags: ["classic"] },
+
+    { name: "Run The Kewells", tags: ["classic"] },
+    { name: "Sancho Unchained", tags: ["classic"] },
+    { name: "TeaForTheTielemans", tags: ["classic"] },
+
+    { name: "Ake Breaky Heart", tags: ["classic"] },
+
+    { name: "Ashley Old", tags: ["classic", "arsenal", "chelsea"] },
+
+    { name: "Back of the Neto", tags: ["classic"] },
+
+    { name: "Ballon D'awson", tags: ["classic"] },
+
+    { name: "Ben Mee Shake Mee", tags: ["classic"] },
+    { name: "Berge King", tags: ["classic"] },
+    { name: "Bernard's Poch", tags: ["classic"] },
+    {
+      name: "Blazinchenko Squad",
+      tags: ["classic", "arsenal", "manchester-city"],
+    },
+
+    { name: "Boys In Dahoud", tags: ["classic", , "TV & Film"] },
+    { name: "Brennan Jerry's", tags: ["classic"] },
+
+    { name: "Calafiori Sunshine", tags: ["classic"] },
+    { name: "Carson Dioxide", tags: ["classic"] },
+    { name: "Castagne Me Now", tags: ["classic"] },
+    { name: "Castagne Supernova", tags: ["classic", "music"] },
+    { name: "Champagne De Cordova", tags: ["classic"] },
+
+    { name: "Clyne of Duty", tags: ["classic", "liverpool", "southampton"] },
+    { name: "Cobra Kai Havertz", tags: ["classic"] },
+
+    { name: "Curious Jorginho", tags: ["classic", "arsenal", "chelsea"] },
+
+    { name: "Fee Fi Foden", tags: ["classic"] },
+    { name: "FeelsLikeSummerville", tags: ["classic"] },
+    { name: "Femme Fatawu", tags: ["classic"] },
+    { name: "FullKrugMetalJacket", tags: ["classic"] },
+
+    { name: "Gilmour Girls", tags: ["classic"] },
+    { name: "Guantana Maupay", tags: ["classic"] },
+    { name: "GvardiolsOfTheGalaxy", tags: ["classic", "TV & Film"] },
+
+    { name: "Hellmans Mainoonaise", tags: ["classic"] },
+    { name: "Heung Like A Horse", tags: ["classic"] },
+    { name: "High Faivre", tags: ["classic"] },
+    { name: "HouseOfTheDragusin", tags: ["classic"] },
+    { name: "I Love Lamp(tey)", tags: ["classic"] },
+    { name: "I'm Yelling Timber", tags: ["classic", "music"] },
+    { name: "IncogNeto", tags: ["classic"] },
+    { name: "IngsCanOnlyGetBetter", tags: ["classic", "music"] },
+    { name: "Issa Ring Toss Game", tags: ["classic"] },
+
+    { name: "Just like Evans", tags: ["classic"] },
+    { name: "Kai Me A River", tags: ["classic", "music"] },
+    { name: "Kamada Harris", tags: ["classic"] },
+    { name: "Keita Mooy Hart", tags: ["classic", "music"] },
+
+    { name: "Kilman Me Softly", tags: ["classic", "music"] },
+    { name: "Kinder Mbeumo", tags: ["classic"] },
+    { name: "KudusToYou", tags: ["classic"] },
+    { name: "Leif Right Now", tags: ["classic"] },
+    { name: "Lil Eze Vert", tags: ["classic"] },
+
+    { name: "Lord and Savio", tags: ["classic"] },
+    { name: "Los Porro Hermanos", tags: ["classic"] },
+    { name: "Losing My Reguilon", tags: ["classic", "music"] },
+    { name: "LoveTheWaySzoboszlai", tags: ["classic"] },
+
+    { name: "McKenna Kick It?", tags: ["classic", "music"] },
+
+    { name: "Mings of Power", tags: ["classic"] },
+    { name: "Minteh Fresh", tags: ["classic"] },
+    { name: "Mitomavirus", tags: ["classic"] },
+    { name: "More Tea Vicario?", tags: ["classic", "TV & Film"] },
+
+    { name: "Name's Not Andre M8", tags: ["classic"] },
+    { name: "Netflix and Chilwell", tags: ["classic", "TV & Film"] },
+    { name: "Nkunku Clock", tags: ["classic"] },
+
+    { name: "Now I'm a Baleba", tags: ["classic"] },
+    { name: "Øde Toilette", tags: ["classic"] },
+    { name: "Odegaarden Partey", tags: ["classic"] },
+    { name: "Ødeparfum", tags: ["classic"] },
+    { name: "Okoli Dokily", tags: ["classic"] },
+
+    { name: "Omari Me", tags: ["classic"] },
+    { name: "OnanaMataPlea", tags: ["classic"] },
+
+    { name: "Paqueta Crisps", tags: ["classic", "west-ham-united"] },
+    { name: "PARTEYNEXTDOOR", tags: ["classic", "music"] },
+    { name: "Pavard the Builder", tags: ["classic", "TV & Film"] },
+    { name: "Pepe Pig", tags: ["classic", "TV & Film"] },
+    { name: "Pitch Perfect", tags: ["classic", "music", "TV & Film"] },
+    { name: "Pope Fiction", tags: ["classic", "TV & Film"] },
+    { name: "Postecog-Low Block", tags: ["classic", "spurs"] },
+    { name: "Praise the Lord", tags: ["classic"] },
+    { name: "Prowse Control", tags: ["classic", "music"] },
+    { name: "Push It To The Neto", tags: ["classic"] },
+    { name: "Rage Against Fabianski", tags: ["classic", "music"] },
+    { name: "Rashford's Recovery Room", tags: ["classic"] },
+    { name: "Reek 'em Ralph", tags: ["classic"] },
+    { name: "Rice Rice Baby", tags: ["classic"] },
+    { name: "Rico Suave", tags: ["classic"] },
+    { name: "Ritchie Richarlison", tags: ["classic"] },
+    { name: "Rodri or Not", tags: ["classic"] },
+    { name: "Rolly Gusto", tags: ["classic"] },
+    { name: "Roque The Kasper", tags: ["classic"] },
+    { name: "Run the Jules", tags: ["classic"] },
+
+    { name: "Saliba Your Face", tags: ["classic"] },
+    { name: "Samba de Doucoure", tags: ["classic"] },
+    { name: "Sanch-Oh No", tags: ["classic"] },
+    { name: "Sangaré-oke", tags: ["classic"] },
+    { name: "Saša And The Sun", tags: ["classic"] },
+    { name: "Sarr Trek", tags: ["classic", "TV & Film"] },
+    { name: "Sat Nav Simms", tags: ["classic"] },
+    { name: "Save Our Sancho", tags: ["classic"] },
+    { name: "Scammaca Rhythm", tags: ["classic"] },
+    { name: "Schär Wars", tags: ["classic", "TV & Film"] },
+    { name: "Schick Moves", tags: ["classic"] },
+    { name: "ScottCarson FC", tags: ["classic"] },
+    { name: "Sesko Mode", tags: ["classic"] },
+    { name: "Sessegnon's Eleven", tags: ["classic"] },
+
+    { name: "Shawcrossed Lovers", tags: ["classic", "TV & Film"] },
+    { name: "She Wore A Trippier", tags: ["classic"] },
+    { name: "Silva Lining", tags: ["classic"] },
+    { name: "Simakan the Beast", tags: ["classic"] },
+    { name: "Simakan You Feel It", tags: ["classic"] },
+    { name: "Sinisterra Squad", tags: ["classic"] },
+    { name: "SlottingOneIn", tags: ["classic"] },
+
+    { name: "Snoochie Doku", tags: ["classic"] },
+    { name: "So I Skipp-ed", tags: ["classic"] },
+    { name: "Soler Power", tags: ["classic"] },
+
+    { name: "Southgate's Tears FC", tags: ["classic"] },
+    { name: "Spence It Like Beckham", tags: ["classic", "TV & Film"] },
+    { name: "Steele or No Steele", tags: ["classic"] },
+    { name: "Sterling Silvers", tags: ["classic"] },
+    { name: "Stones Unturned", tags: ["classic"] },
+    { name: "Struijk and Awe", tags: ["classic"] },
+    { name: "Sue Per Sarr", tags: ["classic"] },
+
+    ,
+    { name: "Take it to the McTominay", tags: ["classic"] },
+    { name: "Targett Practice", tags: ["classic"] },
+    { name: "Taylor Made FC", tags: ["classic"] },
+    { name: "Teemu and the Gang", tags: ["classic"] },
+
+    { name: "The Boys Are Barkley", tags: ["classic", "music"] },
+    { name: "The Full Nelson", tags: ["classic"] },
+
+    {
+      name: "Toney Award Winners",
+      tags: ["classic", "brentford", "TV & Film", "music"],
+    },
+    { name: "Toti Africa", tags: ["classic"] },
+
+    { name: "Turn the Page FC", tags: ["classic"] },
+    { name: "Udogie Style", tags: ["classic"] },
+    { name: "Up the du-Couré", tags: ["classic"] },
+
+    { name: "Vazquez and Furious", tags: ["classic", "TV & Film"] },
+    { name: "Vini Vidi Vicario", tags: ["classic"] },
+    { name: "Viva La Veltman", tags: ["classic"] },
+    { name: "Wataru You Waiting For", tags: ["classic"] },
+    { name: "Watts on Earth?", tags: ["classic"] },
+    { name: "Weghorst Gump", tags: ["classic", "TV & Film"] },
+
+    { name: "Who Let the Kökçüs Out?", tags: ["classic", "music"] },
+    { name: "Wilson's World", tags: ["classic"] },
+
+    { name: "Wright Said Fred", tags: ["classic", "manchester-united"] },
+
+    { name: "You're the Øne", tags: ["classic"] },
+    { name: "Zaniolo Express", tags: ["classic"] },
+    { name: "Zanka You Very Much", tags: ["classic"] },
+    { name: "Zemura's Finesse", tags: ["classic"] },
+
+    // worldwide
+    {
+      name: "Murder on Zidane's Floor",
+      tags: ["worldwide", "classic", "music"],
+    },
+    { name: "De Jong Trousers", tags: ["worldwide", "TV & Film"] },
+    { name: "Muller Reus Corner", tags: ["worldwide", "classic"] },
+    { name: "Baby Reijnders", tags: ["worldwide"] },
+    { name: "CommethTheAouar", tags: ["worldwide"] },
+    { name: "Daylight Ribery", tags: ["worldwide"] },
+    { name: "DeJong&WindingRoad", tags: ["worldwide"] },
+    { name: "DiMarco Polo", tags: ["worldwide"] },
+    { name: "Dunk Your Busquets", tags: ["worldwide"] },
+    { name: "Inglorious Bas Dost", tags: ["worldwide", "TV & Film"] },
+    { name: "Itsy Bitsy Chiellini", tags: ["worldwide", "music"] },
+    { name: "Kroos Control", tags: ["worldwide"] },
+    { name: "Lemon and Laimer", tags: ["worldwide"] },
+    { name: "Mbappe Feet", tags: ["worldwide"] },
+    { name: "Orban Legend", tags: ["worldwide"] },
+    { name: "PassionOfTheCruyff", tags: ["worldwide"] },
+    { name: "Pedri Dish", tags: ["worldwide"] },
+    { name: "Pique Blinders", tags: ["worldwide"] },
+    { name: "PutJohansUp4DeCruyff", tags: ["worldwide"] },
+    { name: "Savic Garden", tags: ["worldwide", "music"] },
+    { name: "Schick's Creek", tags: ["worldwide"] },
+    { name: "Taribo Westlife", tags: ["worldwide", "music"] },
+    { name: "Under My Barella", tags: ["worldwide", "music"] },
+    { name: "Where'sTheLahmSauce", tags: ["worldwide"] },
+    { name: "AC/DC United", tags: ["worldwide", "classic", "music"] },
+    { name: "Ajax Trees Down", tags: ["worldwide"] },
+    { name: "Anderlecht my balls", tags: ["worldwide"] },
+    { name: "Bayer Neverlosin'", tags: ["worldwide"] },
+    { name: "Bayern Bru", tags: ["worldwide"] },
+    { name: "Bayern Maiden", tags: ["worldwide"] },
+    { name: "Bilbao Baggins", tags: ["worldwide", "TV & Film"] },
+    { name: "Borussia Teeth", tags: ["worldwide"] },
+    { name: "ChampagneSuperRovers", tags: ["worldwide", "music"] },
+    { name: "Cry Me A River Plate", tags: ["worldwide", "music"] },
+    { name: "Expected Toulouse", tags: ["worldwide"] },
+    { name: "Fiorentina Turner", tags: ["worldwide", "music"] },
+    { name: "good kid mAAn city", tags: ["worldwide"] },
+    { name: "Imaginary Madrid", tags: ["worldwide"] },
+    { name: "Inter Yermam", tags: ["worldwide"] },
+    { name: "Pathetico Madrid", tags: ["worldwide"] },
+    { name: "Pfizer Chiefs", tags: ["worldwide"] },
+    { name: "Real SoSoBad", tags: ["worldwide"] },
+    { name: "Sexandthe City", tags: ["worldwide", "TV & Film"] },
+    { name: "Spartak Costco", tags: ["worldwide"] },
+    { name: "Sub-standard Liege", tags: ["worldwide"] },
+    { name: "The Molde Peaches", tags: ["worldwide"] },
+    { name: "Vladimir Luton", tags: ["worldwide"] },
+    { name: "Khedira Pin Drop", tags: ["worldwide", "classic"] },
+    { name: "Surreal Madrid", tags: ["worldwide", "classic"] },
+  ];
+const darkMode = localStorage.getItem("darkMode") === "true";
+
+
+app.className = darkMode ? "bg-dark text-light p-4" : "bg-light text-dark p-4";
+
+app.innerHTML = `
+<div id="generatorContainer" class="container">
+
+  <div class="mb-4">
+    <h5>Step 1:</h5>
+    <label for="teamFilter" class="form-label">Select a team name category</label>
+    <select id="teamFilter" class="form-select"></select>
+  </div>
+
+  <div class="mb-4">
+    <h5>Step 2:</h5>
+    <p id="teamNameDisplay" class="fs-4">Click the button to get a name</p>
+    <button id="copyBtn" class="btn btn-outline-secondary" style="display:none;">📋 Copy</button>
+  </div>
+
+  <div class="mb-4">
+    <h5>Step 3:</h5>
+    <button id="generateBtn" class="btn btn-primary mb-2">Generate Team Name</button>
+    <p class="text-muted small">Press the button until you find a name that suits your style.</p>
+  </div>
+
+</div>
+
+`;
+
+
+  // Style elements via JS
+  const styles = {
+    "#generatorContainer": {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      alignSelf: "center",
+      fontFamily: "Arial, sans-serif",
+      textAlign: "center",
+      padding: "2rem",
+      maxWidth: "600px",
+    },
+    "#generateBtn": {
+      padding: "0.5rem 1rem",
+      fontSize: "1rem",
+      cursor: "pointer",
+      marginTop: "1rem",
+    },
+    "#teamNameDisplay": {
+      fontSize: "2rem",
+      
+    },
+    "#teamFilter": {
+      padding: "0.3rem",
+      fontSize: "1rem",
+      marginTop: "0.5rem",
+    },
+    "#copyBtn": {
+      padding: "0.4rem 1rem",
+      marginTop: "1rem",
+      fontSize: "1rem",
+      cursor: "pointer",
+    },
+  };
+  for (const selector in styles) {
+    const element = document.querySelector(selector);
+    if (element) Object.assign(element.style, styles[selector]);
+  }
+
+  // Populate filter dropdown
+  const allTags = new Set();
+  teamNamesForGenerator.forEach((team) =>
+    team.tags.forEach((tag) => allTags.add(tag))
+  );
+
+  const filterSelect = document.getElementById("teamFilter");
+  const createOption = (value, label) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    return option;
+  };
+  filterSelect.appendChild(createOption("all", "All"));
+  [...allTags].sort().forEach((tag) => {
+    const label = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/-/g, " ");
+    filterSelect.appendChild(createOption(tag, label));
+  });
+
+  // Generate button logic
+  const display = document.getElementById("teamNameDisplay");
+  const copyBtn = document.getElementById("copyBtn");
+
+let generationCount = 0;
+
+document.getElementById("generateBtn").addEventListener("click", () => {
+  const selectedFilter = filterSelect.value;
+
+  const filtered = teamNamesForGenerator.filter(
+    (team) => selectedFilter === "all" || team.tags.includes(selectedFilter)
+  );
+
+  if (filtered.length === 0) {
+    display.textContent = "No names match your filter.";
+    copyBtn.style.display = "none";
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * filtered.length);
+  const selectedName = filtered[randomIndex].name;
+  display.textContent = selectedName;
+  copyBtn.style.display = "inline-block";
+  copyBtn.textContent = "📋 Copy";
+
+  // Increment generation counter
+  generationCount++;
+
+  // Show modal after 5 generations (only for non-pro users)
+  if (generationCount === 5 && !userHasAccess([10, 12])) {
+    showModal({
+      title: "Having fun?",
+      body: "Consider updgrading to a paid membership for more amazing <strong>FPL Tools</strong>.<br><br>",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = subscriptionPageUrl;
+      },
+    });
+
+    //Optional: reset count so they see it again every 5
+    generationCount = 0;
+  }
+});
+
+
+  // Copy to clipboard logic
+  copyBtn.addEventListener("click", () => {
+    const textToCopy = display.textContent;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      copyBtn.textContent = "✅ Copied!";
+      setTimeout(() => {
+        copyBtn.textContent = "📋 Copy";
+      }, 1500);
+    });
+  });
+
+if (!userHasAccess([10, 12])) {
+  // Card wrapper
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("card", "shadow-sm", "mb-4", "text-center");
+  wrapper.style.maxWidth = "500px";
+  wrapper.style.margin = "0 auto";
+
+    // Apply dark mode or light mode classes
+  if (darkMode) {
+    wrapper.classList.add("bg-dark", "text-light", "border-light");
+  } else {
+    wrapper.classList.add("bg-light", "text-dark", "border-dark");
+  }
+
+  // Card body
+  const cardBody = document.createElement("div");
+  cardBody.classList.add("card-body");
+
+  // Card title
+  const title = document.createElement("h5");
+  title.classList.add("card-title", "mb-3");
+  title.textContent = "Unlock More Tools";
+
+  // Card text
+  const cardText = document.createElement("p");
+  cardText.classList.add("card-text", "mb-3");
+  cardText.textContent = "Subscribe to access premium tools and features.";
+
+  // Subscribe button
+  const btn = document.createElement("button");
+  btn.classList.add("btn", "btn-primary");
+  btn.textContent = "Subscribe for more tools";
+  btn.onclick = () => {
+    window.location.href = subscriptionPageUrl; // Change this URL to your real subscribe page
+  };
+
+  // Build card
+  cardBody.appendChild(title);
+  cardBody.appendChild(cardText);
+  cardBody.appendChild(btn);
+  wrapper.appendChild(cardBody);
+
+  // Append to app
+  app.append(wrapper);
+}
+
+
 }
 
 async function showMyTeam() {
