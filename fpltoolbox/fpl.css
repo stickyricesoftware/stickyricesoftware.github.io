@@ -10,14 +10,15 @@ html, body, #app-screen {
   width: 100%;
   z-index: 1000; /* ensures it sits above other content */
 }
+.share-button{
+margin-left: 20px;
+}
+
     .nav-tab.active {
       font-weight: bold;
     }
 
-    .form-check{
 
-padding: 20px!important;
-    }
 
 
 #modal-popup {
@@ -282,12 +283,11 @@ padding: 20px!important;
 #pitch,
 #pitch1,
 #pitch2 {
-  /* background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png"); */
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png");
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
+  align-items: center;
   background-position: top center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -299,12 +299,20 @@ padding: 20px!important;
   max-width: 100%;
   display: flex;
   padding: 0px;
+  ;
 }
+
 #pitch1,
 #pitch2 {
   max-width: 50%;
   padding: 2px;
 }
+#pitch1 .player,
+#pitch2 .player {
+  min-width: 40px;
+  max-width: 40px;
+}
+
 
 #pitch > #my-keeper,
 #my-defenders,
@@ -317,6 +325,7 @@ padding: 20px!important;
 
 #my-bench1 {
   justify-content: space-evenly !important;
+  gap: auto;
 }
 
 @media only screen and (min-width: 800px) {
@@ -343,7 +352,9 @@ padding: 20px!important;
   flex-direction: row;
   gap: 5px;
   width: 100%;
-  justify-content: center;
+
+  justify-content: space-evenly !important;
+  
 }
 #my-bench,
 #my-bench2 {
@@ -386,7 +397,7 @@ padding: 20px!important;
   height: 10px;
   margin-bottom: -10px;
   z-index: 20;
-  position: absolute;
+  
 }
 
 .player-search-img {
@@ -567,6 +578,10 @@ padding: 20px!important;
 }
 .rank-difference {
   font-size: 16px;
+}
+#comparison-heading{
+  width: 100%;
+  text-align: center;
 }
 #comparison-text,
 #comparison-heading {
@@ -799,4 +814,98 @@ padding: 20px!important;
 }
 .widget-menu a:hover {
   background-color: #f0f0f0;
+}
+
+
+/* Copycat Modal */
+.influencer-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-top: -20px;
+}
+#influencer-profile-pic {
+  border-radius: 100%;
+  padding: 10px;
+  max-width: 75px;
+  max-height: 75px;
+}
+#share-influencer-comparison {
+  z-index: 10000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  overflow: auto;
+}
+
+#influencer-comparison-modal {
+  background-color: black;
+  padding: 20px;
+  color: #f8f8f8;
+  border-radius: 5px;
+  width: 90%;
+  max-width: 500px;
+  margin-top: 20px;
+}
+
+#influencer-comparison-message {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.similar-gameweeks {
+  margin-top: 0px;
+  padding-top: 0px;
+}
+.similar-gameweeks > p {
+  margin: 0px;
+  padding: 0px;
+}
+.similar-gameweeks > ul {
+  margin-top: 0px;
+  padding-top: 0px;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.best-match-percentage-bar-container {
+  position: relative; /* Enables absolute positioning of children */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.best-match-bar {
+  background-image: linear-gradient(to right, #05eafa, orange, #fc2c80);
+  height: 30px;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  position: relative; /* Pointer aligns within this container */
+}
+
+.copycat-pointer {
+  position: absolute;
+  top: -20px; /* Adjust this to place the pointer above the bar */
+  transform: translateX(-50%); /* Centers the arrow on the percentage */
+  font-size: 32px; /* Adjust for arrow size */
+  transition: left 1s ease; /* Smooth animation of 1 second */
+}
+#copycat-popup-body > strong > h2 {
+  color: white;
+}
+#copycat-popup-body > h4 {
+  color: white;
+  padding: 0px;
+  margin: 0px;
+}
+
+#copycat-popup-body > p {
+  margin: 0px;
 }
