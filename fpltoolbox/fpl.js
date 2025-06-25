@@ -9315,34 +9315,35 @@ function createTopStatTable({
         : getStatValue(b) - getStatValue(a)
     )
     .slice(0, limit);
-
+  const darkMode = localStorage.getItem("darkMode") === "true";
   // Card wrapper
-  const wrapper = document.createElement("div");
-  wrapper.classList.add("card", "shadow-sm", "mb-3");
+const wrapper = document.createElement("div");
+wrapper.classList.add("card", "shadow-sm", "mb-3");
+if (darkMode) wrapper.classList.add("bg-dark", "text-white", "border-secondary");
 
-  const cardBody = document.createElement("div");
-  cardBody.classList.add("card-body");
+const cardBody = document.createElement("div");
+cardBody.classList.add("card-body");
 
-  const title = document.createElement("h5");
-  title.classList.add("card-title", "mb-3");
-  title.textContent = titleText;
+const title = document.createElement("h5");
+title.classList.add("card-title", "mb-3");
+title.textContent = titleText;
 
-  // Table using Bootstrap classes
-  const table = document.createElement("table");
-  table.className = "table table-striped table-hover table-sm mb-0";
+// Table with Bootstrap classes
+const table = document.createElement("table");
+table.className = `table table-striped table-hover table-sm mb-0 ${darkMode ? "table-dark" : ""}`;
 
-  const thead = document.createElement("thead");
-  const headerCells = statLabels
-    .map((label) => `<th class="text-end">${label}</th>`)
-    .join("");
+const thead = document.createElement("thead");
+const headerCells = statLabels
+  .map((label) => `<th class="text-end">${label}</th>`)
+  .join("");
 
-  thead.innerHTML = `
-    <tr>
-      <th class="text-start">#</th>
-      <th class="text-start">Team</th>
-      ${headerCells}
-    </tr>
-  `;
+thead.innerHTML = `
+  <tr>
+    <th class="text-start">#</th>
+    <th class="text-start">Team</th>
+    ${headerCells}
+  </tr>
+`;
 
   const medals = ["🥇", "🥈", "🥉"];
   const tbody = document.createElement("tbody");
@@ -9404,20 +9405,21 @@ async function createSeasonMaxDashboard() {
   seasonStats.id = "season-stats";
   seasonStats.className = "row g-3"; // Bootstrap grid spacing
 
+
   // Example stat cards
-  for (let i = 1; i <= 6; i++) {
-    const statCard = document.createElement("div");
-    statCard.className = "col-12 col-md-6";
-    statCard.innerHTML = `
-    <div class="card shadow-sm text-center">
-      <div class="card-body">
-        <h6 class="card-title">Stat ${i}</h6>
-        <p class="card-text">Value ${i * 10}</p>
-      </div>
-    </div>
-  `;
-    seasonStats.appendChild(statCard);
-  }
+  // for (let i = 1; i <= 6; i++) {
+  //   const statCard = document.createElement("div");
+  //   statCard.className = "col-12 col-md-6";
+  //   statCard.innerHTML = `
+  //   <div class="card shadow-sm text-center">
+  //     <div class="card-body">
+  //       <h6 class="card-title">Stat ${i}</h6>
+  //       <p class="card-text">Value ${i * 10}</p>
+  //     </div>
+  //   </div>
+  // `;
+  //   seasonStats.appendChild(statCard);
+  // }
 
   // === SIDEBAR CONTENT ===
   const sidebarCol = document.createElement("div");
@@ -9442,7 +9444,8 @@ async function createSeasonMaxDashboard() {
   const chipsChart = await createChipsUsedChart(leagueToDisplay);
   seasonStats.appendChild(chipsChart);
 
-  console.log(leagueToDisplay);
+  const managerOfTheMonth = await findManagersOfTheMonth(leagueToDisplay, bootstrap.phases);
+  seasonStats.appendChild(managerOfTheMonth);
 
   // Most Captaincy Points
   createTopStatTable({
@@ -9637,6 +9640,8 @@ async function createSeasonMaxDashboard() {
 }
 
 async function createSeasonMaxTable(standings, containerDiv) {
+
+  
   const table = document.createElement("table");
   table.id = "league-table";
   table.style.width = "100%";
@@ -9784,6 +9789,13 @@ async function createSeasonMaxTable(standings, containerDiv) {
   scrollWrapper.style.overflowX = "auto";
   scrollWrapper.style.width = "100%";
   scrollWrapper.appendChild(table);
+
+    // Title
+  const title = document.createElement("h4");
+  title.textContent = "Season Stats";
+  console.log(title, containerDiv)
+  containerDiv.appendChild(title);
+
   containerDiv.appendChild(scrollWrapper);
 }
 
@@ -9870,6 +9882,91 @@ async function createChipsUsedChart(standings) {
 
   return wrapper;
 }
+
+
+
+async function findManagersOfTheMonth(standings, phases, currentGw) {
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  // Create holding container
+  const holdingContainer = document.createElement("div");
+  holdingContainer.classList.add("mb-4");
+
+  // Title
+  const title = document.createElement("h4");
+  title.textContent = "Manager of the Month";
+  holdingContainer.appendChild(title);
+
+  // Grid Container (Bootstrap grid)
+  const gridContainer = document.createElement("div");
+  gridContainer.className = "row g-3";
+
+  // Filter out the "Overall" phase (id: 1)
+  const monthlyPhases = phases.filter((phase) => phase.id !== 1);
+
+  monthlyPhases.forEach((phase) => {
+    const col = document.createElement("div");
+    col.className = "col-md-4";
+
+    const card = document.createElement("div");
+    card.className = `card h-100 ${darkMode ? "bg-dark text-white border-secondary" : ""}`;
+
+    const cardBody = document.createElement("div");
+    cardBody.className = "card-body text-center";
+
+    const cardTitle = document.createElement("h5");
+    cardTitle.className = "card-title";
+    cardTitle.textContent = phase.name + "🎉";
+    cardBody.appendChild(cardTitle);
+
+    // Check if phase is currently in progress (skip May, etc.)
+    if (currentGw >= phase.start_event && currentGw <= phase.stop_event) {
+      const msg = document.createElement("p");
+      msg.className = "card-text";
+      msg.textContent = "Winner coming soon";
+      cardBody.appendChild(msg);
+    } else {
+      let bestTeam = null;
+      let highestPoints = -1;
+
+      standings.forEach((team) => {
+        const monthlyPoints = team.everyGw
+          .filter(
+            (gw) =>
+              gw.gameweek >= phase.start_event &&
+              gw.gameweek <= phase.stop_event
+          )
+          .reduce((total, gw) => total + (gw.points - gw.transfers_cost), 0);
+
+        if (monthlyPoints > highestPoints) {
+          highestPoints = monthlyPoints;
+          bestTeam = team;
+        }
+      });
+
+      if (bestTeam) {
+        const teamName = document.createElement("p");
+        teamName.className = "mb-1 fw-bold";
+        teamName.textContent = bestTeam.entry_name;
+        cardBody.appendChild(teamName);
+
+        const points = document.createElement("p");
+        points.className = "mb-0";
+        points.textContent = `${highestPoints} points`;
+        cardBody.appendChild(points);
+      }
+    }
+
+    card.appendChild(cardBody);
+    col.appendChild(card);
+    gridContainer.appendChild(col);
+  });
+
+  holdingContainer.appendChild(gridContainer);
+
+  return holdingContainer;
+}
+
 
 async function createLeagueDashboardOLD() {
   //My Team Tab
@@ -10817,92 +10914,7 @@ async function createLeagueDashboardOLD() {
   }
   createYearsActiveChart(standings, seasonStats);
 
-  function findManagersOfTheMonth(standings, container, phases, currentGw) {
-    // Inject CSS into the page
-    const style = document.createElement("style");
-    style.textContent = `
-        /* Title Styling */
-        /* Grid Container */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);  /* 3 columns */
-            gap: 5px;  /* Space between items */
-            margin-top: 20px;
-        }
 
-        /* Grid Item Styling */
-        .grid-item {
-            padding: 20px;
-            border: 1px solid #ddd;
-            text-align: center;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-        }
-
-        .grid-item strong {
-            font-size: 1.2em;
-            display: block;
-            margin-bottom: 10px;
-        }
-    `;
-    document.head.appendChild(style); // Add the CSS to the <head> section
-
-    const holdingContainer = document.createElement("div");
-    holdingContainer.style.marginBottom = "20px"; // Add some space below the grid
-    // Create the title element
-    const title = document.createElement("h4");
-    title.textContent = "Manager of the Month";
-    holdingContainer.appendChild(title); // Add title above the grid
-
-    // Create a grid container
-    const gridContainer = document.createElement("div");
-    gridContainer.classList.add("grid-container");
-
-    // Filter out the "Overall" phase (id: 1)
-    const monthlyPhases = phases.filter((phase) => phase.id !== 1);
-
-    monthlyPhases.forEach((phase) => {
-      // Skip if current phase is in progress (May in this case)
-      if (currentGw >= phase.start_event && currentGw <= phase.stop_event) {
-        const inProgressMsg = document.createElement("div");
-        inProgressMsg.classList.add("grid-item");
-        inProgressMsg.textContent = "Winner coming soon";
-        gridContainer.appendChild(inProgressMsg);
-        return; // Skip the rest for May
-      }
-
-      let bestTeam = null;
-      let highestPoints = -1;
-
-      standings.forEach((team) => {
-        const monthlyPoints = team.everyGw
-          .filter(
-            (gw) =>
-              gw.gameweek >= phase.start_event &&
-              gw.gameweek <= phase.stop_event
-          )
-          .reduce((total, gw) => total + (gw.points - gw.transfers_cost), 0);
-
-        if (monthlyPoints > highestPoints) {
-          highestPoints = monthlyPoints;
-          bestTeam = team;
-        }
-      });
-
-      // Add the result to the grid
-      if (bestTeam) {
-        const resultDiv = document.createElement("div");
-        resultDiv.classList.add("grid-item");
-        resultDiv.innerHTML = `<strong>${phase.name}</strong><br>${bestTeam.entry_name}<br>${highestPoints} points`;
-        gridContainer.appendChild(resultDiv);
-      }
-    });
-
-    // Append the grid container to the main container
-    holdingContainer.appendChild(gridContainer);
-    container.appendChild(holdingContainer);
-  }
-  findManagersOfTheMonth(standings, seasonStats, bootstrap.phases);
 }
 
 //HELPERS
