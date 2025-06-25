@@ -16,7 +16,9 @@ import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksT
 let testMode = false;
 if (
   window.location.href.includes("http://127.0.0.1:5500/fpltoolbox/") ||
-  window.location.href.includes("https://stickyricesoftware.github.io/fpltoolbox/")
+  window.location.href.includes(
+    "https://stickyricesoftware.github.io/fpltoolbox/"
+  )
 ) {
   if (confirm("Enable test mode?")) {
     testMode = true;
@@ -24,7 +26,17 @@ if (
     testMode = false;
   }
 }
-const FPLToolboxVersion = "4.3.8";
+
+
+
+const changelogData = [
+  { version: "4.3.8", description: "Team of the week"},
+  { version: "4.0", description: "Toolbox App Interface" },
+  { version: "3.8.0", description: "Max dashboard" },
+  { version: "1.1", description: "Added league selector" },
+  { version: "1.0", description: "Initial release" },
+];
+const FPLToolboxVersion = changelogData[0].version;
 
 (function checkVersionAndReloadIfNeeded() {
   const storedVersion = localStorage.getItem("FPLToolboxVersion");
@@ -32,7 +44,9 @@ const FPLToolboxVersion = "4.3.8";
 
   if (storedVersion !== FPLToolboxVersion && !reloadGuard) {
     console.log(
-      `%c⚠️ Outdated version detected. Reloading to update from v${storedVersion || "unknown"} to v${FPLToolboxVersion}...`,
+      `%c⚠️ Outdated version detected. Reloading to update from v${
+        storedVersion || "unknown"
+      } to v${FPLToolboxVersion}...`,
       "color: orange; font-weight: bold;"
     );
 
@@ -42,11 +56,13 @@ const FPLToolboxVersion = "4.3.8";
     // Force reload with version param
     window.location.href = window.location.pathname + "?v=" + FPLToolboxVersion;
   } else {
-    console.log(`✅ You are running the current version: v${FPLToolboxVersion}`);
+    console.log(
+      `✅ You are running the current version: v${FPLToolboxVersion}`
+    );
   }
 })();
 
-console.log(theUser.meta)
+console.log(theUser.meta);
 
 const dummyLeagueMessage = `This feature is only available to <strong>paid members</strong>. <br><br>You'll see dummy data here until you subscribe`;
 
@@ -603,6 +619,22 @@ function injectDynamicStyles() {
 function settingsScreen() {
   const settingsContainer = document.getElementById("screen-settings");
 
+  // Generate changelog HTML
+  let changelogHTML = `
+  <div class="mb-4">
+    <h5>Changelog</h5>
+    <ul class="small">
+`;
+
+  changelogData.forEach((entry) => {
+    changelogHTML += `<li>v${entry.version} – ${entry.description}</li>`;
+  });
+
+  changelogHTML += `
+    </ul>
+  </div>
+`;
+
   // Clear container and add Bootstrap padding
   settingsContainer.innerHTML = `
 <div class="p-4">
@@ -633,17 +665,8 @@ function settingsScreen() {
 
   <hr class="my-2"/>
 
-  <!-- Changelog -->
-  <div class="mb-4">
-    <h5>Changelog</h5>
-    <ul class="small">
-       <li>v4.0 – Toolbox App Interface</li>
-       <li>v3.8.0 – Max dashboard</li>
-      <li>v1.0 – Initial release</li>
-      <li>v1.1 – Added league selector</li>
-    </ul>
-  </div>
-
+ ${changelogHTML}
+ 
 
   
   <!-- Version -->
@@ -949,8 +972,6 @@ async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
     console.error("❌ Failed to fetch and process league:", err);
   }
 }
-
-
 
 async function renderToolsScreenWithLeague(leagueId) {
   // Step 0: Use leagueId from localStorage if available
@@ -2174,12 +2195,13 @@ function generateTeamName() {
     { name: "Khedira Pin Drop", tags: ["worldwide", "classic"] },
     { name: "Surreal Madrid", tags: ["worldwide", "classic"] },
   ];
-const darkMode = localStorage.getItem("darkMode") === "true";
+  const darkMode = localStorage.getItem("darkMode") === "true";
 
+  app.className = darkMode
+    ? "bg-dark text-light p-4"
+    : "bg-light text-dark p-4";
 
-app.className = darkMode ? "bg-dark text-light p-4" : "bg-light text-dark p-4";
-
-app.innerHTML = `
+  app.innerHTML = `
 <div id="generatorContainer" class="container">
 
   <div class="mb-4">
@@ -2211,7 +2233,6 @@ app.innerHTML = `
 
 `;
 
-
   // Style elements via JS
   const styles = {
     "#generatorContainer": {
@@ -2232,7 +2253,6 @@ app.innerHTML = `
     },
     "#teamNameDisplay": {
       fontSize: "2rem",
-      
     },
     "#teamFilter": {
       padding: "0.3rem",
@@ -2274,46 +2294,45 @@ app.innerHTML = `
   const display = document.getElementById("teamNameDisplay");
   const copyBtn = document.getElementById("copyBtn");
 
-let generationCount = 0;
+  let generationCount = 0;
 
-document.getElementById("generateBtn").addEventListener("click", () => {
-  const selectedFilter = filterSelect.value;
+  document.getElementById("generateBtn").addEventListener("click", () => {
+    const selectedFilter = filterSelect.value;
 
-  const filtered = teamNamesForGenerator.filter(
-    (team) => selectedFilter === "all" || team.tags.includes(selectedFilter)
-  );
+    const filtered = teamNamesForGenerator.filter(
+      (team) => selectedFilter === "all" || team.tags.includes(selectedFilter)
+    );
 
-  if (filtered.length === 0) {
-    display.textContent = "No names match your filter.";
-    copyBtn.style.display = "none";
-    return;
-  }
+    if (filtered.length === 0) {
+      display.textContent = "No names match your filter.";
+      copyBtn.style.display = "none";
+      return;
+    }
 
-  const randomIndex = Math.floor(Math.random() * filtered.length);
-  const selectedName = filtered[randomIndex].name;
-  display.textContent = selectedName;
-  copyBtn.style.display = "inline-block";
-  copyBtn.textContent = "📋 Copy";
+    const randomIndex = Math.floor(Math.random() * filtered.length);
+    const selectedName = filtered[randomIndex].name;
+    display.textContent = selectedName;
+    copyBtn.style.display = "inline-block";
+    copyBtn.textContent = "📋 Copy";
 
-  // Increment generation counter
-  generationCount++;
+    // Increment generation counter
+    generationCount++;
 
-  // Show modal after 5 generations (only for non-pro users)
-  if (generationCount === 5 && !userHasAccess([10, 12])) {
-    showModal({
-      title: "Having fun?",
-      body: "Consider updgrading to a paid membership for more amazing <strong>FPL Tools</strong>.<br><br>",
-      confirmText: "Upgrade Now",
-      onConfirm: () => {
-        window.location.href = subscriptionPageUrl;
-      },
-    });
+    // Show modal after 5 generations (only for non-pro users)
+    if (generationCount === 5 && !userHasAccess([10, 12])) {
+      showModal({
+        title: "Having fun?",
+        body: "Consider updgrading to a paid membership for more amazing <strong>FPL Tools</strong>.<br><br>",
+        confirmText: "Upgrade Now",
+        onConfirm: () => {
+          window.location.href = subscriptionPageUrl;
+        },
+      });
 
-    //Optional: reset count so they see it again every 5
-    generationCount = 0;
-  }
-});
-
+      //Optional: reset count so they see it again every 5
+      generationCount = 0;
+    }
+  });
 
   // Copy to clipboard logic
   copyBtn.addEventListener("click", () => {
@@ -2326,53 +2345,51 @@ document.getElementById("generateBtn").addEventListener("click", () => {
     });
   });
 
-if (!userHasAccess([10, 12])) {
-  // Card wrapper
-  const wrapper = document.createElement("div");
-  wrapper.classList.add("card", "shadow-sm", "mb-4", "text-center");
-  wrapper.style.maxWidth = "500px";
-  wrapper.style.margin = "0 auto";
+  if (!userHasAccess([10, 12])) {
+    // Card wrapper
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("card", "shadow-sm", "mb-4", "text-center");
+    wrapper.style.maxWidth = "500px";
+    wrapper.style.margin = "0 auto";
 
     // Apply dark mode or light mode classes
-  if (darkMode) {
-    wrapper.classList.add("bg-dark", "text-light", "border-light");
-  } else {
-    wrapper.classList.add("bg-light", "text-dark", "border-dark");
+    if (darkMode) {
+      wrapper.classList.add("bg-dark", "text-light", "border-light");
+    } else {
+      wrapper.classList.add("bg-light", "text-dark", "border-dark");
+    }
+
+    // Card body
+    const cardBody = document.createElement("div");
+    cardBody.classList.add("card-body");
+
+    // Card title
+    const title = document.createElement("h5");
+    title.classList.add("card-title", "mb-3");
+    title.textContent = "Unlock More Tools";
+
+    // Card text
+    const cardText = document.createElement("p");
+    cardText.classList.add("card-text", "mb-3");
+    cardText.textContent = "Subscribe to access premium tools and features.";
+
+    // Subscribe button
+    const btn = document.createElement("button");
+    btn.classList.add("btn", "btn-primary");
+    btn.textContent = "Subscribe for more tools";
+    btn.onclick = () => {
+      window.location.href = subscriptionPageUrl; // Change this URL to your real subscribe page
+    };
+
+    // Build card
+    cardBody.appendChild(title);
+    cardBody.appendChild(cardText);
+    cardBody.appendChild(btn);
+    wrapper.appendChild(cardBody);
+
+    // Append to app
+    app.append(wrapper);
   }
-
-  // Card body
-  const cardBody = document.createElement("div");
-  cardBody.classList.add("card-body");
-
-  // Card title
-  const title = document.createElement("h5");
-  title.classList.add("card-title", "mb-3");
-  title.textContent = "Unlock More Tools";
-
-  // Card text
-  const cardText = document.createElement("p");
-  cardText.classList.add("card-text", "mb-3");
-  cardText.textContent = "Subscribe to access premium tools and features.";
-
-  // Subscribe button
-  const btn = document.createElement("button");
-  btn.classList.add("btn", "btn-primary");
-  btn.textContent = "Subscribe for more tools";
-  btn.onclick = () => {
-    window.location.href = subscriptionPageUrl; // Change this URL to your real subscribe page
-  };
-
-  // Build card
-  cardBody.appendChild(title);
-  cardBody.appendChild(cardText);
-  cardBody.appendChild(btn);
-  wrapper.appendChild(cardBody);
-
-  // Append to app
-  app.append(wrapper);
-}
-
-
 }
 
 async function showMyTeam() {
@@ -9264,20 +9281,18 @@ function createAndShowInfluencerComparison(content) {
   });
 }
 
-
-
 //MAX Features
 
-  // Helper to create a chart container
-  function createChartContainer(divID) {
-    const container = document.createElement("div");
-    container.style.marginBottom = "20px";
-    container.classList.add("chart-js-container");
-    const canvas = document.createElement("canvas");
-    container.appendChild(canvas);
-    divID.appendChild(container);
-    return canvas;
-  }
+// Helper to create a chart container
+function createChartContainer(divID) {
+  const container = document.createElement("div");
+  container.style.marginBottom = "20px";
+  container.classList.add("chart-js-container");
+  const canvas = document.createElement("canvas");
+  container.appendChild(canvas);
+  divID.appendChild(container);
+  return canvas;
+}
 function createTopStatTable({
   standings,
   containerDiv,
@@ -9361,36 +9376,34 @@ function createTopStatTable({
   containerDiv.appendChild(wrapper);
 }
 
-async function createSeasonMaxDashboard(){
-  
-
-  let leagueToDisplay = dummyLeague.standings ;   
+async function createSeasonMaxDashboard() {
+  let leagueToDisplay = dummyLeague.standings;
   if (userHasAccess([12])) {
-      leagueToDisplay = window.FPLToolboxLeagueData.standings ; 
-    }
-   console.log(leagueToDisplay)
+    leagueToDisplay = window.FPLToolboxLeagueData.standings;
+  }
+  console.log(leagueToDisplay);
 
-const app = document.getElementById("screen-tools");
-app.innerHTML = ""; // Clear existing content
+  const app = document.getElementById("screen-tools");
+  app.innerHTML = ""; // Clear existing content
 
-// Create Bootstrap container
-const container = document.createElement("div");
-container.className = "container my-4";
+  // Create Bootstrap container
+  const container = document.createElement("div");
+  container.className = "container my-4";
 
-// Create row to contain stats and sidebar
-const row = document.createElement("div");
-row.className = "row";
+  // Create row to contain stats and sidebar
+  const row = document.createElement("div");
+  row.className = "row";
 
-// === MAIN STATS GRID ===
-const seasonStats = document.createElement("div");
-seasonStats.id = "season-stats";
-seasonStats.className = "row g-3"; // Bootstrap grid spacing
+  // === MAIN STATS GRID ===
+  const seasonStats = document.createElement("div");
+  seasonStats.id = "season-stats";
+  seasonStats.className = "row g-3"; // Bootstrap grid spacing
 
-// Example stat cards
-for (let i = 1; i <= 6; i++) {
-  const statCard = document.createElement("div");
-  statCard.className = "col-12 col-md-6";
-  statCard.innerHTML = `
+  // Example stat cards
+  for (let i = 1; i <= 6; i++) {
+    const statCard = document.createElement("div");
+    statCard.className = "col-12 col-md-6";
+    statCard.innerHTML = `
     <div class="card shadow-sm text-center">
       <div class="card-body">
         <h6 class="card-title">Stat ${i}</h6>
@@ -9398,37 +9411,33 @@ for (let i = 1; i <= 6; i++) {
       </div>
     </div>
   `;
-  seasonStats.appendChild(statCard);
-}
+    seasonStats.appendChild(statCard);
+  }
 
-// === SIDEBAR CONTENT ===
-const sidebarCol = document.createElement("div");
-sidebarCol.className = "col-12 col-lg-3";
-sidebarCol.id = "sidebar-container";
+  // === SIDEBAR CONTENT ===
+  const sidebarCol = document.createElement("div");
+  sidebarCol.className = "col-12 col-lg-3";
+  sidebarCol.id = "sidebar-container";
 
-const sidebarContent = document.createElement("div");
-sidebarContent.id = "season-stats-sidebar";
+  const sidebarContent = document.createElement("div");
+  sidebarContent.id = "season-stats-sidebar";
 
+  // === MAIN STATS COLUMN ===
+  const statsCol = document.createElement("div");
+  statsCol.className = "col-12 col-lg-9 mb-4";
+  statsCol.appendChild(seasonStats);
 
-// === MAIN STATS COLUMN ===
-const statsCol = document.createElement("div");
-statsCol.className = "col-12 col-lg-9 mb-4";
-statsCol.appendChild(seasonStats);
+  // === Assemble the layout ===
+  row.appendChild(statsCol);
+  row.appendChild(sidebarCol);
+  container.appendChild(row);
+  app.appendChild(container);
 
-// === Assemble the layout ===
-row.appendChild(statsCol);
-row.appendChild(sidebarCol);
-container.appendChild(row);
-app.appendChild(container);
+  await createSeasonMaxTable(leagueToDisplay, seasonStats);
+  const chipsChart = await createChipsUsedChart(leagueToDisplay);
+  seasonStats.appendChild(chipsChart);
 
-
-await  createSeasonMaxTable(leagueToDisplay, seasonStats);
-const chipsChart = await createChipsUsedChart(leagueToDisplay);
-seasonStats.appendChild(chipsChart);
-
-console.log(leagueToDisplay)
-
-
+  console.log(leagueToDisplay);
 
   // Most Captaincy Points
   createTopStatTable({
@@ -9509,7 +9518,7 @@ console.log(leagueToDisplay)
 
   // Fewest goals conceded
   createTopStatTable({
-   standings: leagueToDisplay,
+    standings: leagueToDisplay,
     containerDiv: sidebarCol,
     titleText: "Fewest Goals Conceded",
     statKeys: ["total_goals_conceded"],
@@ -9620,22 +9629,16 @@ console.log(leagueToDisplay)
         ? ` <span style="color: gray; font-size: 0.85em;">(GW${team.worstWeek.event})</span>`
         : "",
   });
-
-
-
 }
 
+async function createSeasonMaxTable(standings, containerDiv) {
+  const table = document.createElement("table");
+  table.id = "league-table";
+  table.style.width = "100%";
 
-
-  async function createSeasonMaxTable(standings, containerDiv) {
-    const table = document.createElement("table");
-    table.id = "league-table";
-    table.style.width = "100%";
-
-    table.style.borderCollapse = "collapse";
+  table.style.borderCollapse = "collapse";
   const tableWrapper = document.createElement("div");
   tableWrapper.className = "table-responsive";
-
 
   const darkMode = localStorage.getItem("darkMode") === "true";
 
@@ -9650,148 +9653,143 @@ console.log(leagueToDisplay)
 
   const thead = document.createElement("thead");
   thead.classList.add("text-center");
-    const headers = [
-      { label: "Rank", key: "rank" },
-      { label: "Team Name", key: "entry_name" },
-      { label: "First Name", key: "managerDetails.player_first_name" },
-      { label: "Last Name", key: "managerDetails.player_last_name" },
+  const headers = [
+    { label: "Rank", key: "rank" },
+    { label: "Team Name", key: "entry_name" },
+    { label: "First Name", key: "managerDetails.player_first_name" },
+    { label: "Last Name", key: "managerDetails.player_last_name" },
 
-      {
-        label: "Favourite Team",
-        value: (team) =>
-          getPlayerTeam(team.managerDetails.favourite_team) || "",
-      },
-      { label: "Total Points", key: "managerDetails.summary_overall_points" },
-      {
-        label: "Chips Used",
-        value: (team) => team.chips?.length || 0,
-      },
-      {
-        label: "Most Picked Player",
-        value: (team) => team.pickElementFrequency[0].playerName,
-      },
-      {
-        label: "Least Picked Player",
-        value: (team) =>
-          team.pickElementFrequency[team.pickElementFrequency.length - 1]
-            .playerName,
-      },
-      { label: "Minus Points", key: "totalMinusPoints" },
-      { label: "Bench Points", key: "totalPointsOnBench" },
-      { label: "Transfers", key: "totalTransfers" },
-      { label: "Region", key: "managerDetails.player_region_name" },
-      { label: "Years Active", key: "managerDetails.years_active" },
-      { label: "Overall Rank", key: "managerDetails.summary_overall_rank" },
+    {
+      label: "Favourite Team",
+      value: (team) => getPlayerTeam(team.managerDetails.favourite_team) || "",
+    },
+    { label: "Total Points", key: "managerDetails.summary_overall_points" },
+    {
+      label: "Chips Used",
+      value: (team) => team.chips?.length || 0,
+    },
+    {
+      label: "Most Picked Player",
+      value: (team) => team.pickElementFrequency[0].playerName,
+    },
+    {
+      label: "Least Picked Player",
+      value: (team) =>
+        team.pickElementFrequency[team.pickElementFrequency.length - 1]
+          .playerName,
+    },
+    { label: "Minus Points", key: "totalMinusPoints" },
+    { label: "Bench Points", key: "totalPointsOnBench" },
+    { label: "Transfers", key: "totalTransfers" },
+    { label: "Region", key: "managerDetails.player_region_name" },
+    { label: "Years Active", key: "managerDetails.years_active" },
+    { label: "Overall Rank", key: "managerDetails.summary_overall_rank" },
 
-      // New tracked fields
-      { label: "Total Transfers", key: "totalTransfers" },
-      { label: "Total Assists", key: "total_assists" },
-      { label: "Total Home Games", key: "total_home_games" },
-      { label: "Total Away Games", key: "total_away_games" },
-      { label: "Total Captaincy Points", key: "total_captaincy_points" },
-      { label: "Total Cards", key: "total_cards" },
-      { label: "Total Clean Sheets", key: "total_clean_sheets" },
-      { label: "Total Goals Conceded", key: "total_goals_conceded" },
-      { label: "Total Goals Scored", key: "total_goals_scored" },
-      { label: "Total Minutes", key: "total_minutes" },
-      { label: "Total Own Goals", key: "total_own_goals" },
-      { label: "Total Penalties Missed", key: "total_penalties_missed" },
-      { label: "Total Red Cards", key: "total_red_cards" },
-      { label: "Total Saves", key: "total_saves" },
-      { label: "Total Yellow Cards", key: "total_yellow_cards" },
-    ];
+    // New tracked fields
+    { label: "Total Transfers", key: "totalTransfers" },
+    { label: "Total Assists", key: "total_assists" },
+    { label: "Total Home Games", key: "total_home_games" },
+    { label: "Total Away Games", key: "total_away_games" },
+    { label: "Total Captaincy Points", key: "total_captaincy_points" },
+    { label: "Total Cards", key: "total_cards" },
+    { label: "Total Clean Sheets", key: "total_clean_sheets" },
+    { label: "Total Goals Conceded", key: "total_goals_conceded" },
+    { label: "Total Goals Scored", key: "total_goals_scored" },
+    { label: "Total Minutes", key: "total_minutes" },
+    { label: "Total Own Goals", key: "total_own_goals" },
+    { label: "Total Penalties Missed", key: "total_penalties_missed" },
+    { label: "Total Red Cards", key: "total_red_cards" },
+    { label: "Total Saves", key: "total_saves" },
+    { label: "Total Yellow Cards", key: "total_yellow_cards" },
+  ];
 
-    let sortDirection = {};
-    headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
+  let sortDirection = {};
+  headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
 
-    // Helper: get nested value from object
-    function getValue(obj, path) {
-      return path.split(".").reduce((acc, key) => acc?.[key], obj);
-    }
+  // Helper: get nested value from object
+  function getValue(obj, path) {
+    return path.split(".").reduce((acc, key) => acc?.[key], obj);
+  }
 
-    function renderHeader() {
-      const thead = document.createElement("thead");
-      const headerRow = document.createElement("tr");
+  function renderHeader() {
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    headers.forEach((header) => {
+      const th = document.createElement("th");
+      th.textContent = header.label;
+      th.style.border = "1px solid #ccc";
+      th.style.padding = "8px";
+      th.style.backgroundColor = "#f5f5f5";
+      th.style.cursor = "pointer";
+
+      th.addEventListener("click", () => {
+        const sortKey = header.key || header.label;
+        const dir = sortDirection[sortKey];
+
+        standings.sort((a, b) => {
+          const valA = header.value ? header.value(a) : getValue(a, header.key);
+          const valB = header.value ? header.value(b) : getValue(b, header.key);
+
+          if (typeof valA === "number" && typeof valB === "number") {
+            return dir === "asc" ? valA - valB : valB - valA;
+          } else {
+            return dir === "asc"
+              ? String(valA).localeCompare(String(valB))
+              : String(valB).localeCompare(String(valA));
+          }
+        });
+
+        sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
+        renderTableBody();
+      });
+
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    return thead;
+  }
+
+  function renderTableBody() {
+    const oldTbody = table.querySelector("tbody");
+    if (oldTbody) oldTbody.remove();
+
+    const tbody = document.createElement("tbody");
+
+    standings.forEach((team) => {
+      const row = document.createElement("tr");
 
       headers.forEach((header) => {
-        const th = document.createElement("th");
-        th.textContent = header.label;
-        th.style.border = "1px solid #ccc";
-        th.style.padding = "8px";
-        th.style.backgroundColor = "#f5f5f5";
-        th.style.cursor = "pointer";
-
-        th.addEventListener("click", () => {
-          const sortKey = header.key || header.label;
-          const dir = sortDirection[sortKey];
-
-          standings.sort((a, b) => {
-            const valA = header.value
-              ? header.value(a)
-              : getValue(a, header.key);
-            const valB = header.value
-              ? header.value(b)
-              : getValue(b, header.key);
-
-            if (typeof valA === "number" && typeof valB === "number") {
-              return dir === "asc" ? valA - valB : valB - valA;
-            } else {
-              return dir === "asc"
-                ? String(valA).localeCompare(String(valB))
-                : String(valB).localeCompare(String(valA));
-            }
-          });
-
-          sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
-          renderTableBody();
-        });
-
-        headerRow.appendChild(th);
+        const td = document.createElement("td");
+        const value = header.value
+          ? header.value(team)
+          : getValue(team, header.key);
+        td.textContent = value ?? "";
+        td.style.border = "1px solid #ccc";
+        td.style.padding = "8px";
+        row.appendChild(td);
       });
 
-      thead.appendChild(headerRow);
-      return thead;
-    }
+      tbody.appendChild(row);
+    });
 
-    function renderTableBody() {
-      const oldTbody = table.querySelector("tbody");
-      if (oldTbody) oldTbody.remove();
-
-      const tbody = document.createElement("tbody");
-
-      standings.forEach((team) => {
-        const row = document.createElement("tr");
-
-        headers.forEach((header) => {
-          const td = document.createElement("td");
-          const value = header.value
-            ? header.value(team)
-            : getValue(team, header.key);
-          td.textContent = value ?? "";
-          td.style.border = "1px solid #ccc";
-          td.style.padding = "8px";
-          row.appendChild(td);
-        });
-
-        tbody.appendChild(row);
-      });
-
-      table.appendChild(tbody);
-    }
-
-    table.appendChild(renderHeader());
-    renderTableBody();
-
-    containerDiv.innerHTML = "";
-
-    const scrollWrapper = document.createElement("div");
-    scrollWrapper.style.overflowX = "auto";
-    scrollWrapper.style.width = "100%";
-
-    scrollWrapper.appendChild(table);
-    containerDiv.appendChild(scrollWrapper);
+    table.appendChild(tbody);
   }
- 
+
+  table.appendChild(renderHeader());
+  renderTableBody();
+
+  containerDiv.innerHTML = "";
+
+  const scrollWrapper = document.createElement("div");
+  scrollWrapper.style.overflowX = "auto";
+  scrollWrapper.style.width = "100%";
+
+  scrollWrapper.appendChild(table);
+  containerDiv.appendChild(scrollWrapper);
+}
+
 async function createChipsUsedChart(standings) {
   const wrapper = document.createElement("div");
   wrapper.className = "col-12"; // full-width column
@@ -9875,16 +9873,7 @@ async function createChipsUsedChart(standings) {
   return wrapper;
 }
 
-
-
-
-
 async function createLeagueDashboardOLD() {
-
-
-
-
-
   //My Team Tab
   const myTeam = findManagerTeam(standings, managerData);
   console.log("My Team", myTeam);
@@ -10360,7 +10349,6 @@ async function createLeagueDashboardOLD() {
 
   //Season Tab
 
-
   //Total Points Charts
   function createTotalPointsChart(standings, containerDiv) {
     const canvas = createChartContainer(containerDiv);
@@ -10615,10 +10603,6 @@ async function createLeagueDashboardOLD() {
     renderTable();
   }
 
-
-
-
-
   //Rank progression charts
   function createRankProgressionChart(standings, containerDiv, getRandomColor) {
     const canvas = createChartContainer(containerDiv);
@@ -10657,8 +10641,6 @@ async function createLeagueDashboardOLD() {
     });
   }
   createRankProgressionChart(standings, seasonStats, getRandomColor);
-
-
 
   //Benched Points Chart
   function createBenchPointsChart(standings, containerDiv, colors) {
