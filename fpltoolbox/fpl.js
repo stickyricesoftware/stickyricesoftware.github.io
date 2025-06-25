@@ -2184,21 +2184,28 @@ app.innerHTML = `
 
   <div class="mb-4">
     <h5>Step 1:</h5>
-    <label for="teamFilter" class="form-label">Select a team name category</label>
+    <label for="teamFilter" class="form-label">Select a category</label>
     <select id="teamFilter" class="form-select"></select>
   </div>
 
-  <div class="mb-4">
+
+
+  
+    <div class="mb-4">
     <h5>Step 2:</h5>
-    <p id="teamNameDisplay" class="fs-4">Click the button to get a name</p>
-    <button id="copyBtn" class="btn btn-outline-secondary" style="display:none;">📋 Copy</button>
+        <p class="fs-6">Press the button until you find a name that suits your style.</p>
+    <button id="generateBtn" class="btn btn-primary mb-2">Generate Team Name</button>
+
   </div>
 
   <div class="mb-4">
     <h5>Step 3:</h5>
-    <button id="generateBtn" class="btn btn-primary mb-2">Generate Team Name</button>
-    <p class="text-muted small">Press the button until you find a name that suits your style.</p>
+    <p id="teamNameDisplay" class="fs-4">Click the button to get a name</p>
+    <p class="fs-6">Tap copy if you like what you see!</p>
+    <button id="copyBtn" class="btn btn-outline-secondary" style="display:none;">📋 Copy</button>
   </div>
+
+
 
 </div>
 
