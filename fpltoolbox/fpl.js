@@ -30,8 +30,8 @@ if (
 
 
 const changelogData = [
+  { version: "4.4.0", description: "Manager of the Month"},
   { version: "4.3.8", description: "Team of the week"},
-  { version: "4.0", description: "Toolbox App Interface" },
   { version: "3.8.0", description: "Max dashboard" },
   { version: "1.1", description: "Added league selector" },
   { version: "1.0", description: "Initial release" },
