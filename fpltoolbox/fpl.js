@@ -24,7 +24,7 @@ if (
     testMode = false;
   }
 }
-const FPLToolboxVersion = "4.0.0";
+const FPLToolboxVersion = "4.3.8";
 
 (function checkVersionAndReloadIfNeeded() {
   const storedVersion = localStorage.getItem("FPLToolboxVersion");
@@ -3426,7 +3426,7 @@ async function createManagerCard(elementId, score, isCaptain, isViceCaptain) {
 
   return card;
 }
-async function showGameweekStats() {
+async function showGameweekStats1() {
   const container = document.getElementById("screen-tools");
   container.innerHTML = "";
 
@@ -3595,6 +3595,199 @@ async function showGameweekStats() {
     console.error("Error building table:", error);
   }
 }
+async function showGameweekStats() {
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  // Back button
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const tableHeader = document.createElement("h6");
+  tableHeader.classList.add("text-center", "mb-3");
+  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Gameweek Activity`;
+  container.appendChild(tableHeader);
+
+  const tableWrapper = document.createElement("div");
+  tableWrapper.className = "table-responsive";
+
+  const table = document.createElement("table");
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered",
+    "align-middle",
+    darkMode ? "table-dark" : "table-light"
+  );
+
+  const thead = document.createElement("thead");
+  thead.classList.add("text-center");
+
+  const headerRow = document.createElement("tr");
+  const headers = [
+    "Pos",
+    "Team",
+    "Chip",
+    "Captain",
+    "Score",
+    "Total",
+    "xfrs",
+    "Minus P",
+    "Bench P",
+  ];
+
+  headers.forEach((headerText) => {
+    const th = document.createElement("th");
+    th.innerText = headerText;
+    headerRow.appendChild(th);
+  });
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  // Track highest GW scorer
+  let highestScore = -Infinity;
+  let highestRow = null;
+  let highestRank = null;
+
+  try {
+    for (const element of window.FPLToolboxLeagueData.standings) {
+      const tr = document.createElement("tr");
+
+      if (element.entry == theUser.info.team_id) {
+        tr.classList.add("table-primary");
+      }
+
+      // Position and movement
+      const pos = document.createElement("td");
+      pos.className = "text-center fw-bold";
+      const rankMovement = document.createElement("span");
+
+      if (element.rank < element.last_rank) {
+        rankMovement.innerText = " ▲";
+        rankMovement.className = "text-success";
+      } else if (element.rank > element.last_rank) {
+        rankMovement.innerText = " ▼";
+        rankMovement.className = "text-danger";
+      } else {
+        rankMovement.innerText = " ●";
+        rankMovement.className = "text-muted";
+      }
+
+      pos.innerText = element.rank;
+      pos.appendChild(rankMovement);
+      tr.appendChild(pos);
+
+      // Team
+      const teamNameCell = document.createElement("td");
+      teamNameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
+      tr.appendChild(teamNameCell);
+
+      // Chip
+      const chip = document.createElement("td");
+      chip.className = "text-center";
+      if (element.currentWeek[0].active_chip) {
+        const chipName = convertChipName(element.currentWeek[0].active_chip);
+        chip.innerText = chipName;
+        chip.classList.add(`chip-${chipName.toLowerCase()}`);
+      } else {
+        chip.innerHTML = "-";
+      }
+      tr.appendChild(chip);
+
+      // Captain
+      const captain = document.createElement("td");
+      const activeChip = convertChipName(element.currentWeek[0].active_chip);
+
+      for (const player of element.currentWeek[0].picks) {
+        if (player.is_captain) {
+          const score = await getPlayerScore(player.element);
+          const scoreMultiplier = activeChip === "TC" ? 3 : 2;
+          const card = await createPlayerCardNew(
+            player.element,
+            score,
+            true,
+            false,
+            scoreMultiplier
+          );
+          captain.append(card);
+        }
+      }
+
+      tr.appendChild(captain);
+
+      // GW Score
+      const score = document.createElement("td");
+      score.className = "text-center";
+      score.innerText = element.event_total;
+      tr.appendChild(score);
+
+      // Total Points
+      const total = document.createElement("td");
+      total.className = "text-center";
+      total.innerText = element.total;
+      tr.appendChild(total);
+
+      // Transfers
+      const transfers = document.createElement("td");
+      transfers.className = "text-center";
+      transfers.innerText = element.everyGw.at(-1).transfers;
+      tr.appendChild(transfers);
+
+      // Transfer cost
+      const minus = document.createElement("td");
+      minus.className = "text-center";
+      const cost = element.everyGw.at(-1).transfers_cost;
+      minus.innerText = cost;
+      if (cost > 0) {
+        minus.classList.add("text-danger", "fw-bold");
+      }
+      tr.appendChild(minus);
+
+      // Bench Points
+      const bench = document.createElement("td");
+      bench.className = "text-center";
+      bench.innerText = element.everyGw.at(-1).bench_points;
+      tr.appendChild(bench);
+
+      // Track top GW scorer
+      if (element.event_total > highestScore) {
+        highestScore = element.event_total;
+        highestRow = tr.cloneNode(true);
+        highestRank = element.rank;
+      }
+
+      tbody.appendChild(tr);
+    }
+
+    // Prepend the highest scorer at top
+    if (highestRow) {
+      highestRow.classList.add("table-success"); // Bootstrap highlight color
+
+      // Optional: Add badge or label to Pos cell
+      const posCell = highestRow.children[0];
+      const badge = document.createElement("span");
+      badge.className = "badge bg-success ms-2";
+      badge.innerText = "Top GW Score";
+      posCell.appendChild(badge);
+
+      tbody.insertBefore(highestRow, tbody.firstChild);
+    }
+
+    table.appendChild(tbody);
+    tableWrapper.appendChild(table);
+    container.appendChild(tableWrapper);
+  } catch (error) {
+    console.error("Error building table:", error);
+  }
+}
+
 async function showSeasonStats() {
   let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
   const container = document.getElementById("screen-tools");
