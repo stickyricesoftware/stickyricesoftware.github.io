@@ -9377,6 +9377,8 @@ function createTopStatTable({
 }
 
 async function createSeasonMaxDashboard() {
+
+  
   let leagueToDisplay = dummyLeague.standings;
   if (userHasAccess([12])) {
     leagueToDisplay = window.FPLToolboxLeagueData.standings;
@@ -9385,7 +9387,10 @@ async function createSeasonMaxDashboard() {
 
   const app = document.getElementById("screen-tools");
   app.innerHTML = ""; // Clear existing content
-
+    // Back button
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  app.appendChild(backBtn);
   // Create Bootstrap container
   const container = document.createElement("div");
   container.className = "container my-4";
@@ -9635,10 +9640,7 @@ async function createSeasonMaxTable(standings, containerDiv) {
   const table = document.createElement("table");
   table.id = "league-table";
   table.style.width = "100%";
-
   table.style.borderCollapse = "collapse";
-  const tableWrapper = document.createElement("div");
-  tableWrapper.className = "table-responsive";
 
   const darkMode = localStorage.getItem("darkMode") === "true";
 
@@ -9651,41 +9653,31 @@ async function createSeasonMaxTable(standings, containerDiv) {
     darkMode ? "table-dark" : "table-light"
   );
 
-  const thead = document.createElement("thead");
-  thead.classList.add("text-center");
   const headers = [
     { label: "Rank", key: "rank" },
     { label: "Team Name", key: "entry_name" },
     { label: "First Name", key: "managerDetails.player_first_name" },
     { label: "Last Name", key: "managerDetails.player_last_name" },
-
     {
       label: "Favourite Team",
-      value: (team) => getPlayerTeam(team.managerDetails.favourite_team) || "",
+      value: async (team) => {
+        const name = await getTeamName(team.managerDetails.favourite_team);
+       
+        return (name == null || name === 'undefined') ? "" : name;
+      },
     },
     { label: "Total Points", key: "managerDetails.summary_overall_points" },
     {
       label: "Chips Used",
-      value: (team) => team.chips?.length || 0,
+      value: async (team) => await team.chips?.length || 0,
     },
-    {
-      label: "Most Picked Player",
-      value: (team) => team.pickElementFrequency[0].playerName,
-    },
-    {
-      label: "Least Picked Player",
-      value: (team) =>
-        team.pickElementFrequency[team.pickElementFrequency.length - 1]
-          .playerName,
-    },
+
     { label: "Minus Points", key: "totalMinusPoints" },
     { label: "Bench Points", key: "totalPointsOnBench" },
     { label: "Transfers", key: "totalTransfers" },
     { label: "Region", key: "managerDetails.player_region_name" },
     { label: "Years Active", key: "managerDetails.years_active" },
     { label: "Overall Rank", key: "managerDetails.summary_overall_rank" },
-
-    // New tracked fields
     { label: "Total Transfers", key: "totalTransfers" },
     { label: "Total Assists", key: "total_assists" },
     { label: "Total Home Games", key: "total_home_games" },
@@ -9706,7 +9698,6 @@ async function createSeasonMaxTable(standings, containerDiv) {
   let sortDirection = {};
   headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
 
-  // Helper: get nested value from object
   function getValue(obj, path) {
     return path.split(".").reduce((acc, key) => acc?.[key], obj);
   }
@@ -9718,18 +9709,19 @@ async function createSeasonMaxTable(standings, containerDiv) {
     headers.forEach((header) => {
       const th = document.createElement("th");
       th.textContent = header.label;
-      th.style.border = "1px solid #ccc";
-      th.style.padding = "8px";
-      th.style.backgroundColor = "#f5f5f5";
-      th.style.cursor = "pointer";
 
-      th.addEventListener("click", () => {
+      th.addEventListener("click", async () => {
         const sortKey = header.key || header.label;
         const dir = sortDirection[sortKey];
 
-        standings.sort((a, b) => {
-          const valA = header.value ? header.value(a) : getValue(a, header.key);
-          const valB = header.value ? header.value(b) : getValue(b, header.key);
+        const sortableStandings = await Promise.all(standings.map(async (team) => {
+          const val = header.value ? await header.value(team) : getValue(team, header.key);
+          return { team, sortVal: val };
+        }));
+
+        sortableStandings.sort((a, b) => {
+          const valA = a.sortVal;
+          const valB = b.sortVal;
 
           if (typeof valA === "number" && typeof valB === "number") {
             return dir === "asc" ? valA - valB : valB - valA;
@@ -9740,8 +9732,10 @@ async function createSeasonMaxTable(standings, containerDiv) {
           }
         });
 
+        standings = sortableStandings.map(item => item.team);
+
         sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
-        renderTableBody();
+        await renderTableBody();
       });
 
       headerRow.appendChild(th);
@@ -9751,44 +9745,48 @@ async function createSeasonMaxTable(standings, containerDiv) {
     return thead;
   }
 
-  function renderTableBody() {
+  async function renderTableBody() {
     const oldTbody = table.querySelector("tbody");
     if (oldTbody) oldTbody.remove();
 
     const tbody = document.createElement("tbody");
 
-    standings.forEach((team) => {
+    for (const team of standings) {
       const row = document.createElement("tr");
 
-      headers.forEach((header) => {
+      for (const header of headers) {
         const td = document.createElement("td");
-        const value = header.value
-          ? header.value(team)
-          : getValue(team, header.key);
+
+        let value;
+        if (header.value) {
+          value = await header.value(team);
+        } else if (header.key) {
+          value = getValue(team, header.key);
+        }
+
         td.textContent = value ?? "";
         td.style.border = "1px solid #ccc";
         td.style.padding = "8px";
         row.appendChild(td);
-      });
+      }
 
       tbody.appendChild(row);
-    });
+    }
 
     table.appendChild(tbody);
   }
 
   table.appendChild(renderHeader());
-  renderTableBody();
+  await renderTableBody();
 
   containerDiv.innerHTML = "";
-
   const scrollWrapper = document.createElement("div");
   scrollWrapper.style.overflowX = "auto";
   scrollWrapper.style.width = "100%";
-
   scrollWrapper.appendChild(table);
   containerDiv.appendChild(scrollWrapper);
 }
+
 
 async function createChipsUsedChart(standings) {
   const wrapper = document.createElement("div");
