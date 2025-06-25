@@ -505,7 +505,7 @@ function toolsScreen() {
       icon: "bi-bag-plus",
       label: "Feature Request",
       action: featureRequest,
-      tier: "pro",
+      tier: "Max",
       requiresData: false,
     },
   ];
