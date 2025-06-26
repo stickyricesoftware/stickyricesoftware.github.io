@@ -74,6 +74,7 @@ window.FPLToolboxMaxLeagueDataReady = false;
 
 let subscriptionPageUrl = "/subscribe";
 let profilePageUrl = "/profile";
+let miniLeagueAdminPageUrl = "https://fpltoolbox.com/private-test-page/"
 
 window.FPLToolboxLeagueData = {
   leagueName: null,
@@ -500,7 +501,13 @@ function toolsScreen() {
       tier: "max",
       requiresData: true,
     },
-
+    {
+      icon: "bi-cash-coin",
+      label: "Mini League Admin",
+      action: miniLeagueAdmin,
+      tier: "max",
+      requiresData: false,
+    },
     {
       icon: "bi-bag-plus",
       label: "Feature Request",
@@ -9969,6 +9976,20 @@ async function findManagersOfTheMonth(standings, phases, currentGw) {
   return holdingContainer;
 }
 
+function miniLeagueAdmin(){
+      if (!userHasAccess([12])) {
+      showModal({
+        title: "Paid Feature",
+        body: "This feature is only available to <strong>Max members</strong>.<br><br>If you're a mini league organiser/commissioner, upgrade to import your mini leagues and keep track on who's paid and who hasn't!",
+        confirmText: "Take me there",
+        onConfirm: () => {
+          window.location.href = subscriptionPageUrl;
+        },
+      });
+      return;
+    }
+    window.location.href = miniLeagueAdminPageUrl
+}
 
 async function createLeagueDashboardOLD() {
   //My Team Tab
