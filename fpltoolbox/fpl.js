@@ -46039,6 +46039,13 @@ function toolsScreen() {
       tier: "free",
       requiresData: true,
     },
+        {
+      icon: "bi-emoji-smile",
+      label: "GW Memes",
+      action: showMemes,
+      tier: "free",
+      requiresData: true,
+    },
     {
       icon: "bi-people",
       label: "Benched Points League",
@@ -46126,15 +46133,7 @@ function toolsScreen() {
       requiresData: true,
     },
 
-    {
-      icon: "bi-emoji-smile",
-      label: "GW Memes",
-      action: showMemes,
-      tier: "free",
-      requiresData: true,
-    },
-
-    {
+   {
       icon: "bi-arrow-repeat",
       label: "GW Transfer Summaries",
       action: handleStatsClick,
@@ -54988,6 +54987,9 @@ title.classList.add("card-title", "mb-3");
 title.textContent = titleText;
 
 // Table with Bootstrap classes
+const tableWrapper = document.createElement("div");
+tableWrapper.classList.add("table-responsive");
+
 const table = document.createElement("table");
 table.className = `table table-striped table-hover table-sm mb-0 ${darkMode ? "table-dark" : ""}`;
 
@@ -55031,7 +55033,11 @@ thead.innerHTML = `
 
   // Assemble card
   cardBody.appendChild(title);
-  cardBody.appendChild(table);
+  
+  tableWrapper.appendChild(table);
+
+  cardBody.appendChild(tableWrapper);
+
   wrapper.appendChild(cardBody);
   containerDiv.appendChild(wrapper);
 }
@@ -55105,6 +55111,14 @@ async function createSeasonMaxDashboard() {
 
   const managerOfTheMonth = await findManagersOfTheMonth(leagueToDisplay, bootstrap.phases);
   seasonStats.appendChild(managerOfTheMonth);
+
+  const chipUsageCharts = await createChipUsageCharts(leagueToDisplay);
+  seasonStats.appendChild(chipUsageCharts);
+
+    const rankProgression = await createRankProgressionChart(leagueToDisplay);
+  seasonStats.appendChild(rankProgression);
+
+  
 
   // Most Captaincy Points
   createTopStatTable({
@@ -55192,6 +55206,17 @@ async function createSeasonMaxDashboard() {
     statLabels: ["Goals Conceded"],
     limit: 3,
     sortOrder: "asc", // you'll need to add this option below
+  });
+
+    // Most Transfers
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Transfers",
+    statKeys: ["totalTransfers"],
+    statLabels: ["Transfers"],
+    limit: 3,
+    sortOrder: "desc",
   });
 
   // Most minutes played
@@ -55469,10 +55494,10 @@ async function createChipsUsedChart(standings) {
   const cardBody = document.createElement("div");
   cardBody.className = "card-body";
 
-  const title = document.createElement("h5");
+  const title = document.createElement("h4");
   title.className = "card-title";
   title.textContent = "Number of Chips Used";
-  cardBody.appendChild(title);
+  card.appendChild(title);
 
   const canvas = document.createElement("canvas");
   canvas.height = 300;
@@ -55625,6 +55650,209 @@ async function findManagersOfTheMonth(standings, phases, currentGw) {
 
   return holdingContainer;
 }
+
+async function createChipUsageCharts(standings) {
+    const darkMode = localStorage.getItem("darkMode") === "true";
+  const chipTypes = ["wildcard1", "wildcard2", "freehit", "manager", "bboost", "3xc"];
+  const chipLabels = {
+    wildcard1: "Wildcard 1",
+    wildcard2: "Wildcard 2",
+    freehit: "Free Hit",
+    manager: "Assistant Manager",
+    bboost: "Bench Boost",
+    "3xc": "Triple Captain",
+  };
+
+  const chipUsage = Object.fromEntries(
+    chipTypes.map((type) => [type, { used: 0, unused: 0 }])
+  );
+
+  // Step 1: Count chip usage
+  standings.forEach((team) => {
+    const usedChips = team.chips || [];
+    const usedSet = new Set();
+
+    usedChips.forEach((chip) => {
+      if (chip.name === "wildcard") {
+        const key = chip.gw <= 18 ? "wildcard1" : "wildcard2";
+        chipUsage[key].used++;
+        usedSet.add(key);
+      } else if (chipUsage[chip.name]) {
+        chipUsage[chip.name].used++;
+        usedSet.add(chip.name);
+      }
+    });
+
+    chipTypes.forEach((chip) => {
+      if (!usedSet.has(chip)) {
+        chipUsage[chip].unused++;
+      }
+    });
+  });
+
+  // Step 2: Build container
+  const chipContainer = document.createElement("div");
+  chipContainer.classList.add("container", "my-3");
+
+  const title = document.createElement("h4");
+  title.classList.add("mb-3", "text-body");
+  title.textContent = "League Chip Usage";
+  chipContainer.appendChild(title);
+
+  const row = document.createElement("div");
+  row.classList.add("row", "g-3");
+  chipContainer.appendChild(row);
+
+  // Step 3: Color selector based on your darkMode variable
+  const chartColors = darkMode
+    ? ["#0d6efd", "#6c757d"]  // Blue + Gray for dark mode
+    : ["#0d6efd", "#e9ecef"]; // Blue + Light gray for light mode
+
+  // Step 4: Create each chip card
+  chipTypes.forEach((chipType) => {
+    const col = document.createElement("div");
+    col.classList.add("col-12", "col-sm-6", "col-lg-4");
+
+    const card = document.createElement("div");
+    card.classList.add(
+      "card",
+      "h-100",
+      "shadow-sm",
+      "text-center",
+      darkMode ? "bg-dark" : "bg-body-tertiary",
+      darkMode ? "text-light" : "text-body"
+    );
+
+    const cardBody = document.createElement("div");
+    cardBody.classList.add("card-body", "d-flex", "flex-column", "align-items-center");
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 100;
+    canvas.height = 100;
+    cardBody.appendChild(canvas);
+
+    const info = document.createElement("div");
+    info.classList.add("mt-2");
+    info.innerHTML = `
+      <strong>${chipLabels[chipType]}</strong><br>
+      <span class="text-primary">Used:</span> ${chipUsage[chipType].used} &nbsp;|&nbsp; 
+      <span class="text-muted">Unused:</span> ${chipUsage[chipType].unused}
+    `;
+    cardBody.appendChild(info);
+
+    card.appendChild(cardBody);
+    col.appendChild(card);
+    row.appendChild(col);
+
+    // Step 5: Draw chart
+    new Chart(canvas.getContext("2d"), {
+      type: "pie",
+      data: {
+        labels: ["Used", "Unused"],
+        datasets: [
+          {
+            data: [chipUsage[chipType].used, chipUsage[chipType].unused],
+            backgroundColor: chartColors,
+          },
+        ],
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          title: { display: false },
+          legend: { display: false },
+        },
+      },
+    });
+  });
+
+  return chipContainer;
+}
+async function createRankProgressionChart(standings) {
+  if (!standings || standings.length === 0) return null;
+
+ const darkMode = localStorage.getItem("darkMode") === "true";
+
+  // Bootstrap color palette for line colors
+  const bootstrapColors = darkMode
+    ? ["#0d6efd", "#6610f2", "#198754", "#fd7e14", "#dc3545", "#adb5bd"]  // Dark mode: bold colors
+    : ["#0d6efd", "#6f42c1", "#28a745", "#ffc107", "#dc3545", "#6c757d"]; // Light mode: standard Bootstrap theme colors
+
+  let colorIndex = 0;
+  const getNextColor = () => {
+    const color = bootstrapColors[colorIndex % bootstrapColors.length];
+    colorIndex++;
+    return color;
+  };
+
+  // Create container div
+  const chartContainer = document.createElement("div");
+  chartContainer.classList.add("container", "my-3");
+
+  const title = document.createElement("h4");
+  title.textContent = "Overall Rank Progression";
+  title.classList.add("mb-3", darkMode ? "text-light" : "text-body");
+  chartContainer.appendChild(title);
+
+  // Create chart canvas
+  const canvas = document.createElement("canvas");
+  canvas.height = 400; // Optional: Fixed height for better consistency
+  chartContainer.appendChild(canvas);
+
+  // Generate labels (gameweeks)
+  const labels = standings[0]?.everyGw.map((gw) => `GW${gw.gameweek}`) || [];
+
+  // Create chart datasets
+  const datasets = standings.map((team) => ({
+    label: team.entry_name,
+    data: team.everyGw.map((gw) => gw.overall_rank),
+    fill: false,
+    borderColor: getNextColor(),
+    tension: 0.3,
+    hidden: true, // Start hidden for less clutter
+  }));
+
+  // Create Chart.js chart
+  new Chart(canvas.getContext("2d"), {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: datasets,
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: false,
+        },
+        legend: {
+          labels: {
+            color: darkMode ? "#ffffff" : "#212529", // White for dark mode, dark for light mode
+          },
+        },
+      },
+      scales: {
+        y: {
+          reverse: true,
+          beginAtZero: false,
+          ticks: {
+            color: darkMode ? "#ffffff" : "#212529",
+          },
+        },
+        x: {
+          ticks: {
+            color: darkMode ? "#ffffff" : "#212529",
+          },
+        },
+      },
+    },
+  });
+
+  return chartContainer;
+}
+
+
+
 
 function miniLeagueAdmin(){
       if (!userHasAccess([12])) {
