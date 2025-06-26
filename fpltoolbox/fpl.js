@@ -65,11069 +65,6 @@ const FPLToolboxVersion = changelogData[0].version;
 console.log(theUser);
 
 const dummyLeagueMessage = `This feature is only available to <strong>paid members</strong>. <br><br>You'll see dummy data here until you subscribe`;
-
-// Set to true to use test data
-let addDelaySimulationTime = 100;
-window.FPLToolboxLeagueDataReady = false;
-window.FPLToolboxProLeagueDataReady = false;
-window.FPLToolboxMaxLeagueDataReady = false;
-
-let subscriptionPageUrl = "/subscribe";
-let profilePageUrl = "/profile";
-let miniLeagueAdminPageUrl = "https://fpltoolbox.com/private-test-page/"
-
-window.FPLToolboxLeagueData = {
-  leagueName: null,
-  standings: [],
-  lastUpdated: null,
-  type: null,
-};
-
-let bootstrap = {};
-let currentGw;
-let nextGw;
-let managerData = {};
-let loggedInTeamName = "";
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-document.addEventListener("DOMContentLoaded", injectUI());
-
-async function getEventStatus() {
-  try {
-    if (testMode) {
-      console.log(
-        "%c TEST MODE - NO API CALL MADE - Event Status",
-        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-
-        eventStatusTest
-      );
-      return eventStatusTest;
-    }
-    const res = await fetch(BASE_URL + "event-status/");
-    const data = await res.json();
-    let eventStatus = data;
-    console.log(
-      "%c API CALL MADE - Event Status",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-      eventStatus
-    );
-    return eventStatus;
-  } catch (error) {
-    console.error("Something went wrong... ", error);
-  }
-}
-getEventStatus();
-async function getManagerData(teamID) {
-  if (testMode) {
-    managerData = managerDataTest;
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Manager Data Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      managerData
-    );
-
-    console.log("simulating delay");
-    await sleep(addDelaySimulationTime);
-    return; // Skip live fetching
-  }
-
-  try {
-    const res = await fetch(BASE_URL + "/entry/" + teamID + "/");
-    const data = await res.json();
-    managerData = data;
-    console.log(managerData);
-
-    loggedInTeamName = data.name;
-
-    // Populate league options
-    let options = "";
-    data.leagues.classic.forEach((e) => {
-      options += `<option name="${e.name}" value="${e.id}" id="${
-        e.id
-      }" style="border-radius: 5px;">${e.name + ": " + e.id}</option>`;
-
-      // Check if "league-list" div exists
-      const leagueListDiv = document.getElementById("league-list");
-      if (leagueListDiv) {
-        const newDiv = document.createElement("div");
-        newDiv.innerHTML = `${e.name + ": " + e.id}`;
-        leagueListDiv.appendChild(newDiv);
-      }
-    });
-
-    // Check if "leagues" element exists before setting innerHTML
-    const leaguesElement = document.getElementById("leagues");
-    if (leaguesElement) {
-      leaguesElement.innerHTML = options;
-    }
-  } catch (error) {
-    console.error("Something went wrong... ", error);
-  }
-}
-
-if (theUser.info.team_id) {
-  //console.log("Hey " + theUser.username.data.display_name);
-  //console.log("User's team ID " + theUser.info.team_id);
-  //console.log("User's league ID " + theUser.info.league_id);
-  //console.log(theUser.username.data.membership_level.ID)
-
-  getManagerData(theUser.info.team_id);
-}
-
-if (theUser.info.league_id[0] != "") {
-  //createLeague(theUser.info.league_id);
-} else {
-  showModal({
-    title: `Reminder`,
-    body: `Hey, ${managerData.player_first_name}! Remember to select a league in your profile page`,
-    confirmText: "Take me there",
-    onConfirm: () => {
-      window.location.href = profilePageUrl;
-    },
-  });
-}
-
-async function getBootstrap() {
-  try {
-    if (testMode) {
-      bootstrap = bootstrapTest;
-
-      console.log(
-        "%c TEST MODE - NO API CALL MADE - Bootstrap Data",
-        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-        bootstrap
-      );
-
-      // Set current and next game week
-      bootstrap.events.forEach((event) => {
-        if (event.is_current) currentGw = event.id;
-        if (event.is_next) nextGw = event.id;
-      });
-
-      return bootstrap;
-    }
-
-    const res = await fetch(BASE_URL + "bootstrap-static/");
-    const data = await res.json();
-    bootstrap = data;
-    console.log(
-      "%c API CALL MADE - Bootstrap Data",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-      bootstrap
-    );
-    // Set current and next game week
-    bootstrap.events.forEach((event) => {
-      if (event.is_current) currentGw = event.id;
-      if (event.is_next) nextGw = event.id;
-    });
-    // Sort players by `transfers_in` in descending order
-    bootstrap.elements.sort((a, b) => b.transfers_in - a.transfers_in);
-
-    // Get the top 5 most transferred-in players
-    // top5TransferredIn = bootstrap.elements.slice(0, 10);
-  } catch (error) {
-    console.error("Something went wrong... ", error);
-  }
-}
-getBootstrap();
-
-function injectUI() {
-  const app = document.getElementById("app-screen");
-  app.innerHTML = ""; // Clear previous content
-  app.className = "d-flex flex-column h-100";
-  const mainContainer = document.createElement("div");
-  mainContainer.className = "d-flex flex-column h-100";
-
-  const screenWrapper = document.createElement("div");
-  screenWrapper.id = "screen-wrapper";
-  screenWrapper.className = "flex-grow-1 overflow-auto";
-  createScreens(screenWrapper);
-
-  const nav = createNav();
-
-  mainContainer.appendChild(screenWrapper);
-  mainContainer.appendChild(nav);
-  app.appendChild(mainContainer);
-
-  injectDynamicStyles();
-  setupTabListeners();
-}
-document.getElementById("nav-container").addEventListener("click", (e) => {
-  const tab = e.target.closest(".nav-tab");
-  if (!tab) return;
-
-  // Clear 'active' class
-  document
-    .querySelectorAll(".nav-tab")
-    .forEach((t) => t.classList.remove("active"));
-
-  // Activate current tab
-  tab.classList.add("active");
-
-  // Handle navigation
-  if (tab.dataset.external) {
-    window.location.href = tab.dataset.external;
-    return;
-  }
-  if (tab.dataset.target === "tools") {
-    renderToolsScreenWithLeague();
-  } else if (tab.dataset.target === "settings") {
-    settingsScreen(); // your logic here
-  }
-});
-
-function createScreens(wrapper) {
-  const screenIds = ["tools", "settings"];
-  screenIds.forEach((id) => {
-    const screen = document.createElement("div");
-    screen.id = `screen-${id}`;
-    screen.className = `app-screen ${id === "home" ? "" : "d-none"}`;
-    screen.style.overflowY = "auto";
-    screen.style.flexGrow = "1";
-    screen.style.paddingBottom = "80px"; // enough space for nav
-    wrapper.appendChild(screen);
-  });
-}
-
-function createNav() {
-  const nav = document.createElement("div");
-  nav.className = "d-flex justify-content-around border-top bg-light";
-  nav.id = "nav-container";
-
-  const tabs = [
-    { icon: "tools", label: "Tools", target: "tools" },
-    { icon: "globe2", label: "Website", external: "https://fpltoolbox.com" },
-    { icon: "gear", label: "Settings", target: "settings" },
-  ];
-
-  tabs.forEach((tab) => {
-    const div = document.createElement("div");
-    div.className = "nav-tab text-center flex-fill py-2";
-    if (tab.target) div.dataset.target = tab.target;
-    if (tab.external) div.dataset.external = tab.external;
-    if (tab.target === "tools") div.classList.add("active");
-
-    div.innerHTML = `<i class="bi bi-${tab.icon}"></i><br><small>${tab.label}</small>`;
-    nav.appendChild(div);
-  });
-
-  return nav;
-}
-
-function setupTabListeners() {
-  const tabs = document.querySelectorAll(".nav-tab");
-  const screens = document.querySelectorAll(".app-screen");
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const externalUrl = tab.dataset.external;
-      if (externalUrl) {
-        window.open(externalUrl, "_blank");
-        return;
-      }
-
-      tabs.forEach((t) => t.classList.remove("active"));
-      tab.classList.add("active");
-
-      const targetId = `screen-${tab.dataset.target}`;
-      screens.forEach((screen) => screen.classList.add("d-none"));
-      document.getElementById(targetId).classList.remove("d-none");
-    });
-  });
-}
-
-function toolsScreen() {
-  const homeScreen = document.getElementById("screen-tools");
-  homeScreen.innerHTML = "";
-
-  const container = document.createElement("div");
-  container.className = "container text-center py-3";
-
-  const row = document.createElement("div");
-  row.className = "row g-3";
-
-  const features = [
-    {
-      icon: "bi-person-badge",
-      label: "Team Name Generator",
-      action: generateTeamName,
-      tier: "free",
-      requiresData: false,
-    },
-    {
-      icon: "bi-person-badge",
-      label: "My Team",
-      action: showMyTeam,
-      tier: "free",
-      requiresData: false,
-    },
-    {
-      icon: "bi-bar-chart",
-      label: "GW Stats",
-      action: showGameweekStats,
-      tier: "free",
-      requiresData: true,
-    },
-    {
-      icon: "bi-boxes",
-      label: "Chip Usage",
-      action: showChipUsage,
-      tier: "free",
-      requiresData: true,
-    },
-    {
-      icon: "bi-binoculars",
-      label: "Rival Comparison",
-      action: showRivalDiff,
-      tier: "free",
-      requiresData: true,
-    },
-    {
-      icon: "bi-award",
-      label: "Season Summary",
-      action: showMySeasonSummary,
-      tier: "free",
-      requiresData: true,
-    },
-    {
-      icon: "bi-people",
-      label: "Benched Points League",
-      action: showBenchedPointsLeague,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-trophy",
-      label: "Captaincy Points League",
-      action: showCaptaincyPointsLeague,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-exclamation-triangle",
-      label: "Cards League",
-      action: showCardsLeague,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-shield-check",
-      label: "Golden Boot League",
-      action: showGoldenbootLeague,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-bullseye",
-      label: "Penalities Missed League",
-      action: showPensMissedLeague,
-      tier: "pro",
-      requiresData: true,
-    },
-
-    {
-      icon: "bi-calculator",
-      label: "Rivals Transfer Calculator",
-      action: showTransferCalculator,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-cash-coin",
-      label: "Team Value League",
-      action: showTeamValueLeague,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-person-check",
-      label: "Download My Season",
-      action: downloadMySeason,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-person-check",
-      label: "Catch A Copycat",
-      action: showCopycatFinder,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-graph-up-arrow",
-      label: "Season Stats",
-      action: showSeasonStats,
-      tier: "pro",
-      requiresData: true,
-    },
-    {
-      icon: "bi-sliders",
-      label: "COMPLETE UNTIL HERE", //////////////////// COMPLETE UNTIL HERE
-      action: testFunction2,
-      tier: "max",
-      requiresData: true,
-    },
-
-    {
-      icon: "bi-sliders",
-      label: "Planner",
-      action: testFunction,
-      tier: "max",
-      requiresData: true,
-    },
-
-    {
-      icon: "bi-emoji-smile",
-      label: "GW Memes",
-      action: showMemes,
-      tier: "free",
-      requiresData: true,
-    },
-
-    {
-      icon: "bi-arrow-repeat",
-      label: "GW Transfer Summaries",
-      action: handleStatsClick,
-      tier: "free",
-      requiresData: true,
-    },
-
-    {
-      icon: "bi-speedometer2",
-      label: "Season Max Dashboard",
-      action: createSeasonMaxDashboard,
-      tier: "max",
-      requiresData: true,
-    },
-    {
-      icon: "bi-cash-coin",
-      label: "Mini League Admin",
-      action: miniLeagueAdmin,
-      tier: "max",
-      requiresData: false,
-    },
-    {
-      icon: "bi-bag-plus",
-      label: "Feature Request",
-      action: featureRequest,
-      tier: "max",
-      requiresData: false,
-    },
-  ];
-
-  features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
-    const featureId = `feature-btn-${i}`;
-    const col = document.createElement("div");
-    col.className = "col-4 p-2";
-
-    const button = document.createElement("div");
-    button.id = featureId;
-    button.className =
-      "btn btn-light w-100 feature-icon d-flex flex-column align-items-center justify-content-center text-center position-relative";
-    button.style.height = "120px";
-
-    // Determine data readiness based on tier
-    let dataReady = true;
-
-    if (requiresData) {
-      switch (tier) {
-        case "free":
-          dataReady = !!window.FPLToolboxLeagueDataReady;
-          break;
-        case "pro":
-          dataReady = !!window.FPLToolboxProLeagueDataReady;
-          break;
-        case "max":
-          dataReady = !!window.FPLToolboxMaxLeagueDataReady;
-          break;
-      }
-    }
-
-    if (!dataReady) {
-      button.innerHTML = `
-      <div class="spinner-border text-secondary mb-2" role="status" style="width: 1.5rem; height: 1.5rem;">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <small>${label}</small>
-    `;
-      button.classList.add("disabled");
-      button.style.opacity = "0.5";
-    } else {
-      button.innerHTML = `
-      <i class="bi ${icon} fs-2 mb-1"></i>
-      <small>${label}</small>
-    `;
-      button.addEventListener("click", action);
-    }
-
-    // Tier badge
-    const badge = document.createElement("span");
-    badge.className = "badge position-absolute top-0 end-0 m-1";
-    badge.style.fontSize = "0.6rem";
-    badge.style.padding = "0.25em 0.5em";
-    badge.textContent = tier.toUpperCase();
-
-    switch (tier) {
-      case "free":
-        badge.classList.add("bg-success", "text-light");
-        break;
-      case "pro":
-        badge.classList.add("bg-warning", "text-dark");
-        break;
-      case "max":
-        badge.classList.add("bg-danger", "text-light");
-        break;
-    }
-
-    button.appendChild(badge);
-    col.appendChild(button);
-    row.appendChild(col);
-  });
-
-  container.appendChild(row);
-  homeScreen.appendChild(container);
-
-  // 🔁 Check for league data and re-render individual buttons
-  const pendingButtons = features
-    .map((f, i) => ({ ...f, index: i }))
-    .filter((f) => f.requiresData);
-}
-
-
-function injectDynamicStyles() {
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  const body = document.body;
-  body.classList.toggle("bg-dark", darkMode);
-  body.classList.toggle("text-light", darkMode);
-
-  const navTabs = document.querySelectorAll(".nav-tab");
-  navTabs.forEach((tab) => {
-    tab.classList.toggle("bg-dark", darkMode);
-    tab.classList.toggle("text-light", darkMode);
-    tab.classList.toggle("border-top", true);
-  });
-
-  const buttons = document.querySelectorAll(".feature-icon");
-  buttons.forEach((btn) => {
-    btn.classList.toggle("btn-dark", darkMode);
-    btn.classList.toggle("btn-light", !darkMode);
-  });
-
-  // Update table theme
-  const tables = document.querySelectorAll("table");
-  tables.forEach((table) => {
-    table.classList.remove("table-dark", "table-light");
-    table.classList.add(darkMode ? "table-dark" : "table-light");
-  });
-}
-
-function settingsScreen() {
-  const settingsContainer = document.getElementById("screen-settings");
-
-  // Generate changelog HTML
-  let changelogHTML = `
-  <div class="mb-4">
-    <h5>Changelog</h5>
-    <ul class="small">
-`;
-
-  changelogData.forEach((entry) => {
-    changelogHTML += `<li>v${entry.version} – ${entry.description}</li>`;
-  });
-
-  changelogHTML += `
-    </ul>
-  </div>
-`;
-
-  // Clear container and add Bootstrap padding
-  settingsContainer.innerHTML = `
-<div class="p-4">
-  <h2 class="mb-3">Settings</h2>
-  <hr class="my-2"/>
-
-  <!-- Dark Mode Toggle -->
-  <div class="form-check form-switch mb-4">
-    <input class="form-check-input" type="checkbox" id="darkModeToggle">
-    <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
-  </div>
-
-  <hr class="my-2"/>
-
-  <!-- League Selector -->
-  <div class="mb-4">
-    <label for="leagueSelector" class="form-label">Switch Mini League</label>
-    <select class="form-select" id="leagueSelector"></select>
-  </div>
-
-  <hr class="my-2"/>
-
-  <!-- Toolbox Account -->
-  <div class="mb-4">
-    <h5>My Toolbox Account</h5>
-    <a href="${profilePageUrl}" class="btn btn-outline-primary" target="_blank">View My Profile</a>
-  </div>
-
-  <hr class="my-2"/>
-
- ${changelogHTML}
- 
-
-  
-  <!-- Version -->
-<div class="mb-2 text-muted small">FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span></div>
-</div>
-
-  `;
-
-  // Dark mode toggle logic
-  const darkModeToggle = document.getElementById("darkModeToggle");
-  darkModeToggle.checked = localStorage.getItem("darkMode") === "true";
-
-  darkModeToggle.addEventListener("change", () => {
-    localStorage.setItem("darkMode", darkModeToggle.checked);
-    injectDynamicStyles(); // apply styles immediately
-  });
-
-  injectDynamicStyles(); // apply styles on load
-
-  // League dropdown logic
-  const leagueSelector = document.getElementById("leagueSelector");
-
-  // Add default option
-  const defaultOption = document.createElement("option");
-  defaultOption.value = "";
-  defaultOption.textContent = "Select a league...";
-  defaultOption.disabled = true;
-  defaultOption.selected = true;
-  leagueSelector.appendChild(defaultOption);
-
-  // Add league options
-  managerData.leagues.classic.forEach((league) => {
-    const option = document.createElement("option");
-    option.value = league.id;
-    option.textContent = league.name;
-    leagueSelector.appendChild(option);
-  });
-
-  // Pre-select saved value if exists
-  const savedLeagueId = localStorage.getItem("savedLeagueId");
-  if (savedLeagueId) {
-    leagueSelector.value = savedLeagueId;
-    defaultOption.selected = false; // ensure actual league is selected
-  }
-
-  // On league change
-  leagueSelector.addEventListener("change", (e) => {
-    if (!userHasAccess([12])) {
-      showModal({
-        title: "Paid Feature",
-        body: "This feature is only available to <strong>Max members</strong>.<br><br>Head over to your profile page to switch leagues",
-        confirmText: "Take me there",
-        onConfirm: () => {
-          window.location.href = profilePageUrl;
-        },
-      });
-      return;
-    }
-
-    const selectedLeagueId = e.target.value;
-    localStorage.setItem("savedLeagueId", selectedLeagueId);
-    location.reload();
-  });
-}
-
-// Map level IDs to tier names
-function getTierName(levelId) {
-  switch (levelId) {
-    case 1:
-      return "free";
-    case 10:
-      return "pro";
-    case 12:
-      return "max";
-    default:
-      return "free";
-  }
-}
-function userHasAccess(allowedLevels) {
-  const level = Number(theUser?.username?.data?.membership_level?.ID || 0);
-
-  if (Array.isArray(allowedLevels)) {
-    return allowedLevels.includes(level);
-  }
-
-  return level >= allowedLevels;
-}
-
-function handleStatsClick() {
-  if (!userHasAccess([3])) {
-    showModal({
-      title: "Pro Feature",
-      body: "This feature is only available to <strong>Pro members</strong>. <br><br>Upgrade to unlock Copycat mode!",
-      confirmText: "Upgrade Now",
-      onConfirm: () => {
-        window.location.href = subscriptionPageUrl;
-      },
-    });
-    return;
-  }
-  console.log("Stats clicked");
-  // Add logic here
-}
-
-function showModal({ title, body, confirmText = null, onConfirm = null }) {
-  const modal = document.getElementById("modal-popup");
-  const titleEl = modal.querySelector(".modal-title");
-  const bodyEl = modal.querySelector(".modal-body-content");
-  const closeBtn = modal.querySelector(".modal-close");
-  const confirmBtn = modal.querySelector(".modal-confirm-btn");
-
-  if (!modal || !titleEl || !bodyEl || !closeBtn || !confirmBtn) {
-    console.error("[showModal] ⚠️ Could not find modal or required elements.");
-    return;
-  }
-
-  // Populate content
-  titleEl.textContent = title;
-  bodyEl.innerHTML = body;
-
-  // Confirm button logic
-  if (confirmText && typeof onConfirm === "function") {
-    confirmBtn.textContent = confirmText;
-    confirmBtn.classList.remove("hidden");
-    confirmBtn.onclick = () => {
-      onConfirm();
-      closeModal();
-    };
-  } else {
-    confirmBtn.classList.add("hidden");
-    confirmBtn.onclick = null;
-  }
-
-  // Close behavior
-  closeBtn.onclick = closeModal;
-  modal.onclick = (e) => {
-    if (e.target === modal) closeModal();
-  };
-  document.addEventListener("keydown", handleEsc);
-
-  // Apply dark/light styling
-  applyModalTheme(modal);
-
-  // Show it
-  modal.classList.add("open");
-
-  function closeModal() {
-    modal.classList.remove("open");
-    document.removeEventListener("keydown", handleEsc);
-  }
-
-  function handleEsc(e) {
-    if (e.key === "Escape") closeModal();
-  }
-}
-function createBackButton() {
-  const btn = document.createElement("button");
-  btn.className = "btn btn-secondary mb-3";
-  btn.textContent = "X";
-  btn.addEventListener("click", toolsScreen);
-  return btn;
-}
-function applyModalTheme() {
-  const dark = localStorage.getItem("darkMode") === "true";
-  const root = document.documentElement;
-  if (dark) {
-    root.style.setProperty("--modal-bg", "#222");
-    root.style.setProperty("--modal-text", "#eee");
-  } else {
-    root.style.setProperty("--modal-bg", "#fff");
-    root.style.setProperty("--modal-text", "#000");
-  }
-}
-
-// Returns the max allowed pages for the user based on membership level.
-// Levels: 1 = Free, 10 = Pro, 12 = Max
-
-function getMaxPagesForUser() {
-  // console.log(theUser);
-  const level = parseInt(theUser.username.data.membership_level?.ID, 10);
-
-  switch (level) {
-    case 1: // Free
-      return 1;
-    case 10: // Pro
-      return 1;
-    case 12: // Max
-      return 1;
-    default:
-      console.warn("[getMaxPagesForUser] Unknown membership level:", level);
-      return 1;
-  }
-}
-
-function sliceStandingsForUser(standings) {
-  if (userHasAccess([12])) {
-    return standings; // Max access: full list
-  } else if (userHasAccess([10])) {
-    return standings.slice(0, 20); // Pro access
-  } else {
-    return standings.slice(0, 10); // Free access
-  }
-}
-
-async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
-  onStatusUpdate("started");
-
-  try {
-    if (testMode) {
-      console.log("simulating delay");
-      await sleep(addDelaySimulationTime);
-      onStatusUpdate("fetching test data");
-
-      return {
-        type: superLeagueTest.type,
-        leagueName: superLeagueTest.leagueName,
-        standings: sliceStandingsForUser(superLeagueTest.standings),
-      };
-    }
-
-    let maxPages = getMaxPagesForUser();
-    onStatusUpdate("maxPages", maxPages);
-
-    let standings = [];
-    let leagueName = "";
-
-    for (let i = 1; i <= maxPages; i++) {
-      onStatusUpdate("fetching", i);
-
-      const res = await fetch(
-        `${BASE_URL}leagues-classic/${leagueID}/standings?page_standings=${i}`
-      );
-      const data = await res.json();
-      console.error(data)
-      if (i === 1) leagueName = data.league.name;
-      standings.push(...(data.standings?.results ?? []));
-
-      if (!data.standings?.has_next) break;
-      if (i < maxPages) await sleep(250);
-    }
-
-    onStatusUpdate("fetched", standings.length);
-
-    return {
-      leagueName,
-      standings: sliceStandingsForUser(standings),
-      type: "Live League",
-    };
-  } catch (err) {
-    onStatusUpdate("error", err);
-    throw err;
-  }
-}
-
-function handleLeagueCreation(result) {
-  window.FPLToolboxLeagueData = {
-    leagueName: result.leagueName,
-    standings: result.standings,
-    lastUpdated: Date.now(),
-  };
-}
-
-async function processLeague(standings) {
-  // Free Tier
-  if (userHasAccess([1, 10, 12])) {
-    await addManagerDetailsToLeague(standings, null);
-
-    await addGameweeksToLeague(standings, null);
-    await addDetailedGameweeksToLeague(standings, null);
-    window.FPLToolboxLeagueDataReady = true;
-
-    toolsScreen(); // Re-render for free features
-  }
-
-  // Pro Tier
-  if (userHasAccess([10, 12])) {
-    await weeklyPicksForSuperLeague(standings, null);
-    await addAllTransfers(standings, null);
-    window.FPLToolboxProLeagueDataReady = true;
-    window.FPLToolboxMaxLeagueDataReady = true;
-
-    toolsScreen(); // Re-render for pro features
-  }
-
-  // Max Tier (only user 12)
-  if (userHasAccess([12])) {
-    toolsScreen(); // Re-render for max features
-  }
-  window.FPLToolboxLeagueDataReady = true;
-  window.FPLToolboxProLeagueDataReady = true;
-  window.FPLToolboxMaxLeagueDataReady = true;
-}
-
-async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
-  try {
-    const result = await createSelectedLeague(leagueId, onStatusUpdate);
-    handleLeagueCreation(result);
-    await processLeague(result.standings);
-
-    onStatusUpdate("complete", result); // Only mark complete after all done
-  } catch (err) {
-    onStatusUpdate("error", err);
-    console.error("❌ Failed to fetch and process league:", err);
-  }
-}
-
-async function renderToolsScreenWithLeague(leagueId) {
-  // Step 0: Use leagueId from localStorage if available
-  const savedLeagueId = localStorage.getItem("savedLeagueId");
-  console.log("Saved league ID", savedLeagueId);
-
-  if (!leagueId && savedLeagueId) {
-    leagueId = savedLeagueId;
-  }
-
-  // Step 1: Default to user's league ID if none is found
-  if (!leagueId) {
-    leagueId = theUser.info.league_id;
-  }
-
-  // Step 2: Show initial screen (spinners if needed)
-  toolsScreen();
-
-  const hasStandings = window.FPLToolboxLeagueData?.standings?.length;
-  const needsPro = userHasAccess([10]);
-  const needsMax = userHasAccess([12]);
-
-  const proReady = window.FPLToolboxProLeagueDataReady;
-  const maxReady = window.FPLToolboxMaxLeagueDataReady;
-
-  // Step 3: Skip fetch if all required data is already ready
-  if (hasStandings && (!needsPro || proReady) && (!needsMax || maxReady)) {
-    return;
-  }
-
-  // Step 4: Fetch league and process it
-  await fetchAndProcessLeague(leagueId, (status) => {
-    if (status === "complete") {
-      toolsScreen(); // Re-render after final data load
-    }
-  });
-}
-renderToolsScreenWithLeague(leagueId)
-
-async function addManagerDetailsToLeague(standings, div) {
-  const startTime = Date.now(); // Start the timer
-  if (testMode) {
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Manager Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "Old Data",
-      window.FPLToolboxLeagueData.standings
-    );
-
-    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
-      superLeagueManagerDataTest.standings
-    );
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Manager Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "New Data",
-      window.FPLToolboxLeagueData.standings
-    );
-    console.log("simulating delay");
-    await sleep(addDelaySimulationTime);
-
-    return; // Skip live fetching
-  }
-  const gwFetches = standings.map(async (team) => {
-    try {
-      const res = await fetch(BASE_URL + "/entry/" + team.entry + "/");
-      const data = await res.json();
-      //console.log(data)
-      team.managerDetails = data;
-
-      await sleep(1000);
-      console.log("delay here");
-      //div.innerText = `Adding Manager details for ${team.entry_name}`;
-      //console.log(`Adding Manager details for ${team.entry_name}`);
-    } catch (error) {
-      console.error(`Error fetching data for team ${team.entry}: `, error);
-    }
-  });
-
-  await Promise.all(gwFetches);
-  const endTime = Date.now(); // End the timer
-  console.log(
-    `Manager details added to league ${(endTime - startTime) / 1000} seconds.`
-  );
-  console.log(
-    "%c API CALL MADE - Adding Manager Details",
-    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-    standings
-  );
-}
-async function addGameweeksToLeague(standings, div) {
-  const startTime = Date.now(); // Start the timer
-  if (testMode) {
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "Old Data",
-      window.FPLToolboxLeagueData.standings
-    );
-
-    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
-      superLeagueGameweekDataTest.standings
-    );
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "New Data",
-      window.FPLToolboxLeagueData.standings
-    );
-    console.log("simulating delay");
-    await sleep(addDelaySimulationTime);
-    return; // Skip live fetching
-  }
-  const gwFetches = standings.map(async (team) => {
-    try {
-      const response = await fetch(`${BASE_URL}entry/${team.entry}/history/`);
-      const teamData = await response.json();
-      //console.log(teamData)
-      // Add all gameweeks data to a new array
-      team.everyGw = teamData.current.map((week) => ({
-        percentile_rank: week.percentile_rank,
-        bank: week.bank,
-        gameweek: week.event,
-        points: week.points,
-        rank: week.rank,
-        overall_rank: week.overall_rank,
-        value: week.value,
-        transfers: week.event_transfers,
-        transfers_cost: week.event_transfers_cost,
-        bench_points: week.points_on_bench,
-      }));
-
-      // Helper function to calculate a total for a specific field
-      const calculateTotal = (field) =>
-        teamData.current.reduce((sum, week) => sum + week[field], 0);
-
-      // Calculate totals
-      team.totalTransfers = calculateTotal("event_transfers");
-      team.totalMinusPoints = calculateTotal("event_transfers_cost");
-      team.totalPointsOnBench = calculateTotal("points_on_bench");
-
-      // Helper function to find best and worst weeks by a specified field
-      const findBestWorstWeek = (field) =>
-        teamData.current.reduce(
-          (result, week) => {
-            if (week[field] > result.best[field]) result.best = week;
-            if (week[field] < result.worst[field]) result.worst = week;
-            return result;
-          },
-          { best: teamData.current[0], worst: teamData.current[0] }
-        );
-
-      // Set best and worst week by points and overall rank
-      const { best: bestWeek, worst: worstWeek } = findBestWorstWeek("points");
-      team.bestWeek = bestWeek;
-      team.worstWeek = worstWeek;
-
-      const { best: bestOverallRankWeek, worst: worstOverallRankWeek } =
-        findBestWorstWeek("overall_rank");
-      team.bestOverallRankWeek = bestOverallRankWeek;
-      team.worstOverallRankWeek = worstOverallRankWeek;
-
-      // Find the highest team value week
-      team.highestValueWeek = teamData.current.reduce(
-        (highest, week) => (week.value > highest.value ? week : highest),
-        teamData.current[0]
-      );
-
-      // Add chips data (limited to 6 chips)
-      //console.log(teamData)
-      team.chips = teamData.chips.slice(0, 6).map((chip) => ({
-        name: chip.name,
-        time: chip.time,
-        gw: chip.event,
-      }));
-
-      team.past = teamData.past;
-
-      // Other team data
-      team.seasons = teamData.past.length;
-      team.seasons_managed = teamData.past[0]?.season_name || "NEW";
-      team.previousRank =
-        teamData.current[teamData.current.length - 2]?.overall_rank || "";
-      // Add a small delay between requests (e.g., 500ms)
-      await sleep(1000);
-      //div.innerText = `Adding general gameweek stats for ${team.entry_name}`;
-      console.log("delay here");
-    } catch (error) {
-      console.error(`Error fetching data for team ${team.entry}: `, error);
-    }
-  });
-
-  await Promise.all(gwFetches);
-  const endTime = Date.now(); // End the timer
-  console.log(
-    `All weeks data for all teams added in ${
-      (endTime - startTime) / 1000
-    } seconds.`
-  );
-  console.log(
-    "%c API CALL MADE - Adding Gameweek Details",
-    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-    standings
-  );
-
-  return standings;
-}
-async function addAllTransfers(standings, div) {
-  const startTime = Date.now(); // Start the timer
-  if (testMode) {
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Added Manager Transfers",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "Old Data",
-      window.FPLToolboxLeagueData.standings
-    );
-
-    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
-      superLeagueTransfersAddedDataTest.standings
-    );
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Added Manager Transfers",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "New Data",
-      window.FPLToolboxLeagueData.standings
-    );
-    console.log("simulating delay");
-    await sleep(addDelaySimulationTime);
-    return; // Skip live fetching
-  }
-  const allTransfersFetch = standings.map(async (team) => {
-    try {
-      const transfersPromises = [];
-
-      // Fetch transfer data for each team
-      transfersPromises.push(
-        fetch(`${BASE_URL}/entry/${team.entry}/transfers/`).then((response) =>
-          response.json()
-        )
-      );
-
-      // Wait for all transfer data to resolve
-      const transfersData = await Promise.all(transfersPromises);
-
-      // Add transfers data to the team's object
-      team.transfers = transfersData;
-
-      // Add a small delay between requests (e.g., 500ms)
-      await sleep(200);
-      console.log("delay here");
-    } catch (error) {
-      console.error(`Error fetching transfers for team ${team.entry}: `, error);
-    }
-  });
-
-  await Promise.all(allTransfersFetch);
-  console.log(
-    "%c API CALL MADE - All Transfers Added",
-    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-    standings
-  );
-  const endTime = Date.now(); // End the timer
-  console.log(
-    `All transfers added in ${(endTime - startTime) / 1000} seconds.`
-  );
-}
-async function addDetailedGameweeksToLeague(standings, div) {
-  const startTime = Date.now(); // Start the timer
-  console.log(`Searching database for Detailed Gameweek stats`);
-  if (testMode) {
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Detailed Gameweek Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "Old Data",
-      window.FPLToolboxLeagueData.standings
-    );
-
-    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
-      superLeagueDetailedGameweekDataTest.standings
-    );
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Detailed Gameweek Details",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "New Data",
-      window.FPLToolboxLeagueData.standings
-    );
-    console.log("simulating delay");
-    await sleep(addDelaySimulationTime);
-    return; // Skip live fetching
-  }
-  const allGwFetches = standings.map(async (team) => {
-    try {
-      const allGwPromises = [];
-
-      // Fetch picks data for each gameweek from 1 to currentGw
-      for (let gw = 1; gw <= currentGw; gw++) {
-        allGwPromises.push(
-          fetch(`${BASE_URL}entry/${team.entry}/event/${gw}/picks/`)
-            .then((response) => response.json())
-            .then((data) => ({
-              gameweek: gw,
-              picks: data.picks || [],
-              active_chip: data.active_chip || null,
-            }))
-        );
-        await sleep(1000); // Add small delay between requests
-        console.log(
-          `Calculating detailed stats about FPL Gameweek ${gw} for your league`
-        );
-      }
-
-      // Wait for all gameweek data to resolve
-      const allGwData = await Promise.all(allGwPromises);
-
-      // Add all gameweek picks data to the new array
-      team.everyGwPicks = allGwData;
-
-      // Add current week data
-      const currentWeekData = allGwData.find(
-        (gwData) => gwData.gameweek === currentGw
-      );
-      team.currentWeek = currentWeekData ? [currentWeekData] : [];
-
-      // Create an array for weekly captain picks
-      team.weeklyCaptainPicks = allGwData.map((gwData) => {
-        const captainPick = gwData.picks.find((pick) => pick.is_captain);
-        return {
-          gameweek: gwData.gameweek,
-          captain: captainPick || null,
-          captainName: captainPick
-            ? getPlayerWebName(captainPick.element)
-            : null,
-        };
-      });
-
-      // Count played stats per gameweek
-      team.playedCount = allGwData.map((gwData) => {
-        const playedCount = gwData.picks.filter(
-          (pick) =>
-            pick.multiplier === 1 ||
-            pick.multiplier === 2 ||
-            pick.multiplier === 3
-        ).length;
-
-        const noPlayedCount = gwData.picks.filter(
-          (pick) => pick.multiplier === 0
-        ).length;
-
-        return {
-          gameweek: gwData.gameweek,
-          playedCount,
-          noPlayedCount,
-        };
-      });
-
-      // Total across all weeks
-      team.totalPlayedStats = team.playedCount.reduce(
-        (totals, gwStats) => {
-          totals.totalPlayed += gwStats.playedCount;
-          totals.totalNotPlayed += gwStats.noPlayedCount;
-          return totals;
-        },
-        { totalPlayed: 0, totalNotPlayed: 0 }
-      );
-
-      // Track frequency of each element across all gameweeks
-      const elementFrequencyMap = {};
-      allGwData.forEach((gwData) => {
-        gwData.picks.forEach((pick) => {
-          if (!elementFrequencyMap[pick.element]) {
-            elementFrequencyMap[pick.element] = 0;
-          }
-          elementFrequencyMap[pick.element]++;
-        });
-      });
-
-      // Convert to readable player names and sort by count descending
-      const sortedFrequency = Object.entries(elementFrequencyMap)
-        .map(([elementId, count]) => ({
-          playerName: getPlayerWebName(Number(elementId)),
-          count,
-        }))
-        .sort((a, b) => b.count - a.count);
-
-      team.pickElementFrequency = sortedFrequency;
-
-      await sleep(1000); // Small delay before moving to next team
-      console.log("delay here");
-      console.log(`Adding detailed gameweek stats for ${team.entry_name}`);
-    } catch (error) {
-      console.error(
-        `Error fetching all gameweeks picks for team ${team.entry}: `,
-        error
-      );
-    }
-  });
-
-  await Promise.all(allGwFetches);
-
-  const endTime = Date.now(); // End the timer
-  console.log(
-    `All current weeks data added in ${(endTime - startTime) / 1000} seconds.`
-  );
-  console.log(
-    "%c API CALL MADE - Adding Detailed Gameweek Details",
-    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-    standings
-  );
-}
-async function weeklyPicksForSuperLeague(standings, div) {
-  console.time("Weekly Picks Fetch");
-  if (testMode) {
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Weekly Picks",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "Old Data",
-      window.FPLToolboxLeagueData.standings
-    );
-
-    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
-      superLeagueAddWeeklyPicksTest.standings
-    );
-    console.log(
-      "%c TEST MODE - NO API CALL MADE - Adding Weekly Picks",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
-      "New Data",
-      window.FPLToolboxLeagueData.standings
-    );
-    console.log("simulating longer delay");
-    await sleep(addDelaySimulationTime);
-    return; // Skip live fetching
-  }
-  const cache = new Map();
-
-  for (let i = 0; i < standings.length; i++) {
-    console.log(`Looking for red cards, yellow cards, own goals etc`);
-    const team = standings[i];
-
-    if (!team.everyGwPicks || team.everyGwPicks.length === 0) {
-      console.warn(`No weekly data available for team ${team.entry}`);
-      continue;
-    }
-
-    // Initialize stats
-    team.total_goals_scored = 0;
-    team.total_red_cards = 0;
-    team.total_yellow_cards = 0;
-    team.total_cards = 0;
-    team.total_minutes = 0;
-    team.total_assists = 0;
-    team.total_clean_sheets = 0;
-    team.total_goals_conceded = 0;
-    team.total_own_goals = 0;
-    team.total_penalties_missed = 0;
-    team.total_home_games = 0;
-    team.total_away_games = 0;
-    team.total_captaincy_points = 0;
-    team.allCaptains = [];
-    team.total_saves = 0;
-
-    const apiRequests = new Map();
-
-    for (const gameweek of team.everyGwPicks) {
-      console.log(`Fetching player stats for ${team.entry_name}.`);
-      for (const pick of gameweek.picks) {
-        if (pick.position >= 1 && pick.position <= 11) {
-          const playerId = pick.element;
-          if (cache.has(playerId)) continue;
-
-          const apiUrl = `${BASE_URL}/element-summary/${playerId}/`;
-          apiRequests.set(
-            playerId,
-            fetch(apiUrl).then((res) => res.json())
-          );
-        }
-        console.log(
-          `Gathering detailed gameweek starting 11 for ${team.entry_name}.`
-        );
-      }
-    }
-
-    const responses = await Promise.allSettled(apiRequests.values());
-
-    let index = 0;
-    for (const [playerId] of apiRequests) {
-      const result = responses[index++];
-      if (result.status === "fulfilled") {
-        cache.set(playerId, result.value);
-      } else {
-        console.error(`Failed to fetch data for player ${playerId}`);
-      }
-    }
-
-    for (const gameweek of team.everyGwPicks) {
-      for (const pick of gameweek.picks) {
-        if (pick.position >= 1 && pick.position <= 11) {
-          const playerData = cache.get(pick.element);
-          if (!playerData) continue;
-
-          const matchingHistories = playerData.history.filter(
-            (entry) => entry.round === gameweek.gameweek
-          );
-
-          if (matchingHistories.length === 0) continue;
-
-          // Aggregate stats across all matching histories
-          const combined = matchingHistories.reduce(
-            (acc, curr) => {
-              acc.goals_scored += curr.goals_scored;
-              acc.red_cards += curr.red_cards;
-              acc.yellow_cards += curr.yellow_cards;
-              acc.minutes += curr.minutes;
-              acc.assists += curr.assists;
-              acc.clean_sheets += curr.clean_sheets;
-              acc.goals_conceded += curr.goals_conceded;
-              acc.own_goals += curr.own_goals;
-              acc.penalties_missed += curr.penalties_missed;
-              acc.total_points += curr.total_points;
-              acc.saves += curr.saves;
-
-              // Count home/away games
-              if (curr.was_home) {
-                acc.home_games += 1;
-              } else {
-                acc.away_games += 1;
-              }
-
-              return acc;
-            },
-            {
-              goals_scored: 0,
-              red_cards: 0,
-              yellow_cards: 0,
-              minutes: 0,
-              assists: 0,
-              clean_sheets: 0,
-              goals_conceded: 0,
-              own_goals: 0,
-              penalties_missed: 0,
-              total_points: 0,
-              saves: 0,
-              home_games: 0,
-              away_games: 0,
-            }
-          );
-
-          team.total_goals_scored += combined.goals_scored;
-          team.total_red_cards += combined.red_cards;
-          team.total_yellow_cards += combined.yellow_cards;
-          team.total_cards += combined.yellow_cards + combined.red_cards;
-          team.total_minutes += combined.minutes;
-          team.total_assists += combined.assists;
-          team.total_clean_sheets += combined.clean_sheets;
-          team.total_goals_conceded += combined.goals_conceded;
-          team.total_own_goals += combined.own_goals;
-          team.total_penalties_missed += combined.penalties_missed;
-          team.total_saves += combined.saves;
-          team.total_home_games += combined.home_games;
-          team.total_away_games += combined.away_games;
-
-          if (pick.is_captain) {
-            //console.log("GW" + gameweek.gameweek, getPlayerWebName(pick.element), combined.total_points);
-            team.total_captaincy_points +=
-              combined.total_points * pick.multiplier;
-          }
-        }
-      }
-    }
-
-    //Weekly Scoresheets
-    team.gwScoreSheet = [];
-    team.gwBenchSheet = [];
-
-    for (const gameweek of team.everyGwPicks) {
-      const starters = [];
-      const bench = [];
-
-      const gameweekNumber = gameweek.gameweek;
-
-      for (let i = 0; i < gameweek.picks.length; i++) {
-        const pick = gameweek.picks[i];
-        const playerData = cache.get(pick.element);
-
-        let points = 0;
-        if (playerData) {
-          const history = playerData.history.find(
-            (entry) => entry.round === gameweekNumber
-          );
-          points = history ? history.total_points * pick.multiplier : 0;
-        }
-
-        const pickObj = {
-          playerId: pick.element,
-          name: getPlayerWebName(pick.element),
-          points,
-        };
-
-        if (i < 11) {
-          starters.push(pickObj);
-        } else {
-          bench.push(pickObj);
-        }
-      }
-
-      team.gwScoreSheet.push({
-        gameweek: gameweekNumber,
-        starters,
-      });
-
-      team.gwBenchSheet.push({
-        gameweek: gameweekNumber,
-        bench,
-      });
-      console.log(`Calculating bench scores for ${team.entry_name}.`);
-    }
-
-    console.log(`Add all gameweek picks for ${team.entry_name}.`);
-  }
-  console.log(
-    "%c API CALL MADE - Weekly Picks Added",
-    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-    standings
-  );
-  console.timeEnd("Weekly Picks Fetch");
-}
-
-async function testFunction() {
-  alert("working");
-  console.log(window.FPLToolboxLeagueData);
-}
-
-async function testFunction2() {
-  if (!userHasAccess([12])) {
-    showModal({
-      title: "Pro Feature",
-      body: "This feature is only available to <strong>Pro members</strong>. <br><br>Upgrade to unlock!",
-      confirmText: "Upgrade Now",
-      onConfirm: () => {
-        window.location.href = subscriptionPageUrl;
-      },
-    });
-    return;
-  }
-
-  if (window.FPLToolboxLeagueData?.standings?.length) {
-    console.log(window.FPLToolboxLeagueData);
-  }
-}
-
-function generateTeamName() {
-  // Inject HTML
-  const app = document.getElementById("screen-tools");
-
-  const teamNamesForGenerator = [
-    // Arsenal
-    { name: "Livin' Saliba Loca", tags: ["arsenal", "music"] },
-
-    { name: "Old Havertz Kai Hard", tags: ["arsenal"] },
-    { name: "Ødegaardians of the Galaxy", tags: ["arsenal"] },
-    { name: "Curious Jorginho", tags: ["arsenal"] },
-    { name: "Major League Saka", tags: ["arsenal"] },
-    { name: "The Cesc Pistols", tags: ["classic", "arsenal", "music"] },
-    { name: "Trossard Marks", tags: ["arsenal"] },
-    { name: "You Gotta Havertz", tags: ["arsenal", "chelsea"] },
-    { name: "Arteta-tete", tags: ["arsenal"] },
-    { name: "The Arteta's Apprentice", tags: ["arsenal"] },
-    {
-      name: "Havertz Your Way",
-      tags: ["classic", "arsenal", "chelsea", "music"],
-    },
-
-    // Aston Villa
-    { name: "Stranger Mings", tags: ["aston-villa", "TV & Film"] },
-    { name: "Come Digne With Me", tags: ["aston-villa"] },
-    { name: "Out on Bailey", tags: ["aston-villa"] },
-    { name: "Put a Dendonck on it", tags: ["aston-villa"] },
-    { name: "Tea for the Tielemans", tags: ["aston-villa"] },
-    {
-      name: "Bangers and Rashford",
-      tags: ["classic", "aston-villa", "manchester-united"],
-    },
-    { name: "Aston Village People", tags: ["aston-villa", "music"] },
-    { name: "Rubber Digne Rapids", tags: ["aston-villa"] },
-    { name: "Matty Cash Hoes", tags: ["aston-villa", "music"] },
-    { name: "MattyCashInTheAttic", tags: ["aston-villa", "music"] },
-    { name: "McGinn and Tonic", tags: ["aston-villa"] },
-    { name: "Comme Ci Konsa", tags: ["aston-villa"] },
-
-    // Brentford
-    { name: "Throwing Schade", tags: ["brentford"] },
-    { name: "Mee, Myself and I", tags: ["brentford"] },
-    { name: "Dasilva Lining", tags: ["brentford"] },
-    { name: "Thomas The Frank Engine", tags: ["brentford", "TV & Film"] },
-    { name: "Kinder Mbeumo", tags: ["brentford"] },
-    { name: "Mbeumo No.5", tags: ["classic", "brentford", "music"] },
-    { name: "Wissa Khalifa", tags: ["classic", "brentford", "TV & Film"] },
-
-    // Bournemouth
-    { name: "El Vina Did Flow", tags: ["bournemouth"] },
-    { name: "Dango Unchained", tags: ["bournemouth", "TV & Film"] },
-    { name: "Back of the Neto", tags: ["bournemouth"] },
-    { name: "High Faivre", tags: ["bournemouth"] },
-    { name: "Billing Me Softly", tags: ["bournemouth", "music"] },
-
-    // Brighton
-    { name: "Gilmour Girls", tags: ["brighton", "TV & Film"] },
-    { name: "Dunkytown", tags: ["brighton"] },
-    { name: "Moder on the Dancefloor", tags: ["brighton"] },
-    { name: "Boys In Dahoud", tags: ["brighton", "TV & Film"] },
-    { name: "Estupiña Colada", tags: ["brighton"] },
-    { name: "Groß Misconduct", tags: ["classic", "brighton"] },
-    { name: "Estupina Colada", tags: ["brighton"] },
-    { name: "Kids See Groß", tags: ["classic", "brighton"] },
-
-    // Chelsea
-    { name: "I'm Sorry Nic Jackson", tags: ["chelsea", "music"] },
-    { name: "Stuck in the Mudryk", tags: ["chelsea"] },
-    { name: "Under My Cucurella", tags: ["chelsea", "music"] },
-    { name: "Reece's Set Pieces", tags: ["chelsea"] },
-    { name: "Palmer Violets", tags: ["chelsea"] },
-    { name: "Chilwell Soon", tags: ["chelsea"] },
-    { name: "Petr Cech Yourself", tags: ["classic", "chelsea"] },
-    { name: "Mudryk To Life", tags: ["classic", "chelsea"] },
-    { name: "Malo Gusto: Bad Fart", tags: ["chelsea"] },
-
-    // Crystal Palace
-    { name: "Hakuna Mateta", tags: ["crystal-palace", "music", "TV & Film"] },
-    { name: "Ayew Kidding Me", tags: ["crystal-palace"] },
-    { name: "Jairoglyphics", tags: ["crystal-palace"] },
-    { name: "Schlupptown Funk", tags: ["crystal-palace", "music"] },
-    { name: "Eze Come Eze Go", tags: ["crystal-palace"] },
-    { name: "Bacuna Mateta", tags: ["crystal-palace", "TV & Film"] },
-    { name: "Ayew Being Served", tags: ["crystal-palace"] },
-
-    // Everton
-    { name: "Raiders of the Lost Tark", tags: ["everton", "TV & Film"] },
-    { name: "Taking the Mykolenko", tags: ["everton"] },
-    { name: "Roll the Dyche", tags: ["everton"] },
-    { name: "Tesco McNeil Deal", tags: ["everton"] },
-    { name: "Torn DCL", tags: ["everton"] },
-    {
-      name: "Backstreet Moyes",
-      tags: [
-        "everton",
-        "classic",
-        "manchester-united",
-        "west-ham-united",
-        "music",
-      ],
-    },
-    { name: "Gueye Pride", tags: ["everton"] },
-
-    // Fulham
-    { name: "Iwobi Wan-Kenobi", tags: ["fulham"] },
-    { name: "That's So Craven", tags: ["fulham"] },
-    { name: "I Like To Muniz Muniz", tags: ["fulham", "music"] },
-    { name: "Willian The Conqueror", tags: ["fulham"] },
-    { name: "Diop It Like It's Hot", tags: ["fulham", "music"] },
-    { name: "Smith Rowe Your Boat", tags: ["fulham", "arsenal"] },
-
-    // Ipswich Town
-    { name: "Hungry like the Woolf", tags: ["ipswich-town"] },
-    { name: "Morsy Code", tags: ["ipswich-town"] },
-    { name: "Starsky and Hutchinson", tags: ["ipswich-town"] },
-    { name: "Burgess and Fries", tags: ["ipswich-town"] },
-    { name: "Leif Blower", tags: ["ipswich-town"] },
-    { name: "Hawk Tuanzebe", tags: ["ipswich-town"] },
-
-    // Leicester City
-    { name: "Hey, Wout's Wrong With You", tags: ["leicester-city"] },
-    { name: "Yes Ndidi", tags: ["leicester-city"] },
-    { name: "That's Soumare", tags: ["leicester-city"] },
-    { name: "Champagne Coopernova", tags: ["leicester-city"] },
-    { name: "House of Vards", tags: ["leicester-city", "classic"] },
-    { name: "Vardy Boys FC", tags: ["leicester-city", "classic"] },
-    { name: "Egg On Your Faes", tags: ["classic", "leicester-city"] },
-
-    // Liverpool
-    { name: "Alisson Wonderland", tags: ["liverpool"] },
-    { name: "The 40 Year Old Virgil", tags: ["liverpool", "TV & Film"] },
-    { name: "Pain in Diaz", tags: ["liverpool"] },
-    { name: "The Konate Kid", tags: ["liverpool"] },
-    { name: "Slot Machine", tags: ["liverpool"] },
-    { name: "Haven't Jota Clue", tags: ["liverpool"] },
-    { name: "Salah-vation Army", tags: ["liverpool"] },
-    { name: "Darwinning FC", tags: ["liverpool"] },
-    { name: "Alisson Blunderland", tags: ["liverpool", "TV & Film"] },
-    { name: "Arne Hole's A Goal", tags: ["liverpool"] },
-    { name: "When Harry Met Salah", tags: ["classic", "liverpool"] },
-    { name: "DropItLikeIt'sSlot", tags: ["liverpool", "music"] },
-    { name: "The Salah Doink", tags: ["liverpool"] },
-    { name: "ChickenTikkaMoSalah", tags: ["classic", "liverpool"] },
-    { name: "Darwin Theory", tags: ["classic", "liverpool"] },
-    { name: "Jota than the Son", tags: ["liverpool"] },
-    { name: "Endo Story", tags: ["liverpool", "TV & Film"] },
-    { name: "Szoboszlai 4 Now", tags: ["liverpool"] },
-
-    // Manchester City
-    { name: "Haalandaise Sauce", tags: ["manchester-city"] },
-    { name: "Ake Breaky Heart", tags: ["manchester-city"] },
-    { name: "Gvardiols of the Galaxy", tags: ["manchester-city", "TV & Film"] },
-    { name: "Silva Surfer", tags: ["manchester-city"] },
-    { name: "De Bruyne Ultimatum", tags: ["manchester-city", "TV & Film"] },
-    { name: "Cameroon Diaz", tags: ["manchester-city"] },
-    { name: "Luke Kyle Walker", tags: ["classic", "manchester-city"] },
-    { name: "Judy Haaland", tags: ["manchester-city"] },
-    { name: "Haaland Oates", tags: ["manchester-city"] },
-    { name: "Haalandaise Sauce", tags: ["manchester-city"] },
-    {
-      name: "Diaz Nother Day",
-      tags: ["manchester-city", "classic", "TV & Film"],
-    },
-
-    { name: "Ederson Ake & Palmer", tags: ["manchester-city"] },
-
-    // Manchester United
-    { name: "Bruno Dos Tres", tags: ["manchester-united"] },
-    { name: "Onana, What's My Name?", tags: ["manchester-united"] },
-    { name: "How Dalot Can You Go", tags: ["manchester-united"] },
-    { name: "Shaw and Order", tags: ["manchester-united", "TV & Film"] },
-    { name: "Ten Hag's Army", tags: ["manchester-united", "classic"] },
-    { name: "Mount Rushmore", tags: ["manchester-united"] },
-    { name: "BrokebackMount10", tags: ["manchester-united", "TV & Film"] },
-    { name: "Zirkzee Top Boy", tags: ["manchester-united", "classic"] },
-    {
-      name: "Shaw Shank Redemption",
-      tags: ["manchester-united", "classic", "TV & Film"],
-    },
-    { name: "Earth Wind & Maguire", tags: ["manchester-united", "music"] },
-    { name: "The Shaw Thing", tags: ["manchester-united"] },
-    { name: "Cheesy Garnachos", tags: ["classic", "manchester-united"] },
-    { name: "Garnacho Chips", tags: ["classic", "manchester-united"] },
-    { name: "Afternoon De Ligt", tags: ["manchester-united"] },
-    { name: "It'sOffToZirkzeeGo", tags: ["manchester-united"] },
-
-    // Newcastle United
-    { name: "Botman Begins", tags: ["newcastle-united", "TV & Film"] },
-    { name: "Abra Dubravka", tags: ["newcastle-united"] },
-    { name: "Burn Baby Burn", tags: ["newcastle-united", "music"] },
-    { name: "Krafth Dinner", tags: ["newcastle-united"] },
-    { name: "Trippier on Acid", tags: ["newcastle-united"] },
-    { name: "Born in a Barnes", tags: ["newcastle-united"] },
-    { name: "Botman and Robin", tags: ["newcastle-united"] },
-    { name: "AbraDubravka", tags: ["newcastle-united"] },
-    { name: "A Night In Lascelles", tags: ["newcastle-united"] },
-    { name: "Hall In One", tags: ["classic", "newcastle-united"] },
-    { name: "Not Isakly Sure", tags: ["newcastle-united"] },
-
-    // Nottingham Forest
-    { name: "Duel of the Yates", tags: ["nottingham-forest"] },
-    { name: "Boly and Clyde", tags: ["nottingham-forest"] },
-    { name: "Matz Sels Sea Shells", tags: ["nottingham-forest"] },
-    { name: "Finding Neco", tags: ["nottingham-forest", "TV & Film"] },
-    { name: "MacAwoniyi Cheese", tags: ["nottingham-forest"] },
-    {
-      name: "What the Elanga?",
-      tags: ["nottingham-forest", "manchester-united"],
-    },
-    {
-      name: "Boly Pocket",
-      tags: ["classic", "wolves", "nottingham-forest", "TV & Film"],
-    },
-
-    // Southampton
-    { name: "Escape from Alcaraz", tags: ["southampton"] },
-    { name: "Aribo Tangfastics", tags: ["southampton"] },
-    { name: "Onuachu (Bless you)", tags: ["southampton"] },
-    { name: "Heinz Bella-Kotchap", tags: ["southampton"] },
-    { name: "Lallanas in Pyjamas", tags: ["southampton"] },
-
-    // Spurs
-    { name: "Losing My Reguilon", tags: ["spurs", "music"] },
-    { name: "House of the Dragusin", tags: ["spurs"] },
-    { name: "Van de Ven Diagram", tags: ["spurs"] },
-    { name: "Empire of the Son", tags: ["spurs"] },
-    { name: "Los Porro Hermanos", tags: ["spurs"] },
-    { name: "Sonny and Schar", tags: ["spurs", "newcastle-united"] },
-    { name: "Men with Van De Ven", tags: ["spurs"] },
-    { name: "Ange Management", tags: ["spurs"] },
-    { name: "Son of a Gun", tags: ["spurs"] },
-    { name: "Son-sational", tags: ["spurs"] },
-    { name: "Son's Out, Guns Out", tags: ["spurs"] },
-
-    // West Ham United
-    { name: "Soucek Yourself", tags: ["west-ham-united"] },
-    { name: "WHU Tang Clan", tags: ["west-ham-united"] },
-    { name: "Paqueta Crisps", tags: ["west-ham-united"] },
-    { name: "Bad to the Bowen", tags: ["west-ham-united", "music"] },
-    { name: "Areola Grande", tags: ["west-ham-united", "music"] },
-
-    { name: "Bowen 747", tags: ["west-ham-united"] },
-    { name: "Bowen Arrow", tags: ["west-ham-united"] },
-    { name: "Exposed Areola", tags: ["west-ham-united"] },
-    { name: "Bad to the Bowen", tags: ["west-ham-united", "music"] },
-
-    // Wolves
-    { name: "Purple Rayan", tags: ["wolves", "music"] },
-    { name: "Pedro Lima Bean", tags: ["wolves"] },
-    { name: "Mama, Just Kilman", tags: ["wolves", "music"] },
-    { name: "Cunha Get Any Worse?", tags: ["wolves", "manchester-united"] },
-    { name: "Podence Dence Revolution", tags: ["wolves"] },
-    { name: "Ruthless Toothless Wolves", tags: ["wolves"] },
-    { name: "Ait Nouri Geller", tags: ["wolves"] },
-
-    // Classics
-
-    { name: "Absolutely Fabregas", tags: ["arsenal", "classic", "TV & Film"] },
-    { name: "Baines on Toast", tags: ["everton", "classic"] },
-    {
-      name: "Crouch Potato",
-      tags: ["classic", "spurs", "southampton", "liverpool"],
-    },
-    { name: "Ruud Health", tags: ["classic", "chelsea"] },
-    {
-      name: "How I Met Your Mata",
-      tags: ["manchester-united", "classic", "TV & Film"],
-    },
-    { name: "Two's Kompany", tags: ["classic", "manchester-city", "burnley"] },
-    { name: "Men Behaving Chadli", tags: ["classic", "spurs"] },
-    {
-      name: "3 Men and a Bebe",
-      tags: ["classic", "manchester-united", "TV & Film"],
-    },
-    { name: "50ShadesOfAndyGray", tags: ["classic", "TV & Film"] },
-    { name: "ABCDE FC", tags: ["classic"] },
-
-    { name: "Blink 1-Eto'o", tags: ["classic", "chelsea"] },
-
-    { name: "Cesc and the City", tags: ["classic", "arsenal"] },
-    { name: "Ctrl + Alt + De Laet", tags: ["classic"] },
-    { name: "Delph & Safety", tags: ["classic"] },
-    { name: "Dzeko & the Bunnymen", tags: ["classic", "music"] },
-    { name: "Fiddler on the Huth", tags: ["classic", "TV & Film"] },
-    { name: "Flying Without Ings", tags: ["classic", "music"] },
-    { name: "Game Of Throw-Ins", tags: ["classic"] },
-    { name: "Gangsters Allardyce", tags: ["classic", "music"] },
-    {
-      name: "Giroud Awakening",
-      tags: ["classic", "arsenal", "chelsea", "music"],
-    },
-    { name: "HuttonDressedAsLahm", tags: ["classic"] },
-
-    { name: "Klopps and Robbos", tags: ["classic", "liverpool"] },
-    { name: "Krul and the Gang", tags: ["classic"] },
-    { name: "Le Saux Solid Crew", tags: ["classic", "music"] },
-    { name: "Löw Island", tags: ["classic"] },
-
-    {
-      name: "Michu at De Gea Ba",
-      tags: ["classic", "manchester-united", "music"],
-    },
-    { name: "Neville Wears Prada", tags: ["classic", "TV & Film"] },
-    { name: "Norfolk n' Good", tags: ["classic"] },
-    { name: "Obi 1 Kenobi 0", tags: ["classic", "TV & Film"] },
-    { name: "Pjanic! At The Disco", tags: ["classic", "music"] },
-    {
-      name: "Smack My Bilic Up",
-      tags: ["classic", "west-ham-united", "music"],
-    },
-    { name: "Sound of the Lloris", tags: ["classic", "TV & Film", "music"] },
-    { name: "TAA Very Much", tags: ["classic", "liverpool"] },
-    {
-      name: "The Martial Mata LP",
-      tags: ["classic", "manchester-united", "music"],
-    },
-    { name: "Tinchy Sneijder", tags: ["classic", "music"] },
-    { name: "Who Ate All Depays?", tags: ["classic", "manchester-united"] },
-
-    { name: "Bellerin Than Out", tags: ["classic"] },
-    { name: "Better Call Saúl", tags: ["classic", "chelsea"] },
-
-    { name: "Elneny and the Jets", tags: ["classic", "arsenal"] },
-
-    { name: "GuardianOfTheGulasci", tags: ["classic", "TV & Film"] },
-
-    { name: "Hotel? Thiago", tags: ["classic", "chelsea"] },
-    { name: "Howe Toon Is Now", tags: ["classic"] },
-    { name: "Isco Inferno", tags: ["classic"] },
-
-    { name: "Just 1 Cornet 0", tags: ["classic"] },
-    { name: "Klich and Collect", tags: ["classic"] },
-    { name: "Kodja and Maja", tags: ["classic"] },
-    { name: "Krafth Beer", tags: ["classic"] },
-    { name: "MacAwoniyi Cheese", tags: ["classic"] },
-
-    { name: "ModerOnTheDancefloor", tags: ["classic"] },
-
-    { name: "NotMikeDeanForever", tags: ["classic"] },
-
-    { name: "Run The Kewells", tags: ["classic"] },
-    { name: "Sancho Unchained", tags: ["classic"] },
-    { name: "TeaForTheTielemans", tags: ["classic"] },
-
-    { name: "Ake Breaky Heart", tags: ["classic"] },
-
-    { name: "Ashley Old", tags: ["classic", "arsenal", "chelsea"] },
-
-    { name: "Back of the Neto", tags: ["classic"] },
-
-    { name: "Ballon D'awson", tags: ["classic"] },
-
-    { name: "Ben Mee Shake Mee", tags: ["classic"] },
-    { name: "Berge King", tags: ["classic"] },
-    { name: "Bernard's Poch", tags: ["classic"] },
-    {
-      name: "Blazinchenko Squad",
-      tags: ["classic", "arsenal", "manchester-city"],
-    },
-
-    { name: "Boys In Dahoud", tags: ["classic", , "TV & Film"] },
-    { name: "Brennan Jerry's", tags: ["classic"] },
-
-    { name: "Calafiori Sunshine", tags: ["classic"] },
-    { name: "Carson Dioxide", tags: ["classic"] },
-    { name: "Castagne Me Now", tags: ["classic"] },
-    { name: "Castagne Supernova", tags: ["classic", "music"] },
-    { name: "Champagne De Cordova", tags: ["classic"] },
-
-    { name: "Clyne of Duty", tags: ["classic", "liverpool", "southampton"] },
-    { name: "Cobra Kai Havertz", tags: ["classic"] },
-
-    { name: "Curious Jorginho", tags: ["classic", "arsenal", "chelsea"] },
-
-    { name: "Fee Fi Foden", tags: ["classic"] },
-    { name: "FeelsLikeSummerville", tags: ["classic"] },
-    { name: "Femme Fatawu", tags: ["classic"] },
-    { name: "FullKrugMetalJacket", tags: ["classic"] },
-
-    { name: "Gilmour Girls", tags: ["classic"] },
-    { name: "Guantana Maupay", tags: ["classic"] },
-    { name: "GvardiolsOfTheGalaxy", tags: ["classic", "TV & Film"] },
-
-    { name: "Hellmans Mainoonaise", tags: ["classic"] },
-    { name: "Heung Like A Horse", tags: ["classic"] },
-    { name: "High Faivre", tags: ["classic"] },
-    { name: "HouseOfTheDragusin", tags: ["classic"] },
-    { name: "I Love Lamp(tey)", tags: ["classic"] },
-    { name: "I'm Yelling Timber", tags: ["classic", "music"] },
-    { name: "IncogNeto", tags: ["classic"] },
-    { name: "IngsCanOnlyGetBetter", tags: ["classic", "music"] },
-    { name: "Issa Ring Toss Game", tags: ["classic"] },
-
-    { name: "Just like Evans", tags: ["classic"] },
-    { name: "Kai Me A River", tags: ["classic", "music"] },
-    { name: "Kamada Harris", tags: ["classic"] },
-    { name: "Keita Mooy Hart", tags: ["classic", "music"] },
-
-    { name: "Kilman Me Softly", tags: ["classic", "music"] },
-    { name: "Kinder Mbeumo", tags: ["classic"] },
-    { name: "KudusToYou", tags: ["classic"] },
-    { name: "Leif Right Now", tags: ["classic"] },
-    { name: "Lil Eze Vert", tags: ["classic"] },
-
-    { name: "Lord and Savio", tags: ["classic"] },
-    { name: "Los Porro Hermanos", tags: ["classic"] },
-    { name: "Losing My Reguilon", tags: ["classic", "music"] },
-    { name: "LoveTheWaySzoboszlai", tags: ["classic"] },
-
-    { name: "McKenna Kick It?", tags: ["classic", "music"] },
-
-    { name: "Mings of Power", tags: ["classic"] },
-    { name: "Minteh Fresh", tags: ["classic"] },
-    { name: "Mitomavirus", tags: ["classic"] },
-    { name: "More Tea Vicario?", tags: ["classic", "TV & Film"] },
-
-    { name: "Name's Not Andre M8", tags: ["classic"] },
-    { name: "Netflix and Chilwell", tags: ["classic", "TV & Film"] },
-    { name: "Nkunku Clock", tags: ["classic"] },
-
-    { name: "Now I'm a Baleba", tags: ["classic"] },
-    { name: "Øde Toilette", tags: ["classic"] },
-    { name: "Odegaarden Partey", tags: ["classic"] },
-    { name: "Ødeparfum", tags: ["classic"] },
-    { name: "Okoli Dokily", tags: ["classic"] },
-
-    { name: "Omari Me", tags: ["classic"] },
-    { name: "OnanaMataPlea", tags: ["classic"] },
-
-    { name: "Paqueta Crisps", tags: ["classic", "west-ham-united"] },
-    { name: "PARTEYNEXTDOOR", tags: ["classic", "music"] },
-    { name: "Pavard the Builder", tags: ["classic", "TV & Film"] },
-    { name: "Pepe Pig", tags: ["classic", "TV & Film"] },
-    { name: "Pitch Perfect", tags: ["classic", "music", "TV & Film"] },
-    { name: "Pope Fiction", tags: ["classic", "TV & Film"] },
-    { name: "Postecog-Low Block", tags: ["classic", "spurs"] },
-    { name: "Praise the Lord", tags: ["classic"] },
-    { name: "Prowse Control", tags: ["classic", "music"] },
-    { name: "Push It To The Neto", tags: ["classic"] },
-    { name: "Rage Against Fabianski", tags: ["classic", "music"] },
-    { name: "Rashford's Recovery Room", tags: ["classic"] },
-    { name: "Reek 'em Ralph", tags: ["classic"] },
-    { name: "Rice Rice Baby", tags: ["classic"] },
-    { name: "Rico Suave", tags: ["classic"] },
-    { name: "Ritchie Richarlison", tags: ["classic"] },
-    { name: "Rodri or Not", tags: ["classic"] },
-    { name: "Rolly Gusto", tags: ["classic"] },
-    { name: "Roque The Kasper", tags: ["classic"] },
-    { name: "Run the Jules", tags: ["classic"] },
-
-    { name: "Saliba Your Face", tags: ["classic"] },
-    { name: "Samba de Doucoure", tags: ["classic"] },
-    { name: "Sanch-Oh No", tags: ["classic"] },
-    { name: "Sangaré-oke", tags: ["classic"] },
-    { name: "Saša And The Sun", tags: ["classic"] },
-    { name: "Sarr Trek", tags: ["classic", "TV & Film"] },
-    { name: "Sat Nav Simms", tags: ["classic"] },
-    { name: "Save Our Sancho", tags: ["classic"] },
-    { name: "Scammaca Rhythm", tags: ["classic"] },
-    { name: "Schär Wars", tags: ["classic", "TV & Film"] },
-    { name: "Schick Moves", tags: ["classic"] },
-    { name: "ScottCarson FC", tags: ["classic"] },
-    { name: "Sesko Mode", tags: ["classic"] },
-    { name: "Sessegnon's Eleven", tags: ["classic"] },
-
-    { name: "Shawcrossed Lovers", tags: ["classic", "TV & Film"] },
-    { name: "She Wore A Trippier", tags: ["classic"] },
-    { name: "Silva Lining", tags: ["classic"] },
-    { name: "Simakan the Beast", tags: ["classic"] },
-    { name: "Simakan You Feel It", tags: ["classic"] },
-    { name: "Sinisterra Squad", tags: ["classic"] },
-    { name: "SlottingOneIn", tags: ["classic"] },
-
-    { name: "Snoochie Doku", tags: ["classic"] },
-    { name: "So I Skipp-ed", tags: ["classic"] },
-    { name: "Soler Power", tags: ["classic"] },
-
-    { name: "Southgate's Tears FC", tags: ["classic"] },
-    { name: "Spence It Like Beckham", tags: ["classic", "TV & Film"] },
-    { name: "Steele or No Steele", tags: ["classic"] },
-    { name: "Sterling Silvers", tags: ["classic"] },
-    { name: "Stones Unturned", tags: ["classic"] },
-    { name: "Struijk and Awe", tags: ["classic"] },
-    { name: "Sue Per Sarr", tags: ["classic"] },
-
-    ,
-    { name: "Take it to the McTominay", tags: ["classic"] },
-    { name: "Targett Practice", tags: ["classic"] },
-    { name: "Taylor Made FC", tags: ["classic"] },
-    { name: "Teemu and the Gang", tags: ["classic"] },
-
-    { name: "The Boys Are Barkley", tags: ["classic", "music"] },
-    { name: "The Full Nelson", tags: ["classic"] },
-
-    {
-      name: "Toney Award Winners",
-      tags: ["classic", "brentford", "TV & Film", "music"],
-    },
-    { name: "Toti Africa", tags: ["classic"] },
-
-    { name: "Turn the Page FC", tags: ["classic"] },
-    { name: "Udogie Style", tags: ["classic"] },
-    { name: "Up the du-Couré", tags: ["classic"] },
-
-    { name: "Vazquez and Furious", tags: ["classic", "TV & Film"] },
-    { name: "Vini Vidi Vicario", tags: ["classic"] },
-    { name: "Viva La Veltman", tags: ["classic"] },
-    { name: "Wataru You Waiting For", tags: ["classic"] },
-    { name: "Watts on Earth?", tags: ["classic"] },
-    { name: "Weghorst Gump", tags: ["classic", "TV & Film"] },
-
-    { name: "Who Let the Kökçüs Out?", tags: ["classic", "music"] },
-    { name: "Wilson's World", tags: ["classic"] },
-
-    { name: "Wright Said Fred", tags: ["classic", "manchester-united"] },
-
-    { name: "You're the Øne", tags: ["classic"] },
-    { name: "Zaniolo Express", tags: ["classic"] },
-    { name: "Zanka You Very Much", tags: ["classic"] },
-    { name: "Zemura's Finesse", tags: ["classic"] },
-
-    // worldwide
-    {
-      name: "Murder on Zidane's Floor",
-      tags: ["worldwide", "classic", "music"],
-    },
-    { name: "De Jong Trousers", tags: ["worldwide", "TV & Film"] },
-    { name: "Muller Reus Corner", tags: ["worldwide", "classic"] },
-    { name: "Baby Reijnders", tags: ["worldwide"] },
-    { name: "CommethTheAouar", tags: ["worldwide"] },
-    { name: "Daylight Ribery", tags: ["worldwide"] },
-    { name: "DeJong&WindingRoad", tags: ["worldwide"] },
-    { name: "DiMarco Polo", tags: ["worldwide"] },
-    { name: "Dunk Your Busquets", tags: ["worldwide"] },
-    { name: "Inglorious Bas Dost", tags: ["worldwide", "TV & Film"] },
-    { name: "Itsy Bitsy Chiellini", tags: ["worldwide", "music"] },
-    { name: "Kroos Control", tags: ["worldwide"] },
-    { name: "Lemon and Laimer", tags: ["worldwide"] },
-    { name: "Mbappe Feet", tags: ["worldwide"] },
-    { name: "Orban Legend", tags: ["worldwide"] },
-    { name: "PassionOfTheCruyff", tags: ["worldwide"] },
-    { name: "Pedri Dish", tags: ["worldwide"] },
-    { name: "Pique Blinders", tags: ["worldwide"] },
-    { name: "PutJohansUp4DeCruyff", tags: ["worldwide"] },
-    { name: "Savic Garden", tags: ["worldwide", "music"] },
-    { name: "Schick's Creek", tags: ["worldwide"] },
-    { name: "Taribo Westlife", tags: ["worldwide", "music"] },
-    { name: "Under My Barella", tags: ["worldwide", "music"] },
-    { name: "Where'sTheLahmSauce", tags: ["worldwide"] },
-    { name: "AC/DC United", tags: ["worldwide", "classic", "music"] },
-    { name: "Ajax Trees Down", tags: ["worldwide"] },
-    { name: "Anderlecht my balls", tags: ["worldwide"] },
-    { name: "Bayer Neverlosin'", tags: ["worldwide"] },
-    { name: "Bayern Bru", tags: ["worldwide"] },
-    { name: "Bayern Maiden", tags: ["worldwide"] },
-    { name: "Bilbao Baggins", tags: ["worldwide", "TV & Film"] },
-    { name: "Borussia Teeth", tags: ["worldwide"] },
-    { name: "ChampagneSuperRovers", tags: ["worldwide", "music"] },
-    { name: "Cry Me A River Plate", tags: ["worldwide", "music"] },
-    { name: "Expected Toulouse", tags: ["worldwide"] },
-    { name: "Fiorentina Turner", tags: ["worldwide", "music"] },
-    { name: "good kid mAAn city", tags: ["worldwide"] },
-    { name: "Imaginary Madrid", tags: ["worldwide"] },
-    { name: "Inter Yermam", tags: ["worldwide"] },
-    { name: "Pathetico Madrid", tags: ["worldwide"] },
-    { name: "Pfizer Chiefs", tags: ["worldwide"] },
-    { name: "Real SoSoBad", tags: ["worldwide"] },
-    { name: "Sexandthe City", tags: ["worldwide", "TV & Film"] },
-    { name: "Spartak Costco", tags: ["worldwide"] },
-    { name: "Sub-standard Liege", tags: ["worldwide"] },
-    { name: "The Molde Peaches", tags: ["worldwide"] },
-    { name: "Vladimir Luton", tags: ["worldwide"] },
-    { name: "Khedira Pin Drop", tags: ["worldwide", "classic"] },
-    { name: "Surreal Madrid", tags: ["worldwide", "classic"] },
-  ];
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  app.className = darkMode
-    ? "bg-dark text-light p-4"
-    : "bg-light text-dark p-4";
-
-  app.innerHTML = `
-<div id="generatorContainer" class="container">
-
-  <div class="mb-4">
-    <h5>Step 1:</h5>
-    <label for="teamFilter" class="form-label">Select a category</label>
-    <select id="teamFilter" class="form-select"></select>
-  </div>
-
-
-
-  
-    <div class="mb-4">
-    <h5>Step 2:</h5>
-        <p class="fs-6">Press the button until you find a name that suits your style.</p>
-    <button id="generateBtn" class="btn btn-primary mb-2">Generate Team Name</button>
-
-  </div>
-
-  <div class="mb-4">
-    <h5>Step 3:</h5>
-    <p id="teamNameDisplay" class="fs-4">Click the button to get a name</p>
-    <p class="fs-6">Tap copy if you like what you see!</p>
-    <button id="copyBtn" class="btn btn-outline-secondary" style="display:none;">📋 Copy</button>
-  </div>
-
-
-
-</div>
-
-`;
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  app.prepend(backBtn);
-  // Style elements via JS
-  const styles = {
-    "#generatorContainer": {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      alignSelf: "center",
-      fontFamily: "Arial, sans-serif",
-      textAlign: "center",
-      padding: "2rem",
-      maxWidth: "600px",
-    },
-    "#generateBtn": {
-      padding: "0.5rem 1rem",
-      fontSize: "1rem",
-      cursor: "pointer",
-      marginTop: "1rem",
-    },
-    "#teamNameDisplay": {
-      fontSize: "2rem",
-    },
-    "#teamFilter": {
-      padding: "0.3rem",
-      fontSize: "1rem",
-      marginTop: "0.5rem",
-    },
-    "#copyBtn": {
-      padding: "0.4rem 1rem",
-      marginTop: "1rem",
-      fontSize: "1rem",
-      cursor: "pointer",
-    },
-  };
-  for (const selector in styles) {
-    const element = document.querySelector(selector);
-    if (element) Object.assign(element.style, styles[selector]);
-  }
-
-  // Populate filter dropdown
-  const allTags = new Set();
-  teamNamesForGenerator.forEach((team) =>
-    team.tags.forEach((tag) => allTags.add(tag))
-  );
-
-  const filterSelect = document.getElementById("teamFilter");
-  const createOption = (value, label) => {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = label;
-    return option;
-  };
-  filterSelect.appendChild(createOption("all", "All"));
-  [...allTags].sort().forEach((tag) => {
-    const label = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/-/g, " ");
-    filterSelect.appendChild(createOption(tag, label));
-  });
-
-  // Generate button logic
-  const display = document.getElementById("teamNameDisplay");
-  const copyBtn = document.getElementById("copyBtn");
-
-  let generationCount = 0;
-
-  document.getElementById("generateBtn").addEventListener("click", () => {
-    const selectedFilter = filterSelect.value;
-
-    const filtered = teamNamesForGenerator.filter(
-      (team) => selectedFilter === "all" || team.tags.includes(selectedFilter)
-    );
-
-    if (filtered.length === 0) {
-      display.textContent = "No names match your filter.";
-      copyBtn.style.display = "none";
-      return;
-    }
-
-    const randomIndex = Math.floor(Math.random() * filtered.length);
-    const selectedName = filtered[randomIndex].name;
-    display.textContent = selectedName;
-    copyBtn.style.display = "inline-block";
-    copyBtn.textContent = "📋 Copy";
-
-    // Increment generation counter
-    generationCount++;
-
-    // Show modal after 5 generations (only for non-pro users)
-    if (generationCount === 5 && !userHasAccess([10, 12])) {
-      showModal({
-        title: "Having fun?",
-        body: "Consider updgrading to a paid membership for more amazing <strong>FPL Tools</strong>.<br><br>",
-        confirmText: "Upgrade Now",
-        onConfirm: () => {
-          window.location.href = subscriptionPageUrl;
-        },
-      });
-
-      //Optional: reset count so they see it again every 5
-      generationCount = 0;
-    }
-  });
-
-  // Copy to clipboard logic
-  copyBtn.addEventListener("click", () => {
-    const textToCopy = display.textContent;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      copyBtn.textContent = "✅ Copied!";
-      setTimeout(() => {
-        copyBtn.textContent = "📋 Copy";
-      }, 1500);
-    });
-  });
-
-  if (!userHasAccess([10, 12])) {
-    // Card wrapper
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("card", "shadow-sm", "mb-4", "text-center");
-    wrapper.style.maxWidth = "500px";
-    wrapper.style.margin = "0 auto";
-
-    // Apply dark mode or light mode classes
-    if (darkMode) {
-      wrapper.classList.add("bg-dark", "text-light", "border-light");
-    } else {
-      wrapper.classList.add("bg-light", "text-dark", "border-dark");
-    }
-
-    // Card body
-    const cardBody = document.createElement("div");
-    cardBody.classList.add("card-body");
-
-    // Card title
-    const title = document.createElement("h5");
-    title.classList.add("card-title", "mb-3");
-    title.textContent = "Unlock More Tools";
-
-    // Card text
-    const cardText = document.createElement("p");
-    cardText.classList.add("card-text", "mb-3");
-    cardText.textContent = "Subscribe to access premium tools and features.";
-
-    // Subscribe button
-    const btn = document.createElement("button");
-    btn.classList.add("btn", "btn-primary");
-    btn.textContent = "Subscribe for more tools";
-    btn.onclick = () => {
-      window.location.href = subscriptionPageUrl; // Change this URL to your real subscribe page
-    };
-
-    // Build card
-    cardBody.appendChild(title);
-    cardBody.appendChild(cardText);
-    cardBody.appendChild(btn);
-    wrapper.appendChild(cardBody);
-
-    // Append to app
-    app.append(wrapper);
-  }
-}
-
-async function showMyTeam() {
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  // Show the spinner
-  showBootstrapSpinner(container);
-  const myScore = createScoreCard();
-  const pitch = createPitch();
-  container.append(myScore, pitch);
-
-  const data = await fetchGwTeamData();
-  await renderTeam(data);
-  await fetchAndRenderUpcomingFixtures(data);
-  //calculatePlayersPlayed(data);
-  document.getElementById("expected-points").innerHTML = "";
-
-  if (userHasAccess([10, 12])) {
-    await fetchAndRenderAdditionalStats(data);
-    await fetchAndRenderTransferStats(data);
-    await fetchAndRenderXpStats(data);
-
-    //await fetchAndRenderFixturesForNonOwned(data);
-  }
-  await fetchAndRenderFixturesForAllSeason(data);
-  await createProWidget();
-  removeSpinner();
-}
-// Render the team based on fetched data
-
-async function renderTeam(data) {
-  const { picks } = data;
-  // Show the spinner
-
-  let captainPick, viceCaptainPick;
-  let tripleCaptain = false;
-
-  for (const pick of picks) {
-    if (pick.position > 15) continue; // Stop the loop if pick.position is greater than 15
-
-    //console.log(pick);
-    let pointsMultiplier = pick.multiplier || 1;
-    const playerEP = getPlayerEP(pick.element) * pointsMultiplier;
-    const playerScore = (await getPlayerScore(pick.element)) * pointsMultiplier;
-
-    if (pick.is_vice_captain) viceCaptainPick = pick.element;
-    if (pick.is_captain) captainPick = pick.element;
-
-    const card = await createPlayerCardNew(
-      pick.element,
-      playerScore,
-      pick.is_captain,
-      pick.is_vice_captain,
-      pointsMultiplier
-    );
-
-    const position =
-      pick.position > 11
-        ? "my-bench"
-        : getPositionSection(await getPlayerType(pick.element));
-
-    document.getElementById(position).appendChild(card);
-  }
-  //Assistant Manager
-  for (const pick of picks) {
-    if (pick.position !== 16) continue; // Skip all picks that are not position 16
-
-    //console.log(pick);
-    let pointsMultiplier = pick.multiplier || 1;
-    const playerEP = getPlayerEP(pick.element) * pointsMultiplier;
-    const playerScore = getPlayerScore(pick.element) * pointsMultiplier;
-
-    if (pick.is_vice_captain) viceCaptainPick = pick.element;
-    if (pick.is_captain) captainPick = pick.element;
-
-    const card = createManagerCard(
-      pick.element,
-      playerScore,
-      pick.is_captain,
-      pick.is_vice_captain
-    );
-    const position =
-      pick.position > 11
-        ? "my-bench"
-        : getPositionSection(getPlayerType(pick.element));
-
-    document.getElementById(position).prepend(card);
-  }
-
-  updateScoreCard(data);
-
-  addCaptainBadge();
-
-  //addSantaHatsToPlayers();
-}
-async function createProWidget() {
-  // Create the floating widget container
-  const floatingWidget = document.createElement("div");
-  floatingWidget.className = "floating-widget";
-
-  // Create the main button
-  const widgetButton = document.createElement("button");
-  widgetButton.className = "widget-button";
-  widgetButton.textContent = "☰";
-
-  function toggleStats(showClass, hideClasses) {
-    // Hide elements of specified classes
-    hideClasses.forEach((hideClass) => {
-      document.querySelectorAll(`.${hideClass}`).forEach((element) => {
-        element.style.display = "none"; // Hide element
-      });
-    });
-
-    // Toggle the display of elements for the showClass
-    document.querySelectorAll(`.${showClass}`).forEach((element) => {
-      element.style.display =
-        element.style.display === "flex" ? "none" : "flex"; // Toggle element
-    });
-  }
-
-  function toggleGameStats() {
-    toggleStats("additional-stats", ["transfer-stats", "xp-stats"]);
-  }
-
-  function toggleTransferStats() {
-    toggleStats("transfer-stats", ["additional-stats", "xp-stats"]);
-  }
-
-  function toggleXpStats() {
-    toggleStats("xp-stats", ["additional-stats", "transfer-stats"]);
-  }
-
-  const isPro = userHasAccess([10, 12]);
-
-  const menuItems = [
-    {
-      text: isPro ? "⚽ Game Info" : "🔒 Game Info",
-      onclick: isPro ? toggleGameStats : proFeaturePopUp,
-    },
-    {
-      text: isPro ? "↔️ Round Transfers" : "🔒 Round Transfers",
-      onclick: isPro ? toggleTransferStats : proFeaturePopUp,
-    },
-    {
-      text: isPro ? "🅿️ Expected Points" : "🔒 Expected Points",
-      onclick: isPro ? toggleXpStats : proFeaturePopUp,
-    },
-    {
-      text: isPro ? "🔁 Auto-Subs" : "🔒 Auto-Subs",
-      onclick: isPro ? autoSubsNotification : proFeaturePopUp,
-    },
-    {
-      text: "🏟️ Fixtures",
-      onclick: toggleUpComingFixtures,
-    },
-  ];
-
-  // Create the menu container
-  const widgetMenu = document.createElement("div");
-  widgetMenu.className = "widget-menu";
-
-  // Add menu items to the menu container
-  menuItems.forEach((item) => {
-    // Create a div element for each menu item
-    const menuItem = document.createElement("div");
-    menuItem.textContent = item.text;
-    menuItem.className = "menu-item";
-
-    // Add the click event listener to trigger the function
-    if (item.onclick) {
-      menuItem.addEventListener("click", () => {
-        item.onclick();
-      });
-    }
-
-    widgetMenu.appendChild(menuItem);
-  });
-
-  // Append button and menu to the widget container
-  floatingWidget.appendChild(widgetButton);
-  floatingWidget.appendChild(widgetMenu);
-
-  // Append the widget container to the body
-  const app = document.getElementById("screen-tools");
-  app.appendChild(floatingWidget);
-  // Toggle menu display on button click
-  widgetButton.addEventListener("click", () => {
-    widgetMenu.style.display =
-      widgetMenu.style.display === "flex" ? "none" : "flex";
-  });
-}
-
-function toggleUpComingFixtures() {
-  const fixturesDivs = document.querySelectorAll(".homeawaygame");
-  fixturesDivs.forEach((div) => {
-    const isHidden =
-      div.style.display === "none" || getComputedStyle(div).display === "none";
-    div.style.display = isHidden ? "flex" : "none";
-  });
-}
-function autoSubsNotification() {
-  // Get all field players not in the bench
-  const initialFieldPlayers = Array.from(
-    document.querySelectorAll(
-      ".player.type1, .player.type2, .player.type3, .player.type4"
-    )
-  ).filter((player) => !player.closest("#my-bench"));
-
-  // Get all bench players
-  const benchPlayers = document.querySelectorAll("#my-bench .player");
-
-  // A mutable copy of the field players to reflect swaps
-  let currentFieldPlayers = [...initialFieldPlayers];
-
-  // Count players by type
-  const countPlayerTypes = (players) => ({
-    goalkeepers: players.filter((player) => player.classList.contains("type1"))
-      .length, // Assuming type1 is goalkeepers
-    defenders: players.filter((player) => player.classList.contains("type2"))
-      .length, // Assuming type2 is defenders
-    midfielders: players.filter((player) => player.classList.contains("type3"))
-      .length, // Assuming type3 is midfielders
-    strikers: players.filter((player) => player.classList.contains("type4"))
-      .length, // Assuming type4 is forwards
-  });
-
-  // Check if a formation is valid
-  const isFormationValid = (counts) =>
-    counts.goalkeepers === 1 &&
-    counts.defenders >= 3 &&
-    counts.midfielders >= 2 &&
-    counts.strikers >= 1;
-
-  // Log initial formation
-  const initialCounts = countPlayerTypes(currentFieldPlayers);
-  console.log(
-    `Initial team formation: ${initialCounts.defenders}${initialCounts.midfielders}${initialCounts.strikers}`
-  );
-
-  // Variables to track the swaps and message details
-  let changesLogged = false;
-  let goalkeeperChecked = false;
-  let swapDetails = [];
-
-  currentFieldPlayers.forEach((fieldPlayer, fieldIndex) => {
-    // If this is a goalkeeper and we've already processed one, skip further checks
-    if (fieldPlayer.classList.contains("type1") && goalkeeperChecked) {
-      return;
-    }
-
-    // Find the stat4Div inside the field player
-    const fieldStat4Div = fieldPlayer.querySelector("#stat4 .breakdown-stats");
-
-    // Check if stat4Div exists and its value is "❌"
-    if (fieldStat4Div && fieldStat4Div.textContent.trim() === "❌") {
-      // Loop through bench players to find an eligible swap
-      for (let benchPlayer of benchPlayers) {
-        // Goalkeeper-specific check
-        if (
-          fieldPlayer.classList.contains("type1") &&
-          !benchPlayer.classList.contains("type1")
-        ) {
-          continue; // Skip if the field player is a goalkeeper and the bench player isn't
-        }
-
-        // Find the stat4Div inside the bench player
-        const benchStat4Div = benchPlayer.querySelector(
-          "#stat4 .breakdown-stats"
-        );
-
-        // Check if stat4Div exists and its value is "⏳" or "✅"
-        if (
-          benchStat4Div &&
-          ["⏳", "✅"].includes(benchStat4Div.textContent.trim())
-        ) {
-          // Simulate the swap in the mutable copy
-          const updatedFieldPlayers = [...currentFieldPlayers];
-          updatedFieldPlayers[fieldIndex] = benchPlayer;
-
-          // Count players after the swap
-          const updatedCounts = countPlayerTypes(updatedFieldPlayers);
-
-          // Check if the swap maintains a valid formation
-          if (isFormationValid(updatedCounts)) {
-            // Log the swap
-            swapDetails.push(
-              `${getPlayerWebName(
-                fieldPlayer.id
-              )} will be subbed off for ${getPlayerWebName(benchPlayer.id)}`
-            );
-            changesLogged = true;
-
-            // Apply the swap to the current lineup
-            currentFieldPlayers = updatedFieldPlayers;
-
-            // Mark goalkeeper as checked if this player is a goalkeeper
-            if (fieldPlayer.classList.contains("type1")) {
-              goalkeeperChecked = true;
-            }
-            break; // Stop checking once the swap is logged
-          }
-        }
-      }
-    }
-  });
-
-  if (!changesLogged) {
-    console.log("No eligible auto-subs were identified.");
-  }
-
-  // Log final formation based on the updated lineup
-  const finalCounts = countPlayerTypes(currentFieldPlayers);
-  console.log(
-    `Final team formation: ${finalCounts.defenders}${finalCounts.midfielders}${finalCounts.strikers}`
-  );
-
-  // Prepare the alert message
-  const alertMessage = `Current Formation: ${initialCounts.defenders}${
-    initialCounts.midfielders
-  }${initialCounts.strikers}
-    \nLikely auto-subs: ${
-      swapDetails.length > 0 ? swapDetails.join("\n") : "No eligible auto-subs"
-    }
-    \nFormation after auto-subs: ${finalCounts.defenders}${
-    finalCounts.midfielders
-  }${finalCounts.strikers}
-    \nCheck your auto-subs and more here
-  `;
-
-  showModal({
-    title: "Auto Subs",
-    body: alertMessage,
-    confirmText: "OK",
-    onConfirm: () => {}, // No action taken
-  });
-}
-function proFeaturePopUp() {
-  showModal({
-    title: "Paid Feature",
-    body: `Hey, ${managerData.player_first_name}, this is a pro feature! You can unlock this and many more features, instantly for only £14.99 GBP a year! \n`,
-    confirmText: "Upgrade Now",
-    onConfirm: () => {
-      window.location.href = subscriptionPageUrl;
-    },
-  });
-}
-
-// Update score card with total points
-async function updateScoreCard(data) {
-  //console.log(data);
-  const myScore = document.getElementById("my-score");
-  const {
-    points,
-    total_points: totalPoints,
-    overall_rank: overallRank,
-    rank: gwRank,
-  } = data.entry_history;
-
-  let liveScore = 0; // Use 'let' so the value can be updated
-  let highestScore = 0; // Variable to track the highest raw score
-  let highestScoringPlayer = null; // Variable to track the player with the highest raw score
-  console.log(data);
-  for (let i = 0; i < 11; i++) {
-    const player = data.picks[i]; // Get the player data
-    const playerRawScore = await getPlayerScore(player.element); // Raw score without multiplier
-    const playerScore = playerRawScore * player.multiplier; // Calculate the player's total score
-    liveScore += playerScore; // Increment liveScore by the player's score
-
-    // Check if this player's raw score is the highest so far
-    if (playerRawScore > highestScore) {
-      highestScore = playerRawScore; // Update the highest raw score
-      highestScoringPlayer = player; // Store the player with the highest raw score
-    }
-  }
-
-  // Output the total live score and the player with the highest raw score
-  //console.log(`Total live score: ${liveScore}`);
-  // if (highestScoringPlayer) {
-  //   console.log(
-  //     `Highest scoring player: ${getPlayerWebName(
-  //       highestScoringPlayer.element
-  //     )} with ${highestScore} raw points`
-  //   );
-  // }
-
-  const playerOfTheWeek = await createPlayerOfTheWeekCard(
-    highestScoringPlayer.element
-  );
-
-  playerOfTheWeek.classList.add("player-of-the-week");
-
-  async function createPlayerOfTheWeekCard(elementId) {
-    const card = document.createElement("div");
-    card.classList.add("player");
-    const type = await getPlayerType(elementId);
-    card.classList.add("type" + type);
-
-    const img = document.createElement("img");
-    img.setAttribute("class", "player-img");
-    console.log(await getPlayerPhoto(elementId));
-
-    const photo = await getPlayerPhoto(elementId);
-    img.src = `https://resources.premierleague.com/premierleague/photos/players/250x250/p${photo.slice(
-      0,
-      -3
-    )}png`;
-
-    const name = document.createElement("div");
-    name.className = "my-player-name";
-    name.textContent = await getPlayerWebName(elementId);
-    name.textContent.slice(0, 10);
-    const scoreText = document.createElement("div");
-    scoreText.className = "my-player-xp";
-    scoreText.textContent = await getPlayerScore(elementId);
-
-    // Create a new image element
-    const star = document.createElement("div");
-    star.innerHTML = "⭐";
-    star.style.textAlign = "left";
-    star.style.width = "30px";
-    star.style.marginBottom = "-5px";
-    star.style.zIndex = "20";
-    star.margin = "0";
-    //star.style.transform = "rotate(10deg)"; // Rotate the image slightly
-
-    card.append(star, img, name, scoreText);
-
-    return card;
-  }
-
-  const formattedOverallRank = overallRank.toLocaleString();
-  const formattedGwRank = gwRank ? gwRank.toLocaleString() : "";
-
-  // Fetch previous gameweek data
-  const previousData = await fetchPreviousGwTeamData();
-  const previousRank = previousData.entry_history.overall_rank;
-  console.log(previousRank);
-
-  // Determine rank change and difference
-  const isRankImproved = previousRank > overallRank;
-  const rankArrow = isRankImproved
-    ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
-    : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
-
-  const rankDifference = previousRank - overallRank;
-  const rankDifferenceDisplay = `
-    <div class="rank-difference" style="color:${
-      isRankImproved ? "#05FA87" : "#FC2C80"
-    };">
-      ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
-    </div>`;
-
-  function calculatePercentileRank(userRank, totalTeams) {
-    if (totalTeams <= 0 || userRank <= 0) {
-      throw new Error("Total teams and user rank must be positive numbers.");
-    }
-
-    let percentileRank = (1 - userRank / totalTeams) * 100;
-    let topPercentage = (100 - percentileRank).toFixed(2);
-    return topPercentage;
-  }
-
-  // Update the scorecard
-  myScore.innerHTML = `
-  <div id="score-panel">
- 
- 
-      <div id="first-panel">
-      <div class="rank-percentile">Top: ${calculatePercentileRank(
-        overallRank,
-        bootstrap.total_players
-      )}%</div>
-      <div id="rank-container"><div id="rank-change">${rankArrow}</div><div id="rank-difference-text" style="font-size:1.2rem">${rankDifferenceDisplay}</div></div>
-      <div style="font-size:0.7rem">OR: ${formattedOverallRank}</div>
-          <div style="font-size:0.7rem">Total: ${totalPoints}pts</div>
-           
-        
-       
-      </div>
-
-      <div id="middle-panel">
-        <div id="team-name">${loggedInTeamName}</div>
-        <div id="gameweek-identifier">GW ${currentGw}:</div>
-        <div id="actual-points">${points}</div>
-        <div id="players-played"></div>
-        <div id="expected-points">...calculating</div>
-      </div>
-
-      <div id="third-panel">
-        
-        ${playerOfTheWeek.outerHTML}
-      </div>
-    </div>
-    <div id="points-summary"></div>`;
-
-  //<div id:"live-score">Live: ${liveScore}</div>
-}
-// Fetch and render upcoming fixtures for each player
-async function fetchAndRenderUpcomingFixtures(data) {
-  for (let i = 0; i < data.picks.length && i < 16; i++) {
-    const pick = data.picks[i];
-    const fixtures = await fetchPlayerFixtures(pick.element);
-    const playerDiv = document.getElementById(pick.element);
-    const upcomingFixturesDiv = createUpcomingFixtures(fixtures);
-    playerDiv.appendChild(upcomingFixturesDiv);
-  }
-}
-// Create stats display for a player
-function createAdditionalStats(fixtures) {
-  const statsDiv = document.createElement("div");
-  statsDiv.setAttribute("id", "additional-stats");
-  statsDiv.classList.add("additional-stats");
-
-  fixtures.forEach((fixture) => {
-    const stat0Div = document.createElement("div");
-    stat0Div.id = "stat0";
-    const stat1Div = document.createElement("div");
-    stat1Div.id = "stat1";
-    const stat2Div = document.createElement("div");
-    stat2Div.id = "stat2";
-    const stat3Div = document.createElement("div");
-    stat3Div.id = "stat3";
-    const stat4Div = document.createElement("div");
-    stat4Div.id = "stat4";
-    const stat5Div = document.createElement("div");
-    stat5Div.id = "stat5";
-    const stat6Div = document.createElement("div");
-    stat6Div.id = "stat6";
-    const stat7Div = document.createElement("div");
-    stat7Div.id = "stat7";
-
-    // Check if fixture has kicked off
-    const dateString = fixture.kickoff_time;
-    const fixtureDate = new Date(dateString);
-    const now = new Date();
-
-    // Conditionally set innerHTML for each stat
-    if (fixture.clean_sheets > 0 && getPlayerType(fixture.element) < 4) {
-      stat0Div.innerHTML = "<div class='breakdown-stats'>🆑</div>";
-    }
-    stat1Div.innerHTML = "<div class='breakdown-stats'>⚽</div>".repeat(
-      fixture.goals_scored
-    );
-
-    stat2Div.innerHTML = "<div class='breakdown-stats'>🅰️</div>".repeat(
-      fixture.assists
-    );
-
-    if (fixture.bonus >= 1) {
-      stat3Div.innerHTML = "<div class='breakdown-stats'>🅱️</div>";
-    }
-    // Extract components
-    const dayName = fixtureDate.toDateString().split(" ")[0]; // "Tue"
-    // Extract hours and minutes
-    const hours = String(fixtureDate.getHours()).padStart(2, "0"); // Ensures 2 digits
-    const minutes = String(fixtureDate.getMinutes()).padStart(2, "0"); // Ensures 2 digits
-
-    // Combine into the desired format
-    const formattedDate = `${dayName} ${hours}:${minutes}`;
-    if (fixture.minutes == 0 && fixtureDate > now) {
-      stat4Div.innerHTML = `<div class='breakdown-stats'>${formattedDate}</div>`;
-    } else if (fixture.minutes > 0) {
-      stat4Div.innerHTML = "<div class='breakdown-stats'>✅</div>";
-    } else {
-      stat4Div.innerHTML = "<div class='breakdown-stats'>❌</div>";
-    }
-
-    if (fixture.yellow_cards != 0) {
-      stat5Div.innerHTML = "<div class='breakdown-stats'>🟨</div>";
-    }
-    if (fixture.red_cards != 0) {
-      stat6Div.innerHTML = "🟥";
-    }
-    if (fixture.red_cards != 0) {
-      stat7Div.innerHTML = "🟥";
-    }
-
-    // Append each div to the statsDiv only if it has content
-    if (stat0Div.innerHTML) {
-      statsDiv.appendChild(stat0Div);
-    }
-    if (stat1Div.innerHTML) {
-      statsDiv.appendChild(stat1Div);
-    }
-    if (stat2Div.innerHTML) {
-      statsDiv.appendChild(stat2Div);
-    }
-    if (stat3Div.innerHTML) {
-      statsDiv.appendChild(stat3Div);
-    }
-    if (stat4Div.innerHTML) {
-      statsDiv.appendChild(stat4Div);
-    }
-    if (stat5Div.innerHTML) {
-      statsDiv.appendChild(stat5Div);
-    }
-    if (stat6Div.innerHTML) {
-      statsDiv.appendChild(stat6Div);
-    }
-    if (stat7Div.innerHTML) {
-      statsDiv.appendChild(stat7Div);
-    }
-
-    if (fixture.round == currentGw) {
-      console.log("current gw");
-    } else {
-      statsDiv.innerHTML = "❌";
-    }
-  });
-
-  return statsDiv;
-}
-// Fetch and render additional stats for each player
-async function fetchAndRenderAdditionalStats(data) {
-  for (let i = 0; i < data.picks.length && i < 16; i++) {
-    const pick = data.picks[i];
-    const fixtures = await fetchPlayerCurrentStats(pick.element);
-
-    const playerDiv = document.getElementById(pick.element);
-    const additionlStatsDiv = createAdditionalStats(fixtures);
-
-    playerDiv.prepend(additionlStatsDiv);
-  }
-}
-// Fetch and render transfer stats for each player
-async function fetchAndRenderTransferStats(data) {
-  for (let i = 0; i < data.picks.length && i < 11; i++) {
-    const pick = data.picks[i];
-    const fixtures = await fetchPlayerCurrentStats(pick.element);
-
-    const playerDiv = document.getElementById(pick.element);
-    const transferStatsDiv = createTransferStats(fixtures);
-    playerDiv.prepend(transferStatsDiv);
-  }
-}
-// Create stats display for a player
-function createTransferStats(fixtures) {
-  const statsDiv = document.createElement("div");
-  statsDiv.setAttribute("id", "transfer-stats");
-  statsDiv.classList.add("transfer-stats");
-  fixtures.forEach((fixture) => {
-    //console.log(fixture);
-    const stat1Div = document.createElement("div");
-    const stat2Div = document.createElement("div");
-    const stat3Div = document.createElement("div");
-
-    // Check if game has kicked off
-    const dateString = fixture.kickoff_time;
-    const fixtureDate = new Date(dateString);
-    const now = new Date();
-
-    // Conditionally set innerHTML for each stat
-
-    stat1Div.innerHTML = "⬅️" + fixture.transfers_in;
-
-    stat2Div.innerHTML = "➡️" + fixture.transfers_out;
-
-    // Append each div to the statsDiv only if it has content
-    if (stat1Div.innerHTML) {
-      statsDiv.appendChild(stat1Div);
-    }
-    if (stat2Div.innerHTML) {
-      statsDiv.appendChild(stat2Div);
-    }
-    if (stat3Div.innerHTML) {
-      statsDiv.appendChild(stat3Div);
-    }
-  });
-
-  return statsDiv;
-}
-
-const expectedPointsArray = [];
-function updateXp() {
-  //console.log(expectedPointsArray);
-  if (expectedPointsArray.length == 11) {
-    const xpSum = expectedPointsArray.reduce((sum, val) => sum + val, 0);
-    document.getElementById("expected-points").innerHTML = "xp " + xpSum;
-  }
-}
-// Create xp stats display for a player
-async function createXpStats(fixtures) {
-  const statsDiv = document.createElement("div");
-  statsDiv.setAttribute("id", "xp-stats");
-  statsDiv.classList.add("xp-stats");
-
-  //console.log(fixtures);
-
-  const playerEP = await getPlayerEP(fixtures[0].element);
-  expectedPointsArray.push(parseInt(playerEP));
-
-  const stat1Div = document.createElement("div");
-  console.log(playerEP);
-  stat1Div.innerHTML = playerEP;
-
-  // Append each div to the statsDiv only if it has content
-  if (stat1Div.innerHTML) {
-    statsDiv.appendChild(stat1Div);
-  }
-
-  updateXp();
-  return statsDiv;
-}
-// Fetch and render xp stats for each player
-async function fetchAndRenderXpStats(data) {
-  for (let i = 0; i < data.picks.length && i < 11; i++) {
-    const pick = data.picks[i];
-    const fixtures = await fetchPlayerCurrentStats(pick.element);
-    console.log(fixtures);
-    const playerDiv = document.getElementById(pick.element);
-    const xpStatsDiv = await createXpStats(fixtures);
-    playerDiv.prepend(xpStatsDiv);
-  }
-}
-
-// Helper to create score card
-function createScoreCard() {
-  const myScore = document.createElement("div");
-  myScore.setAttribute("id", "my-score");
-  const gwIdentifier = document.createElement("div");
-  gwIdentifier.setAttribute("id", "gameweek-identifier");
-  myScore.appendChild(gwIdentifier);
-  return myScore;
-}
-// Fetch player's fixtures from API
-async function fetchPlayerFixtures(elementId) {
-  const response = await fetch(`${BASE_URL}/element-summary/${elementId}/`);
-  const data = await response.json();
-
-  return data.fixtures.slice(0, 5);
-}
-
-// Create fixtures display for a player
-function createUpcomingFixtures(fixtures) {
-  const fixturesDiv = document.createElement("div");
-  fixturesDiv.classList.add("up-coming-fixtures");
-
-  fixtures.forEach((fixture) => {
-    //console.log(fixture)
-    const fixtureDiv = document.createElement("div");
-    fixtureDiv.id = `diff${fixture.difficulty}`;
-    fixtureDiv.setAttribute("class", "fixtureDiv");
-    let homeAway;
-    if (fixture.is_home == true) {
-      homeAway =
-        "<div class='homeawaygame'>" +
-        getTeamShortName(fixture.team_a) +
-        "</div><div class='homeaway'>H</div>";
-    } else {
-      homeAway =
-        "<div class='homeawaygame'>" +
-        getTeamShortName(fixture.team_h) +
-        "</div><div class='homeaway'>A</div>";
-    }
-    fixtureDiv.innerHTML = homeAway;
-    fixturesDiv.appendChild(fixtureDiv);
-  });
-
-  return fixturesDiv;
-}
-
-// Fetch and render fixtures for whole season
-async function fetchAndRenderFixturesForAllSeason(data) {
-  if (currentGw == 38) {
-    return;
-  }
-
-  const app = document.getElementById("screen-tools");
-  const tableHeader = document.createElement("h6");
-  tableHeader.innerText = "Fixtures for the rest of the season:";
-  tableHeader.style.textAlign = "center";
-  app.appendChild(tableHeader);
-
-  const container = document.createElement("div");
-  container.setAttribute("id", "season-container");
-  app.appendChild(container);
-  // Add a header above the table
-  const gwHeaders = document.createElement("div");
-  gwHeaders.setAttribute("id", "gw-headers");
-
-  for (let i = 0; i < data.picks.length && i < 16; i++) {
-    const pick = data.picks[i];
-    const fixtures = await fetchPlayerFixturesForSeason(pick.element);
-    const playerDiv = document.createElement("div");
-    playerDiv.setAttribute("id", "season-fixtures");
-    playerDiv.style.display = "flex";
-    const player = document.createElement("img");
-    player.setAttribute("class", "player-fixture-img");
-
-    const photo = await getPlayerPhoto(pick.element);
-    player.src = `https://resources.premierleague.com/premierleague/photos/players/250x250/p${photo.slice(
-      0,
-      -3
-    )}png`;
-
-    // const photo = await getPlayerPhoto(data.picks[i].element)
-    // photo.slice(0, -3);
-    // player.src =
-    //   "https://resources.premierleague.com/premierleague/photos/players/250x250/p" +
-    //   photo + "png";
-
-    playerDiv.appendChild(player);
-
-    const upcomingFixturesDiv = await createUpcomingFixturesForAllSeason(
-      fixtures
-    );
-    playerDiv.appendChild(upcomingFixturesDiv);
-
-    container.appendChild(playerDiv);
-  }
-}
-
-// Fetch player's fixtures for the whole season from API
-async function fetchPlayerFixturesForSeason(elementId) {
-  const response = await fetch(`${BASE_URL}/element-summary/${elementId}/`);
-  const data = await response.json();
-  return data.fixtures;
-}
-// Create fixtures display for a player
-async function createUpcomingFixturesForAllSeason(fixtures) {
-  const fixturesDiv = document.createElement("div");
-  fixturesDiv.classList.add("up-coming-season-fixtures");
-  fixtures.forEach((fixture) => {
-    const fixtureDiv = document.createElement("div");
-
-    if (userHasAccess([10, 12])) {
-      let homeAway;
-      if (fixture.is_home == true) {
-        homeAway = "H";
-      } else {
-        homeAway = "A";
-      }
-      fixtureDiv.innerHTML =
-        getTeamShortName(`${fixture.team_h}`) +
-        "<br>" +
-        getTeamShortName(`${fixture.team_a}`) +
-        "<br>" +
-        "(" +
-        homeAway +
-        ")";
-      fixtureDiv.id = `diff${fixture.difficulty}`;
-    } else {
-      fixtureDiv.innerHTML = "🔒";
-    }
-
-    fixturesDiv.appendChild(fixtureDiv);
-  });
-
-  return fixturesDiv;
-}
-
-// Fetch and render fixtures for whole season
-async function fetchAndRenderFixturesForNonOwned(data) {
-  const app = document.getElementById("screen-tools");
-  const tableHeader = document.createElement("h6");
-  tableHeader.innerText = "Fixtures for Top Players that you don't own:";
-  tableHeader.style.textAlign = "center";
-  app.appendChild(tableHeader);
-
-  const container = document.createElement("div");
-  container.setAttribute("id", "season-container");
-  app.appendChild(container);
-  // Add a header above the table
-  //console.log(data.picks);
-  //console.log(top5TransferredIn);
-
-  // Filter `data.picks` to find picks where `element` is not in `top5TransferredIn.id`
-  // let unmatchedPicks = top5TransferredIn.filter(
-  //   (pick) => !data.picks.some((player) => player.element === pick.id)
-  // );
-
-  //console.log(
-  //  "Picks with elements not found in top5TransferredIn:",
-  //  unmatchedPicks
-  //);
-
-  // for (let i = 0; i < unmatchedPicks.length; i++) {
-  //   const fixtures = await fetchPlayerFixturesForNonOwned(unmatchedPicks[i].id);
-
-  //   const playerDiv = document.createElement("div");
-  //   playerDiv.setAttribute("id", "season-fixtures-non-owned");
-  //   playerDiv.style.display = "flex";
-  //   const player = document.createElement("img");
-  //   player.setAttribute("class", "player-fixture-img");
-  //   player.src =
-  //     "https://resources.premierleague.com/premierleague/photos/players/250x250/p" +
-  //     getPlayerPhoto(unmatchedPicks[i].id).slice(0, -3) +
-  //     "png";
-
-  //   playerDiv.appendChild(player);
-
-  //   const upcomingFixturesDiv = createUpcomingFixturesForNonOwned(fixtures);
-  //   playerDiv.appendChild(upcomingFixturesDiv);
-
-  //   container.appendChild(playerDiv);
-  // }
-}
-// Fetch player's fixtures for the whole season from API
-async function fetchPlayerFixturesForNonOwned(elementId) {
-  const response = await fetch(`${BASE_URL}/element-summary/${elementId}/`);
-  const data = await response.json();
-  return data.fixtures;
-}
-// Create fixtures display for a player
-function createUpcomingFixturesForNonOwned(fixtures) {
-  const fixturesDiv = document.createElement("div");
-  fixturesDiv.classList.add("up-coming-season-fixtures");
-  //console.log(fixtures);
-
-  fixtures.forEach((fixture) => {
-    const fixtureDiv = document.createElement("div");
-    let homeAway;
-    if (fixture.is_home == true) {
-      homeAway = "H";
-    } else {
-      homeAway = "A";
-    }
-    fixtureDiv.innerHTML =
-      getTeamShortName(`${fixture.team_h}`) +
-      "<br>" +
-      getTeamShortName(`${fixture.team_a}`) +
-      "<br>" +
-      "(" +
-      homeAway +
-      ")";
-    fixtureDiv.id = `diff${fixture.difficulty}`;
-    fixturesDiv.appendChild(fixtureDiv);
-  });
-
-  return fixturesDiv;
-}
-// Get the section ID for a player type
-function getPositionSection(playerType) {
-  return {
-    1: "my-keeper",
-    2: "my-defenders",
-    3: "my-midfielders",
-    4: "my-strikers",
-  }[playerType];
-}
-// Helper to create pitch
-function createPitch() {
-  const pitch = document.createElement("div");
-  pitch.setAttribute("id", "pitch");
-
-  // Apply theme immediately
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  pitch.classList.add(darkMode ? "pitch-dark" : "pitch-light");
-
-  [
-    "my-keeper",
-    "my-defenders",
-    "my-midfielders",
-    "my-strikers",
-    "my-bench",
-  ].forEach((id) => {
-    const section = document.createElement("div");
-    section.setAttribute("id", id);
-    pitch.appendChild(section);
-  });
-
-  return pitch;
-}
-// Fetch the team data for the gameweek
-async function fetchGwTeamData() {
-  const response = await fetch(
-    `${BASE_URL}entry/${theUser.info.team_id}/event/${currentGw}/picks/`
-  );
-
-  return response.json();
-}
-
-// Fetch the team data for the gameweek
-async function fetchPreviousGwTeamData() {
-  console.log(currentGw);
-  const response = await fetch(
-    `${BASE_URL}entry/${theUser.info.team_id}/event/${currentGw - 1}/picks/`
-  );
-  return response.json();
-}
-async function createPlayerCardNew(
-  elementId,
-  score,
-  isCaptain,
-  isViceCaptain,
-  isTriple
-) {
-  //console.log(getPlayerType(elementId));
-  const card = document.createElement("div");
-  card.classList.add("player");
-  const type = await getPlayerType(elementId); // if async
-  card.classList.add("type" + type);
-  card.classList.add("player-new");
-  card.id = elementId;
-  const img = document.createElement("img");
-  img.setAttribute("class", "player-img");
-  const photo = await getPlayerTeamCode(elementId);
-  img.src = `https://fpltoolbox.com/wp-content/uploads/2025/04/shirt_${photo}.webp`;
-  if (type == 1) {
-    img.src = `https://fpltoolbox.com/wp-content/uploads/2025/04/shirt_${photo}_1.webp`;
-  }
-
-  //console.log(elementId, score, isCaptain, isViceCaptain, isTriple)
-
-  const name = document.createElement("div");
-  if (isCaptain) {
-    name.className = "my-captain-name";
-  } else if (isViceCaptain) {
-    name.className = "my-vice-captain-name";
-  } else {
-    name.className = "my-player-name";
-  }
-  if (isTriple == 3) {
-    name.className = "my-triple-captain-name";
-  }
-
-  name.textContent = await getPlayerWebName(elementId);
-  name.textContent.slice(0, 10);
-  const scoreText = document.createElement("div");
-  scoreText.className = "my-player-xp";
-  scoreText.textContent = score;
-
-  card.append(img, name, scoreText);
-
-  return card;
-}
-async function createManagerCard(elementId, score, isCaptain, isViceCaptain) {
-  //console.log(getPlayerPhoto(elementId));
-  const card = document.createElement("div");
-  card.classList.add("player");
-  const playerType = await getPlayerType(elementId);
-  card.classList.add("type" + playerType);
-  card.id = elementId;
-  const img = document.createElement("img");
-  img.setAttribute("class", "player-img");
-  img.src = `https://fpltoolbox.com/wp-content/uploads/2025/02/icons8-manager-50.png`;
-
-  const name = document.createElement("div");
-  if (isCaptain) {
-    name.className = "my-captain-name";
-  } else if (isViceCaptain) {
-    name.className = "my-vice-captain-name";
-  } else {
-    name.className = "my-player-name";
-  }
-
-  name.textContent = getPlayerWebName(elementId).slice(0, 10);
-
-  const scoreText = document.createElement("div");
-  scoreText.className = "my-player-xp";
-  scoreText.textContent = score;
-
-  card.append(img, name, scoreText);
-
-  return card;
-}
-async function showGameweekStats1() {
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  // Back button
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const tableHeader = document.createElement("h6");
-  tableHeader.classList.add("text-center", "mb-3");
-  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Gameweek Activity`;
-
-  container.appendChild(tableHeader);
-
-  const tableWrapper = document.createElement("div");
-  tableWrapper.className = "table-responsive";
-
-  const table = document.createElement("table");
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered",
-    "align-middle",
-    darkMode ? "table-dark" : "table-light"
-  );
-
-  const thead = document.createElement("thead");
-  thead.classList.add("text-center");
-
-  const headerRow = document.createElement("tr");
-  const headers = [
-    "Pos",
-    "Team",
-    "Chip",
-    "Captain",
-    "Score",
-    "Total",
-    "xfrs",
-    "Minus P",
-    "Bench P",
-  ];
-
-  headers.forEach((headerText) => {
-    const th = document.createElement("th");
-    th.innerText = headerText;
-    headerRow.appendChild(th);
-  });
-
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-
-  try {
-    for (const element of window.FPLToolboxLeagueData.standings) {
-      const tr = document.createElement("tr");
-
-      if (element.entry == theUser.info.team_id) {
-        tr.classList.add("table-primary");
-      }
-
-      // Position and movement
-      const pos = document.createElement("td");
-      pos.className = "text-center fw-bold";
-      const rankMovement = document.createElement("span");
-
-      if (element.rank < element.last_rank) {
-        rankMovement.innerText = " ▲";
-        rankMovement.className = "text-success";
-      } else if (element.rank > element.last_rank) {
-        rankMovement.innerText = " ▼";
-        rankMovement.className = "text-danger";
-      } else {
-        rankMovement.innerText = " ●";
-        rankMovement.className = "text-muted";
-      }
-
-      pos.innerText = element.rank;
-      pos.appendChild(rankMovement);
-      tr.appendChild(pos);
-
-      // Team
-
-      const teamNameCell = document.createElement("td");
-      teamNameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
-      tr.appendChild(teamNameCell);
-
-      // Chip
-      const chip = document.createElement("td");
-      chip.className = "text-center";
-      if (element.currentWeek[0].active_chip) {
-        const chipName = convertChipName(element.currentWeek[0].active_chip);
-        chip.innerText = chipName;
-        chip.classList.add(`chip-${chipName.toLowerCase()}`);
-      } else {
-        chip.innerHTML = "-";
-      }
-      tr.appendChild(chip);
-
-      // Captain
-      const captain = document.createElement("td");
-
-      const activeChip = convertChipName(element.currentWeek[0].active_chip);
-
-      for (const player of element.currentWeek[0].picks) {
-        if (player.is_captain) {
-          const score = await getPlayerScore(player.element);
-          const scoreMultiplier = activeChip === "TC" ? 3 : 2;
-          const card = await createPlayerCardNew(
-            player.element,
-            score,
-            true,
-            false,
-            scoreMultiplier
-          );
-          captain.append(card);
-        }
-      }
-
-      tr.appendChild(captain);
-
-      // GW Score
-      const score = document.createElement("td");
-      score.className = "text-center";
-      score.innerText = element.event_total;
-      tr.appendChild(score);
-
-      // Total Points
-      const total = document.createElement("td");
-      total.className = "text-center";
-      total.innerText = element.total;
-      tr.appendChild(total);
-
-      // Transfers
-      const transfers = document.createElement("td");
-      transfers.className = "text-center";
-      transfers.innerText = element.everyGw.at(-1).transfers;
-      tr.appendChild(transfers);
-
-      // Transfer cost
-      const minus = document.createElement("td");
-      minus.className = "text-center";
-      const cost = element.everyGw.at(-1).transfers_cost;
-      minus.innerText = cost;
-      if (cost > 0) {
-        minus.classList.add("text-danger", "fw-bold");
-      }
-      tr.appendChild(minus);
-
-      // Bench Points
-      const bench = document.createElement("td");
-      bench.className = "text-center";
-      bench.innerText = element.everyGw.at(-1).bench_points;
-      tr.appendChild(bench);
-
-      tbody.appendChild(tr);
-    }
-
-    table.appendChild(tbody);
-    tableWrapper.appendChild(table);
-    container.appendChild(tableWrapper);
-  } catch (error) {
-    console.error("Error building table:", error);
-  }
-}
-async function showGameweekStats() {
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  // Back button
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const tableHeader = document.createElement("h6");
-  tableHeader.classList.add("text-center", "mb-3");
-  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Gameweek Activity`;
-  container.appendChild(tableHeader);
-
-  const tableWrapper = document.createElement("div");
-  tableWrapper.className = "table-responsive";
-
-  const table = document.createElement("table");
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered",
-    "align-middle",
-    darkMode ? "table-dark" : "table-light"
-  );
-
-  const thead = document.createElement("thead");
-  thead.classList.add("text-center");
-
-  const headerRow = document.createElement("tr");
-  const headers = [
-    "Pos",
-    "Team",
-    "Chip",
-    "Captain",
-    "Score",
-    "Total",
-    "xfrs",
-    "Minus P",
-    "Bench P",
-  ];
-
-  headers.forEach((headerText) => {
-    const th = document.createElement("th");
-    th.innerText = headerText;
-    headerRow.appendChild(th);
-  });
-
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-
-  // Track highest GW scorer
-  let highestScore = -Infinity;
-  let highestRow = null;
-  let highestRank = null;
-
-  try {
-    for (const element of window.FPLToolboxLeagueData.standings) {
-      const tr = document.createElement("tr");
-
-      if (element.entry == theUser.info.team_id) {
-        tr.classList.add("table-primary");
-      }
-
-      // Position and movement
-      const pos = document.createElement("td");
-      pos.className = "text-center fw-bold";
-      const rankMovement = document.createElement("span");
-
-      if (element.rank < element.last_rank) {
-        rankMovement.innerText = " ▲";
-        rankMovement.className = "text-success";
-      } else if (element.rank > element.last_rank) {
-        rankMovement.innerText = " ▼";
-        rankMovement.className = "text-danger";
-      } else {
-        rankMovement.innerText = " ●";
-        rankMovement.className = "text-muted";
-      }
-
-      pos.innerText = element.rank;
-      pos.appendChild(rankMovement);
-      tr.appendChild(pos);
-
-      // Team
-      const teamNameCell = document.createElement("td");
-      teamNameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
-      tr.appendChild(teamNameCell);
-
-      // Chip
-      const chip = document.createElement("td");
-      chip.className = "text-center";
-      if (element.currentWeek[0].active_chip) {
-        const chipName = convertChipName(element.currentWeek[0].active_chip);
-        chip.innerText = chipName;
-        chip.classList.add(`chip-${chipName.toLowerCase()}`);
-      } else {
-        chip.innerHTML = "-";
-      }
-      tr.appendChild(chip);
-
-      // Captain
-      const captain = document.createElement("td");
-      const activeChip = convertChipName(element.currentWeek[0].active_chip);
-
-      for (const player of element.currentWeek[0].picks) {
-        if (player.is_captain) {
-          const score = await getPlayerScore(player.element);
-          const scoreMultiplier = activeChip === "TC" ? 3 : 2;
-          const card = await createPlayerCardNew(
-            player.element,
-            score,
-            true,
-            false,
-            scoreMultiplier
-          );
-          captain.append(card);
-        }
-      }
-
-      tr.appendChild(captain);
-
-      // GW Score
-      const score = document.createElement("td");
-      score.className = "text-center";
-      score.innerText = element.event_total;
-      tr.appendChild(score);
-
-      // Total Points
-      const total = document.createElement("td");
-      total.className = "text-center";
-      total.innerText = element.total;
-      tr.appendChild(total);
-
-      // Transfers
-      const transfers = document.createElement("td");
-      transfers.className = "text-center";
-      transfers.innerText = element.everyGw.at(-1).transfers;
-      tr.appendChild(transfers);
-
-      // Transfer cost
-      const minus = document.createElement("td");
-      minus.className = "text-center";
-      const cost = element.everyGw.at(-1).transfers_cost;
-      minus.innerText = cost;
-      if (cost > 0) {
-        minus.classList.add("text-danger", "fw-bold");
-      }
-      tr.appendChild(minus);
-
-      // Bench Points
-      const bench = document.createElement("td");
-      bench.className = "text-center";
-      bench.innerText = element.everyGw.at(-1).bench_points;
-      tr.appendChild(bench);
-
-      // Track top GW scorer
-      if (element.event_total > highestScore) {
-        highestScore = element.event_total;
-        highestRow = tr.cloneNode(true);
-        highestRank = element.rank;
-      }
-
-      tbody.appendChild(tr);
-    }
-
-    // Prepend the highest scorer at top
-    if (highestRow) {
-      highestRow.classList.add("table-success"); // Bootstrap highlight color
-
-      // Optional: Add badge or label to Pos cell
-      const posCell = highestRow.children[0];
-      const badge = document.createElement("span");
-      badge.className = "badge bg-success ms-2";
-      badge.innerText = "Top GW Score";
-      posCell.appendChild(badge);
-
-      tbody.insertBefore(highestRow, tbody.firstChild);
-    }
-
-    table.appendChild(tbody);
-    tableWrapper.appendChild(table);
-    container.appendChild(tableWrapper);
-  } catch (error) {
-    console.error("Error building table:", error);
-  }
-}
-
-async function showSeasonStats() {
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-  console.log(leagueToDisplay);
-  // Back button
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const tableHeader = document.createElement("h6");
-  tableHeader.classList.add("text-center", "mb-3");
-  tableHeader.innerText = `${leagueToDisplay.leagueName} \n Gameweek Activity`;
-
-  container.appendChild(tableHeader);
-
-  const tableWrapper = document.createElement("div");
-  tableWrapper.className = "table-responsive";
-
-  const table = document.createElement("table");
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered",
-    "align-middle",
-    darkMode ? "table-dark" : "table-light"
-  );
-
-  const thead = document.createElement("thead");
-  thead.classList.add("text-center");
-
-  const headerRow = document.createElement("tr");
-  const headers = [
-    "Pos",
-    "Team",
-    "Chips Used",
-    "Total",
-    "Trasnfers",
-    "Transfers with chips",
-    "Minus Points",
-    "Bench Points",
-    "Captaincy Points",
-    "Goals Scored",
-    "Goals Conceded",
-    "Pens Missed",
-    "Red Cards",
-    "Yellow Cards",
-    "Saves",
-    "Best GW",
-    "Worst GW",
-  ];
-
-  headers.forEach((headerText) => {
-    const th = document.createElement("th");
-    th.innerText = headerText;
-    headerRow.appendChild(th);
-  });
-
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-
-  try {
-    for (const element of leagueToDisplay.standings) {
-      const tr = document.createElement("tr");
-
-      if (element.entry == theUser.info.team_id) {
-        tr.classList.add("table-primary");
-      }
-
-      // Position and movement
-      const pos = document.createElement("td");
-      pos.className = "text-center fw-bold";
-      const rankMovement = document.createElement("span");
-
-      if (element.rank < element.last_rank) {
-        rankMovement.innerText = " ▲";
-        rankMovement.className = "text-success";
-      } else if (element.rank > element.last_rank) {
-        rankMovement.innerText = " ▼";
-        rankMovement.className = "text-danger";
-      } else {
-        rankMovement.innerText = " ●";
-        rankMovement.className = "text-muted";
-      }
-
-      pos.innerText = element.rank;
-      pos.appendChild(rankMovement);
-      tr.appendChild(pos);
-
-      // Team
-
-      const teamNameCell = document.createElement("td");
-      teamNameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
-      tr.appendChild(teamNameCell);
-
-      // Chip
-      const chip = document.createElement("td");
-      chip.className = "text-center";
-      if (element.chips) {
-        chip.innerText = element.chips.length;
-      } else {
-        chip.innerHTML = "-";
-      }
-      tr.appendChild(chip);
-
-      // Total Points
-      const total = document.createElement("td");
-      total.className = "text-center";
-      total.innerText = element.total;
-      tr.appendChild(total);
-
-      // Transfers
-      const transfers = document.createElement("td");
-      transfers.className = "text-center";
-      transfers.innerText = element.totalTransfers;
-      tr.appendChild(transfers);
-
-      // Total Transfers with chips
-      const xfrsWithChips = document.createElement("td");
-      xfrsWithChips.className = "text-center";
-      xfrsWithChips.innerText = element.transfers.length;
-      tr.appendChild(xfrsWithChips);
-
-      // Transfer cost
-      const minus = document.createElement("td");
-      minus.className = "text-center";
-      const cost = element.totalMinusPoints;
-      minus.innerText = cost;
-      if (cost > 0) {
-        minus.classList.add("text-danger", "fw-bold");
-      }
-      tr.appendChild(minus);
-
-      // Bench Points
-      const bench = document.createElement("td");
-      bench.className = "text-center";
-      bench.innerText = element.totalPointsOnBench;
-      tr.appendChild(bench);
-
-      // Captaincy Points
-      const captainPoints = document.createElement("td");
-      captainPoints.className = "text-center";
-      captainPoints.innerText = element.total_captaincy_points;
-      tr.appendChild(captainPoints);
-
-      // Goals Scored
-      const goalsScored = document.createElement("td");
-      goalsScored.className = "text-center";
-      goalsScored.innerText = element.total_goals_scored;
-      tr.appendChild(goalsScored);
-
-      // Goals Conceded
-      const goalsConceded = document.createElement("td");
-      goalsConceded.className = "text-center";
-      goalsConceded.innerText = element.total_goals_conceded;
-      tr.appendChild(goalsConceded);
-
-      // Penalties Missed
-      const penaltiesMissed = document.createElement("td");
-      penaltiesMissed.className = "text-center";
-      penaltiesMissed.innerText = element.total_penalties_missed;
-      tr.appendChild(penaltiesMissed);
-
-      // Red Cards
-      const redCards = document.createElement("td");
-      redCards.className = "text-center";
-      redCards.innerText = element.total_red_cards;
-      tr.appendChild(redCards);
-
-      // Yellow Cards
-      const yellowCards = document.createElement("td");
-      yellowCards.className = "text-center";
-      yellowCards.innerText = element.total_yellow_cards;
-      tr.appendChild(yellowCards);
-
-      // Saves
-      const saves = document.createElement("td");
-      saves.className = "text-center";
-      saves.innerText = element.total_saves;
-      tr.appendChild(saves);
-
-      // Best Week (GW)
-      const bestWeek = document.createElement("td");
-      bestWeek.className = "text-center";
-      bestWeek.innerText = element.bestWeek
-        ? `GW  ${element.bestWeek.event} (${element.bestWeek.points})`
-        : "-";
-      tr.appendChild(bestWeek);
-
-      // Worst Week (GW)
-      const worstWeek = document.createElement("td");
-      worstWeek.className = "text-center";
-      worstWeek.innerText = element.worstWeek
-        ? `GW ${element.worstWeek.event} (${element.worstWeek.points})`
-        : "-";
-      tr.appendChild(worstWeek);
-
-      tbody.appendChild(tr);
-    }
-
-    table.appendChild(tbody);
-    tableWrapper.appendChild(table);
-    container.appendChild(tableWrapper);
-  } catch (error) {
-    console.error("Error building table:", error);
-  }
-}
-
-///////////////////////////Rival Differences Compare START////////////////
-
-async function showRivalDiff() {
-  const app = document.getElementById("screen-tools");
-  app.innerHTML = "";
-  // Add back button (styled with Bootstrap)
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  app.appendChild(backBtn);
-  showBootstrapSpinner(app);
-
-  // Add a header above the table
-  const tableHeader = document.createElement("h6");
-  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Tap Team To Compare`;
-  tableHeader.className = "text-center my-3";
-  app.appendChild(tableHeader);
-
-  const tableWrapper = document.createElement("div");
-  tableWrapper.className = "table-responsive";
-
-  const table = document.createElement("table");
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered",
-    "align-middle",
-    darkMode ? "table-dark" : "table-light"
-  );
-
-  // Create thead
-  const thead = document.createElement("thead");
-
-  const headers = ["Pos", "Team", "GW" + currentGw];
-  headers.forEach((text) => {
-    const th = document.createElement("th");
-    th.innerText = text;
-    thead.appendChild(th);
-  });
-  table.appendChild(thead);
-
-  // Create tbody
-  const tbody = document.createElement("tbody");
-  tbody.id = "league-table";
-  table.appendChild(tbody);
-
-  // Fetch user's team
-  try {
-    const res = await fetch(
-      `${BASE_URL}/entry/${theUser.info.team_id}/event/${currentGw}/picks/`
-    );
-    const data = await res.json();
-    const myTeam = data;
-
-    // Populate table rows
-    FPLToolboxLeagueData.standings.forEach((element) => {
-      const tr = document.createElement("tr");
-      if (element.entry == theUser.info.team_id) {
-        tr.className = "table-primary";
-      }
-
-      // Pos
-      const pos = document.createElement("td");
-      pos.className = "fw-bold";
-      const rankMovement = document.createElement("span");
-      rankMovement.classList.add("ms-1");
-      if (element.rank == element.last_rank) {
-        rankMovement.innerText = "●";
-        rankMovement.classList.add("text-muted");
-      } else if (element.rank < element.last_rank) {
-        rankMovement.innerText = "▲";
-        rankMovement.classList.add("text-success");
-      } else {
-        rankMovement.innerText = "▼";
-        rankMovement.classList.add("text-danger");
-      }
-      pos.innerText = element.rank;
-      pos.appendChild(rankMovement);
-      tr.appendChild(pos);
-
-      // Team name + manager
-      const team = document.createElement("td");
-      team.className = "text-start";
-      const name = document.createElement("div");
-      name.className = "fw-semibold";
-      name.innerText = element.entry_name;
-      const manager = document.createElement("div");
-      manager.className = "text-muted small";
-      manager.innerText = element.player_name.slice(0, 40);
-      team.appendChild(name);
-      team.appendChild(manager);
-      tr.appendChild(team);
-
-      // Score
-      const score = document.createElement("td");
-      score.className = "fw-semibold";
-      score.innerText = element.event_total;
-      tr.appendChild(score);
-
-      // Click listener
-      tr.addEventListener("click", function () {
-        console.log(myTeam, element);
-        getUniquePlayers(myTeam, element);
-      });
-
-      tbody.appendChild(tr);
-    });
-
-    // Append table to wrapper and wrapper to app
-    tableWrapper.appendChild(table);
-    app.appendChild(tableWrapper);
-  } catch (error) {
-    console.error("Error fetching team data:", error);
-    app.innerHTML = `<div class="alert alert-danger">Failed to load team data.</div>`;
-  } finally {
-    removeSpinner();
-  }
-}
-
-async function getUniquePlayers(team1, team2) {
-  const app = document.getElementById("screen-tools");
-  if (document.getElementById("pitches")) {
-    document.getElementById("pitches").remove();
-    document.getElementById("comparison-heading").remove();
-    document.getElementById("comparison-text").remove();
-    document.getElementById("share-button").remove();
-  }
-
-  const comparisonHeadingDiv = document.createElement("div");
-  comparisonHeadingDiv.setAttribute("id", "comparison-heading");
-  app.appendChild(comparisonHeadingDiv);
-
-  const comparisonTextDiv = document.createElement("div");
-  comparisonTextDiv.setAttribute("id", "comparison-text");
-  app.appendChild(comparisonTextDiv);
-
-  const pitches = document.createElement("div");
-  pitches.setAttribute("id", "pitches");
-  app.appendChild(pitches);
-
-  const pitch1 = document.createElement("div");
-  pitch1.setAttribute("id", "pitch1");
-  pitches.appendChild(pitch1);
-
-  const pitch2 = document.createElement("div");
-  pitch2.setAttribute("id", "pitch2");
-  pitches.appendChild(pitch2);
-
-  const gwIdentifier = document.createElement("div");
-  gwIdentifier.setAttribute("id", "gameweek-identifier");
-
-  //Team A
-
-  const myScore = document.createElement("div");
-  myScore.innerHTML = team1.entry_history.points;
-  myScore.setAttribute("id", "my-score");
-  myScore.classList.add("comparison-score");
-
-  myScore.appendChild(gwIdentifier);
-
-  pitch1.appendChild(myScore);
-
-  const keeper = document.createElement("div");
-  keeper.setAttribute("id", "my-keeper");
-  pitch1.appendChild(keeper);
-
-  const defenders = document.createElement("div");
-  defenders.setAttribute("id", "my-defenders");
-  pitch1.appendChild(defenders);
-
-  const midfielders = document.createElement("div");
-  midfielders.setAttribute("id", "my-midfielders");
-  pitch1.appendChild(midfielders);
-
-  const strikers = document.createElement("div");
-  strikers.setAttribute("id", "my-strikers");
-  pitch1.appendChild(strikers);
-
-  const bench = document.createElement("div");
-  bench.setAttribute("id", "my-bench");
-  pitch1.appendChild(bench);
-
-  const team1name = document.createElement("div");
-  team1name.setAttribute("id", "team1name");
-  pitch1.appendChild(team1name);
-
-  //Team B
-
-  const myScore2 = document.createElement("div");
-  myScore2.innerHTML = team2.event_total;
-  myScore2.setAttribute("id", "my-score2");
-  myScore2.classList.add("comparison-score");
-
-  myScore2.appendChild(gwIdentifier);
-
-  pitch2.appendChild(myScore2);
-
-  const keeper2 = document.createElement("div");
-  keeper2.setAttribute("id", "my-keeper2");
-  pitch2.appendChild(keeper2);
-
-  const defenders2 = document.createElement("div");
-  defenders2.setAttribute("id", "my-defenders2");
-  pitch2.appendChild(defenders2);
-
-  const midfielders2 = document.createElement("div");
-  midfielders2.setAttribute("id", "my-midfielders2");
-  pitch2.appendChild(midfielders2);
-
-  const strikers2 = document.createElement("div");
-  strikers2.setAttribute("id", "my-strikers2");
-  pitch2.appendChild(strikers2);
-
-  const bench2 = document.createElement("div");
-  bench2.setAttribute("id", "my-bench2");
-  pitch2.appendChild(bench2);
-
-  const team2name = document.createElement("div");
-  team2name.setAttribute("id", "team2name");
-  pitch2.appendChild(team2name);
-
-  //////
-
-  //console.log(team1)
-  //console.log(team2)
-
-  let t1Array = [];
-  let t2Array = [];
-
-  team1.picks.forEach((pick) => t1Array.push(pick.element));
-  team2.currentWeek[0].picks.forEach((pick) => t2Array.push(pick.element));
-
-  let difference1Text = [];
-  const difference1 = t1Array.filter((element) => !t2Array.includes(element));
-  difference1.forEach((pick) => difference1Text.push(getPlayerWebName(pick)));
-
-  let difference2Text = [];
-  const difference2 = t2Array.filter((element) => !t1Array.includes(element));
-  difference2.forEach((pick) => difference2Text.push(getPlayerWebName(pick)));
-
-  setTimeout(() => {
-    difference1.forEach((id) => {
-      const div = document.getElementById(id);
-      if (div) {
-        div.classList.add("different-players");
-      }
-    });
-    difference2.forEach((id) => {
-      const div = document.getElementById(id);
-      if (div) {
-        div.classList.add("different-players");
-      }
-    });
-  }, "1000");
-
-  const comparisonHeadingText = loggedInTeamName + " v " + team2.entry_name;
-  const h6Div = document.createElement("h6");
-  const h6Content = document.createTextNode(comparisonHeadingText);
-  h6Div.appendChild(h6Content);
-  const currenth6Div = document.getElementById("comparison-heading");
-  currenth6Div.appendChild(h6Div);
-
-  const comparisonText =
-    "These are the players that are going to make a difference for you against " +
-    team2.entry_name +
-    ": " +
-    difference1Text.join(", ");
-  // create a new div element
-  const comparisonDiv = document.createElement("p");
-  // and give it some content
-  const comparisonContent = document.createTextNode(comparisonText);
-  // add the text node to the newly created div
-  comparisonDiv.appendChild(comparisonContent);
-  // add the newly created element and its content into the DOM
-  const currentDiv = document.getElementById("comparison-text");
-  //currentDiv.appendChild(comparisonDiv);
-
-  const comparisonText2 =
-    "The players that might hurt you in this battle are:  " +
-    difference2Text.join(", ") +
-    " Good luck!";
-  // create a new div element
-  const comparisonDiv2 = document.createElement("p");
-  // and give it some content
-  const comparisonContent2 = document.createTextNode(comparisonText2);
-  // add the text node to the newly created div
-  comparisonDiv2.appendChild(comparisonContent2);
-  // add the newly created element and its content into the DOM
-
-  //currentDiv.appendChild(comparisonDiv2);
-
-  const shareData = {
-    title: "Team Comparison",
-    text:
-      "Hey, the players that I've got that you haven't are: " +
-      " \n" +
-      difference1Text.join(", ") +
-      " \n\n" +
-      "The players that you've got that I haven't are: " +
-      difference2Text.join(", ") +
-      "\n\n" +
-      " You can compare your team too by clicking the link",
-    url: "https://fpltoolbox.com/team-comparison",
-  };
-
-  const shareButton = document.createElement("button");
-  shareButton.innerText = "Share";
-  shareButton.setAttribute("id", "share-button");
-  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
-
-  // Share must be triggered by "user activation"
-  shareButton.addEventListener("click", async () => {
-    try {
-      await navigator.share(shareData);
-    } catch (err) {
-      console.log(`Error: ${err}`);
-    }
-  });
-  app.append(shareButton);
-
-  //My Team
-
-  for (var i = 0; i < team1.picks.length; i++) {
-    if (team1.picks[i].position <= 11) {
-      const playerScore = await getPlayerScore(team1.picks[i].element);
-      const card = await createPlayerCardNew(
-        team1.picks[i].element,
-        playerScore,
-        team1.picks[i].is_captain,
-        team1.picks[i].is_vice_captain,
-        team1.picks[i].multiplier
-      );
-
-      const playerType = await getPlayerType(team1.picks[i].element);
-
-      if (playerType == 1) {
-        document.getElementById("my-keeper").appendChild(card);
-      }
-      if (playerType == 2) {
-        document.getElementById("my-defenders").appendChild(card);
-      }
-      if (playerType == 3) {
-        document.getElementById("my-midfielders").appendChild(card);
-      }
-      if (playerType == 4) {
-        document.getElementById("my-strikers").appendChild(card);
-      }
-    }
-
-    //Benched Players
-    if (team1.picks[i].position > 11 && team1.picks[i].position < 16) {
-      const playerScore = await getPlayerScore(team1.picks[i].element);
-      const card = await createPlayerCardNew(
-        team1.picks[i].element,
-        playerScore,
-        false,
-        false,
-        0
-      );
-      document.getElementById("my-bench").appendChild(card);
-    }
-    //Manager
-    if (team1.picks[i].position == 16) {
-      const card = createManagerCard(
-        team1.picks[i].element,
-        getPlayerScore(team1.picks[i].element),
-        false,
-        false,
-        false
-      );
-      card.style.transform = "scale(1.2)";
-      card.style.marginLeft = "20px";
-      document.getElementById("my-strikers").append(card);
-    }
-  }
-
-  document.getElementById("team1name").innerHTML = loggedInTeamName;
-  console.log(t2Array);
-  console.log(team2.currentWeek[0].picks);
-  const testPlayer = await getPlayerWebName(17);
-  console.log(testPlayer);
-  //Their Team
-
-  for (var i = 0; i < team2.currentWeek[0].picks.length; i++) {
-    if (team2.currentWeek[0].picks[i].position <= 11) {
-      const playerScore = await getPlayerScore(
-        team2.currentWeek[0].picks[i].element
-      );
-      const card = await createPlayerCardNew(
-        team2.currentWeek[0].picks[i].element,
-        playerScore,
-        team2.currentWeek[0].picks[i].is_captain,
-        team2.currentWeek[0].picks[i].is_vice_captain,
-        team2.currentWeek[0].picks[i].multiplier
-      );
-
-      const playerType = await getPlayerType(
-        team2.currentWeek[0].picks[i].element
-      );
-      if (playerType == 1) {
-        document.getElementById("my-keeper2").appendChild(card);
-      }
-      if (playerType == 2) {
-        document.getElementById("my-defenders2").appendChild(card);
-      }
-      if (playerType == 3) {
-        document.getElementById("my-midfielders2").appendChild(card);
-      }
-      if (playerType == 4) {
-        document.getElementById("my-strikers2").appendChild(card);
-      }
-    }
-
-    //Benched Players
-    if (
-      team2.currentWeek[0].picks[i].position > 11 &&
-      team2.currentWeek[0].picks[i].position < 16
-    ) {
-      const playerScore = await getPlayerScore(
-        team2.currentWeek[0].picks[i].element
-      );
-      const card = await createPlayerCardNew(
-        team1.picks[i].element,
-        playerScore,
-        team2.currentWeek[0].picks[i].is_captain,
-        team2.currentWeek[0].picks[i].is_vice_captain,
-        team2.currentWeek[0].picks[i].multiplier
-      );
-
-      document.getElementById("my-bench2").appendChild(card);
-    }
-    //Manager
-    if (team2.currentWeek[0].picks[i].position == 16) {
-      const card = await createManagerCard(
-        team2.currentWeek[0].picks[i].element,
-        getPlayerScore(team2.currentWeek[0].picks[i].element),
-        false,
-        false,
-        false
-      );
-      card.style.transform = "scale(1.2)";
-      card.style.marginRight = "20px";
-      document.getElementById("my-strikers2").prepend(card);
-    }
-  }
-
-  document.getElementById("team2name").innerHTML = team2.entry_name;
-  addCaptainBadge();
-  window.location.href = "#comparison-heading";
-}
-//////////////////////////Rival Differences Comapre END //////////////////
-
-//Side Leagues for Pro
-function getLeagueToDisplay(realLeague, dummyLeague, options = {}) {
-  const { accessRoles = [10, 12], showLockedModal = true } = options;
-
-  if (userHasAccess(accessRoles)) {
-    return realLeague;
-  }
-
-  if (showLockedModal) {
-    showModal({
-      title: "Paid Feature",
-      body: dummyLeagueMessage,
-      confirmText: "Ok",
-      onConfirm: () => {},
-    });
-  }
-
-  return dummyLeague;
-}
-
-async function showCaptaincyPointsLeague() {
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  // Add back button (styled with Bootstrap)
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const leagueTable = document.createElement("div");
-  leagueTable.setAttribute("id", "league-table");
-  container.appendChild(leagueTable);
-
-  // Header
-  const tableDescription = document.createElement("h6");
-  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Captaincy Points Leaderboard`;
-  tableDescription.classList.add("text-center", "mb-3");
-  leagueTable.appendChild(tableDescription);
-
-  // Create table with Bootstrap classes
-  const table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered"
-  );
-
-  // Detect dark mode if applicable
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  table.classList.add(darkMode ? "table-dark" : "table-light");
-
-  // Table header
-  const tableHeader = document.createElement("thead");
-  const tableHeaderRow = document.createElement("tr");
-
-  const headers = ["#", "Team Name", "TOT"];
-  headers.forEach((headerText, index) => {
-    const th = document.createElement("th");
-    th.innerText = headerText;
-
-    if (headerText === "TOT") {
-      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
-      th.classList.add("text-end");
-      th.style.cursor = "pointer";
-    }
-
-    tableHeaderRow.appendChild(th);
-  });
-
-  tableHeader.appendChild(tableHeaderRow);
-  table.appendChild(tableHeader);
-
-  const tableBody = document.createElement("tbody");
-
-  leagueToDisplay.standings.forEach((team, index) => {
-    const row = document.createElement("tr");
-
-    const rowNumberCell = document.createElement("td");
-    rowNumberCell.innerText = index + 1;
-    row.appendChild(rowNumberCell);
-
-    const teamNameCell = document.createElement("td");
-    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
-    row.appendChild(teamNameCell);
-
-    const captaincyPointsCell = document.createElement("td");
-    captaincyPointsCell.innerText = team.total_captaincy_points || 0;
-    captaincyPointsCell.classList.add("text-end");
-    row.appendChild(captaincyPointsCell);
-
-    tableBody.appendChild(row);
-  });
-
-  table.appendChild(tableBody);
-  leagueTable.appendChild(table);
-
-  // Sort logic
-  const sortTable = (ascending = false) => {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    rows.sort((rowA, rowB) => {
-      const pointsA = parseFloat(rowA.cells[2].innerText);
-      const pointsB = parseFloat(rowB.cells[2].innerText);
-      return ascending ? pointsA - pointsB : pointsB - pointsA;
-    });
-
-    rows.forEach((row, index) => {
-      row.cells[0].innerText = index + 1;
-      tableBody.appendChild(row);
-    });
-
-    const sortIndicator = document.getElementById("sort-indicator");
-    sortIndicator.innerText = ascending ? "▲" : "▼";
-  };
-
-  // Initial sort
-  sortTable(false);
-
-  // Toggle sort on header click
-  tableHeaderRow.children[2].addEventListener("click", () => {
-    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
-    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
-    sortTable(!isAscending);
-  });
-
-  // Share Button
-  const shareButton = document.createElement("button");
-  shareButton.innerText = "Share League";
-  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
-  shareButton.onclick = shareLeague;
-  leagueTable.appendChild(shareButton);
-
-  function shareLeague() {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    let shareMessage = `${leagueToDisplay.leagueName}\nCaptaincy Points Leaderboard:\n`;
-    rows.forEach((row, index) => {
-      const teamName = row.cells[1].innerText.split("\n")[0];
-      const captaincyPoints = row.cells[2].innerText;
-      shareMessage += `${
-        index + 1
-      }. ${teamName} - Captaincy Points: ${captaincyPoints}\n`;
-    });
-
-    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Share League",
-          text: shareMessage,
-        })
-        .catch((error) => console.log("Error sharing", error));
-    } else {
-      alert("Sharing is not supported in this browser.");
-    }
-  }
-}
-async function showBenchedPointsLeague() {
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  // Add back button (styled with Bootstrap)
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  console.log(leagueToDisplay);
-
-  const leagueTable = document.createElement("div");
-  leagueTable.setAttribute("id", "league-table");
-  container.appendChild(leagueTable);
-
-  // Header
-  const tableDescription = document.createElement("h6");
-  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Benched Points Leaderboard`;
-  tableDescription.classList.add("text-center", "mb-3");
-  leagueTable.appendChild(tableDescription);
-
-  // Create table with Bootstrap classes
-  const table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered"
-  );
-
-  // Detect dark mode if applicable
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  table.classList.add(darkMode ? "table-dark" : "table-light");
-
-  // Table header
-  const tableHeader = document.createElement("thead");
-  const tableHeaderRow = document.createElement("tr");
-
-  const headers = ["#", "Team Name", "TOT"];
-  headers.forEach((headerText, index) => {
-    const th = document.createElement("th");
-    th.innerText = headerText;
-
-    if (headerText === "TOT") {
-      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
-      th.classList.add("text-end");
-      th.style.cursor = "pointer";
-    }
-
-    tableHeaderRow.appendChild(th);
-  });
-
-  tableHeader.appendChild(tableHeaderRow);
-  table.appendChild(tableHeader);
-
-  const tableBody = document.createElement("tbody");
-
-  leagueToDisplay.standings.forEach((team, index) => {
-    const row = document.createElement("tr");
-
-    const rowNumberCell = document.createElement("td");
-    rowNumberCell.innerText = index + 1;
-    row.appendChild(rowNumberCell);
-
-    const teamNameCell = document.createElement("td");
-    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
-    row.appendChild(teamNameCell);
-
-    const benchedPointsCell = document.createElement("td");
-    benchedPointsCell.innerText = team.totalPointsOnBench || 0;
-    benchedPointsCell.classList.add("text-end");
-    row.appendChild(benchedPointsCell);
-
-    tableBody.appendChild(row);
-  });
-
-  table.appendChild(tableBody);
-  leagueTable.appendChild(table);
-
-  // Sort logic
-  const sortTable = (ascending = false) => {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    rows.sort((rowA, rowB) => {
-      const pointsA = parseFloat(rowA.cells[2].innerText);
-      const pointsB = parseFloat(rowB.cells[2].innerText);
-      return ascending ? pointsA - pointsB : pointsB - pointsA;
-    });
-
-    rows.forEach((row, index) => {
-      row.cells[0].innerText = index + 1;
-      tableBody.appendChild(row);
-    });
-
-    const sortIndicator = document.getElementById("sort-indicator");
-    sortIndicator.innerText = ascending ? "▲" : "▼";
-  };
-
-  // Initial sort
-  sortTable(false);
-
-  // Toggle sort on header click
-  tableHeaderRow.children[2].addEventListener("click", () => {
-    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
-    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
-    sortTable(!isAscending);
-  });
-
-  // Share Button
-  let shareButton = document.createElement("button");
-  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
-  shareButton.innerText = "Share League";
-
-  shareButton.onclick = shareLeague;
-  container.appendChild(shareButton);
-  function shareLeague() {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    let shareMessage = `${leagueToDisplay.leagueName}\nBenched Points Leaderboard:\n`;
-    rows.forEach((row, index) => {
-      const teamName = row.cells[1].innerText.split("\n")[0];
-      const benchedPoints = row.cells[2].innerText;
-      shareMessage += `${
-        index + 1
-      }. ${teamName} - Benched Points: ${benchedPoints}\n`;
-    });
-
-    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Share League",
-          text: shareMessage,
-        })
-        .catch((error) => console.log("Error sharing", error));
-    } else {
-      alert("Sharing is not supported in this browser.");
-    }
-  }
-}
-async function showCardsLeague() {
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const leagueTable = document.createElement("div");
-  leagueTable.setAttribute("id", "league-table");
-  container.appendChild(leagueTable);
-
-  const tableDescription = document.createElement("h6");
-  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Total Cards Leaderboard`;
-  tableDescription.classList.add("text-center", "mb-3");
-  leagueTable.appendChild(tableDescription);
-
-  const table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered"
-  );
-
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  table.classList.add(darkMode ? "table-dark" : "table-light");
-
-  // Table Header
-  const tableHeader = document.createElement("thead");
-  const tableHeaderRow = document.createElement("tr");
-
-  const headers = ["#", "Team Name", "Total"];
-  headers.forEach((text, i) => {
-    const th = document.createElement("th");
-
-    if (text === "Total") {
-      th.innerHTML = `Total <span id="sort-indicator">▼</span>`;
-      th.classList.add("text-end");
-      th.style.cursor = "pointer";
-    }
-
-    tableHeaderRow.appendChild(th);
-  });
-
-  tableHeader.appendChild(tableHeaderRow);
-  table.appendChild(tableHeader);
-
-  const tableBody = document.createElement("tbody");
-
-  leagueToDisplay.standings.forEach((team, index) => {
-    const row = document.createElement("tr");
-
-    const rowNum = document.createElement("td");
-    rowNum.innerText = index + 1;
-    row.appendChild(rowNum);
-
-    const teamName = document.createElement("td");
-    teamName.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
-    row.appendChild(teamName);
-
-    const total = document.createElement("td");
-    total.innerText = team.total_cards || 0;
-    total.classList.add("text-end");
-    row.appendChild(total);
-
-    tableBody.appendChild(row);
-  });
-
-  table.appendChild(tableBody);
-  leagueTable.appendChild(table);
-
-  // Sort Logic (by Total Cards)
-  const sortTable = (ascending = false) => {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    rows.sort((a, b) => {
-      const valA = parseFloat(a.cells[2].innerText) || 0;
-      const valB = parseFloat(b.cells[2].innerText) || 0;
-      return ascending ? valA - valB : valB - valA;
-    });
-
-    rows.forEach((row, i) => {
-      row.cells[0].innerText = i + 1;
-      tableBody.appendChild(row);
-    });
-
-    document.getElementById("sort-indicator").innerText = ascending ? "▲" : "▼";
-  };
-
-  sortTable(false);
-
-  tableHeaderRow.children[2].addEventListener("click", () => {
-    const current = tableHeaderRow.children[2].dataset.sorted === "asc";
-    tableHeaderRow.children[2].dataset.sorted = current ? "desc" : "asc";
-    sortTable(!current);
-  });
-
-  // Share Button
-  const shareButton = document.createElement("button");
-  shareButton.innerText = "Share League";
-  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
-  shareButton.onclick = shareLeague;
-  leagueTable.appendChild(shareButton);
-
-  function shareLeague() {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    let shareText = `${leagueToDisplay.leagueName}\nTotal Cards Leaderboard:\n`;
-
-    rows.forEach((row, i) => {
-      const name = row.cells[1].innerText.split("\n")[0];
-      const total = row.cells[2].innerText;
-      shareText += `${i + 1}. ${name} - Cards: ${total}\n`;
-    });
-
-    shareText += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Share League",
-          text: shareText,
-        })
-        .catch((err) => console.log("Share failed", err));
-    } else {
-      alert("Sharing is not supported in this browser.");
-    }
-  }
-}
-async function showGoldenbootLeague() {
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const leagueTable = document.createElement("div");
-  leagueTable.setAttribute("id", "league-table");
-  container.appendChild(leagueTable);
-
-  const tableDescription = document.createElement("h6");
-  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Golden Boot Leaderboard`;
-  tableDescription.classList.add("text-center", "mb-3");
-  leagueTable.appendChild(tableDescription);
-
-  const table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered"
-  );
-
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  table.classList.add(darkMode ? "table-dark" : "table-light");
-
-  const tableHeader = document.createElement("thead");
-  const tableHeaderRow = document.createElement("tr");
-
-  const headers = ["#", "Team Name", "TOT"];
-  headers.forEach((headerText) => {
-    const th = document.createElement("th");
-    if (headerText === "TOT") {
-      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
-      th.classList.add("text-end");
-      th.style.cursor = "pointer";
-    } else {
-      th.innerText = headerText;
-    }
-    tableHeaderRow.appendChild(th);
-  });
-
-  tableHeader.appendChild(tableHeaderRow);
-  table.appendChild(tableHeader);
-
-  const tableBody = document.createElement("tbody");
-
-  leagueToDisplay.standings.forEach((team, index) => {
-    const row = document.createElement("tr");
-
-    const rowNumberCell = document.createElement("td");
-    rowNumberCell.innerText = index + 1;
-    row.appendChild(rowNumberCell);
-
-    const teamNameCell = document.createElement("td");
-    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
-    row.appendChild(teamNameCell);
-
-    const goalsCell = document.createElement("td");
-    goalsCell.innerText = team.total_goals_scored || 0;
-    goalsCell.classList.add("text-end");
-    row.appendChild(goalsCell);
-
-    tableBody.appendChild(row);
-  });
-
-  table.appendChild(tableBody);
-  leagueTable.appendChild(table);
-
-  const sortTable = (ascending = false) => {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    rows.sort((rowA, rowB) => {
-      const goalsA = parseFloat(rowA.cells[2].innerText);
-      const goalsB = parseFloat(rowB.cells[2].innerText);
-      return ascending ? goalsA - goalsB : goalsB - goalsA;
-    });
-
-    rows.forEach((row, index) => {
-      row.cells[0].innerText = index + 1;
-      tableBody.appendChild(row);
-    });
-
-    const sortIndicator = document.getElementById("sort-indicator");
-    sortIndicator.innerText = ascending ? "▲" : "▼";
-  };
-
-  sortTable(false);
-
-  tableHeaderRow.children[2].addEventListener("click", () => {
-    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
-    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
-    sortTable(!isAscending);
-  });
-
-  const shareButton = document.createElement("button");
-  shareButton.innerText = "Share League";
-  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
-  shareButton.onclick = shareLeague;
-  leagueTable.appendChild(shareButton);
-
-  function shareLeague() {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    let shareMessage = `${leagueToDisplay.leagueName}\nGolden Boot Leaderboard:\n`;
-
-    rows.forEach((row, index) => {
-      const teamName = row.cells[1].innerText.split("\n")[0];
-      const goals = row.cells[2].innerText;
-      shareMessage += `${index + 1}. ${teamName} - Goals: ${goals}\n`;
-    });
-
-    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Share League",
-          text: shareMessage,
-        })
-        .catch((error) => console.log("Error sharing", error));
-    } else {
-      alert("Sharing is not supported in this browser.");
-    }
-  }
-}
-
-async function showPensMissedLeague() {
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const leagueTable = document.createElement("div");
-  leagueTable.setAttribute("id", "league-table");
-  container.appendChild(leagueTable);
-
-  const tableDescription = document.createElement("h6");
-  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Penalities Missed Leaderboard`;
-  tableDescription.classList.add("text-center", "mb-3");
-  leagueTable.appendChild(tableDescription);
-
-  const table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered"
-  );
-
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  table.classList.add(darkMode ? "table-dark" : "table-light");
-
-  const tableHeader = document.createElement("thead");
-  const tableHeaderRow = document.createElement("tr");
-
-  const headers = ["#", "Team Name", "TOT"];
-  headers.forEach((headerText) => {
-    const th = document.createElement("th");
-    if (headerText === "TOT") {
-      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
-      th.classList.add("text-end");
-      th.style.cursor = "pointer";
-    } else {
-      th.innerText = headerText;
-    }
-    tableHeaderRow.appendChild(th);
-  });
-
-  tableHeader.appendChild(tableHeaderRow);
-  table.appendChild(tableHeader);
-
-  const tableBody = document.createElement("tbody");
-
-  leagueToDisplay.standings.forEach((team, index) => {
-    const row = document.createElement("tr");
-
-    const rowNumberCell = document.createElement("td");
-    rowNumberCell.innerText = index + 1;
-    row.appendChild(rowNumberCell);
-
-    const teamNameCell = document.createElement("td");
-    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
-    row.appendChild(teamNameCell);
-
-    const goalsCell = document.createElement("td");
-    goalsCell.innerText = team.total_penalties_missed || 0;
-    goalsCell.classList.add("text-end");
-    row.appendChild(goalsCell);
-
-    tableBody.appendChild(row);
-  });
-
-  table.appendChild(tableBody);
-  leagueTable.appendChild(table);
-
-  const sortTable = (ascending = false) => {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    rows.sort((rowA, rowB) => {
-      const goalsA = parseFloat(rowA.cells[2].innerText);
-      const goalsB = parseFloat(rowB.cells[2].innerText);
-      return ascending ? goalsA - goalsB : goalsB - goalsA;
-    });
-
-    rows.forEach((row, index) => {
-      row.cells[0].innerText = index + 1;
-      tableBody.appendChild(row);
-    });
-
-    const sortIndicator = document.getElementById("sort-indicator");
-    sortIndicator.innerText = ascending ? "▲" : "▼";
-  };
-
-  sortTable(false);
-
-  tableHeaderRow.children[2].addEventListener("click", () => {
-    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
-    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
-    sortTable(!isAscending);
-  });
-
-  const shareButton = document.createElement("button");
-  shareButton.innerText = "Share League";
-  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
-  shareButton.onclick = shareLeague;
-  leagueTable.appendChild(shareButton);
-
-  function shareLeague() {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    let shareMessage = `${leagueToDisplay.leagueName}\nGolden Boot Leaderboard:\n`;
-
-    rows.forEach((row, index) => {
-      const teamName = row.cells[1].innerText.split("\n")[0];
-      const goals = row.cells[2].innerText;
-      shareMessage += `${index + 1}. ${teamName} - Goals: ${goals}\n`;
-    });
-
-    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Share League",
-          text: shareMessage,
-        })
-        .catch((error) => console.log("Error sharing", error));
-    } else {
-      alert("Sharing is not supported in this browser.");
-    }
-  }
-}
-
-async function showChipUsage() {
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const tableHeader = document.createElement("h6");
-  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Chip Usage`;
-  tableHeader.style.textAlign = "center";
-  container.appendChild(tableHeader);
-
-  const table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-bordered",
-    "table-hover",
-    "table-striped"
-  );
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  table.classList.add(darkMode ? "table-dark" : "table-light");
-
-  const thead = document.createElement("thead");
-  const headRow = document.createElement("tr");
-
-  const chipOrder = [
-    "wildcard1",
-    "bboost",
-    "3xc",
-    "wildcard2",
-    "freehit",
-    "manager",
-  ];
-  const chipMap = {
-    wildcard1: "Wildcard 1",
-    wildcard2: "Wildcard 2",
-    bboost: "Bench Boost",
-    "3xc": "Triple Captain",
-    freehit: "Free Hit",
-    manager: "Assistant",
-  };
-
-  ["#", "Team", ...chipOrder.map((c) => chipMap[c])].forEach((header) => {
-    const th = document.createElement("th");
-    th.innerText = header;
-    th.style.whiteSpace = "nowrap";
-    headRow.appendChild(th);
-  });
-
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-
-  FPLToolboxLeagueData.standings.forEach((element, index) => {
-    const tr = document.createElement("tr");
-
-    const numCell = document.createElement("td");
-    numCell.innerText = index + 1;
-    tr.appendChild(numCell);
-
-    const nameCell = document.createElement("td");
-    nameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
-    tr.appendChild(nameCell);
-
-    const wildcards = element.chips.filter((c) => c.name === "wildcard");
-
-    chipOrder.forEach((chipType) => {
-      let chipData = null;
-
-      if (chipType === "wildcard1") {
-        chipData = wildcards[0];
-      } else if (chipType === "wildcard2") {
-        chipData = wildcards[1];
-      } else {
-        chipData = element.chips.find((c) => c.name === chipType);
-      }
-
-      const td = document.createElement("td");
-      td.style.textAlign = "center";
-      td.style.whiteSpace = "nowrap";
-
-      const img = document.createElement("img");
-      img.src = `https://fpltoolbox.com/wp-content/uploads/2025/03/${chipType.replace(
-        /[12]/,
-        ""
-      )}.webp`;
-      img.style.maxWidth = "30px";
-      img.style.opacity = chipData ? "1" : "0.3";
-
-      const info = document.createElement("div");
-      info.style.fontSize = "0.75rem";
-      info.innerText = chipData ? `GW${chipData.gw}` : "—";
-
-      td.appendChild(img);
-      td.appendChild(info);
-      tr.appendChild(td);
-    });
-
-    tbody.appendChild(tr);
-  });
-
-  table.appendChild(tbody);
-
-  const tableWrapper = document.createElement("div");
-  tableWrapper.className = "table-responsive";
-  tableWrapper.appendChild(table);
-  container.appendChild(tableWrapper);
-}
-async function showTransferCalculator() {
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const tableHeader = document.createElement("h6");
-  tableHeader.innerText = `${leagueToDisplay.leagueName} \n Free Transfers Available Next Week`;
-  tableHeader.style.textAlign = "center";
-  container.appendChild(tableHeader);
-
-  const tableWrapper = document.createElement("div");
-  tableWrapper.className = "table-responsive";
-  container.appendChild(tableWrapper);
-
-  const table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-bordered",
-    "table-hover",
-    "table-striped"
-  );
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  table.classList.add(darkMode ? "table-dark" : "table-light");
-  tableWrapper.appendChild(table);
-
-  const thead = document.createElement("thead");
-  const headRow = document.createElement("tr");
-
-  ["Pos", "Team", "Available Transfers"].forEach((header) => {
-    const th = document.createElement("th");
-    th.innerText = header;
-    th.style.whiteSpace = "nowrap";
-    th.style.textAlign = header === "Transfers" ? "right" : "left";
-    headRow.appendChild(th);
-  });
-
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-  table.appendChild(tbody);
-
-  try {
-    // Calculate available transfers
-    leagueToDisplay.standings.forEach((team) => {
-      team.availableTransfers = calculateAvailableTransfers(team);
-    });
-
-    // Sort standings
-    const sortedLeague = [...leagueToDisplay.standings].sort(
-      (a, b) => b.availableTransfers - a.availableTransfers
-    );
-
-    // Render rows
-    sortedLeague.forEach((team, index) => {
-      const tr = document.createElement("tr");
-
-      const posTd = document.createElement("td");
-      posTd.innerText = index + 1;
-      tr.appendChild(posTd);
-
-      const teamTd = document.createElement("td");
-      teamTd.innerHTML = `<strong>${
-        team.entry_name
-      }</strong><br><small>${team.player_name.slice(0, 40)}</small>`;
-      tr.appendChild(teamTd);
-
-      const transfersTd = document.createElement("td");
-      transfersTd.innerText = team.availableTransfers;
-      transfersTd.style.textAlign = "right";
-      tr.appendChild(transfersTd);
-
-      tbody.appendChild(tr);
-    });
-
-    // Share Button
-    const shareButton = document.createElement("button");
-    shareButton.innerText = "Share League";
-    shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
-    shareButton.onclick = () => shareTopTen(sortedLeague);
-    container.appendChild(shareButton);
-  } catch (error) {
-    console.error("Error in transferCalculator:", error);
-  }
-
-  // Helper: Calculate Available Transfers
-  function calculateAvailableTransfers(team) {
-    let freeTransfers = 1;
-    const maxTransfers = 5;
-    const transfersByGW = {};
-
-    team.transfers[0]?.forEach((transfer) => {
-      if (!transfersByGW[transfer.event]) {
-        transfersByGW[transfer.event] = [];
-      }
-      transfersByGW[transfer.event].push(transfer);
-    });
-
-    for (let gw = 2; gw <= currentGw; gw++) {
-      freeTransfers = Math.min(freeTransfers + 1, maxTransfers);
-
-      const chipUsed = team.chips.find(
-        (chip) =>
-          (chip.name === "wildcard" || chip.name === "freehit") &&
-          chip.gw === gw
-      );
-      if (chipUsed) continue;
-
-      const transfersMade = transfersByGW[gw]?.length || 0;
-      freeTransfers -= transfersMade;
-      freeTransfers = Math.max(freeTransfers, 1);
-    }
-
-    return freeTransfers;
-  }
-
-  // Helper: Share top 10 teams
-  function shareTopTen(league) {
-    const topTen = league.slice(0, 10);
-    let shareMessage = `${FPLToolboxLeagueData.leagueName}\nAvailable Transfers:\n`;
-
-    topTen.forEach((team, index) => {
-      shareMessage += `${index + 1}. ${
-        team.entry_name
-      }\n (${team.player_name.slice(0, 10)}) - Available Transfers: ${
-        team.availableTransfers
-      }\n`;
-    });
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Share League",
-          text:
-            shareMessage +
-            `\nCheck your own league here:\nhttps://fpltoolbox.com/fpl-toolbox-pro/`,
-        })
-        .catch((error) => console.log("Error sharing", error));
-    } else {
-      alert("Sharing is not supported in this browser.");
-    }
-  }
-}
-async function showTeamValueLeague() {
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const leagueTable = document.createElement("div");
-  leagueTable.setAttribute("id", "league-table");
-  container.appendChild(leagueTable);
-
-  const tableDescription = document.createElement("h6");
-  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Team Value Leaderboard`;
-  tableDescription.classList.add("text-center", "mb-3");
-  leagueTable.appendChild(tableDescription);
-
-  const table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered"
-  );
-
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  table.classList.add(darkMode ? "table-dark" : "table-light");
-
-  const tableHeader = document.createElement("thead");
-  const tableHeaderRow = document.createElement("tr");
-
-  const headers = ["#", "Team Name", "Team Value (£m)"];
-  headers.forEach((headerText, i) => {
-    const th = document.createElement("th");
-
-    if (i === 2) {
-      th.innerHTML = `Team Value <span id="sort-indicator">▼</span>`;
-      th.classList.add("text-end");
-      th.style.cursor = "pointer";
-    } else {
-      th.innerText = headerText;
-    }
-
-    tableHeaderRow.appendChild(th);
-  });
-
-  tableHeader.appendChild(tableHeaderRow);
-  table.appendChild(tableHeader);
-
-  const tableBody = document.createElement("tbody");
-
-  leagueToDisplay.standings.forEach((team, index) => {
-    const row = document.createElement("tr");
-
-    const rowNumberCell = document.createElement("td");
-    rowNumberCell.innerText = index + 1;
-    row.appendChild(rowNumberCell);
-
-    const teamNameCell = document.createElement("td");
-    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
-    row.appendChild(teamNameCell);
-
-    const latestGw = team.everyGw?.[team.everyGw.length - 1];
-    const rawValue = latestGw?.value || 0;
-    const valueInMillions = (rawValue / 10).toFixed(1);
-
-    const valueCell = document.createElement("td");
-    valueCell.innerText = valueInMillions;
-    valueCell.classList.add("text-end");
-    row.appendChild(valueCell);
-
-    tableBody.appendChild(row);
-  });
-
-  table.appendChild(tableBody);
-  leagueTable.appendChild(table);
-
-  const sortTable = (ascending = false) => {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    rows.sort((rowA, rowB) => {
-      const valA = parseFloat(rowA.cells[2].innerText);
-      const valB = parseFloat(rowB.cells[2].innerText);
-      return ascending ? valA - valB : valB - valA;
-    });
-
-    rows.forEach((row, index) => {
-      row.cells[0].innerText = index + 1;
-      tableBody.appendChild(row);
-    });
-
-    const sortIndicator = document.getElementById("sort-indicator");
-    sortIndicator.innerText = ascending ? "▲" : "▼";
-  };
-
-  sortTable(false);
-
-  tableHeaderRow.children[2].addEventListener("click", () => {
-    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
-    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
-    sortTable(!isAscending);
-  });
-
-  const shareButton = document.createElement("button");
-  shareButton.innerText = "Share League";
-  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
-  shareButton.onclick = shareLeague;
-  leagueTable.appendChild(shareButton);
-
-  function shareLeague() {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    let shareMessage = `${leagueToDisplay.leagueName}\nTeam Value Leaderboard:\n`;
-
-    rows.forEach((row, index) => {
-      const teamName = row.cells[1].innerText.split("\n")[0];
-      const value = row.cells[2].innerText;
-      shareMessage += `${index + 1}. ${teamName} - £${value}m\n`;
-    });
-
-    shareMessage += `\nView your own league here:\nhttps://fpltoolbox.com/fpl-toolbox-pro`;
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Share League",
-          text: shareMessage,
-        })
-        .catch((error) => console.log("Error sharing", error));
-    } else {
-      alert("Sharing is not supported in this browser.");
-    }
-  }
-}
-async function showMySeasonSummary() {
-  if (userHasAccess([1, 10, 12])) {
-    showModal({
-      title: "Coming Soon",
-      body: "Come back in a few weeks - we don't have enough info to yet to give you anything useful!",
-      confirmText: "Ok",
-      onConfirm: () => {}, // No action taken
-    });
-    return;
-  }
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-}
-async function downloadMySeason() {
-  if (userHasAccess([1, 10, 12])) {
-    showModal({
-      title: "Come back later!",
-      body: "Once the season is over, come back and download a season momento!",
-      confirmText: "Ok",
-      onConfirm: () => {}, // No action taken
-    });
-    return;
-  }
-  if (!userHasAccess([10, 12])) {
-    showModal({
-      title: "Paid Feature",
-      body: "This feature is only available to <strong>paid members</strong>.<br><br>Upgrade to unlock!",
-      confirmText: "Upgrade Now",
-      onConfirm: () => {
-        window.location.href = subscriptionPageUrl;
-      },
-    });
-    return;
-  }
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-  container.classList.add("container", "py-4");
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const startTime = new Date();
-  console.log(
-    `[${startTime.toLocaleTimeString()}] Starting fetchinig gameweek seasons`
-  );
-
-  const eventStatus = await getEventStatus();
-
-  const ignoredUrls = [
-    "https://fpltoolbox.com/tools-for-fpl-content/",
-    "http://127.0.0.1:5500/index.html",
-  ];
-
-  const currentUrl = window.location.href;
-
-  if (eventStatus.status[0].event != 38) {
-    container.innerHTML = "";
-    const loaderCard = document.createElement("div");
-    const loaderContainer = document.createElement("div");
-    loaderContainer.id = "loader-container";
-    loaderCard.id = "loader-card";
-    loaderCard.textContent = `Come back when the season is over to download all of your gameweeks with one click`;
-    loaderCard.className = "skeleton";
-    loaderContainer.appendChild(loaderCard);
-    container.append(loaderContainer);
-    return;
-  }
-
-  // Spinner setup
-  const spinnerWrapper = document.createElement("div");
-  spinnerWrapper.id = "loading-spinner";
-  spinnerWrapper.className = "d-flex justify-content-center my-5";
-
-  const spinner = document.createElement("div");
-  spinner.className = "spinner-border text-primary";
-  spinner.role = "status";
-
-  const spinnerText = document.createElement("span");
-  spinnerText.className = "visually-hidden";
-  spinnerText.innerText = "Loading...";
-
-  spinner.appendChild(spinnerText);
-  spinnerWrapper.appendChild(spinner);
-  container.appendChild(spinnerWrapper);
-
-  // Container placeholders
-  const season = document.createElement("div");
-  season.id = "season-view";
-  const firstHalf = document.createElement("div");
-  firstHalf.className = "col-lg-6";
-  const secondHalf = document.createElement("div");
-  secondHalf.className = "col-lg-6";
-
-  const nameHeader = document.createElement("h3");
-  nameHeader.className = "text-center fw-bold mb-0";
-  nameHeader.innerText =
-    theUser.info.player_first_name + " " + theUser.info.player_last_name;
-
-  const seasonDiv = document.createElement("div");
-  seasonDiv.className =
-    "badge bg-dark text-white mx-auto d-block my-2 px-3 py-2";
-  seasonDiv.innerText = "Your 24/25 Season";
-
-  let previousRank = undefined;
-
-  try {
-    const currentGw = eventStatus.status[0].event;
-
-    for (
-      let gameweekIdentifier = 1;
-      gameweekIdentifier <= currentGw;
-      gameweekIdentifier++
-    ) {
-      const response = await fetch(
-        `${BASE_URL}/entry/${theUser.info.team_id}/event/${gameweekIdentifier}/picks/`
-      );
-      const data = await response.json();
-
-      const gameweekView = document.createElement("div");
-      gameweekView.id = `gameweek-view-${gameweekIdentifier}`;
-
-      const gwSummary = document.createElement("div");
-      gwSummary.className = "text-center p-2";
-
-      let rankArrowBadge = document.createElement("img");
-      rankArrowBadge.style.width = "20px";
-      rankArrowBadge.style.height = "20px";
-
-      if (previousRank !== undefined) {
-        const currentRank = data.entry_history.overall_rank;
-        rankArrowBadge = document.createElement("img");
-        rankArrowBadge.id = "download-season-rank";
-        rankArrowBadge.style.width = "20px";
-        rankArrowBadge.style.height = "20px";
-
-        if (currentRank < previousRank) {
-          rankArrowBadge.src =
-            "https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png";
-        } else if (currentRank > previousRank) {
-          rankArrowBadge.src =
-            "https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png";
-          rankArrowBadge.style.transform = "rotate(180deg)";
-        }
-      }
-
-      previousRank = data.entry_history.overall_rank;
-
-      const summaryText = document.createElement("p");
-      summaryText.className = "mb-1 fw-semibold";
-      summaryText.innerText = `GW: ${gameweekIdentifier} | Points: ${data.entry_history.points} | Total: ${data.entry_history.total_points}`;
-      gwSummary.append(rankArrowBadge, summaryText);
-
-      if (data.active_chip) {
-        const chipTag = document.createElement("div");
-        chipTag.className = "small text-success mb-1";
-        chipTag.innerText = `${convertChipName(data.active_chip)} activated`;
-        gwSummary.append(chipTag);
-      }
-
-      const rankText = document.createElement("div");
-      rankText.className = "text-muted";
-      rankText.innerText = `Overall Rank: ${data.entry_history.overall_rank.toLocaleString(
-        "en"
-      )}`;
-      gwSummary.append(rankText);
-
-      gameweekView.appendChild(gwSummary);
-
-      const playersContainer = document.createElement("div");
-      playersContainer.className =
-        "d-flex flex-wrap justify-content-center gap-2 mb-2";
-
-      const benchContainer = document.createElement("div");
-      benchContainer.className =
-        "d-flex flex-wrap justify-content-center gap-2 p-2 bg-secondary bg-opacity-10 rounded";
-
-      for (const pick of data.picks) {
-        if (pick.position > 16) continue;
-
-        let pointsMultiplier = pick.multiplier || 1;
-        const playerScore =
-          (await getPlayerWeeklyScore(pick.element, gameweekIdentifier)) *
-          pointsMultiplier;
-
-        const card = await createPlayerCardNew(
-          pick.element,
-          playerScore,
-          pick.is_captain,
-          pick.is_vice_captain,
-          pointsMultiplier
-        );
-
-        const img = card.querySelector("img");
-        if (img) {
-          img.style.maxWidth = "100%";
-          img.style.height = "auto";
-        }
-
-        const col = document.createElement("div");
-        col.className = "col-4 col-sm-3 col-md-2 mb-2";
-        col.style.flex = "0 0 9.09%";
-        col.style.maxWidth = "9.09%";
-        card.style.maxWidth = "30px";
-        card.style.maxHeight = "30px";
-
-        col.appendChild(card);
-
-        if (pick.position > 11) {
-          benchContainer.appendChild(col);
-        } else {
-          playersContainer.appendChild(col);
-        }
-      }
-
-      gameweekView.appendChild(playersContainer);
-      gameweekView.appendChild(benchContainer);
-
-      const toolboxCom = document.createElement("p");
-      toolboxCom.innerText = "24/25 Season - fpltoolbox.com";
-      toolboxCom.className = "text-center small text-muted";
-      gameweekView.appendChild(toolboxCom);
-
-      const gameweekCard = document.createElement("div");
-      gameweekCard.className = "card mb-4 shadow-sm bg-light p-3";
-      gameweekCard.appendChild(gameweekView);
-
-      if (gameweekIdentifier <= 19) {
-        firstHalf.appendChild(gameweekCard);
-      } else {
-        secondHalf.appendChild(gameweekCard);
-      }
-    }
-
-    // Done loading
-    document.getElementById("loading-spinner")?.remove();
-
-    container.appendChild(nameHeader);
-    container.appendChild(seasonDiv);
-
-    const halvesWrapper = document.createElement("div");
-    halvesWrapper.className = "row";
-    halvesWrapper.appendChild(firstHalf);
-    halvesWrapper.appendChild(secondHalf);
-    season.appendChild(halvesWrapper);
-    container.appendChild(season);
-
-    const endTime = new Date();
-    console.log(
-      `[${endTime.toLocaleTimeString()}] Finished fetching gameweek seasons`
-    );
-
-    addCaptainBadge();
-
-    const shareBtn = document.createElement("button");
-    shareBtn.id = "shareBtn";
-    shareBtn.className = "btn btn-primary mt-4";
-    shareBtn.textContent = "Download";
-    container.appendChild(shareBtn);
-
-    shareBtn.addEventListener("click", () => {
-      document.body.classList.add("force-desktop");
-
-      html2canvas(season, { scale: 2 }).then((canvas) => {
-        document.body.classList.remove("force-desktop");
-        const imgData = canvas.toDataURL("image/png");
-
-        if (navigator.share) {
-          fetch(imgData)
-            .then((res) => res.blob())
-            .then((blob) => {
-              const file = new File([blob], "fpltoolbox-my-season.png", {
-                type: "image/png",
-              });
-              navigator
-                .share({
-                  title: "Your Season",
-                  text: "FPLTOOLBOX.com",
-                  files: [file],
-                })
-                .catch((err) => alert("Error sharing: " + err));
-            });
-        } else {
-          const link = document.createElement("a");
-          link.href = imgData;
-          link.download = "season.png";
-          link.click();
-          alert(
-            "Sharing is not supported on your device. Image downloaded instead."
-          );
-        }
-      });
-    });
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-}
-
-// Simple cache object
-const weeklyPlayerDataCache = {};
-async function getPlayerWeeklyScore(playerId, gameweek) {
-  // Check if this player's data is already cached
-  if (weeklyPlayerDataCache[playerId]) {
-    const cachedData = weeklyPlayerDataCache[playerId];
-
-    const matchingHistories = cachedData.history.filter(
-      (entry) => entry.round === gameweek
-    );
-
-    if (matchingHistories.length > 0) {
-      return matchingHistories.reduce(
-        (sum, entry) => sum + (entry.total_points || 0),
-        0
-      );
-    } else {
-      console.warn(`No match found for player ${playerId} in GW ${gameweek}`);
-      return null;
-    }
-  }
-
-  const url = `${BASE_URL}/element-summary/${playerId}/`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!data.history || !Array.isArray(data.history)) {
-      console.warn(`Unexpected data format from ${url}`, data);
-      return null;
-    }
-
-    // Cache the full data for future use
-    weeklyPlayerDataCache[playerId] = data;
-
-    const matchingHistories = data.history.filter(
-      (entry) => entry.round === gameweek
-    );
-
-    if (matchingHistories.length > 0) {
-      return matchingHistories.reduce(
-        (sum, entry) => sum + (entry.total_points || 0),
-        0
-      );
-    } else {
-      console.warn(`No match found for player ${playerId} in GW ${gameweek}`);
-      return null;
-    }
-  } catch (error) {
-    console.error(`Error fetching ${url}:`, error);
-    return null;
-  }
-}
-
-async function showMemes() {
-  if (!userHasAccess([1, 10, 12])) {
-    showModal({
-      title: "Coming Soon",
-      body: "Come back in a few weeks - we don't have enough info to yet to give you anything useful!",
-      confirmText: "Ok",
-      onConfirm: () => {}, // No action taken
-    });
-    return;
-  }
-
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  // Add a header above the table
-  const tableDescription = document.createElement("h6");
-  tableDescription.innerText = `${FPLToolboxLeagueData.leagueName} - Gameweek ${currentGw} Memes \n Tap a meme to share`;
-  tableDescription.style.textAlign = "center";
-  container.appendChild(tableDescription);
-
-  const memeContainer = document.createElement("div");
-  memeContainer.id = "meme-container";
-  // Create and append the loading indicator
-  const memeLoaderContainer = document.createElement("div");
-  memeLoaderContainer.id = "meme-loader-container";
-
-  // List of URLs where you want to ignore the condition
-  const ignoredUrls = [
-    "https://fpltoolbox.com/tools-for-fpl-content/", // Example full URL
-    "http://127.0.0.1:5500/index.html",
-  ];
-
-  const currentUrl = window.location.href; // Get the full URL
-  const eventStatus = await getEventStatus();
-  console.log(eventStatus);
-  if (
-    currentGw !== 34 && // Ignore this whole check if we're in Gameweek 34
-    !ignoredUrls.includes(currentUrl) && // Check if the full URL is not in the ignore list
-    eventStatus.status[eventStatus.status.length - 1].bonus_added === false
-  ) {
-    const memeLoader = document.createElement("div");
-    memeLoader.id = "meme-loader";
-    memeLoader.innerText = `Hold up - Let's wait for the gameweek to end before we start making accusations 👀`;
-    memeLoader.className = "skeleton";
-    memeLoaderContainer.appendChild(memeLoader);
-    container.append(memeLoaderContainer);
-    return;
-  }
-
-  const memeLoader = document.createElement("div");
-  memeLoader.id = "meme-loader";
-  memeLoader.innerText = "Memes loading..."; // Optional text
-  memeLoader.innerText = `Loading some juicy memes for you... 👀`;
-  memeLoader.className = "skeleton";
-
-  for (let i = 0; i < 4; i++) {
-    memeLoaderContainer.appendChild(memeLoader.cloneNode(true));
-  }
-
-  container.append(memeLoaderContainer);
-
-  memeLoaderContainer.remove();
-
-  function getRandomTeam(league) {
-    return league[Math.floor(Math.random() * league.length)];
-  }
-  const pointingAtYouMemes = [
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/ronaldo.gif",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/vaya.gif",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/3845a815f8746f8cb96c6effd98d37c9.jpg",
-  ];
-  const surprisedMemes = [
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/omg-ohmygod.gif",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/wow.png",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/1grvjo.jpg",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/yeah-excellent.gif",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/lego-lego-batman.gif",
-  ];
-
-  const suicidalMemes = [
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/Ben-Affleck-Smoking-meme-1.jpg",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/suicidal.gif",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/oh-ffs-8abb884c90.jpg",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/crying-crying-meme.gif",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/caught-out.webp",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/giphy.gif",
-  ];
-
-  const utterWokeMemes = [
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/sean-dyche-football.gif",
-    "https://fpltoolbox.com/wp-content/uploads/2025/02/r7vfc0oych5e1.jpeg",
-  ];
-
-  function findCaptaincyFailDrake() {
-    for (const team of FPLToolboxLeagueData.standings) {
-      let captain = null;
-      let vice = null;
-
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.is_captain) captain = player;
-        if (player.is_vice_captain) vice = player;
-      });
-
-      if (captain && vice) {
-        if (getPlayerScore(vice.element) > getPlayerScore(captain.element)) {
-          const message = `Bro making gameweek ${currentGw} captaincy decisions`;
-
-          const capCard = createPlayerCardNew(
-            captain.element,
-            getPlayerScore(captain.element),
-            true,
-            null,
-            null
-          );
-          const viceCard = createPlayerCardNew(
-            vice.element,
-            getPlayerScore(vice.element),
-            null,
-            true,
-            null
-          );
-
-          if (capCard instanceof HTMLElement) {
-            capCard.style.marginLeft = "-70%";
-            viceCard.style.marginLeft = "-70%";
-            capCard.style.transform = "scale(1.2)";
-            viceCard.style.transform = "scale(1.2)";
-          } else {
-            console.warn("message2 is not a DOM element:", capCard);
-          }
-          const footer = `Spoiler alert, It's ${team.player_name.substring(
-            0,
-            team.player_name.indexOf(" ")
-          )}`;
-          // Image URL for meme
-          const img =
-            "https://fpltoolbox.com/wp-content/uploads/2025/02/30b1gx-1.jpg";
-
-          const meme = createMeme4Corners(
-            message,
-            " ",
-            viceCard,
-            capCard,
-            " ",
-            footer,
-            img
-          );
-
-          memeContainer.append(meme);
-
-          return; // Stop searching after finding the first qualifying team
-        }
-      }
-    }
-    console.log("No team found with a captaincy fail.");
-  }
-  function findCaptaincyFailDoggo() {
-    for (const team of FPLToolboxLeagueData.standings) {
-      let captain = null;
-      let vice = null;
-
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.is_captain) captain = player;
-        if (player.is_vice_captain) vice = player;
-      });
-
-      if (captain && vice) {
-        if (getPlayerScore(vice.element) > getPlayerScore(captain.element)) {
-          const message = `${team.player_name.substring(
-            0,
-            team.player_name.indexOf(" ")
-          )}'s vice captain vs actual captain`;
-
-          const capCard = createPlayerCardNew(
-            captain.element,
-            getPlayerScore(captain.element),
-            true,
-            null,
-            null
-          );
-          const viceCard = createPlayerCardNew(
-            vice.element,
-            getPlayerScore(vice.element),
-            null,
-            true,
-            null
-          );
-
-          if (capCard instanceof HTMLElement) {
-            // capCard.style.marginLeft = "-70%";
-            // viceCard.style.marginLeft = "-70%";
-            capCard.style.transform = "scale(1.2)";
-            viceCard.style.transform = "scale(1.2)";
-          } else {
-            console.warn("message2 is not a DOM element:", capCard);
-          }
-          const footer = `www.fpltoolbox.com`;
-          // Image URL for meme
-          const img =
-            "https://fpltoolbox.com/wp-content/uploads/2025/02/430zkq.webp";
-
-          const meme = createMeme4Corners(
-            message,
-            null,
-            capCard,
-            null,
-            viceCard,
-            footer,
-            img
-          );
-
-          memeContainer.append(meme);
-
-          return; // Stop searching after finding the first qualifying team
-        }
-      }
-    }
-    console.log("No team found with a captaincy fail.");
-  }
-
-  function findKeeperFail() {
-    for (const team of FPLToolboxLeagueData.standings) {
-      let keeper = null;
-      let benchedKeeper = null;
-
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.element_type == 1 && player.position == 1) keeper = player;
-        if (player.element_type == 1 && player.position == 12)
-          benchedKeeper = player;
-      });
-
-      if (keeper && benchedKeeper) {
-        if (
-          getPlayerScore(benchedKeeper.element) > getPlayerScore(keeper.element)
-        ) {
-          const message = `${team.player_name.substring(
-            0,
-            team.player_name.indexOf(" ")
-          )}'s thought process when deciding which keeper to start in gameweek ${currentGw}`;
-
-          const capCard = createPlayerCardNew(
-            keeper.element,
-            getPlayerScore(keeper.element),
-            null,
-            null,
-            null
-          );
-          const viceCard = createPlayerCardNew(
-            benchedKeeper.element,
-            getPlayerScore(benchedKeeper.element),
-            null,
-            null,
-            null
-          );
-
-          if (capCard instanceof HTMLElement) {
-            capCard.style.marginLeft = "-70%";
-            viceCard.style.marginLeft = "-70%";
-            capCard.style.transform = "scale(1.2)";
-            viceCard.style.transform = "scale(1.2)";
-          } else {
-            console.warn("message2 is not a DOM element:", capCard);
-          }
-
-          // Image URL for meme
-          const img =
-            "https://fpltoolbox.com/wp-content/uploads/2025/02/30b1gx-1.jpg";
-
-          const meme = createMeme4Corners(
-            message,
-            " ",
-            viceCard,
-            capCard,
-            " ",
-            null,
-            img
-          );
-
-          memeContainer.append(meme);
-
-          return; // Stop searching after finding the first qualifying team
-        }
-      }
-    }
-    console.log("No team found with a keeper bench fail.");
-  }
-
-  function findHighestandLowest() {
-    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
-      return team.event_total < lowest.event_total ? team : lowest;
-    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
-    const highestTeam = FPLToolboxLeagueData.standings.reduce(
-      (highest, team) => {
-        return team.event_total > highest.event_total ? team : highest;
-      },
-      FPLToolboxLeagueData.standings[0]
-    ); // Start with the first team
-
-    console.log(lowestTeam);
-    console.log(highestTeam);
-    const team1 = `${lowestTeam.player_name.substring(
-      0,
-      lowestTeam.player_name.indexOf(" ")
-    )}`;
-    const team2 = `${highestTeam.player_name.substring(
-      0,
-      highestTeam.player_name.indexOf(" ")
-    )}`;
-    const img =
-      "https://fpltoolbox.com/wp-content/uploads/2025/02/Batman-Slapping-Robin.jpg";
-    const meme = createMeme4Corners(
-      null,
-      `GW${currentGw} locked in!`,
-      `Nah mate, \n not this week!`,
-      `${team2}`,
-      `${team1}`,
-      null,
-      img
-    );
-    memeContainer.append(meme);
-  }
-
-  function findWorstRun() {
-    const worstRankRun = FPLToolboxLeagueData.standings.find((team) => {
-      const totalGWs = team.everyGw.length;
-
-      // Ensure at least 3 gameweeks exist
-      if (totalGWs < 3) return false;
-
-      // Extract last 3 gameweek ranks
-      const lastThreeRanks = team.everyGw
-        .slice(-3)
-        .map((gw) => gw.overall_rank);
-
-      // Check if rank is consistently getting worse
-      return (
-        lastThreeRanks[0] < lastThreeRanks[1] &&
-        lastThreeRanks[1] < lastThreeRanks[2]
-      );
-    });
-
-    console.log(worstRankRun);
-
-    if (worstRankRun) {
-      const message1 = `When ${worstRankRun.player_name.substring(
-        0,
-        worstRankRun.player_name.indexOf(" ")
-      )} realises that ${
-        worstRankRun.entry_name
-      } has had red arrows for three weeks in a row`;
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/Monkey-Puppet-e1739162235444.jpg";
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        null,
-
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findBestMiniLeagueRun() {
-    if (
-      FPLToolboxLeagueData.standings[0].rank ==
-      FPLToolboxLeagueData.standings[0].last_rank
-    ) {
-      const message1 = `${FPLToolboxLeagueData.standings[0].player_name.substring(
-        0,
-        FPLToolboxLeagueData.standings[0].player_name.indexOf(" ")
-      )} being handed the award from last week's mini-league number 1`;
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/download-1.png";
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        null,
-
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findChillGuy() {
-    if (
-      FPLToolboxLeagueData.standings[0].rank ==
-      FPLToolboxLeagueData.standings[0].last_rank
-    ) {
-      const message1 = `Just ${FPLToolboxLeagueData.standings[0].player_name.substring(
-        0,
-        FPLToolboxLeagueData.standings[0].player_name.indexOf(" ")
-      )} being a chill guy at the top of the mini-league again`;
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/9au02y.jpg";
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findStrikerFail() {
-    for (const team of FPLToolboxLeagueData.standings) {
-      let striker = null;
-      let benchedStriker = null;
-      //console.log(team);
-      team.currentWeek[0].picks.forEach((player) => {
-        if (
-          player.element_type == 4 &&
-          player.position > 1 &&
-          player.position < 12
-        )
-          striker = player;
-        if (player.element_type == 4 && player.position > 11)
-          benchedStriker = player;
-      });
-
-      if (striker && benchedStriker) {
-        if (
-          getPlayerScore(benchedStriker.element) >
-          getPlayerScore(striker.element)
-        ) {
-          const message1 = `Imagine starting ${getPlayerWebName(
-            striker.element
-          )} but leaving ${getPlayerWebName(
-            benchedStriker.element
-          )} on the bench this week`;
-
-          const message2 = `${team.player_name.substring(
-            0,
-            team.player_name.indexOf(" ")
-          )}, \n to pick a striker!`;
-
-          const img =
-            "https://fpltoolbox.com/wp-content/uploads/2025/02/4lts08-e1739170546997.jpg";
-
-          const benchCard = createPlayerCardNew(
-            benchedStriker.element,
-            getPlayerScore(benchedStriker.element),
-            null,
-            null,
-            null
-          );
-
-          const footer = document.createElement("div");
-          footer.style.display = "flex"; // Optional: Arrange elements in a row
-          footer.style.alignItems = "center"; // Optional: Align content nicely
-          footer.style.gap = "10px"; // Optional: Add space between them
-          footer.style.color = "black";
-          footer.style.backgroundColor = "white";
-          footer.style.paddingLeft = "30px";
-          footer.style.paddingright = "30px";
-          footer.style.paddingTop = "10px";
-          footer.style.paddingBottom = "10px";
-
-          // Append benchCard (if it's an HTML element)
-          if (benchCard instanceof HTMLElement) {
-            footer.appendChild(benchCard);
-          } else {
-            console.warn("benchCard is not a valid HTMLElement", benchCard);
-          }
-
-          // Append message2 (if it's a string)
-          if (typeof message2 === "string") {
-            const messageText = document.createElement("span");
-            messageText.textContent = message2;
-            messageText.style.textAlign = "center";
-            messageText.classList.add("whitespace-fix");
-            footer.appendChild(messageText);
-          } else {
-            console.warn("message2 is not a string", message2);
-          }
-
-          const meme = createMeme4Corners(
-            message1,
-            null,
-            null,
-            null,
-            null,
-            footer,
-            img
-          );
-          memeContainer.append(meme);
-          return; // Stop searching after finding the first qualifying team
-        }
-      }
-    }
-    console.log("No team found with a striker bench fail.");
-  }
-
-  function findLowestScorer() {
-    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
-      return team.event_total < lowest.event_total ? team : lowest;
-    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
-
-    console.log(lowestTeam);
-
-    const message1 = `I bet he's thinking about other women`;
-    const message2 = `${lowestTeam.player_name.substring(
-      0,
-      lowestTeam.player_name.indexOf(" ")
-    )}: How have I only got ${lowestTeam.event_total} FPL points this week`;
-
-    const img = "https://fpltoolbox.com/wp-content/uploads/2025/02/1tl71a.jpg";
-
-    const meme = createMeme4Corners(
-      message1,
-      null,
-      null,
-      null,
-      null,
-      message2,
-      img
-    );
-    memeContainer.append(meme);
-  }
-
-  function findLowestScorer1() {
-    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
-      return team.event_total < lowest.event_total ? team : lowest;
-    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
-
-    console.log(lowestTeam);
-
-    const message1 = `POV: Realising that you've got to listen to another year of "We got ____ before GTA 6... "`;
-    const message2 = `and ${lowestTeam.player_name.substring(
-      0,
-      lowestTeam.player_name.indexOf(" ")
-    )} being shit at FPL`;
-
-    const img =
-      "https://fpltoolbox.com/wp-content/uploads/2025/05/disgusted.webp";
-
-    const meme = createMeme4Corners(
-      message1,
-      null,
-      null,
-      null,
-      null,
-      message2,
-      img
-    );
-    memeContainer.append(meme);
-  }
-
-  function findLowestScorerAlternative() {
-    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
-      return team.event_total < lowest.event_total ? team : lowest;
-    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
-
-    console.log(lowestTeam);
-
-    const message1 = `POV: ${lowestTeam.player_name.substring(
-      0,
-      lowestTeam.player_name.indexOf(" ")
-    )} waiting for some FPL points this week`;
-
-    const img = "https://fpltoolbox.com/wp-content/uploads/2025/02/1c1uej.jpg";
-
-    const meme = createMeme4Corners(
-      message1,
-      null,
-      null,
-      null,
-      null,
-      null,
-      img
-    );
-    memeContainer.append(meme);
-  }
-
-  function findBelowAverage() {
-    let gwAverage = bootstrap.events[currentGw - 1].average_entry_score;
-
-    const lowestAverage = FPLToolboxLeagueData.standings.filter(
-      (team) => team.event_total < gwAverage
-    );
-
-    console.log(lowestAverage);
-    if (lowestAverage > 0) {
-      const randomTeam = getRandomTeam(lowestAverage);
-
-      const message1 = `POV: ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} waiting to get at least the gameweek average this week`;
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/1c1uej.jpg";
-
-      const message2 = `${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} needs ${gwAverage - randomTeam.event_total} more points 😅 `;
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        message2,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function find100Plus() {
-    const club100 = FPLToolboxLeagueData.standings.filter(
-      (team) => team.event_total > 99
-    );
-
-    const randomTeam = getRandomTeam(club100);
-
-    if (randomTeam) {
-      const message1 = `POV: Your bro ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} enters the 100 club this week`;
-
-      const message2 = `(GW ${currentGw} score: ${randomTeam.event_total})`;
-
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/aplausos-clapped.gif";
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        message2,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findHighBench() {
-    const teamsWithHighBenchPoints = []; // Array to store teams with bench points > 10
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      let totalBenchPoints = 0;
-      //console.log(team);
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.position > 11 && player.position < 16) {
-          totalBenchPoints += getPlayerScore(player.element);
-        }
-      });
-
-      //console.log("Player Bench Points: " + totalBenchPoints);
-
-      // Only store teams with bench points greater than 10
-      if (totalBenchPoints > 10) {
-        teamsWithHighBenchPoints.push({ team, totalBenchPoints });
-      }
-    }
-
-    //console.log(teamsWithHighBenchPoints); // Check the stored teams
-
-    if (teamsWithHighBenchPoints.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithHighBenchPoints);
-
-      const message1 = `POV: ${randomTeam.team.player_name.substring(
-        0,
-        randomTeam.team.player_name.indexOf(" ")
-      )} after leaving ${
-        randomTeam.totalBenchPoints
-      } points on the bench this week`;
-      const img =
-        suicidalMemes[Math.floor(Math.random() * suicidalMemes.length)];
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findLowBench() {
-    const teamsWithHighBenchPoints = []; // Array to store teams with bench points > 10
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      let totalBenchPoints = 0;
-      //console.log(team);
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.position > 11 && player.position < 16) {
-          totalBenchPoints += getPlayerScore(player.element);
-        }
-      });
-
-      //console.log("Player Bench Points: " + totalBenchPoints);
-
-      // Only store teams with bench points greater than 10
-      if (totalBenchPoints == 4) {
-        teamsWithHighBenchPoints.push({ team, totalBenchPoints });
-      }
-    }
-
-    //console.log(teamsWithHighBenchPoints); // Check the stored teams
-
-    if (teamsWithHighBenchPoints.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithHighBenchPoints);
-
-      const message1 = `POV: ${randomTeam.team.player_name.substring(
-        0,
-        randomTeam.team.player_name.indexOf(" ")
-      )}'s masterclass of a bench this gameweek`;
-      const img =
-        suicidalMemes[Math.floor(Math.random() * suicidalMemes.length)];
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findFailedhBench() {
-    const teamsWithHighBenchPoints = []; // Array to store teams with bench points > 10
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      let totalBenchPoints = 0;
-      //console.log(team);
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.position > 11 && player.position < 16) {
-          totalBenchPoints += getPlayerScore(player.element);
-        }
-      });
-
-      //console.log("Player Bench Points: " + totalBenchPoints);
-
-      // Only store teams with bench points greater than 10
-      if (totalBenchPoints > 10) {
-        teamsWithHighBenchPoints.push({ team, totalBenchPoints });
-      }
-    }
-
-    //console.log(teamsWithHighBenchPoints); // Check the stored teams
-
-    if (teamsWithHighBenchPoints.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithHighBenchPoints);
-
-      const message1 = document.createElement("div");
-      message1.innerText = `Seeing your players score `;
-      message1.style.color = "black";
-
-      const message2 = document.createElement("div");
-      message2.innerText = `${randomTeam.team.player_name.substring(
-        0,
-        randomTeam.team.player_name.indexOf(" ")
-      )} after leaving them on the bench in GW${currentGw}`;
-      message2.style.color = "black";
-
-      const img = "https://fpltoolbox.com/wp-content/uploads/2025/03/pep.jpg";
-
-      const meme = createMeme4Corners(
-        null,
-        message1,
-        null,
-        null,
-        message2,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  async function findRedCards() {
-    const teamsWithRedCards = [];
-    const playerStatsCache = new Map(); // Cache for storing player stats
-
-    // Create and append the loading indicator
-    const memeLoader = document.createElement("div");
-    memeLoader.id = "meme-loader";
-    memeLoader.innerText =
-      "There might be a juicy meme loading here, just gotta do some more digging...";
-    memeLoader.className = "skeleton";
-    memeContainer.append(memeLoader);
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
-
-      for (const player of team.currentWeek[0].picks) {
-        let playerStats;
-
-        // Check if player's stats are already cached
-        if (playerStatsCache.has(player.element)) {
-          playerStats = playerStatsCache.get(player.element);
-        } else {
-          // Fetch and store in cache
-          playerStats = await fetchPlayerCurrentStats(player.element);
-          playerStatsCache.set(player.element, playerStats);
-        }
-
-        if (playerStats[0].red_cards > 0) {
-          console.log(playerStats);
-          teamsWithRedCards.push(team);
-          team.redCardPlayer = player.element;
-          break; // Stop checking this team's players and move to the next team
-        }
-      }
-    }
-
-    if (teamsWithRedCards.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithRedCards);
-      console.log(randomTeam);
-
-      const message1 = `When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} gets a player sent off:`;
-
-      const img =
-        utterWokeMemes[Math.floor(Math.random() * utterWokeMemes.length)];
-
-      const message2 = createPlayerCardNew(
-        randomTeam.redCardPlayer,
-        getPlayerScore(randomTeam.redCardPlayer),
-        null,
-        null,
-        null
-      );
-      if (message2 instanceof HTMLElement) {
-        message2.style.marginRight = "1.5rem";
-        message2.style.transform = "scale(1.5)";
-      } else {
-        console.warn("message2 is not a DOM element:", message2);
-      }
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        message2,
-        null,
-        null,
-        null,
-        img
-      );
-
-      // ✅ Replace the loader with the actual meme
-      memeLoader.replaceWith(meme);
-    } else {
-      memeLoader.remove();
-    }
-  }
-
-  async function findTwoYellows() {
-    const teamsWithTwoYellows = [];
-    const playerStatsCache = new Map(); // Cache for storing player stats
-
-    // Create and append the loading indicator
-    const memeLoader = document.createElement("div");
-    memeLoader.id = "meme-loader";
-    memeLoader.innerText =
-      "There might be a juicy meme loading here, just gotta do some more digging...";
-    memeLoader.className = "skeleton";
-    memeContainer.append(memeLoader);
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
-
-      for (const player of team.currentWeek[0].picks) {
-        let playerStats;
-
-        // Check if player's stats are already cached
-        if (playerStatsCache.has(player.element)) {
-          playerStats = playerStatsCache.get(player.element);
-        } else {
-          // Fetch and store in cache
-          playerStats = await fetchPlayerCurrentStats(player.element);
-          playerStatsCache.set(player.element, playerStats);
-        }
-
-        //console.log(playerStats);
-        if (playerStats[0].yellow_cards > 2) {
-          //console.log(playerStats);
-          teamsWithTwoYellows.push(team);
-          team.twoYellowCardsPlayer = player.element;
-          break; // Stop checking this team's players and move to the next team
-        }
-      }
-    }
-
-    if (teamsWithTwoYellows.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithTwoYellows);
-      console.log(randomTeam);
-
-      const message1 = `When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} sees a player get two yellow cards:`;
-
-      const img =
-        utterWokeMemes[Math.floor(Math.random() * utterWokeMemes.length)];
-
-      const message2 = createPlayerCardNew(
-        randomTeam.twoYellowCardsPlayer,
-        getPlayerScore(randomTeam.twoYellowCardsPlayer),
-        null,
-        null,
-        null
-      );
-      if (message2 instanceof HTMLElement) {
-        message2.style.marginRight = "1.5rem";
-        message2.style.transform = "scale(1.5)";
-      } else {
-        console.warn("message2 is not a DOM element:", message2);
-      }
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        message2,
-        null,
-        null,
-        null,
-        img
-      );
-
-      // ✅ Replace the loader with the actual meme
-      memeLoader.replaceWith(meme);
-    } else {
-      memeLoader.remove();
-    }
-  }
-
-  async function find59Minutes() {
-    const teamsWith59Minutes = [];
-    const playerStatsCache = new Map(); // Cache for storing player stats
-
-    // Create and append the loading indicator
-    const memeLoader = document.createElement("div");
-    memeLoader.id = "meme-loader";
-    memeLoader.innerText =
-      "There might be a juicy meme loading here, just gotta do some more digging...";
-    memeLoader.className = "skeleton";
-    memeContainer.append(memeLoader);
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
-
-      for (const player of team.currentWeek[0].picks) {
-        if (player.element_type === 2) {
-          let playerStats;
-
-          // Check if player's stats are already cached
-          if (playerStatsCache.has(player.element)) {
-            playerStats = playerStatsCache.get(player.element);
-          } else {
-            // Fetch and store in cache
-            playerStats = await fetchPlayerCurrentStats(player.element);
-            playerStatsCache.set(player.element, playerStats);
-          }
-
-          const { minutes, was_home, team_a_score, team_h_score } =
-            playerStats[0];
-
-          if (
-            minutes > 44 &&
-            minutes < 60 &&
-            ((was_home && team_a_score === 0) ||
-              (!was_home && team_h_score === 0))
-          ) {
-            console.log(playerStats);
-            teamsWith59Minutes.push(team);
-            team.fiftyNineMinutePlayer = player.element;
-            break; // Stop checking this team's players and move to the next team
-          }
-        }
-      }
-    }
-
-    // Example of updating the text later
-    setTimeout(() => {
-      memeLoader.innerText = "Finding the perfect meme...";
-    }, 2000);
-
-    if (teamsWith59Minutes.length > 0) {
-      const randomTeam = getRandomTeam(teamsWith59Minutes);
-      console.log(randomTeam);
-
-      const message1 = `POV: When your defender comes off before 60 minutes and doesn't even lock in the cleansheet. Looking at you ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )}`;
-
-      const img =
-        suicidalMemes[Math.floor(Math.random() * suicidalMemes.length)];
-
-      const message2 = createPlayerCardNew(
-        randomTeam.fiftyNineMinutePlayer,
-        getPlayerScore(randomTeam.fiftyNineMinutePlayer),
-        null,
-        null,
-        null
-      );
-      if (message2 instanceof HTMLElement) {
-        message2.style.marginRight = "1.5rem";
-        message2.style.transform = "scale(1.5)";
-      } else {
-        console.warn("message2 is not a DOM element:", message2);
-      }
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        message2,
-        null,
-        null,
-        null,
-        img
-      );
-
-      // ✅ Replace the loader with the actual meme
-      memeLoader.replaceWith(meme);
-    } else {
-      memeLoader.innerText = `naaah, thought I had something, but not today`;
-      setTimeout(() => {
-        memeLoader.remove();
-        console.log("No 59-minute players");
-      }, 2000);
-    }
-  }
-  async function findMissedPen() {
-    const teamsWith59Minutes = [];
-    const playerStatsCache = new Map(); // Cache for storing player stats
-
-    // Create and append the loading indicator
-    const memeLoader = document.createElement("div");
-    memeLoader.id = "meme-loader";
-    memeLoader.innerText =
-      "There might be a juicy meme loading here, just gotta do some more digging...";
-    memeLoader.className = "skeleton";
-    memeContainer.append(memeLoader);
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
-
-      for (const player of team.currentWeek[0].picks) {
-        let playerStats;
-
-        // Check if player's stats are already cached
-        if (playerStatsCache.has(player.element)) {
-          playerStats = playerStatsCache.get(player.element);
-        } else {
-          // Fetch and store in cache
-          playerStats = await fetchPlayerCurrentStats(player.element);
-          playerStatsCache.set(player.element, playerStats);
-        }
-
-        console.log(player);
-        console.log(playerStats);
-        if (playerStats[0].penalties_missed > 0) {
-          teamsWith59Minutes.push(team);
-          team.fiftyNineMinutePlayer = player.element;
-          break; // Stop checking this team's players and move to the next team
-        }
-      }
-    }
-
-    // Example of updating the text later
-    setTimeout(() => {
-      memeLoader.innerText = "Finding the perfect meme...";
-    }, 2000);
-
-    if (teamsWith59Minutes.length > 0) {
-      const randomTeam = getRandomTeam(teamsWith59Minutes);
-      console.log(randomTeam);
-
-      const message1 = `POV: When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )}'s player misses a pen!`;
-
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/dogshit.jpeg";
-
-      const message2 = createPlayerCardNew(
-        randomTeam.fiftyNineMinutePlayer,
-        getPlayerScore(randomTeam.fiftyNineMinutePlayer),
-        null,
-        null,
-        null
-      );
-      if (message2 instanceof HTMLElement) {
-        message2.style.marginRight = "1.5rem";
-        message2.style.transform = "scale(1.5)";
-      } else {
-        console.warn("message2 is not a DOM element:", message2);
-      }
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        message2,
-        null,
-        null,
-        null,
-        img
-      );
-
-      // ✅ Replace the loader with the actual meme
-      memeLoader.replaceWith(meme);
-    } else {
-      memeLoader.innerText = `naaah, thought I had something, but not today`;
-      setTimeout(() => {
-        memeLoader.remove();
-        console.log("No missed pens");
-      }, 2000);
-    }
-  }
-  function findHigestTransferMaker() {
-    let gwAverage = bootstrap.events[currentGw - 1].average_entry_score;
-
-    const lowestAverage = FPLToolboxLeagueData.standings.filter(
-      (team) => team.event_total < gwAverage
-    );
-
-    console.log(lowestAverage);
-    if (lowestAverage > 0) {
-      const randomTeam = getRandomTeam(lowestAverage);
-
-      const message1 = `POV: ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} after making the most transfers this week`;
-      const video =
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/homer-bush.gif";
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        null,
-        video
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findFailedScorer() {
-    // Select a random team from the league
-    const randomTeam = getRandomTeam(FPLToolboxLeagueData.standings);
-
-    // Generate message based on the random team
-    const message1 = `Mood right now if your name is ${
-      randomTeam.player_name.split(" ")[0]
-    }`;
-
-    // Select a random player from the team's picks
-    const randomPlayer =
-      randomTeam.currentWeek[0].picks[
-        Math.floor(Math.random() * randomTeam.currentWeek[0].picks.length)
-      ];
-
-    // Get the player's score
-    const playerScore = getPlayerScore(randomPlayer.element);
-
-    let message2 = null;
-
-    // If player score is exactly 2, create a player card
-    if (playerScore < 0 || playerScore == 1) {
-      console.log("Player score = 2");
-
-      message2 = createPlayerCardNew(
-        randomPlayer.element,
-        playerScore,
-        null,
-        null,
-        null
-      );
-
-      if (message2 instanceof HTMLElement) {
-        message2.style.marginLeft = "75%";
-        message2.style.marginTop = "50%";
-        message2.style.transform = "scale(1.5)";
-      } else {
-        console.warn("message2 is not a DOM element:", message2);
-      }
-    }
-
-    // Image URL for meme
-    const img =
-      "https://fpltoolbox.com/wp-content/uploads/2025/02/download-2.png";
-
-    // Create and append meme only if message2 exists
-    if (message2) {
-      const meme = createMeme4Corners(
-        message1,
-        message2,
-        null,
-        null,
-        null,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findFailedTransfer() {
-    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
-    //   {
-    //     "element_in": 336,
-    //     "element_in_cost": 63,
-    //     "element_out": 398,
-    //     "element_out_cost": 74,
-    //     "entry": 18620,
-    //     "event": 24,
-    //     "time": "2025-02-01T01:02:49.163163Z"
-    // }
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          teamsWithFailedTranfers.push(team);
-        }
-      });
-    }
-    console.log(teamsWithFailedTranfers);
-
-    if (teamsWithFailedTranfers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
-      console.log(randomTeam);
-
-      let xfrTracker = [];
-      randomTeam.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          xfrTracker.push(xfr);
-        }
-      });
-
-      console.log(xfrTracker);
-      function findBiggestScoreDifference(xfrTracker) {
-        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
-          return null; // Return null if xfrTracker is empty or not an array
-        }
-
-        let biggestDiffXfr = null;
-        let maxDifference = -Infinity;
-
-        for (const xfr of xfrTracker) {
-          const inScore = getPlayerScore(xfr.element_in);
-          const outScore = getPlayerScore(xfr.element_out);
-          const difference = Math.abs(inScore - outScore); // Absolute difference
-
-          if (difference > maxDifference) {
-            maxDifference = difference;
-            biggestDiffXfr = xfr;
-          }
-        }
-
-        return biggestDiffXfr;
-      }
-
-      // Example Usage
-      const biggestXfr = findBiggestScoreDifference(xfrTracker);
-      console.log(biggestXfr);
-
-      const xfrIN = createPlayerCardNew(
-        biggestXfr.element_in,
-        getPlayerScore(biggestXfr.element_in),
-        null,
-        null,
-        null
-      );
-      const xfrOUT = createPlayerCardNew(
-        biggestXfr.element_out,
-        getPlayerScore(biggestXfr.element_out),
-        null,
-        null,
-        null
-      );
-
-      const message1 = `POV: The grass is always greener if you're ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} making gameweek transfers`;
-
-      images = [
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/download-3.png",
-      ];
-      const img = images[Math.floor(Math.random() * images.length)];
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        xfrOUT,
-        null,
-        xfrIN,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-  function findFailedTransferSecond() {
-    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
-    //   {
-    //     "element_in": 336,
-    //     "element_in_cost": 63,
-    //     "element_out": 398,
-    //     "element_out_cost": 74,
-    //     "entry": 18620,
-    //     "event": 24,
-    //     "time": "2025-02-01T01:02:49.163163Z"
-    // }
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          teamsWithFailedTranfers.push(team);
-        }
-      });
-    }
-    console.log(teamsWithFailedTranfers);
-
-    if (teamsWithFailedTranfers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
-      console.log(randomTeam);
-
-      let xfrTracker = [];
-      randomTeam.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          xfrTracker.push(xfr);
-        }
-      });
-
-      console.log(xfrTracker);
-      function findBiggestScoreDifference(xfrTracker) {
-        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
-          return null; // Return null if xfrTracker is empty or not an array
-        }
-
-        let biggestDiffXfr = null;
-        let maxDifference = -Infinity;
-
-        for (const xfr of xfrTracker) {
-          const inScore = getPlayerScore(xfr.element_in);
-          const outScore = getPlayerScore(xfr.element_out);
-          const difference = Math.abs(inScore - outScore); // Absolute difference
-
-          if (difference > maxDifference) {
-            maxDifference = difference;
-            biggestDiffXfr = xfr;
-          }
-        }
-
-        return biggestDiffXfr;
-      }
-
-      const biggestXfr = findBiggestScoreDifference(xfrTracker);
-      console.log(biggestXfr);
-
-      const xfrIN = createPlayerCardNew(
-        biggestXfr.element_in,
-        getPlayerScore(biggestXfr.element_in),
-        null,
-        null,
-        null
-      );
-      const xfrOUT = createPlayerCardNew(
-        biggestXfr.element_out,
-        getPlayerScore(biggestXfr.element_out),
-        null,
-        null,
-        null
-      );
-
-      const message1 = `POV: ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} after transferring out ${getPlayerWebName(
-        biggestXfr.element_out
-      )} for ${getPlayerWebName(biggestXfr.element_in)}`;
-      const img =
-        suicidalMemes[Math.floor(Math.random() * suicidalMemes.length)];
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        xfrIN,
-        xfrOUT,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-  function findFailedTransferThird() {
-    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
-    //   {
-    //     "element_in": 336,
-    //     "element_in_cost": 63,
-    //     "element_out": 398,
-    //     "element_out_cost": 74,
-    //     "entry": 18620,
-    //     "event": 24,
-    //     "time": "2025-02-01T01:02:49.163163Z"
-    // }
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          teamsWithFailedTranfers.push(team);
-        }
-      });
-    }
-    console.log(teamsWithFailedTranfers);
-
-    if (teamsWithFailedTranfers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
-      console.log(randomTeam);
-
-      let xfrTracker = [];
-      randomTeam.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          xfrTracker.push(xfr);
-        }
-      });
-
-      console.log(xfrTracker);
-      function findBiggestScoreDifference(xfrTracker) {
-        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
-          return null; // Return null if xfrTracker is empty or not an array
-        }
-
-        let biggestDiffXfr = null;
-        let maxDifference = -Infinity;
-
-        for (const xfr of xfrTracker) {
-          const inScore = getPlayerScore(xfr.element_in);
-          const outScore = getPlayerScore(xfr.element_out);
-          const difference = Math.abs(inScore - outScore); // Absolute difference
-
-          if (difference > maxDifference) {
-            maxDifference = difference;
-            biggestDiffXfr = xfr;
-          }
-        }
-
-        return biggestDiffXfr;
-      }
-
-      const biggestXfr = findBiggestScoreDifference(xfrTracker);
-      console.log(biggestXfr);
-
-      const xfrIN = createPlayerCardNew(
-        biggestXfr.element_in,
-        getPlayerScore(biggestXfr.element_in),
-        null,
-        null,
-        null
-      );
-      const xfrOUT = createPlayerCardNew(
-        biggestXfr.element_out,
-        getPlayerScore(biggestXfr.element_out),
-        null,
-        null,
-        null
-      );
-
-      const message1 = `The group chat watching ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} transfer out ${getPlayerWebName(
-        biggestXfr.element_out
-      )} for ${getPlayerWebName(biggestXfr.element_in)}`;
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/henry-rio.gif";
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        xfrIN,
-        xfrOUT,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-  function findFailedTransferFourth() {
-    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
-    //   {
-    //     "element_in": 336,
-    //     "element_in_cost": 63,
-    //     "element_out": 398,
-    //     "element_out_cost": 74,
-    //     "entry": 18620,
-    //     "event": 24,
-    //     "time": "2025-02-01T01:02:49.163163Z"
-    // }
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          teamsWithFailedTranfers.push(team);
-        }
-      });
-    }
-    console.log(teamsWithFailedTranfers);
-
-    if (teamsWithFailedTranfers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
-      let randomTeam2 = getRandomTeam(FPLToolboxLeagueData.standings);
-
-      while (randomTeam2.player_name === randomTeam.player_name) {
-        randomTeam2 = getRandomTeam(FPLToolboxLeagueData.standings);
-      }
-
-      let xfrTracker = [];
-      randomTeam.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          xfrTracker.push(xfr);
-        }
-      });
-
-      console.log(xfrTracker);
-      function findBiggestScoreDifference(xfrTracker) {
-        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
-          return null; // Return null if xfrTracker is empty or not an array
-        }
-
-        let biggestDiffXfr = null;
-        let maxDifference = -Infinity;
-
-        for (const xfr of xfrTracker) {
-          const inScore = getPlayerScore(xfr.element_in);
-          const outScore = getPlayerScore(xfr.element_out);
-          const difference = Math.abs(inScore - outScore); // Absolute difference
-
-          if (difference > maxDifference) {
-            maxDifference = difference;
-            biggestDiffXfr = xfr;
-          }
-        }
-
-        return biggestDiffXfr;
-      }
-
-      const biggestXfr = findBiggestScoreDifference(xfrTracker);
-      console.log(biggestXfr);
-
-      const xfrIN = createPlayerCardNew(
-        biggestXfr.element_in,
-        getPlayerScore(biggestXfr.element_in),
-        null,
-        null,
-        null
-      );
-      const xfrOUT = createPlayerCardNew(
-        biggestXfr.element_out,
-        getPlayerScore(biggestXfr.element_out),
-        null,
-        null,
-        null
-      );
-
-      const message1 = `${randomTeam2.player_name.substring(
-        0,
-        randomTeam2.player_name.indexOf(" ")
-      )}
-      seeing ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} transfer out ${getPlayerWebName(
-        biggestXfr.element_out
-      )} for ${getPlayerWebName(biggestXfr.element_in)}`;
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/1641347298.webp";
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        xfrIN,
-        xfrOUT,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findFailedTransferFifth() {
-    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
-    //   {
-    //     "element_in": 336,
-    //     "element_in_cost": 63,
-    //     "element_out": 398,
-    //     "element_out_cost": 74,
-    //     "entry": 18620,
-    //     "event": 24,
-    //     "time": "2025-02-01T01:02:49.163163Z"
-    // }
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          teamsWithFailedTranfers.push(team);
-        }
-      });
-    }
-    console.log(teamsWithFailedTranfers);
-
-    if (teamsWithFailedTranfers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
-      let randomTeam2 = getRandomTeam(FPLToolboxLeagueData.standings);
-
-      while (randomTeam2.player_name === randomTeam.player_name) {
-        randomTeam2 = getRandomTeam(FPLToolboxLeagueData.standings);
-      }
-
-      let xfrTracker = [];
-      randomTeam.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          xfrTracker.push(xfr);
-        }
-      });
-
-      console.log(xfrTracker);
-      function findBiggestScoreDifference(xfrTracker) {
-        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
-          return null; // Return null if xfrTracker is empty or not an array
-        }
-
-        let biggestDiffXfr = null;
-        let maxDifference = -Infinity;
-
-        for (const xfr of xfrTracker) {
-          const inScore = getPlayerScore(xfr.element_in);
-          const outScore = getPlayerScore(xfr.element_out);
-          const difference = Math.abs(inScore - outScore); // Absolute difference
-
-          if (difference > maxDifference) {
-            maxDifference = difference;
-            biggestDiffXfr = xfr;
-          }
-        }
-
-        return biggestDiffXfr;
-      }
-
-      const biggestXfr = findBiggestScoreDifference(xfrTracker);
-      console.log(biggestXfr);
-
-      const xfrIN = createPlayerCardNew(
-        biggestXfr.element_in,
-        getPlayerScore(biggestXfr.element_in),
-        null,
-        null,
-        null
-      );
-      const xfrOUT = createPlayerCardNew(
-        biggestXfr.element_out,
-        getPlayerScore(biggestXfr.element_out),
-        null,
-        null,
-        null
-      );
-      console.log(
-        getPlayerScore(biggestXfr.element_in),
-        getPlayerScore(biggestXfr.element_out)
-      );
-      const message1 = document.createElement("p");
-
-      message1.innerText = `"What happened to ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )}?"`;
-
-      const xfrOutMsg = document.createElement("p");
-      xfrOutMsg.style.color = "black";
-      xfrOutMsg.innerText = `"He transferred out ${getPlayerWebName(
-        biggestXfr.element_out
-      )}"`;
-
-      const playerName = document.createElement("p");
-      playerName.style.color = "black";
-      playerName.innerText = `${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )}:`;
-
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/what-happened.webp";
-
-      const meme = createMeme4Corners(
-        message1,
-        playerName,
-        null,
-        xfrOutMsg,
-        xfrOUT,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findFailedTransferSixth() {
-    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          teamsWithFailedTranfers.push(team);
-        }
-      });
-    }
-    console.log(teamsWithFailedTranfers);
-
-    if (teamsWithFailedTranfers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
-      console.log(randomTeam);
-
-      let xfrTracker = [];
-      randomTeam.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          xfrTracker.push(xfr);
-        }
-      });
-
-      console.log(xfrTracker);
-      function findBiggestScoreDifference(xfrTracker) {
-        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
-          return null; // Return null if xfrTracker is empty or not an array
-        }
-
-        let biggestDiffXfr = null;
-        let maxDifference = -Infinity;
-
-        for (const xfr of xfrTracker) {
-          const inScore = getPlayerScore(xfr.element_in);
-          const outScore = getPlayerScore(xfr.element_out);
-          const difference = Math.abs(inScore - outScore); // Absolute difference
-
-          if (difference > maxDifference) {
-            maxDifference = difference;
-            biggestDiffXfr = xfr;
-          }
-        }
-
-        return biggestDiffXfr;
-      }
-
-      // Example Usage
-      const biggestXfr = findBiggestScoreDifference(xfrTracker);
-      console.log(biggestXfr);
-      if (biggestXfr) {
-        const xfrIN = createPlayerCardNew(
-          biggestXfr.element_in,
-          getPlayerScore(biggestXfr.element_in),
-          null,
-          null,
-          null
-        );
-
-        const tInArrow = document.createElement("img");
-        tInArrow.src =
-          "https://fpltoolbox.com/wp-content/uploads/2024/12/svgexport-9.png";
-        tInArrow.setAttribute("id", "transfer-direction-in");
-        xfrIN.prepend(tInArrow);
-
-        const xfrOUT = createPlayerCardNew(
-          biggestXfr.element_out,
-          getPlayerScore(biggestXfr.element_out),
-          null,
-          null,
-          null
-        );
-        const tOutArrow = document.createElement("img");
-        tOutArrow.src =
-          "https://fpltoolbox.com/wp-content/uploads/2024/12/svgexport-9.png";
-        tOutArrow.setAttribute("id", "transfer-direction-out");
-        xfrOUT.prepend(tOutArrow);
-        const message1 = `${randomTeam.player_name.substring(
-          0,
-          randomTeam.player_name.indexOf(" ")
-        )} making transfer decisions like this:`;
-
-        images = [
-          "https://fpltoolbox.com/wp-content/uploads/2025/04/sweating.png",
-        ];
-        const img = images[Math.floor(Math.random() * images.length)];
-
-        const meme = createMeme4Corners(
-          message1,
-          xfrOUT,
-          xfrIN,
-          null,
-          null,
-          null,
-          img
-        );
-        memeContainer.append(meme);
-      }
-    }
-  }
-
-  function findSuccesfulTransfer() {
-    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) < getPlayerScore(xfr.element_in)
-        ) {
-          teamsWithFailedTranfers.push(team);
-        }
-      });
-    }
-    console.log(teamsWithFailedTranfers);
-
-    if (teamsWithFailedTranfers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
-      console.log(randomTeam);
-
-      let xfrTracker = [];
-      randomTeam.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) < getPlayerScore(xfr.element_in)
-        ) {
-          xfrTracker.push(xfr);
-        }
-      });
-
-      console.log(xfrTracker);
-      function findBiggestScoreDifference(xfrTracker) {
-        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
-          return null; // Return null if xfrTracker is empty or not an array
-        }
-
-        let biggestDiffXfr = null;
-        let maxDifference = -Infinity;
-
-        for (const xfr of xfrTracker) {
-          const inScore = getPlayerScore(xfr.element_in);
-          const outScore = getPlayerScore(xfr.element_out);
-          const difference = Math.abs(inScore - outScore); // Absolute difference
-
-          if (difference > maxDifference) {
-            maxDifference = difference;
-            biggestDiffXfr = xfr;
-          }
-        }
-
-        return biggestDiffXfr;
-      }
-
-      // Example Usage
-      const biggestXfr = findBiggestScoreDifference(xfrTracker);
-      console.log(biggestXfr);
-      if (biggestXfr) {
-        const xfrIN = createPlayerCardNew(
-          biggestXfr.element_in,
-          getPlayerScore(biggestXfr.element_in),
-          null,
-          null,
-          null
-        );
-
-        const tInArrow = document.createElement("img");
-        tInArrow.src =
-          "https://fpltoolbox.com/wp-content/uploads/2024/12/svgexport-9.png";
-        tInArrow.setAttribute("id", "transfer-direction-in");
-        xfrIN.prepend(tInArrow);
-
-        const xfrOUT = createPlayerCardNew(
-          biggestXfr.element_out,
-          getPlayerScore(biggestXfr.element_out),
-          null,
-          null,
-          null
-        );
-        const tOutArrow = document.createElement("img");
-        tOutArrow.src =
-          "https://fpltoolbox.com/wp-content/uploads/2024/12/svgexport-9.png";
-        tOutArrow.setAttribute("id", "transfer-direction-out");
-        xfrOUT.prepend(tOutArrow);
-        const message1 = `${randomTeam.player_name.substring(
-          0,
-          randomTeam.player_name.indexOf(" ")
-        )} making the right transfer decision this week`;
-
-        images = [
-          "https://fpltoolbox.com/wp-content/uploads/2025/04/note-dead.webp",
-          "https://fpltoolbox.com/wp-content/uploads/2025/04/very-nice.png",
-
-          ,
-        ];
-        const img = images[Math.floor(Math.random() * images.length)];
-
-        const meme = createMeme4Corners(
-          message1,
-          xfrOUT,
-          xfrIN,
-          null,
-          null,
-          null,
-          img
-        );
-        memeContainer.append(meme);
-      }
-    }
-  }
-  function findSolidDefence() {
-    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      let allDefendersScoredFiveOrMore = true;
-
-      team.currentWeek[0].picks.forEach((player) => {
-        //console.log(player, getPlayerWebName(player.element))
-        if (player.element_type === 2 && getPlayerScore(player.element) < 5) {
-          allDefendersScoredFiveOrMore = false;
-        }
-      });
-
-      if (allDefendersScoredFiveOrMore) {
-        teamsWithAllDefendersScoring.push(team);
-      }
-    }
-
-    console.log(teamsWithAllDefendersScoring); // Check the stored teams
-
-    if (teamsWithAllDefendersScoring.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
-      console.log(randomTeam);
-      const message1 = `POV: When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )}'s defenders all pull their socks up`;
-      const img =
-        surprisedMemes[Math.floor(Math.random() * surprisedMemes.length)];
-
-      const defenderRow = document.createElement("div");
-      defenderRow.style.display = "flex";
-      defenderRow.style.gap = "5px";
-      defenderRow.style.flexDirection = "row";
-      randomTeam.currentWeek[0].picks.forEach((player) => {
-        if (player.element_type === 2) {
-          const card = createPlayerCardNew(
-            player.element,
-            getPlayerScore(player.element),
-            null,
-            null,
-            null
-          );
-          defenderRow.appendChild(card);
-        }
-      });
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        defenderRow,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-  function findSolidStrikeForce() {
-    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      let allDefendersScoredFiveOrMore = true;
-
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.element_type === 4 && getPlayerScore(player.element) < 5) {
-          allDefendersScoredFiveOrMore = false;
-        }
-      });
-
-      if (allDefendersScoredFiveOrMore) {
-        teamsWithAllDefendersScoring.push(team);
-      }
-    }
-
-    console.log(teamsWithAllDefendersScoring); // Check the stored teams
-
-    if (teamsWithAllDefendersScoring.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
-      console.log(randomTeam);
-      const message1 = `POV: When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )}'s strikers all pull their socks up`;
-      const img =
-        surprisedMemes[Math.floor(Math.random() * surprisedMemes.length)];
-
-      const defenderRow = document.createElement("div");
-      defenderRow.style.display = "flex";
-      defenderRow.style.gap = "5px";
-      defenderRow.style.flexDirection = "row";
-      randomTeam.currentWeek[0].picks.forEach((player) => {
-        if (player.element_type === 4) {
-          const card = createPlayerCardNew(
-            player.element,
-            getPlayerScore(player.element),
-            null,
-            null,
-            null
-          );
-          defenderRow.appendChild(card);
-        }
-      });
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        defenderRow,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-  function findPlayersWithOnePoint() {
-    console.log("Failed row");
-    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.currentWeek[0].picks.forEach((player) => {
-        if (getPlayerScore(player.element) === 1) {
-          teamsWithAllDefendersScoring.push(team);
-          return;
-        }
-      });
-    }
-
-    console.log(teamsWithAllDefendersScoring); // Check the stored teams
-
-    if (teamsWithAllDefendersScoring.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
-      console.log(randomTeam);
-      const message1 = `POV: When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} opens the FPL app`;
-
-      images = [
-        "https://fpltoolbox.com/wp-content/uploads/2025/03/fine-this-is-fine.png",
-
-        ,
-      ];
-      const img = images[Math.floor(Math.random() * images.length)];
-
-      const defenderRow = document.createElement("div");
-      defenderRow.style.display = "flex";
-      defenderRow.style.gap = "5px";
-      defenderRow.style.flexDirection = "row";
-      randomTeam.currentWeek[0].picks.forEach((player) => {
-        if (getPlayerScore(player.element) === 1) {
-          const card = createPlayerCardNew(
-            player.element,
-            getPlayerScore(player.element),
-            null,
-            null,
-            null
-          );
-          defenderRow.appendChild(card);
-        }
-      });
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        defenderRow,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-  function findPlayersWithOnePointSecond() {
-    console.log("Failed row");
-    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.currentWeek[0].picks.forEach((player) => {
-        if (getPlayerScore(player.element) === 1) {
-          teamsWithAllDefendersScoring.push(team);
-          return;
-        }
-      });
-    }
-
-    console.log(teamsWithAllDefendersScoring); // Check the stored teams
-
-    if (teamsWithAllDefendersScoring.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
-      console.log(randomTeam);
-      const message1 = `"Bro, how's your gameweek going...?"`;
-
-      images = [
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/thumbs-up.png",
-      ];
-      const img = images[Math.floor(Math.random() * images.length)];
-
-      const defenderRow = document.createElement("div");
-      defenderRow.style.display = "flex";
-      defenderRow.style.gap = "5px";
-      defenderRow.style.flexDirection = "row";
-      randomTeam.currentWeek[0].picks.forEach((player) => {
-        if (getPlayerScore(player.element) === 1) {
-          const card = createPlayerCardNew(
-            player.element,
-            getPlayerScore(player.element),
-            null,
-            null,
-            null
-          );
-          defenderRow.appendChild(card);
-        }
-      });
-
-      const randomName = document.createElement("div");
-      randomName.innerText = `${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )}:`;
-
-      randomName.style.fontSize = "1.5rem";
-      randomName.style.fontWeight = "bold";
-      randomName.style.color = "black";
-      randomName.style.backgroundColor = "white";
-      randomName.style.padding = "0.5rem";
-
-      const meme = createMeme4Corners(
-        message1,
-        randomName,
-        null,
-        null,
-        null,
-        defenderRow,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findPlayerSuccess() {
-    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      //console.log(team);
-      if (team) {
-        team.currentWeek[0].picks.forEach((player) => {
-          if (getPlayerScore(player.element) > 8) {
-            teamsWithAllDefendersScoring.push(team);
-            return;
-          }
-        });
-      }
-    }
-
-    console.log(teamsWithAllDefendersScoring); // Check the stored teams
-
-    if (teamsWithAllDefendersScoring.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
-      console.log(randomTeam);
-      const message1 = `POV: When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} opens the FPL app`;
-
-      images = [
-        "https://fpltoolbox.com/wp-content/uploads/2025/03/8d30zh.jpg",
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/liplicking.png",
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/iamjose.webp",
-      ];
-      const img = images[Math.floor(Math.random() * images.length)];
-
-      const defenderRow = document.createElement("div");
-      defenderRow.style.display = "flex";
-      defenderRow.style.gap = "5px";
-      defenderRow.style.flexDirection = "row";
-      randomTeam.currentWeek[0].picks.forEach((player) => {
-        if (getPlayerScore(player.element) > 8) {
-          const card = createPlayerCardNew(
-            player.element,
-            getPlayerScore(player.element),
-            null,
-            null,
-            null
-          );
-          defenderRow.appendChild(card);
-        }
-      });
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        defenderRow,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function findCaptaincyResults() {
-    console.log("finding captains");
-    const successfulCaptains = [];
-    const failedCaptains = [];
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      let captain = null;
-
-      // Find the captain
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.is_captain) captain = player;
-      });
-
-      if (captain) {
-        const captainScore = getPlayerScore(captain.element);
-
-        if (captainScore > 4) {
-          successfulCaptains.push({ team, captain, score: captainScore });
-        } else {
-          failedCaptains.push({ team, captain, score: captainScore });
-        }
-      }
-    }
-    let result = [];
-    // Check if there is at least one failed captain
-    if (failedCaptains.length > 0) {
-      // Pick a random failed captain
-      const randomFailedCaptain =
-        failedCaptains[Math.floor(Math.random() * failedCaptains.length)];
-      result.push(randomFailedCaptain);
-    }
-
-    // Check how many successful captains exist
-    if (successfulCaptains.length >= 2) {
-      const count = successfulCaptains.length >= 3 ? 3 : 2;
-
-      // Shuffle the array and pick the required number of successful captains
-      const shuffledSuccessful = successfulCaptains.sort(
-        () => 0.5 - Math.random()
-      );
-      result.push(...shuffledSuccessful.slice(0, count));
-    }
-    console.log(result);
-
-    if (result.length > 2) {
-      const message = `There's always one...`;
-
-      const captainCards = document.createElement("div");
-      captainCards.id = "dragon-meme-footer";
-
-      function addCaptainToFooter(teamNumber) {
-        const cap = document.createElement("div");
-        const capCard = createPlayerCardNew(
-          result[teamNumber].captain.element,
-          result[teamNumber].score,
-          true,
-          null,
-          null
-        );
-        const capCardText = document.createElement("div");
-        capCardText.id = "dragon-meme-footer-text";
-        capCardText.innerText = `${result[
-          teamNumber
-        ].team.player_name.substring(
-          0,
-          result[teamNumber].team.player_name.indexOf(" ")
-        )}`;
-
-        cap.appendChild(capCard);
-        cap.appendChild(capCardText);
-
-        captainCards.appendChild(cap);
-      }
-
-      addCaptainToFooter(1);
-      addCaptainToFooter(2);
-
-      let img = "https://fpltoolbox.com/wp-content/uploads/2025/02/9e2.jpg";
-
-      if (result.length === 4) {
-        addCaptainToFooter(3);
-        img = "https://fpltoolbox.com/wp-content/uploads/2025/02/4p4zc2.jpg";
-      }
-
-      addCaptainToFooter(0);
-      // if (capCard1 instanceof HTMLElement) {
-      //   capCard1.style.marginLeft = "-70%";
-      //   capCard1.style.transform = "scale(1.2)";
-      // } else {
-      //   console.warn("capCard is not a DOM element:", capCard1);
-      // }
-
-      const meme = createMeme4Corners(
-        message,
-        null,
-        null,
-        null,
-        null,
-        captainCards,
-        img
-      );
-
-      memeContainer.append(meme);
-    } else {
-      console.log("Captain Dragons Meme unavailable");
-    }
-
-    console.log("Successful Captains:", successfulCaptains);
-    console.log("Failed Captains:", failedCaptains);
-  }
-
-  function gwSpecificMeme() {
-    const teamsWithKeyPlayers = []; // Array to store teams with both target players
-    const playersToTarget = [668, 366, 424];
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      if (team) {
-        const pickedPlayerElements = team.currentWeek[0].picks.map(
-          (player) => player.element
-        );
-
-        // Check if ALL playersToTarget are in pickedPlayerElements
-        const hasAllTargetPlayers = playersToTarget.every((targetId) =>
-          pickedPlayerElements.includes(targetId)
-        );
-
-        if (hasAllTargetPlayers) {
-          teamsWithKeyPlayers.push(team);
-        }
-      }
-    }
-
-    console.log(teamsWithKeyPlayers); // Check the stored teams
-
-    if (teamsWithKeyPlayers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithKeyPlayers);
-      console.log(randomTeam);
-      const message1 = `${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} owning these three this gameweek`;
-
-      images = [
-        "https://fpltoolbox.com/wp-content/uploads/2025/03/8d30zh.jpg",
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/liplicking.png",
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/iamjose.webp",
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/very-nice.png",
-      ];
-      const img = images[Math.floor(Math.random() * images.length)];
-
-      const defenderRow = document.createElement("div");
-      defenderRow.style.display = "flex";
-      defenderRow.style.gap = "5px";
-      defenderRow.style.flexDirection = "row";
-      randomTeam.currentWeek[0].picks.forEach((player) => {
-        if (playersToTarget.includes(player.element)) {
-          const card = createPlayerCardNew(
-            player.element,
-            getPlayerScore(player.element),
-            null,
-            null,
-            null
-          );
-          defenderRow.appendChild(card);
-        }
-      });
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        defenderRow,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
-
-  function runAllRandomly() {
-    const functionsList = [
-      findFailedScorer,
-      findHigestTransferMaker,
-      findHighBench,
-      find100Plus,
-      gwSpecificMeme,
-      findMissedPen,
-      findBelowAverage,
-      findLowestScorer,
-      findLowestScorer1,
-      findStrikerFail,
-      findFailedTransferSixth,
-      findChillGuy,
-      findLowBench,
-      findBestMiniLeagueRun,
-      findWorstRun,
-      findHighestandLowest,
-      findKeeperFail,
-      findCaptaincyFailDrake,
-      findCaptaincyFailDoggo,
-      findFailedTransfer,
-      findRedCards,
-      find59Minutes,
-      //findSolidDefence,
-      findPlayersWithOnePoint,
-      findTwoYellows,
-      findLowestScorerAlternative,
-      findCaptaincyResults,
-      findFailedTransferSecond,
-      findPlayerSuccess,
-      //findSolidStrikeForce,
-      findSuccesfulTransfer,
-      findFailedTransferThird,
-      findFailedTransferFourth,
-      findFailedTransferFifth,
-      findPlayersWithOnePointSecond,
-      findFailedhBench,
-    ];
-
-    // Shuffle the list randomly
-    const shuffled = functionsList.sort(() => Math.random() - 0.5);
-
-    // Execute each function in the new random order
-    shuffled.forEach((fn) => fn());
-  }
-
-  function endOfMemes() {
-    const message1 = `Guess who's had enough FPL memes for one day:`;
-    const img =
-      pointingAtYouMemes[Math.floor(Math.random() * pointingAtYouMemes.length)];
-
-    const meme = createMeme4Corners(
-      message1,
-      null,
-      null,
-      null,
-      null,
-      "www.fpltoolbox.com",
-      img
-    );
-    memeContainer.append(meme);
-  }
-
-  function subscribeToProMeme() {
-    const message1 = `POV: You just subscribed to FPL Toolbox Pro and got instant access to even more personalised FPL memes`;
-    const img =
-      surprisedMemes[Math.floor(Math.random() * surprisedMemes.length)];
-
-    const meme = createMeme4Corners(
-      message1,
-      null,
-      null,
-      null,
-      null,
-      "www.fpltoolbox.com",
-      img
-    );
-    memeContainer.append(meme);
-  }
-
-  if (
-    theUser.username.data.membership_level.ID == 10 ||
-    theUser.username.data.membership_level.ID == 12
-  ) {
-    // Call the function to execute all in random order
-    runAllRandomly();
-    endOfMemes();
-    addCaptainBadge();
-  } else if (
-    theUser.username.data.membership_level.ID != 10 ||
-    theUser.username.data.membership_level.ID != 12
-  ) {
-    runAllRandomly(); //Turn off after testing
-    subscribeToProMeme();
-    endOfMemes();
-    addCaptainBadge();
-  } else {
-    ontainer.append("You need to be a pro member to access this feature");
-  }
-  const refreshButton = document.createElement("button");
-  refreshButton.innerHTML = "Refresh Memes";
-  refreshButton.addEventListener("click", showMemes);
-  memeContainer.prepend(refreshButton);
-  container.appendChild(memeContainer);
-  addCaptainBadge();
-}
-
-function shareMeme(meme) {
-  html2canvas(meme).then((canvas) => {
-    const imgData = canvas.toDataURL("image/png");
-
-    if (navigator.share) {
-      // Create a Blob from the image
-      fetch(imgData)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const file = new File([blob], "comparison.png", {
-            type: "image/png",
-          });
-          navigator
-            .share({
-              title: "Check out this FPL meme!",
-              text: "Get personalised FPL memes with just one click at \n www.FPLToolbox.com",
-              files: [file], // Share the image as a file
-            })
-            .catch((err) => alert("Error sharing: " + err));
-        });
-    } else {
-      // Fallback: Download the image if sharing isn't supported
-      const link = document.createElement("a");
-      link.href = imgData;
-      link.download = "fpltoolbox-meme.png";
-      link.click();
-      alert(
-        "Sharing is not supported on your device. Image downloaded instead."
-      );
-    }
-  });
-}
-
-function createMeme4Corners(
-  header,
-  topLeft,
-  topRight,
-  bottomRight,
-  bottomLeft,
-  footer,
-  imageSrc
-) {
-  // Main meme container
-  const meme = document.createElement("div");
-  meme.className = "custom-meme";
-  meme.style.position = "relative";
-  meme.style.width = "100%";
-  meme.style.display = "flex";
-  meme.style.flexDirection = "column";
-  meme.style.alignItems = "center";
-
-  // Utility function to handle text or elements
-  function appendContent(container, content) {
-    if (typeof content === "string") {
-      container.textContent = content;
-    } else if (content instanceof HTMLElement) {
-      container.appendChild(content);
-    }
-  }
-
-  // Header
-  if (header) {
-    const headerContainer = document.createElement("div");
-    headerContainer.className = "meme-header";
-
-    // Watermark Container
-    const watermarkContainer = document.createElement("div");
-    watermarkContainer.id = "watermark-container";
-
-    const watermarkLogo = document.createElement("img");
-    watermarkLogo.src =
-      "https://fpltoolbox.com/wp-content/uploads/2024/01/Blog-Graphic-Mobile-1-e1733487933669.jpg";
-    watermarkLogo.id = "watermark-logo";
-
-    const watermarkText = document.createElement("p");
-    watermarkText.textContent = "FPLToolbox";
-    watermarkText.id = "watermark-text";
-
-    watermarkContainer.appendChild(watermarkLogo);
-    watermarkContainer.appendChild(watermarkText);
-
-    // Create a header wrapper for text
-    const headerContent = document.createElement("div");
-    appendContent(headerContent, header); // This handles both text & elements
-
-    // Append watermark & header text separately
-    headerContainer.appendChild(watermarkContainer);
-    headerContainer.appendChild(headerContent);
-
-    // Add header to meme
-    meme.appendChild(headerContainer);
-  }
-
-  // Image container
-  const imgContainer = document.createElement("div");
-  imgContainer.style.position = "relative";
-  imgContainer.style.width = "100%";
-  imgContainer.id = "meme-image-container";
-
-  const img = document.createElement("img");
-  img.src = imageSrc;
-  img.style.width = "100%";
-  img.style.display = "block";
-
-  // Overlay Text Positions
-  const overlayTextStyles = {
-    position: "absolute",
-    color: "white",
-    maxWidth: "45%",
-  };
-
-  const overlayPositions = {
-    topLeft: { top: "10%", left: "5%" },
-    topRight: { top: "10%", right: "5%", textAlign: "right" },
-    bottomRight: { bottom: "10%", right: "5%", textAlign: "right" },
-    bottomLeft: { bottom: "10%", left: "5%" },
-  };
-
-  function createOverlay(position, content) {
-    if (content) {
-      const overlay = document.createElement("div");
-      Object.assign(overlay.style, overlayTextStyles, position);
-      appendContent(overlay, content);
-      imgContainer.appendChild(overlay);
-    }
-  }
-
-  createOverlay(overlayPositions.topLeft, topLeft);
-  createOverlay(overlayPositions.topRight, topRight);
-  createOverlay(overlayPositions.bottomRight, bottomRight);
-  createOverlay(overlayPositions.bottomLeft, bottomLeft);
-
-  imgContainer.appendChild(img);
-  meme.appendChild(imgContainer);
-
-  // Footer
-  if (footer) {
-    const footerContainer = document.createElement("div");
-    footerContainer.className = "meme-footer";
-
-    appendContent(footerContainer, footer);
-    meme.appendChild(footerContainer);
-  }
-  // Share functionality
-  meme.addEventListener("click", () => shareMeme(meme));
-  return meme;
-}
-
-function featureRequest() {
-  if (userHasAccess([10, 12])) {
-    showModal({
-      title: "Feature Request",
-      body: "Got a great idea for feature? Tell me all about it! <strong>If</strong> I can do it - I will try my best to add it to the toolbox. <br><br>Head over to your profile page to submit your request",
-      confirmText: "Take me there",
-      onConfirm: () => {
-        window.location.href = profilePageUrlPageUrl;
-      },
-    });
-  } else {
-    showModal({
-      title: "Paid Feature",
-      body: "Feature requests are only availble to <strong>Paid members</strong>. <br><br>Upgrade to unlock!",
-      confirmText: "Upgrade Now",
-      onConfirm: () => {
-        window.location.href = subscriptionPageUrl;
-      },
-    });
-  }
-}
-
-//Copycat Code
-const influencersList = [
-  {
-    influencer: "FPL Harry",
-    entry: 3544,
-    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/channels4_profile.jpg",
-  },
-  {
-    influencer: "Let's Talk FPL",
-    entry: 24,
-    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/LTFPL_Icon-1-480x480-1.webp",
-  },
-  {
-    influencer: "FPL Raptor",
-    entry: 746,
-    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/channels4_profile-1.jpg",
-  },
-  {
-    influencer: "FPL Focal",
-    entry: 1301,
-    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/ab67656300005f1f8105233ce9dc6cb312e54569.jpg",
-  },
-  {
-    influencer: "Holly Shand",
-    entry: 9,
-    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/0Fn-qMWH_400x400.jpg",
-  },
-];
-
-function getinfluencerName(entry) {
-  for (let i = 0; i < influencersList.length; i++) {
-    if (entry === influencersList[i].entry)
-      return influencersList[i].influencer;
-  }
-}
-function getinfluencerImg(entry) {
-  for (let i = 0; i < influencersList.length; i++) {
-    if (entry === influencersList[i].entry) return influencersList[i].img;
-  }
-}
-function extractTeamIds(arrayOfTeams) {
-  return arrayOfTeams.map((team) => team.entry);
-}
-
-async function showCopycatFinder() {
-  if (currentGw < 38) {
-    showModal({
-      title: "Coming Soon",
-      body: "Come back in a few weeks (around gameweek 6) - we don't have enough info to yet to give you anything useful!",
-      confirmText: "Ok",
-      onConfirm: () => {}, // No action taken
-    });
-    return;
-  }
-
-  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
-  const app = document.getElementById("screen-tools");
-  app.innerHTML = "";
-
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  app.appendChild(backBtn);
-
-  // Add a header above the cards
-  const header = document.createElement("h6");
-  header.innerText = `Catch a copycat! \n Tap Team To Reveal the Truth`;
-  header.style.textAlign = "center";
-  app.appendChild(header);
-  showBootstrapSpinner(app);
-
-  // Fetch data for influencers
-  const arrayOfTeamIds = extractTeamIds(influencersList);
-  const influencers = await createInfluencerLeague(arrayOfTeamIds);
-
-  console.log(influencers);
-
-  // Fetch data for the user's team
-  fetch(
-    BASE_URL +
-      "/entry/" +
-      theUser.info.team_id +
-      "/event/" +
-      currentGw +
-      "/picks/"
-  )
-    .then((res) => res.json())
-    .then((data) => {
-      let myTeam = data;
-      console.log(myTeam);
-      removeSpinner();
-
-      const tableWrapper = document.createElement("div");
-      tableWrapper.className = "table-responsive";
-
-      const table = document.createElement("table");
-      const darkMode = localStorage.getItem("darkMode") === "true";
-
-      table.classList.add(
-        "table",
-        "table-striped",
-        "table-hover",
-        "table-bordered",
-        "align-middle",
-        darkMode ? "table-dark" : "table-light"
-      );
-
-      const thead = document.createElement("thead");
-      thead.classList.add("text-center");
-
-      const headerRow = document.createElement("tr");
-      const headers = ["Pos", "Team", "Total"];
-
-      headers.forEach((headerText) => {
-        const th = document.createElement("th");
-        th.innerText = headerText;
-        headerRow.appendChild(th);
-      });
-
-      thead.appendChild(headerRow);
-      table.appendChild(thead);
-
-      const tbody = document.createElement("tbody");
-
-      // Loop through league standings and add table rows
-      leagueToDisplay.standings.forEach((element) => {
-        const row = document.createElement("tr");
-
-        // Position
-        const posCell = document.createElement("td");
-        posCell.innerText = element.rank;
-        row.appendChild(posCell);
-
-        // Team and Manager Name
-        const teamCell = document.createElement("td");
-        teamCell.innerHTML = `
-    <strong>${element.entry_name}</strong><br>
-    <small>${element.player_name}</small>
-  `;
-        row.appendChild(teamCell);
-
-        // Total Points
-        const totalCell = document.createElement("td");
-        totalCell.innerText = element.total;
-        row.appendChild(totalCell);
-
-        // Optional: make row clickable
-        row.style.cursor = "pointer";
-        row.addEventListener("click", function () {
-          selectInfluencer(element, influencers);
-        });
-
-        tbody.appendChild(row);
-      });
-
-      table.appendChild(tbody);
-      tableWrapper.appendChild(table);
-      app.appendChild(tableWrapper);
-    })
-    .then(() => {
-      const div = document.createElement("a");
-      div.href = "https://fpltoolbox.com/help";
-      div.innerHTML = "Want to know more on about how this works? Click here";
-      div.style.padding = "20px";
-      app.appendChild(div);
-    });
-}
-
-async function selectInfluencer(team2, influencers) {
-  console.log(team2);
-  console.log(influencers);
-  if (team2.everyGw[0].gameweek != 1) {
-    alert(
-      `${team2.player_name} missed a few games at the begining of the season, I don't quite have enough evidence to make comparisons here.`
-    );
-    console.log(team2);
-  }
-  const t2Picks = team2.everyGwPicks;
-
-  // Extract elements and active_chip for team2's picks for each gameweek
-  const t2Elements = t2Picks.map((gw) =>
-    gw.picks.slice(0, 11).map((pick) => pick.element)
-  );
-  const t2ActiveChips = t2Picks.map((gw) => gw.active_chip);
-
-  // Extract elements and active_chip for each influencer's picks for each gameweek
-  const influencersPicks = influencers.map((influencer) => {
-    return influencer.everyGwPicks.map((gw) => {
-      return {
-        elements: gw.picks.slice(0, 11).map((pick) => pick.element),
-        active_chip: gw.active_chip,
-      };
-    });
-  });
-
-  // Function to calculate added and removed elements
-  function trackElementChanges(prevElements, currentElements) {
-    const added = currentElements.filter(
-      (element) => !prevElements.includes(element)
-    );
-    const removed = prevElements.filter(
-      (element) => !currentElements.includes(element)
-    );
-    return { added, removed };
-  }
-
-  // Function to calculate the percentage of matching elements and track active_chip
-  function calculateMatchPercentage(
-    t2Elements,
-    t2ActiveChips,
-    influencerElements,
-    influencerActiveChips
-  ) {
-    let totalMatches = 0;
-    let gameweeksWithMatches = [];
-    let bothTeamsActiveChip = [];
-    let elementChanges = []; // To track changes
-
-    t2Elements.forEach((gwElements, index) => {
-      const influencerGwElements = influencerElements[index];
-      const matchCount = gwElements.filter((element) =>
-        influencerGwElements.includes(element)
-      ).length;
-      const matchPercentage = (matchCount / gwElements.length) * 100;
-      totalMatches += matchPercentage;
-
-      // Track the gameweek with the highest match percentage
-      const activeChip =
-        t2ActiveChips[index] && t2ActiveChips[index] !== "null"
-          ? ` (Active chip: ${t2ActiveChips[index]})`
-          : "";
-      gameweeksWithMatches.push({
-        gameweek: index + 1,
-        matchPercentage,
-        activeChip,
-      });
-
-      // Check if both teams have an active_chip for the same gameweek
-      if (
-        t2ActiveChips[index] &&
-        t2ActiveChips[index] !== "null" &&
-        influencerActiveChips[index] &&
-        influencerActiveChips[index] !== "null"
-      ) {
-        bothTeamsActiveChip.push(index + 1); // Store the gameweek number
-      }
-
-      // Track added and removed elements for each gameweek, only if the changes match
-      if (index > 0) {
-        const prevT2Elements = t2Elements[index - 1];
-        const prevInfluencerElements = influencerElements[index - 1];
-
-        const t2Changes = trackElementChanges(prevT2Elements, gwElements);
-        const influencerChanges = trackElementChanges(
-          prevInfluencerElements,
-          influencerGwElements
-        );
-
-        // Only include gameweek if the changes are exactly the same
-        if (
-          JSON.stringify(t2Changes.added) ===
-            JSON.stringify(influencerChanges.added) &&
-          JSON.stringify(t2Changes.removed) ===
-            JSON.stringify(influencerChanges.removed)
-        ) {
-          elementChanges.push({
-            gameweek: index + 1,
-            t2: t2Changes,
-            influencer: influencerChanges,
-          });
-        }
-      }
-    });
-
-    // Sort gameweeks by match percentage in descending order
-    gameweeksWithMatches.sort((a, b) => b.matchPercentage - a.matchPercentage);
-
-    // Return the total match percentage, the most similar gameweeks, and gameweeks where both teams had active_chip
-    return {
-      averageMatchPercentage: totalMatches / t2Elements.length,
-      mostSimilarGameweeks: gameweeksWithMatches.slice(0, 3), // Top 3 most similar gameweeks
-      bothTeamsActiveChip, // Gameweeks where both teams had active_chip
-      elementChanges, // Track element changes for each gameweek
-    };
-  }
-
-  // Find the influencer with the highest match percentage
-  let bestMatch = {
-    influencer: null,
-    matchPercentage: 0,
-    mostSimilarGameweeks: [],
-    bothTeamsActiveChip: [],
-    elementChanges: [],
-  };
-
-  influencersPicks.forEach((influencerPicks, index) => {
-    const {
-      averageMatchPercentage,
-      mostSimilarGameweeks,
-      bothTeamsActiveChip,
-      elementChanges,
-    } = calculateMatchPercentage(
-      t2Elements,
-      t2ActiveChips,
-      influencerPicks.map((pick) => pick.elements),
-      influencerPicks.map((pick) => pick.active_chip)
-    );
-    if (averageMatchPercentage > bestMatch.matchPercentage) {
-      bestMatch = {
-        influencer: influencers[index],
-        matchPercentage: averageMatchPercentage,
-        mostSimilarGameweeks,
-        bothTeamsActiveChip,
-        elementChanges,
-      };
-    }
-  });
-
-  // Reusable function to track captain's element for a team's gameweeks
-  const trackCaptains = (everyGwPicks) => {
-    return everyGwPicks.map((gw) => {
-      const captain = gw.picks.find((pick) => pick.is_captain);
-      return {
-        gameweek: gw.gameweek, // Include gameweek info if available
-        captainElement: captain ? captain.element : null, // Record captain's element or null if no captain
-      };
-    });
-  };
-
-  // Use the reusable function for both bestMatch and team2
-  const trackedBestMatchCaptains = trackCaptains(
-    bestMatch.influencer.everyGwPicks
-  );
-  const trackedt2Captains = trackCaptains(team2.everyGwPicks);
-
-  console.log(trackedBestMatchCaptains);
-  console.log(trackedt2Captains);
-
-  // Calculate how many times both picked the same captainElement
-  const matchingCaptains = trackedBestMatchCaptains.reduce(
-    (count, bm, index) => {
-      const t2 = trackedt2Captains[index];
-      return bm.captainElement === t2.captainElement ? count + 1 : count;
-    },
-    0
-  );
-
-  let matchingCaptainMessage;
-  if (`${matchingCaptains}` == currentGw) {
-    matchingCaptainMessage = `Both have had the same captain pick EVERY gameweek. Sounds a bit fishy to me!\n`;
-  } else if (`${matchingCaptains}` != currentGw) {
-    matchingCaptainMessage = `Make of this what you will, but both ${
-      team2.player_name
-    } and ${getinfluencerName(
-      bestMatch.influencer.entry
-    )} picked the same captain for ${matchingCaptains} out of ${currentGw} gameweeks. It might have just been a common strategy in those gameweeks!\n`;
-  }
-
-  // Create a div element to display the best match, most similar gameweeks, the active_chip comparison, and element changes
-  const div = document.createElement("div");
-  div.id = "copycat-popup-body";
-
-  const similarGameweeks = bestMatch.mostSimilarGameweeks
-    .map(
-      (gw) =>
-        `<li>Gameweek ${gw.gameweek}: ${gw.matchPercentage.toFixed(0)}%</li>`
-    )
-    .join("");
-
-  const activeChipMessage =
-    bestMatch.bothTeamsActiveChip.length > 0
-      ? `Both teams had a chip activated in Gameweeks: ${bestMatch.bothTeamsActiveChip.join(
-          ", "
-        )}. Just saying 👀. Add that to your evidence.`
-      : "They've never had a chip activated in the same week.";
-
-  // Create the elementChanges message (only if there are changes)
-  const elementChangesMessage = bestMatch.elementChanges
-    .filter((change) => {
-      // Check if there are actual changes (added or removed elements)
-      return (
-        change.t2.added.length > 0 ||
-        change.t2.removed.length > 0 ||
-        change.influencer.added.length > 0 ||
-        change.influencer.removed.length > 0
-      );
-    })
-    .map((change) => {
-      const t2Added = change.t2.added.length
-        ? `${team2.player_name} transferred in: ${change.t2.added
-            .map(getPlayerWebName)
-            .join(", ")}`
-        : "";
-      const t2Removed = change.t2.removed.length
-        ? `${team2.player_name} transferred out: ${change.t2.removed
-            .map(getPlayerWebName)
-            .join(", ")}`
-        : "";
-      const influencerAdded = change.influencer.added.length
-        ? `${getinfluencerName(
-            bestMatch.influencer.entry
-          )} transferred in: ${change.influencer.added
-            .map(getPlayerWebName)
-            .join(", ")}`
-        : "";
-      const influencerRemoved = change.influencer.removed.length
-        ? `${getinfluencerName(
-            bestMatch.influencer.entry
-          )} transferred out: ${change.influencer.removed
-            .map(getPlayerWebName)
-            .join(", ")}`
-        : "";
-
-      return `
-  <li>Gameweek ${change.gameweek}: 
-${t2Added}
-${influencerAdded} 
-${t2Removed} 
-${influencerRemoved}
-</li>
-  `;
-    })
-    .join("");
-
-  // Only include the element changes section if there are any changes
-  const elementChangesSection = elementChangesMessage
-    ? `<br>Look what else I found:<ul>${elementChangesMessage}</ul>`
-    : "";
-  console.log(bestMatch.influencer);
-  const influencerScore =
-    bestMatch.influencer.everyGwPicks[
-      bestMatch.influencer.everyGwPicks.length - 1
-    ].total_points;
-  console.log(influencerScore);
-  let scoreMessage;
-  if (team2.total > influencerScore) {
-    scoreMessage = `<p>It's worth noting that ${team2.player_name} has ${
-      team2.total - influencerScore
-    } more points anyway, so be careful with those accusations! What if ${getinfluencerName(
-      bestMatch.influencer.entry
-    )} is copying ${team2.player_name}?</p>`;
-  } else if (team2.total < influencerScore) {
-    scoreMessage = `<p>By the way, ${team2.player_name} has ${
-      influencerScore - team2.total
-    } fewer points than ${getinfluencerName(
-      bestMatch.influencer.entry
-    )}. Take that into consideration.</p>`;
-  } else {
-    scoreMessage = `<p>WTF! They have the same amount of points! Coincidence?</p>`;
-  }
-
-  let matchMessage;
-
-  if (bestMatch.matchPercentage >= 90) {
-    matchMessage = `<strong><h2>Caught Red Handed</h2></strong><p>AWKWARD! - there's enough here to throw the book at ${team2.player_name}! Approach with caution, suspect could turn violent.</p>`;
-  } else if (bestMatch.matchPercentage >= 80) {
-    matchMessage = `<strong><h2>Hot Match!</h2></strong><p>${team2.player_name} seems heavily influenced by an outsider. Keep a close eye on this situation and monitor them for a few more weeks.</p>`;
-  } else if (bestMatch.matchPercentage >= 70) {
-    matchMessage = `<strong><h2>Warm Warning</h2></strong><p>Things are starting to heat up! Could ${team2.player_name} be borrowing ideas? Check the stats and decide for yourself.</p>`;
-  } else if (bestMatch.matchPercentage >= 60) {
-    matchMessage = `<strong><h2>Warm Match</h2></strong><p>No major drama here, but it’s worth keeping ${team2.player_name} on your radar. Have a look at the stats below for clarity.</p>`;
-  } else if (bestMatch.matchPercentage >= 50) {
-    matchMessage = `<strong><h2>Luke Warm</h2></strong><p>Nothing conclusive yet. ${team2.player_name} might just be playing it safe and sticking to common strategies.</p>`;
-  } else if (bestMatch.matchPercentage >= 40) {
-    matchMessage = `<strong><h2>Chilly Match</h2></strong><p>No need to worry too much. ${team2.player_name} seems to be taking an independent approach to their FPL team.</p>`;
-  } else if (bestMatch.matchPercentage >= 30) {
-    matchMessage = `<strong><h2>Cold Match</h2></strong><p>It’s unlikely that ${team2.player_name} is being influenced. They appear to be paving their own path in FPL.</p>`;
-  } else if (bestMatch.matchPercentage >= 20) {
-    matchMessage = `<strong><h2>Subtle Chill</h2></strong><p>${team2.player_name} is almost certainly playing their own game. Nothing to see here!</p>`;
-  } else {
-    matchMessage = `<strong><h2>Sub Zero</h2></strong><p>${team2.player_name} is an FPL maverick with a completely unique strategy. No signs of influence detected.</p>`;
-  }
-
-  let influencerContainer = `<h4 style="text-align:center">FPLToolbox Copycat Rating:</h4>  
-<div class="best-match-percentage-bar-container">
-  <div class="best-match-bar"></div>
-  <div class="copycat-pointer" style="left: 0%">▼</div>
-</div>
-  <div class="influencer-container">
-The best match I found was with ${getinfluencerName(
-    bestMatch.influencer.entry
-  )}, they had a copycat percentage of ${bestMatch.matchPercentage.toFixed(
-    0
-  )}%<br>
-  <img id="influencer-profile-pic" src="${getinfluencerImg(
-    bestMatch.influencer.entry
-  )}">  
-  </div>`;
-
-  // Animate the pointer to the desired position
-  setTimeout(() => {
-    // Select the pointer element
-    const pointer = document.querySelector(".copycat-pointer");
-    pointer.style.left = `${bestMatch.matchPercentage}%`;
-  }, 500); // Optional slight delay to ensure styles are applied smoothly
-
-  div.innerHTML = `
-${matchMessage}
-${influencerContainer}
-${scoreMessage}
-<div class="similar-gameweeks">
-<p>The gameweeks where their starting 11 were the most similar:</p>
-<ul>${similarGameweeks}</ul>
-</div>
-${matchingCaptainMessage}
-
-${activeChipMessage}
-${elementChangesSection}
-`;
-
-  // Assuming `createAndShowInfluencerComparison` is defined elsewhere to display the comparison
-  createAndShowInfluencerComparison(div);
-}
-
-async function createInfluencerLeague(arrayOfTeamIds) {
-  const manuallyMadeLeague = [];
-
-  for (const entry of arrayOfTeamIds) {
-    const everyGwPicks = [];
-
-    for (let gw = 1; gw <= currentGw; gw++) {
-      try {
-        const response = await fetch(
-          `${BASE_URL}/entry/${entry}/event/${gw}/picks/`
-        );
-        const data = await response.json();
-        everyGwPicks.push({
-          active_chip: data.active_chip,
-          gameweek: data.entry_history.event,
-          total_points: data.entry_history.total_points,
-          picks: data.picks,
-        });
-      } catch (error) {
-        console.error(
-          `Failed to fetch data for team ID ${entry}, gameweek ${gw}:`,
-          error
-        );
-      }
-    }
-
-    manuallyMadeLeague.push({ entry, everyGwPicks });
-  }
-
-  return manuallyMadeLeague;
-}
-function createAndShowInfluencerComparison(content) {
-  // Create modal elements
-  const modal = document.createElement("div");
-  modal.id = "share-influencer-comparison";
-
-  const modalContent = document.createElement("div");
-  modalContent.id = "influencer-comparison-modal";
-
-  const modalMessage = document.createElement("div");
-  modalMessage.id = "influencer-comparison-message";
-
-  // Append the content (DOM element or string) to the modal message
-  if (typeof content === "string") {
-    modalMessage.textContent = content;
-  } else if (content instanceof HTMLElement) {
-    modalMessage.appendChild(content);
-  } else {
-    modalMessage.textContent = "Invalid content provided for the modal.";
-  }
-
-  const shareBtn = document.createElement("button");
-  shareBtn.id = "shareBtn";
-  shareBtn.style.marginRight = "10px";
-  shareBtn.style.fontSize = "1rem";
-  shareBtn.textContent = "Share";
-
-  const closeModal = document.createElement("button");
-  closeModal.id = "closeModal";
-  closeModal.style.marginRight = "10px";
-  closeModal.style.fontSize = "1rem";
-  closeModal.textContent = "Close";
-
-  // Append elements to the modal
-  modalContent.appendChild(modalMessage);
-  modalContent.appendChild(shareBtn);
-  modalContent.appendChild(closeModal);
-  modal.appendChild(modalContent);
-
-  // Append the modal to the body
-  document.body.appendChild(modal);
-
-  // Close the modal
-  closeModal.addEventListener("click", () => {
-    document.body.removeChild(modal);
-  });
-
-  // Share button functionality
-  shareBtn.addEventListener("click", () => {
-    html2canvas(modalContent).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-
-      if (navigator.share) {
-        // Create a Blob from the image
-        fetch(imgData)
-          .then((res) => res.blob())
-          .then((blob) => {
-            const file = new File([blob], "comparison.png", {
-              type: "image/png",
-            });
-            navigator
-              .share({
-                title: "Catch an FPL Copycat",
-                text: "Check out this influencer comparison!",
-                files: [file], // Share the image as a file
-              })
-              .catch((err) => alert("Error sharing: " + err));
-          });
-      } else {
-        // Fallback: Download the image if sharing isn't supported
-        const link = document.createElement("a");
-        link.href = imgData;
-        link.download = "comparison.png";
-        link.click();
-        alert(
-          "Sharing is not supported on your device. Image downloaded instead."
-        );
-      }
-    });
-  });
-}
-
-//MAX Features
-
-// Helper to create a chart container
-function createChartContainer(divID) {
-  const container = document.createElement("div");
-  container.style.marginBottom = "20px";
-  container.classList.add("chart-js-container");
-  const canvas = document.createElement("canvas");
-  container.appendChild(canvas);
-  divID.appendChild(container);
-  return canvas;
-}
-function createTopStatTable({
-  standings,
-  containerDiv,
-  titleText,
-  statKeys,
-  statLabels,
-  limit = 3,
-  sortOrder = "desc",
-  statExtractor,
-  rowInfoExtractor = () => "",
-}) {
-  const getStatValue = statExtractor
-    ? statExtractor
-    : (team) => statKeys.reduce((sum, key) => sum + (team[key] || 0), 0);
-
-  const sorted = [...standings]
-    .sort((a, b) =>
-      sortOrder === "asc"
-        ? getStatValue(a) - getStatValue(b)
-        : getStatValue(b) - getStatValue(a)
-    )
-    .slice(0, limit);
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  // Card wrapper
-const wrapper = document.createElement("div");
-wrapper.classList.add("card", "shadow-sm", "mb-3");
-if (darkMode) wrapper.classList.add("bg-dark", "text-white", "border-secondary");
-
-const cardBody = document.createElement("div");
-cardBody.classList.add("card-body");
-
-const title = document.createElement("h5");
-title.classList.add("card-title", "mb-3");
-title.textContent = titleText;
-
-// Table with Bootstrap classes
-const table = document.createElement("table");
-table.className = `table table-striped table-hover table-sm mb-0 ${darkMode ? "table-dark" : ""}`;
-
-const thead = document.createElement("thead");
-const headerCells = statLabels
-  .map((label) => `<th class="text-end">${label}</th>`)
-  .join("");
-
-thead.innerHTML = `
-  <tr>
-    <th class="text-start">#</th>
-    <th class="text-start">Team</th>
-    ${headerCells}
-  </tr>
-`;
-
-  const medals = ["🥇", "🥈", "🥉"];
-  const tbody = document.createElement("tbody");
-
-  sorted.forEach((team, index) => {
-    const rankDisplay = medals[index] || index + 1;
-    const rowInfo = rowInfoExtractor(team);
-
-    const statCells = statExtractor
-      ? `<td class="text-end">${getStatValue(team)}</td>`
-      : statKeys
-          .map((key) => `<td class="text-end">${team[key]}</td>`)
-          .join("");
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${rankDisplay}</td>
-      <td>${team.entry_name}${rowInfo}</td>
-      ${statCells}
-    `;
-    tbody.appendChild(row);
-  });
-
-  table.appendChild(thead);
-  table.appendChild(tbody);
-
-  // Assemble card
-  cardBody.appendChild(title);
-  cardBody.appendChild(table);
-  wrapper.appendChild(cardBody);
-  containerDiv.appendChild(wrapper);
-}
-
-async function createSeasonMaxDashboard() {
-
-  
-  let leagueToDisplay = dummyLeague.standings;
-  if (userHasAccess([12])) {
-    leagueToDisplay = window.FPLToolboxLeagueData.standings;
-  }
-  console.log(leagueToDisplay);
-
-  const app = document.getElementById("screen-tools");
-  app.innerHTML = ""; // Clear existing content
-    // Back button
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  app.appendChild(backBtn);
-  // Create Bootstrap container
-  const container = document.createElement("div");
-  container.className = "container my-4";
-
-  // Create row to contain stats and sidebar
-  const row = document.createElement("div");
-  row.className = "row";
-
-  // === MAIN STATS GRID ===
-  const seasonStats = document.createElement("div");
-  seasonStats.id = "season-stats";
-  seasonStats.className = "row g-3"; // Bootstrap grid spacing
-
-
-  // Example stat cards
-  // for (let i = 1; i <= 6; i++) {
-  //   const statCard = document.createElement("div");
-  //   statCard.className = "col-12 col-md-6";
-  //   statCard.innerHTML = `
-  //   <div class="card shadow-sm text-center">
-  //     <div class="card-body">
-  //       <h6 class="card-title">Stat ${i}</h6>
-  //       <p class="card-text">Value ${i * 10}</p>
-  //     </div>
-  //   </div>
-  // `;
-  //   seasonStats.appendChild(statCard);
-  // }
-
-  // === SIDEBAR CONTENT ===
-  const sidebarCol = document.createElement("div");
-  sidebarCol.className = "col-12 col-lg-3";
-  sidebarCol.id = "sidebar-container";
-
-  const sidebarContent = document.createElement("div");
-  sidebarContent.id = "season-stats-sidebar";
-
-  // === MAIN STATS COLUMN ===
-  const statsCol = document.createElement("div");
-  statsCol.className = "col-12 col-lg-9 mb-4";
-  statsCol.appendChild(seasonStats);
-
-  // === Assemble the layout ===
-  row.appendChild(statsCol);
-  row.appendChild(sidebarCol);
-  container.appendChild(row);
-  app.appendChild(container);
-
-  await createSeasonMaxTable(leagueToDisplay, seasonStats);
-  const chipsChart = await createChipsUsedChart(leagueToDisplay);
-  seasonStats.appendChild(chipsChart);
-
-  const managerOfTheMonth = await findManagersOfTheMonth(leagueToDisplay, bootstrap.phases);
-  seasonStats.appendChild(managerOfTheMonth);
-
-  // Most Captaincy Points
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Captaincy Points",
-    statKeys: ["total_captaincy_points"],
-    statLabels: ["Points"],
-    limit: 10, // top 10
-    sortOrder: "desc",
-  });
-
-  // Fewest Captaincy Points
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Fewest Captaincy Points",
-    statKeys: ["total_captaincy_points"],
-    statLabels: ["Points"],
-    limit: 10,
-    sortOrder: "asc", // you'll need to add this option below
-  });
-
-  // Most Benched Points
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Benched Points",
-    statKeys: ["totalPointsOnBench"],
-    statLabels: ["Points"],
-    limit: 10, // top 10
-    sortOrder: "desc",
-  });
-
-  // Fewest Benched Points
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Fewest Benched Points",
-    statKeys: ["totalPointsOnBench"],
-    statLabels: ["Points"],
-    limit: 10,
-    sortOrder: "asc", // you'll need to add this option below
-  });
-
-  // Most goals scored
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Goals Scored",
-    statKeys: ["total_goals_scored"],
-    statLabels: ["Goals"],
-    limit: 10, // top 10
-    sortOrder: "desc",
-  });
-
-  // Fewest goals scored
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Fewest Goals Scored",
-    statKeys: ["total_goals_scored"],
-    statLabels: ["Goals"],
-    limit: 10,
-    sortOrder: "asc", // you'll need to add this option below
-  });
-
-  // Most goals conceded
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Goals Conceded",
-    statKeys: ["total_goals_conceded"],
-    statLabels: ["Goals Conceded"],
-    limit: 3, // top 10
-    sortOrder: "desc",
-  });
-
-  // Fewest goals conceded
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Fewest Goals Conceded",
-    statKeys: ["total_goals_conceded"],
-    statLabels: ["Goals Conceded"],
-    limit: 3,
-    sortOrder: "asc", // you'll need to add this option below
-  });
-
-  // Most minutes played
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Minutes Played",
-    statKeys: ["total_minutes"],
-    statLabels: ["Minutes"],
-    limit: 3,
-    sortOrder: "desc",
-  });
-
-  // Most own goals
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Own Goals",
-    statKeys: ["total_own_goals"],
-    statLabels: ["Own Goals"],
-    limit: 3,
-    sortOrder: "desc",
-  });
-
-  // Most penalties missed
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Penalties Missed",
-    statKeys: ["total_penalties_missed"],
-    statLabels: ["Penalties Missed"],
-    limit: 3,
-    sortOrder: "desc",
-  });
-  // Most cards
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Cards",
-    statKeys: ["total_yellow_cards", "total_red_cards"],
-    statLabels: ["Yellow", "Red"],
-    limit: 3,
-    sortOrder: "desc",
-  });
-  // Most Saves
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Saves",
-    statKeys: ["total_saves"],
-    statLabels: ["Saves"],
-    limit: 3,
-    sortOrder: "desc",
-  });
-  // Most Cleansheets
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Cleansheets",
-    statKeys: ["total_clean_sheets"],
-    statLabels: ["CleanSheets"],
-    limit: 3,
-    sortOrder: "desc",
-  });
-
-  // Most Experienced
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Most Experienced",
-    statKeys: ["seasons"],
-    statLabels: ["Years"],
-    limit: 3,
-    sortOrder: "desc",
-  });
-
-  //Best Week
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Best Week",
-    statLabels: ["Points"],
-    limit: 3,
-    sortOrder: "desc",
-    statExtractor: (team) => team.bestWeek?.points ?? 0,
-    rowInfoExtractor: (team) =>
-      team.bestWeek?.event
-        ? ` <span style="color: gray; font-size: 0.85em;">(GW${team.bestWeek.event})</span>`
-        : "",
-  });
-  //Worst Week
-  createTopStatTable({
-    standings: leagueToDisplay,
-    containerDiv: sidebarCol,
-    titleText: "Worst Week",
-    statLabels: ["Points"],
-    limit: 3,
-    sortOrder: "asc",
-    statExtractor: (team) => team.worstWeek?.points ?? 0,
-    rowInfoExtractor: (team) =>
-      team.worstWeek?.event
-        ? ` <span style="color: gray; font-size: 0.85em;">(GW${team.worstWeek.event})</span>`
-        : "",
-  });
-}
-
-async function createSeasonMaxTable(standings, containerDiv) {
-
-  
-  const table = document.createElement("table");
-  table.id = "league-table";
-  table.style.width = "100%";
-  table.style.borderCollapse = "collapse";
-
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered",
-    "align-middle",
-    darkMode ? "table-dark" : "table-light"
-  );
-
-  const headers = [
-    { label: "Rank", key: "rank" },
-    { label: "Team Name", key: "entry_name" },
-    { label: "First Name", key: "managerDetails.player_first_name" },
-    { label: "Last Name", key: "managerDetails.player_last_name" },
-    {
-      label: "Favourite Team",
-      value: async (team) => {
-        const name = await getTeamName(team.managerDetails.favourite_team);
-       
-        return (name == null || name === 'undefined') ? "" : name;
-      },
-    },
-    { label: "Total Points", key: "managerDetails.summary_overall_points" },
-    {
-      label: "Chips Used",
-      value: async (team) => await team.chips?.length || 0,
-    },
-
-    { label: "Minus Points", key: "totalMinusPoints" },
-    { label: "Bench Points", key: "totalPointsOnBench" },
-    { label: "Transfers", key: "totalTransfers" },
-    { label: "Region", key: "managerDetails.player_region_name" },
-    { label: "Years Active", key: "managerDetails.years_active" },
-    { label: "Overall Rank", key: "managerDetails.summary_overall_rank" },
-    { label: "Total Transfers", key: "totalTransfers" },
-    { label: "Total Assists", key: "total_assists" },
-    { label: "Total Home Games", key: "total_home_games" },
-    { label: "Total Away Games", key: "total_away_games" },
-    { label: "Total Captaincy Points", key: "total_captaincy_points" },
-    { label: "Total Cards", key: "total_cards" },
-    { label: "Total Clean Sheets", key: "total_clean_sheets" },
-    { label: "Total Goals Conceded", key: "total_goals_conceded" },
-    { label: "Total Goals Scored", key: "total_goals_scored" },
-    { label: "Total Minutes", key: "total_minutes" },
-    { label: "Total Own Goals", key: "total_own_goals" },
-    { label: "Total Penalties Missed", key: "total_penalties_missed" },
-    { label: "Total Red Cards", key: "total_red_cards" },
-    { label: "Total Saves", key: "total_saves" },
-    { label: "Total Yellow Cards", key: "total_yellow_cards" },
-  ];
-
-  let sortDirection = {};
-  headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
-
-  function getValue(obj, path) {
-    return path.split(".").reduce((acc, key) => acc?.[key], obj);
-  }
-
-  function renderHeader() {
-    const thead = document.createElement("thead");
-    const headerRow = document.createElement("tr");
-
-    headers.forEach((header) => {
-      const th = document.createElement("th");
-      th.textContent = header.label;
-
-      th.addEventListener("click", async () => {
-        const sortKey = header.key || header.label;
-        const dir = sortDirection[sortKey];
-
-        const sortableStandings = await Promise.all(standings.map(async (team) => {
-          const val = header.value ? await header.value(team) : getValue(team, header.key);
-          return { team, sortVal: val };
-        }));
-
-        sortableStandings.sort((a, b) => {
-          const valA = a.sortVal;
-          const valB = b.sortVal;
-
-          if (typeof valA === "number" && typeof valB === "number") {
-            return dir === "asc" ? valA - valB : valB - valA;
-          } else {
-            return dir === "asc"
-              ? String(valA).localeCompare(String(valB))
-              : String(valB).localeCompare(String(valA));
-          }
-        });
-
-        standings = sortableStandings.map(item => item.team);
-
-        sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
-        await renderTableBody();
-      });
-
-      headerRow.appendChild(th);
-    });
-
-    thead.appendChild(headerRow);
-    return thead;
-  }
-
-  async function renderTableBody() {
-    const oldTbody = table.querySelector("tbody");
-    if (oldTbody) oldTbody.remove();
-
-    const tbody = document.createElement("tbody");
-
-    for (const team of standings) {
-      const row = document.createElement("tr");
-
-      for (const header of headers) {
-        const td = document.createElement("td");
-
-        let value;
-        if (header.value) {
-          value = await header.value(team);
-        } else if (header.key) {
-          value = getValue(team, header.key);
-        }
-
-        td.textContent = value ?? "";
-        td.style.border = "1px solid #ccc";
-        td.style.padding = "8px";
-        row.appendChild(td);
-      }
-
-      tbody.appendChild(row);
-    }
-
-    table.appendChild(tbody);
-  }
-
-  table.appendChild(renderHeader());
-  await renderTableBody();
-
-  containerDiv.innerHTML = "";
-  const scrollWrapper = document.createElement("div");
-  scrollWrapper.style.overflowX = "auto";
-  scrollWrapper.style.width = "100%";
-  scrollWrapper.appendChild(table);
-
-    // Title
-  const title = document.createElement("h4");
-  title.textContent = "Season Stats";
-  console.log(title, containerDiv)
-  containerDiv.appendChild(title);
-
-  containerDiv.appendChild(scrollWrapper);
-}
-
-
-async function createChipsUsedChart(standings) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "col-12"; // full-width column
-
-  const card = document.createElement("div");
-  card.className = "card shadow-sm mb-3";
-
-  const cardBody = document.createElement("div");
-  cardBody.className = "card-body";
-
-  const title = document.createElement("h5");
-  title.className = "card-title";
-  title.textContent = "Number of Chips Used";
-  cardBody.appendChild(title);
-
-  const canvas = document.createElement("canvas");
-  canvas.height = 300;
-  cardBody.appendChild(canvas);
-
-  card.appendChild(cardBody);
-  wrapper.appendChild(card);
-
-  // Now generate the chart
-  const sortedStandings = [...standings].sort(
-    (a, b) => a.chips.length - b.chips.length
-  );
-
-  const darkMode = localStorage.getItem("darkMode") === "true";
-  const backgroundColor = "#0d6efd"; // Bootstrap primary
-  const textColor = darkMode ? "#ffffff" : "#212529";
-  const gridColor = darkMode ? "#444" : "#ddd";
-
-  new Chart(canvas.getContext("2d"), {
-    type: "bar",
-    data: {
-      labels: sortedStandings.map((team) => team.entry_name),
-      datasets: [
-        {
-          label: "Chips Used",
-          data: sortedStandings.map((team) => team.chips.length),
-          backgroundColor,
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      indexAxis: "x",
-      responsive: true,
-      plugins: {
-        title: {
-          display: false,
-        },
-        legend: {
-          display: false,
-        },
-      },
-      scales: {
-        x: {
-          beginAtZero: true,
-          ticks: {
-            color: textColor,
-            stepSize: 1,
-          },
-          grid: {
-            color: gridColor,
-          },
-        },
-        y: {
-          ticks: {
-            color: textColor,
-            autoSkip: false,
-          },
-          grid: {
-            color: gridColor,
-          },
-        },
-      },
-    },
-  });
-
-  return wrapper;
-}
-
-
-
-async function findManagersOfTheMonth(standings, phases, currentGw) {
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  // Create holding container
-  const holdingContainer = document.createElement("div");
-  holdingContainer.classList.add("mb-4");
-
-  // Title
-  const title = document.createElement("h4");
-  title.textContent = "Manager of the Month";
-  holdingContainer.appendChild(title);
-
-  // Grid Container (Bootstrap grid)
-  const gridContainer = document.createElement("div");
-  gridContainer.className = "row g-3";
-
-  // Filter out the "Overall" phase (id: 1)
-  const monthlyPhases = phases.filter((phase) => phase.id !== 1);
-
-  monthlyPhases.forEach((phase) => {
-    const col = document.createElement("div");
-    col.className = "col-md-4";
-
-    const card = document.createElement("div");
-    card.className = `card h-100 ${darkMode ? "bg-dark text-white border-secondary" : ""}`;
-
-    const cardBody = document.createElement("div");
-    cardBody.className = "card-body text-center";
-
-    const cardTitle = document.createElement("h5");
-    cardTitle.className = "card-title";
-    cardTitle.textContent = phase.name + "🎉";
-    cardBody.appendChild(cardTitle);
-
-    // Check if phase is currently in progress (skip May, etc.)
-    if (currentGw >= phase.start_event && currentGw <= phase.stop_event) {
-      const msg = document.createElement("p");
-      msg.className = "card-text";
-      msg.textContent = "Winner coming soon";
-      cardBody.appendChild(msg);
-    } else {
-      let bestTeam = null;
-      let highestPoints = -1;
-
-      standings.forEach((team) => {
-        const monthlyPoints = team.everyGw
-          .filter(
-            (gw) =>
-              gw.gameweek >= phase.start_event &&
-              gw.gameweek <= phase.stop_event
-          )
-          .reduce((total, gw) => total + (gw.points - gw.transfers_cost), 0);
-
-        if (monthlyPoints > highestPoints) {
-          highestPoints = monthlyPoints;
-          bestTeam = team;
-        }
-      });
-
-      if (bestTeam) {
-        const teamName = document.createElement("p");
-        teamName.className = "mb-1 fw-bold";
-        teamName.textContent = bestTeam.entry_name;
-        cardBody.appendChild(teamName);
-
-        const points = document.createElement("p");
-        points.className = "mb-0";
-        points.textContent = `${highestPoints} points`;
-        cardBody.appendChild(points);
-      }
-    }
-
-    card.appendChild(cardBody);
-    col.appendChild(card);
-    gridContainer.appendChild(col);
-  });
-
-  holdingContainer.appendChild(gridContainer);
-
-  return holdingContainer;
-}
-
-function miniLeagueAdmin(){
-      if (!userHasAccess([12])) {
-      showModal({
-        title: "Paid Feature",
-        body: "This feature is only available to <strong>Max members</strong>.<br><br>If you're a mini league organiser/commissioner, upgrade to import your mini leagues and keep track on who's paid and who hasn't!",
-        confirmText: "Take me there",
-        onConfirm: () => {
-          window.location.href = subscriptionPageUrl;
-        },
-      });
-      return;
-    }
-    window.location.href = miniLeagueAdminPageUrl
-}
-
-async function createLeagueDashboardOLD() {
-  //My Team Tab
-  const myTeam = findManagerTeam(standings, managerData);
-  console.log("My Team", myTeam);
-  const playerPointsMap = {};
-
-  if (myTeam != undefined) {
-    console.log("Checking GW sheets:", myTeam.gwScoreSheet.length);
-    myTeam.gwScoreSheet.forEach((gw, gwIndex) => {
-      //console.log(`GW${gwIndex + 1}: starters count =`, gw.starters.length);
-
-      gw.starters.forEach((player) => {
-        const id = player.playerId;
-        const name = player.name;
-
-        if (!playerPointsMap[id]) {
-          playerPointsMap[id] = {
-            playerId: id,
-            name: name,
-            totalPoints: 0,
-            appearances: 0,
-            seasonPoints: getPlayerTotalPoints(id),
-          };
-        }
-
-        playerPointsMap[id].totalPoints += player.points;
-        playerPointsMap[id].appearances += 1;
-
-        //console.log(`→ ${name} (${id}) now has ${playerPointsMap[id].appearances} appearances`);
-      });
-    });
-  }
-
-  const playerPointsArray = Object.values(playerPointsMap);
-  console.log(playerPointsArray);
-  // Helper: get nested value from object
-  function getValue(obj, path) {
-    return path.split(".").reduce((acc, key) => acc?.[key], obj);
-  }
-
-  // Create Table for Team Player Stats
-  function createPlayerStatsTable(players, containerDiv) {
-    const tableContainer = document.createElement("div");
-    tableContainer.id = "my-team-table-container";
-    tableContainer.style.overflowX = "auto";
-    tableContainer.style.width = "100%";
-    const table = document.createElement("table");
-    table.id = "my-team-table";
-
-    // Define the columns and their respective data sources
-    const headers = [
-      { label: "Rank", key: "rank" },
-      { label: "Player", key: "name" },
-      { label: "Team Points", key: "totalPoints" },
-      { label: "Apps", key: "appearances" },
-      { label: "Total Points", key: "seasonPoints" },
-    ];
-
-    let sortDirection = {};
-    headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
-
-    // Helper function to render header
-    function renderHeader() {
-      const thead = document.createElement("thead");
-      const headerRow = document.createElement("tr");
-
-      headers.forEach((header) => {
-        const th = document.createElement("th");
-        th.textContent = header.label;
-        th.style.border = "1px solid #ccc";
-        th.style.padding = "8px";
-        th.style.backgroundColor = "#f5f5f5";
-        th.style.cursor = "pointer";
-
-        th.addEventListener("click", () => {
-          const sortKey = header.key || header.label;
-          const dir = sortDirection[sortKey];
-
-          players.sort((a, b) => {
-            const valA = getValue(a, header.key);
-            const valB = getValue(b, header.key);
-
-            if (typeof valA === "number" && typeof valB === "number") {
-              return dir === "asc" ? valA - valB : valB - valA;
-            } else {
-              return dir === "asc"
-                ? String(valA).localeCompare(String(valB))
-                : String(valB).localeCompare(String(valA));
-            }
-          });
-
-          sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
-          renderTableBody();
-        });
-
-        headerRow.appendChild(th);
-      });
-
-      thead.appendChild(headerRow);
-      return thead;
-    }
-
-    // Helper function to render table body
-    function renderTableBody() {
-      const oldTbody = table.querySelector("tbody");
-      if (oldTbody) oldTbody.remove();
-
-      const tbody = document.createElement("tbody");
-
-      players.forEach((player) => {
-        const row = document.createElement("tr");
-
-        headers.forEach((header) => {
-          const td = document.createElement("td");
-          let value;
-          if (header.key === "rank") {
-            value = players.indexOf(player) + 1;
-          } else {
-            value = getValue(player, header.key);
-          }
-          td.textContent = value ?? "-";
-          td.style.border = "1px solid #ccc";
-          td.style.padding = "8px";
-          row.appendChild(td);
-        });
-
-        tbody.appendChild(row);
-      });
-
-      table.appendChild(tbody);
-    }
-
-    table.appendChild(renderHeader());
-    renderTableBody();
-
-    containerDiv.innerHTML = ""; // Clear previous content
-    tableContainer.appendChild(table);
-    containerDiv.appendChild(tableContainer);
-  }
-  if (myTeam !== undefined) {
-    createPlayerStatsTable(playerPointsArray, myTeamStats);
-  } else {
-    const teamMessage = document.createElement("p");
-    teamMessage.textContent =
-      "No data available for your team. Select a league in which you're in the top 100 to calculate data";
-    myTeamStats.appendChild(teamMessage);
-  }
-
-  // Gameweek Tab
-  function createGameweekLeagueTable(standings, containerDiv) {
-    const table = document.createElement("table");
-    table.id = "league-table";
-    table.style.width = "100%";
-    table.style.borderCollapse = "collapse";
-
-    const headers = [
-      { label: "First Name", key: "managerDetails.player_first_name" },
-      { label: "Last Name", key: "managerDetails.player_last_name" },
-      { label: "Team Name", key: "entry_name" },
-
-      { label: "GW Points", key: "event_total" },
-      {
-        label: "Active Chip",
-        value: (team) =>
-          convertChipName(team.currentWeek?.[0]?.active_chip) || "",
-      },
-      {
-        label: "Captain ID",
-        value: (team) => {
-          const picks = team.currentWeek?.[0]?.picks || [];
-          const captain = picks.find((p) => p.is_captain);
-          return captain ? getPlayerWebName(captain.element) : "None";
-        },
-      },
-      {
-        label: "Bench Points",
-        value: (team) =>
-          team.everyGw[team.everyGw.length - 1].bench_points || "0",
-      },
-      {
-        label: "Transfers",
-        value: (team) => team.everyGw[team.everyGw.length - 1].transfers || "0",
-      },
-      {
-        label: "Hits",
-        value: (team) =>
-          team.everyGw[team.everyGw.length - 1].transfers_cost || "0",
-      },
-      {
-        label: "Percentile Rank",
-        value: (team) =>
-          team.everyGw[team.everyGw.length - 1].percentile_rank || "0",
-      },
-
-      { label: "Overall Rank", key: "managerDetails.summary_overall_rank" },
-    ];
-
-    let sortDirection = {};
-    headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
-
-    // Helper: get nested value from object
-    function getValue(obj, path) {
-      return path.split(".").reduce((acc, key) => acc?.[key], obj);
-    }
-
-    function renderHeader() {
-      const thead = document.createElement("thead");
-      const headerRow = document.createElement("tr");
-
-      headers.forEach((header) => {
-        const th = document.createElement("th");
-        th.textContent = header.label;
-        th.style.border = "1px solid #ccc";
-        th.style.padding = "8px";
-        th.style.backgroundColor = "#f5f5f5";
-        th.style.cursor = "pointer";
-
-        th.addEventListener("click", () => {
-          const sortKey = header.key || header.label;
-          const dir = sortDirection[sortKey];
-
-          standings.sort((a, b) => {
-            const valA = header.value
-              ? header.value(a)
-              : getValue(a, header.key);
-            const valB = header.value
-              ? header.value(b)
-              : getValue(b, header.key);
-
-            if (typeof valA === "number" && typeof valB === "number") {
-              return dir === "asc" ? valA - valB : valB - valA;
-            } else {
-              return dir === "asc"
-                ? String(valA).localeCompare(String(valB))
-                : String(valB).localeCompare(String(valA));
-            }
-          });
-
-          sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
-          renderTableBody();
-        });
-
-        headerRow.appendChild(th);
-      });
-
-      thead.appendChild(headerRow);
-      return thead;
-    }
-
-    function renderTableBody() {
-      const oldTbody = table.querySelector("tbody");
-      if (oldTbody) oldTbody.remove();
-
-      const tbody = document.createElement("tbody");
-
-      standings.forEach((team) => {
-        const row = document.createElement("tr");
-
-        headers.forEach((header) => {
-          const td = document.createElement("td");
-          const value = header.value
-            ? header.value(team)
-            : getValue(team, header.key);
-          td.textContent = value ?? "";
-          td.style.border = "1px solid #ccc";
-          td.style.padding = "8px";
-          row.appendChild(td);
-        });
-
-        tbody.appendChild(row);
-      });
-
-      table.appendChild(tbody);
-    }
-
-    table.appendChild(renderHeader());
-    renderTableBody();
-
-    containerDiv.innerHTML = "";
-
-    const scrollWrapper = document.createElement("div");
-    scrollWrapper.style.overflowX = "auto";
-    scrollWrapper.style.width = "100%";
-
-    scrollWrapper.appendChild(table);
-    containerDiv.appendChild(scrollWrapper);
-  }
-  createGameweekLeagueTable(standings, gameweekStats);
-
-  function createTopPlayerOwnershipChart(standings, containerDiv) {
-    const playerCounts = {};
-
-    standings.forEach((team) => {
-      const picks = team.currentWeek[0].picks.slice(0, 11); // Starting XI only
-      picks.forEach((pick) => {
-        const elementId = pick.element;
-        if (playerCounts[elementId]) {
-          playerCounts[elementId]++;
-        } else {
-          playerCounts[elementId] = 1;
-        }
-      });
-    });
-
-    const topPlayerEntries = Object.entries(playerCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 11);
-
-    const topPlayerLabels = topPlayerEntries.map(([elementId]) =>
-      getPlayerWebName(elementId)
-    );
-
-    const data = topPlayerEntries.map(([_, count]) => count);
-    const popularPlayersCanvas = createChartContainer(containerDiv);
-
-    const totalTeams = standings.length;
-    const percentageData = data.map((count) =>
-      ((count / totalTeams) * 100).toFixed(1)
-    );
-
-    new Chart(popularPlayersCanvas.getContext("2d"), {
-      type: "bar",
-      data: {
-        labels: topPlayerLabels,
-        datasets: [
-          {
-            axis: "y",
-            label: "Mini League Player Ownership %",
-            data: percentageData,
-            backgroundColor: colors.dashboardBlue,
-            borderColor: "rgba(75, 192, 192, 1)",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        indexAxis: "y",
-        plugins: {
-          title: {
-            display: true,
-            text: "Top 20 Most Picked Players (By % of Teams)",
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => `${context.label}: ${context.raw}% of teams`,
-            },
-          },
-          legend: { display: false },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            beginAtZero: true,
-            max: 100,
-            ticks: {
-              stepSize: 10,
-              callback: (value) => value + "%",
-            },
-            title: {
-              display: true,
-              text: "% of Teams",
-            },
-          },
-        },
-      },
-    });
-  }
-  createTopPlayerOwnershipChart(standings, gameweekStats); // draws inside the gameweekStats container
-
-  //Remove when finished testing
-  //Chip usage pie charts
-  function createChipUsageChartsTest(standings, containerDiv) {
-    console.log("working");
-    const chipTypes = [
-      "wildcard1",
-      "wildcard2",
-      "freehit",
-      "manager",
-      "bboost",
-      "3xc",
-    ];
-    const chipUsage = Object.fromEntries(
-      chipTypes.map((type) => [type, { used: 0, unused: 0 }])
-    );
-
-    // Step 1: Count chip usage
-    standings.forEach((team) => {
-      const usedChips = team.chips || [];
-      const usedSet = new Set();
-
-      usedChips.forEach((chip) => {
-        if (chip.name === "wildcard") {
-          const key = chip.gw <= 18 ? "wildcard1" : "wildcard2";
-          chipUsage[key].used++;
-          usedSet.add(key);
-        } else {
-          chipUsage[chip.name].used++;
-          usedSet.add(chip.name);
-        }
-      });
-
-      chipTypes.forEach((chip) => {
-        if (!usedSet.has(chip)) {
-          chipUsage[chip].unused++;
-        }
-      });
-    });
-
-    // Step 2: Create UI + charts
-    const chipLabels = {
-      wildcard1: "Wildcard 1",
-      wildcard2: "Wildcard 2",
-      freehit: "Free Hit",
-      manager: "Assistant Manager",
-      bboost: "Bench Boost",
-      "3xc": "Triple Captain",
-    };
-
-    if (!containerDiv) return;
-
-    const chipContainer = document.createElement("div");
-    chipContainer.id = "sidebar-chip-container";
-    chipContainer.style.display = "grid";
-    chipContainer.style.gridTemplateColumns =
-      "repeat(auto-fit, minmax(250px, 1fr))";
-    chipContainer.style.gap = "10px";
-    containerDiv.appendChild(chipContainer);
-
-    chipTypes.forEach((chipType) => {
-      const chipCard = document.createElement("div");
-      chipCard.style.display = "flex";
-      chipCard.style.flexDirection = "column";
-      chipCard.style.alignItems = "center";
-
-      const canvas = document.createElement("canvas");
-      canvas.width = 100;
-      canvas.height = 100;
-      chipCard.appendChild(canvas);
-
-      const info = document.createElement("div");
-      info.innerHTML = `
-        <strong>${chipLabels[chipType]}</strong><br>
-        Used: ${chipUsage[chipType].used} &nbsp;|&nbsp; 
-        Unused: ${chipUsage[chipType].unused}
-      `;
-      info.style.textAlign = "center";
-      info.style.marginTop = "8px";
-      chipCard.appendChild(info);
-
-      chipContainer.appendChild(chipCard);
-
-      new Chart(canvas.getContext("2d"), {
-        type: "pie",
-        data: {
-          labels: ["Used", "Unused"],
-          datasets: [
-            {
-              data: [chipUsage[chipType].used, chipUsage[chipType].unused],
-              backgroundColor: ["#1A73E8", "#ccc"],
-            },
-          ],
-        },
-        options: {
-          responsive: false,
-          plugins: {
-            title: { display: false },
-            legend: { display: false },
-          },
-        },
-      });
-    });
-  }
-  createChipUsageChartsTest(standings, gameweekStatsSidebar);
-
-  //Season Tab
-
-  //Total Points Charts
-  function createTotalPointsChart(standings, containerDiv) {
-    const canvas = createChartContainer(containerDiv);
-
-    new Chart(canvas.getContext("2d"), {
-      type: "bar",
-      data: {
-        labels: standings.map((team) => team.entry_name),
-        datasets: [
-          {
-            label: "Total Points",
-            data: standings.map((team) => team.total),
-            backgroundColor: "#1A73E8",
-          },
-        ],
-      },
-      options: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Total Points by Team",
-          },
-          legend: { display: false },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            ticks: {
-              autoSkip: false,
-            },
-          },
-        },
-      },
-    });
-  }
-  createTotalPointsChart(standings, seasonStats); // draws inside the seasonStats container
-
-  //Chip usage pie charts
-  function createChipUsageCharts(standings, containerDiv) {
-    const chipTypes = [
-      "wildcard1",
-      "wildcard2",
-      "freehit",
-      "manager",
-      "bboost",
-      "3xc",
-    ];
-    const chipUsage = Object.fromEntries(
-      chipTypes.map((type) => [type, { used: 0, unused: 0 }])
-    );
-
-    // Step 1: Count chip usage
-    standings.forEach((team) => {
-      const usedChips = team.chips || [];
-      const usedSet = new Set();
-
-      usedChips.forEach((chip) => {
-        if (chip.name === "wildcard") {
-          const key = chip.gw <= 18 ? "wildcard1" : "wildcard2";
-          chipUsage[key].used++;
-          usedSet.add(key);
-        } else {
-          chipUsage[chip.name].used++;
-          usedSet.add(chip.name);
-        }
-      });
-
-      chipTypes.forEach((chip) => {
-        if (!usedSet.has(chip)) {
-          chipUsage[chip].unused++;
-        }
-      });
-    });
-
-    // Step 2: Create UI + charts
-    const chipLabels = {
-      wildcard1: "Wildcard 1",
-      wildcard2: "Wildcard 2",
-      freehit: "Free Hit",
-      manager: "Assistant Manager",
-      bboost: "Bench Boost",
-      "3xc": "Triple Captain",
-    };
-
-    if (!containerDiv) return;
-
-    const chipContainer = document.createElement("div");
-    chipContainer.id = "sidebar-chip-container";
-    chipContainer.style.display = "grid";
-    chipContainer.style.gridTemplateColumns =
-      "repeat(auto-fit, minmax(250px, 1fr))";
-    chipContainer.style.gap = "10px";
-
-    const title = document.createElement("h4");
-    title.textContent = `League Chip Usage`;
-    title.style.marginBottom = "0.5rem";
-    chipContainer.appendChild(title);
-    const blank = document.createElement("h4");
-    blank.textContent = ` `;
-    blank.style.marginBottom = "0.5rem";
-    chipContainer.appendChild(blank);
-
-    containerDiv.appendChild(chipContainer);
-
-    chipTypes.forEach((chipType) => {
-      const chipCard = document.createElement("div");
-      chipCard.style.display = "flex";
-      chipCard.style.flexDirection = "column";
-      chipCard.style.alignItems = "center";
-
-      const canvas = document.createElement("canvas");
-      canvas.width = 100;
-      canvas.height = 100;
-      chipCard.appendChild(canvas);
-
-      const info = document.createElement("div");
-      info.innerHTML = `
-        <strong>${chipLabels[chipType]}</strong><br>
-        Used: ${chipUsage[chipType].used} &nbsp;|&nbsp; 
-        Unused: ${chipUsage[chipType].unused}
-      `;
-      info.style.textAlign = "center";
-      info.style.marginTop = "8px";
-      chipCard.appendChild(info);
-
-      chipContainer.appendChild(chipCard);
-
-      new Chart(canvas.getContext("2d"), {
-        type: "pie",
-        data: {
-          labels: ["Used", "Unused"],
-          datasets: [
-            {
-              data: [chipUsage[chipType].used, chipUsage[chipType].unused],
-              backgroundColor: ["#1A73E8", "#ccc"],
-            },
-          ],
-        },
-        options: {
-          responsive: false,
-          plugins: {
-            title: { display: false },
-            legend: { display: false },
-          },
-        },
-      });
-    });
-  }
-  createChipUsageCharts(standings, seasonStatsSidebar);
-
-  function createMyTeamStatTable({
-    players,
-    containerDiv,
-    titleText,
-    statKeys,
-    statLabels,
-    sortOrder = "desc",
-    limit = null,
-  }) {
-    // Helper function to get the stat value for sorting
-    const getStatValue = (player, key) => player[key] || 0;
-
-    // Sort players based on the chosen stat key
-    let sorted = [...players];
-
-    // Sort the rows when the column header is clicked
-    const sortTable = (columnIndex, sortOrder) => {
-      sorted.sort((a, b) => {
-        const aValue = getStatValue(a, statKeys[columnIndex]);
-        const bValue = getStatValue(b, statKeys[columnIndex]);
-
-        if (sortOrder === "asc") {
-          return aValue - bValue;
-        } else {
-          return bValue - aValue;
-        }
-      });
-      renderTable(); // Re-render the table after sorting
-    };
-
-    // Render the table
-    const renderTable = () => {
-      const wrapper = document.createElement("div");
-      wrapper.style.marginTop = "1rem";
-
-      const title = document.createElement("h4");
-      title.textContent = titleText;
-      title.style.marginBottom = "0.5rem";
-
-      const table = document.createElement("table");
-      table.style.width = "100%";
-      table.style.borderCollapse = "collapse";
-
-      const thead = document.createElement("thead");
-      const headerCells = statLabels
-        .map((label, index) => {
-          return `
-          <th 
-            style="text-align: left; padding: 8px; border-bottom: 1px solid #ccc; cursor: pointer;"
-            onclick="sortTable(${index}, '${
-            sortOrder === "desc" ? "asc" : "desc"
-          }')">
-            ${label}
-          </th>
-        `;
-        })
-        .join("");
-
-      thead.innerHTML = `
-      <tr>
-        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ccc;">#</th>
-        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ccc;">Player</th>
-        ${headerCells}
-      </tr>
-    `;
-
-      const tbody = document.createElement("tbody");
-      const medals = ["🥇", "🥈", "🥉"];
-
-      // Limit the number of rows if needed
-      const limited = limit ? sorted.slice(0, limit) : sorted;
-
-      limited.forEach((player, index) => {
-        const rankDisplay = medals[index] || index + 1;
-        const statCells = statKeys
-          .map(
-            (key) =>
-              `<td style="text-align: right; padding: 8px; border-bottom: 1px solid #eee;">${getStatValue(
-                player,
-                key
-              )}</td>`
-          )
-          .join("");
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${rankDisplay}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${player.name}</td>
-        ${statCells}
-      `;
-        tbody.appendChild(row);
-      });
-
-      table.appendChild(thead);
-      table.appendChild(tbody);
-      wrapper.appendChild(title);
-      wrapper.appendChild(table);
-      containerDiv.appendChild(wrapper);
-    };
-
-    // Initial render of the table
-    renderTable();
-  }
-
-  //Rank progression charts
-  function createRankProgressionChart(standings, containerDiv, getRandomColor) {
-    const canvas = createChartContainer(containerDiv);
-    //canvas.style.minHeight = "600px"
-    // Generate labels from the first team's gameweek data
-    const labels = standings[0]?.everyGw.map((gw) => `GW${gw.gameweek}`) || [];
-
-    new Chart(canvas.getContext("2d"), {
-      type: "line",
-      data: {
-        labels: labels,
-        datasets: standings.map((team) => ({
-          label: team.entry_name,
-          data: team.everyGw.map((gw) => gw.overall_rank),
-          fill: false,
-          borderColor: getRandomColor(),
-          tension: 0.3,
-          hidden: true, // Start hidden
-        })),
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: "Overall Rank Progression",
-          },
-        },
-        scales: {
-          y: {
-            reverse: true, // Higher rank = lower number
-            beginAtZero: false,
-          },
-        },
-      },
-    });
-  }
-  createRankProgressionChart(standings, seasonStats, getRandomColor);
-
-  //Benched Points Chart
-  function createBenchPointsChart(standings, containerDiv, colors) {
-    const canvas = createChartContainer(containerDiv);
-
-    // Step 1: Sort by bench points
-    const sortedStandings = [...standings].sort(
-      (a, b) => b.totalPointsOnBench - a.totalPointsOnBench
-    );
-
-    // Step 2: Extract labels and data
-    const benchLabels = sortedStandings.map((team) => team.entry_name);
-    const benchPoints = sortedStandings.map((team) => team.totalPointsOnBench);
-    const totalPoints = sortedStandings.map((team) => team.total / 5); // Adjusted if intentional
-
-    // Step 3: Render bar chart
-    new Chart(canvas.getContext("2d"), {
-      type: "bar",
-      data: {
-        labels: benchLabels,
-        datasets: [
-          {
-            label: "Bench Points",
-            data: benchPoints,
-            backgroundColor: colors.dashboardBlue,
-          },
-          {
-            label: "Total Points / 5",
-            data: totalPoints,
-            backgroundColor: colors.greenNeon,
-          },
-        ],
-      },
-      options: {
-        indexAxis: "y",
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: "Bench Points vs Total Points by Manager",
-          },
-          legend: {
-            position: "top",
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => `${context.dataset.label}: ${context.raw}`,
-            },
-          },
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            stacked: false,
-            ticks: {
-              stepSize: 50,
-            },
-          },
-          y: {
-            stacked: false,
-          },
-        },
-      },
-    });
-  }
-  createBenchPointsChart(standings, seasonStats, colors);
-
-  //Country Chart
-  function createPlayersByCountryChart(standings, containerDiv) {
-    const canvas = createChartContainer(containerDiv);
-
-    // Step 1: Count players per country
-    const countryCounts = {};
-    standings.forEach((team) => {
-      const country = team.managerDetails?.player_region_name;
-      if (country) {
-        countryCounts[country] = (countryCounts[country] || 0) + 1;
-      }
-    });
-
-    // Step 2: Sort descending
-    const sortedData = Object.entries(countryCounts).sort(
-      (a, b) => b[1] - a[1]
-    );
-
-    const countryLabels = sortedData.map(([country]) => country);
-    const playerCountryCounts = sortedData.map(([, count]) => count);
-
-    // Step 3: Create chart
-    new Chart(canvas.getContext("2d"), {
-      type: "bar",
-      data: {
-        labels: countryLabels,
-        datasets: [
-          {
-            label: "Players per Country",
-            data: playerCountryCounts,
-            backgroundColor: getRandomColor(),
-          },
-        ],
-      },
-      options: {
-        indexAxis: "x",
-        plugins: {
-          title: {
-            display: true,
-            text: "Number of Players by Country",
-          },
-          legend: { display: false },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            stepSize: 1,
-          },
-        },
-      },
-    });
-  }
-  createPlayersByCountryChart(standings, seasonStats);
-
-  //Years Active chart
-  function createYearsActiveChart(standings, containerDiv) {
-    const canvas = createChartContainer(containerDiv);
-
-    // Sort by years_active descending (default to 0 if missing)
-    const sortedStandings = [...standings].sort(
-      (a, b) =>
-        (b.managerDetails?.years_active || 0) -
-        (a.managerDetails?.years_active || 0)
-    );
-
-    const teamLabels = sortedStandings.map((team) => team.entry_name);
-    const yearsData = sortedStandings.map(
-      (team) => team.managerDetails?.years_active || 0
-    );
-
-    new Chart(canvas.getContext("2d"), {
-      type: "bar",
-      data: {
-        labels: teamLabels,
-        datasets: [
-          {
-            label: "Years Active",
-            data: yearsData,
-            backgroundColor: "#1A73E8",
-          },
-        ],
-      },
-      options: {
-        plugins: {
-          title: {
-            display: true,
-            text: "Years Active per Manager (Sorted)",
-          },
-          legend: { display: false },
-        },
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1,
-            },
-          },
-          x: {
-            ticks: {
-              autoSkip: false,
-              maxRotation: 90,
-              minRotation: 45,
-            },
-          },
-        },
-      },
-    });
-  }
-  createYearsActiveChart(standings, seasonStats);
-
-
-}
-
-
-
-
-
-
-//HELPERS
-// Convert FPL chip name to user-friendly chip names
-function convertChipName(chip) {
-  const chipMap = {
-    wildcard: "WC",
-    freehit: "FH",
-    bboost: "BB",
-    manager: "AM",
-    "3xc": "TC",
-    "": "",
-  };
-  return chipMap[chip] || chip;
-}
-// Fetch player's current game stats from API
-async function fetchPlayerCurrentStats(elementId) {
-  const response = await fetch(`${BASE_URL}/element-summary/${elementId}/`);
-  const data = await response.json();
-  return data.history.slice(-1);
-}
-// Make getFootballerObject return a Promise
-function getFootballerObject(playerId) {
-  return new Promise((resolve, reject) => {
-    const player = bootstrap.elements.find((el) => el.id == playerId);
-
-    if (!player) {
-      reject(`Player with ID ${playerId} not found.`);
-      return;
-    }
-
-    const team = bootstrap.teams.find((t) => t.id == player.team);
-
-    const footballer = {
-      web_name: player.web_name,
-      first_name: player.first_name,
-      second_name: player.second_name,
-      event_points: player.event_points,
-      dreamteam: player.in_dreamteam,
-      points_per_game: player.points_per_game,
-      transfers_in: player.transfers_in,
-      transfers_in_event: player.transfers_in_event,
-      transfers_out: player.transfers_out,
-      transfers_out_event: player.transfers_out_event,
-      price_change: player.cost_change_event,
-      news: player.news,
-      team_code: player.team_code,
-      element_type: player.element_type,
-      ep_this: player.ep_this,
-      ep_next: player.ep_next,
-      photo: player.photo,
-      total_points: player.total_points,
-      goals_scored: player.goals_scored,
-      assists: player.assists,
-      type: player.element_type,
-      team: team ? team.name : "Unknown",
-    };
-
-    resolve(footballer);
-  });
-}
-
-// Make getPlayerWebName async
-async function getPlayerWebName(playerId) {
-  const footballer = await getFootballerObject(playerId); // Store the returned object
-  return footballer.web_name;
-}
-
-function getTeamName(teamCode) {
-  for (var i = 0; i < bootstrap.teams.length; i++) {
-    if (bootstrap.teams[i].id == teamCode) {
-      return bootstrap.teams[i].name;
-    }
-  }
-}
-
-function getTeamShortName(teamCode) {
-  for (var i = 0; i < bootstrap.teams.length; i++) {
-    if (bootstrap.teams[i].id == teamCode) {
-      return bootstrap.teams[i].short_name;
-    }
-  }
-}
-
-async function getPlayerScore(playerId) {
-  const footballer = await getFootballerObject(playerId); // Store the returned object
-  return footballer.event_points;
-}
-async function getPlayerAssists(playerId) {
-  const footballer = await getFootballerObject(playerId);
-  return footballer.assists;
-}
-async function getPlayerGoals(playerId) {
-  const footballer = await getFootballerObject(playerId);
-  return footballer.goals_scored;
-}
-
-async function getPlayerTeam(playerId) {
-  const footballer = await getFootballerObject(playerId);
-  return footballer.team;
-}
-async function getPlayerTeamCode(playerId) {
-  const footballer = await getFootballerObject(playerId);
-  return footballer.team_code;
-}
-async function getPlayerEP(playerId) {
-  const footballer = await getFootballerObject(playerId);
-  return footballer.ep_this;
-}
-
-async function getPlayerTotalPoints(playerId) {
-  const footballer = await getFootballerObject(playerId);
-  return footballer.total_points;
-}
-
-async function getPlayerType(playerId) {
-  const footballer = await getFootballerObject(playerId);
-  return footballer.element_type;
-}
-
-async function getPlayerPhoto(playerId) {
-  const footballer = await getFootballerObject(playerId);
-  return footballer.photo;
-}
-
-function addCaptainBadge() {
-  //console.log("Adding Captain Badges");
-  // Select all elements with the class 'player'
-  const players = document.querySelectorAll(".player");
-
-  players.forEach((player) => {
-    if (player.querySelectorAll(".my-captain-name")[0]) {
-      // Create a new image element
-      const img = document.createElement("img");
-      img.src = "https://fpltoolbox.com/wp-content/uploads/2024/12/Captain.png";
-      img.setAttribute("class", "captain-badge");
-      // Append the image to the player element
-      player.prepend(img);
-    }
-    if (player.querySelectorAll(".my-vice-captain-name")[0]) {
-      // Create a new image element
-      const img = document.createElement("img");
-      img.src =
-        "https://fpltoolbox.com/wp-content/uploads/2024/12/Captain-1.png";
-      img.setAttribute("class", "my-vice-captain-badge");
-      // Append the image to the player element
-      player.prepend(img);
-    }
-    if (player.querySelectorAll(".my-triple-captain-name")[0]) {
-      // Create a new image element
-      const img = document.createElement("img");
-      img.src =
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/svgexport-10.png";
-      img.setAttribute("class", "my-triple-captain-badge");
-      // Append the image to the player element
-      player.prepend(img);
-    }
-  });
-}
-
-function showBootstrapSpinner(div) {
-  const spinnerWrapper = document.createElement("div");
-  spinnerWrapper.id = "fpl-spinner"; // <- Add an ID for targeting
-  spinnerWrapper.className = "d-flex justify-content-center align-items-center";
-  spinnerWrapper.style.height = "200px";
-
-  const spinner = document.createElement("div");
-  spinner.className = "spinner-border text-primary";
-  spinner.setAttribute("role", "status");
-
-  const srText = document.createElement("span");
-  srText.className = "visually-hidden";
-  srText.textContent = "Loading...";
-
-  spinner.appendChild(srText);
-  spinnerWrapper.appendChild(spinner);
-  div.appendChild(spinnerWrapper);
-}
-function removeSpinner() {
-  const spinner = document.getElementById("fpl-spinner");
-  if (spinner) spinner.remove();
-}
-
 const dummyLeague = {
   leagueName: "🔒 Subscribe to see your mini-league here 🔒",
   standings: [
@@ -56775,3 +45712,11067 @@ const dummyLeague = {
     },
   ],
 };
+
+
+// Set to true to use test data
+let addDelaySimulationTime = 100;
+window.FPLToolboxLeagueDataReady = false;
+window.FPLToolboxProLeagueDataReady = false;
+window.FPLToolboxMaxLeagueDataReady = false;
+
+let subscriptionPageUrl = "/subscribe";
+let profilePageUrl = "/profile";
+let miniLeagueAdminPageUrl = "https://fpltoolbox.com/private-test-page/"
+
+window.FPLToolboxLeagueData = {
+  leagueName: null,
+  standings: [],
+  lastUpdated: null,
+  type: null,
+};
+
+let bootstrap = {};
+let currentGw;
+let nextGw;
+let managerData = {};
+let loggedInTeamName = "";
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+document.addEventListener("DOMContentLoaded", injectUI());
+
+async function getEventStatus() {
+  try {
+    if (testMode) {
+      console.log(
+        "%c TEST MODE - NO API CALL MADE - Event Status",
+        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+
+        eventStatusTest
+      );
+      return eventStatusTest;
+    }
+    const res = await fetch(BASE_URL + "event-status/");
+    const data = await res.json();
+    let eventStatus = data;
+    console.log(
+      "%c API CALL MADE - Event Status",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+      eventStatus
+    );
+    return eventStatus;
+  } catch (error) {
+    console.error("Something went wrong... ", error);
+  }
+}
+getEventStatus();
+async function getManagerData(teamID) {
+  if (testMode) {
+    managerData = managerDataTest;
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Manager Data Details",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      managerData
+    );
+
+    console.log("simulating delay");
+    await sleep(addDelaySimulationTime);
+    return; // Skip live fetching
+  }
+
+  try {
+    const res = await fetch(BASE_URL + "/entry/" + teamID + "/");
+    const data = await res.json();
+    managerData = data;
+    console.log(managerData);
+
+    loggedInTeamName = data.name;
+
+    // Populate league options
+    let options = "";
+    data.leagues.classic.forEach((e) => {
+      options += `<option name="${e.name}" value="${e.id}" id="${
+        e.id
+      }" style="border-radius: 5px;">${e.name + ": " + e.id}</option>`;
+
+      // Check if "league-list" div exists
+      const leagueListDiv = document.getElementById("league-list");
+      if (leagueListDiv) {
+        const newDiv = document.createElement("div");
+        newDiv.innerHTML = `${e.name + ": " + e.id}`;
+        leagueListDiv.appendChild(newDiv);
+      }
+    });
+
+    // Check if "leagues" element exists before setting innerHTML
+    const leaguesElement = document.getElementById("leagues");
+    if (leaguesElement) {
+      leaguesElement.innerHTML = options;
+    }
+  } catch (error) {
+    console.error("Something went wrong... ", error);
+  }
+}
+
+if (theUser.info.team_id) {
+  //console.log("Hey " + theUser.username.data.display_name);
+  //console.log("User's team ID " + theUser.info.team_id);
+  //console.log("User's league ID " + theUser.info.league_id);
+  //console.log(theUser.username.data.membership_level.ID)
+
+  getManagerData(theUser.info.team_id);
+}
+
+if (theUser.info.league_id[0] != "") {
+  //createLeague(theUser.info.league_id);
+} else {
+  showModal({
+    title: `Reminder`,
+    body: `Hey, ${managerData.player_first_name}! Remember to select a league in your profile page`,
+    confirmText: "Take me there",
+    onConfirm: () => {
+      window.location.href = profilePageUrl;
+    },
+  });
+}
+
+async function getBootstrap() {
+  try {
+    if (testMode) {
+      bootstrap = bootstrapTest;
+
+      console.log(
+        "%c TEST MODE - NO API CALL MADE - Bootstrap Data",
+        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+        bootstrap
+      );
+
+      // Set current and next game week
+      bootstrap.events.forEach((event) => {
+        if (event.is_current) currentGw = event.id;
+        if (event.is_next) nextGw = event.id;
+      });
+
+      return bootstrap;
+    }
+
+    const res = await fetch(BASE_URL + "bootstrap-static/");
+    const data = await res.json();
+    bootstrap = data;
+    console.log(
+      "%c API CALL MADE - Bootstrap Data",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+      bootstrap
+    );
+    // Set current and next game week
+    bootstrap.events.forEach((event) => {
+      if (event.is_current) currentGw = event.id;
+      if (event.is_next) nextGw = event.id;
+    });
+    // Sort players by `transfers_in` in descending order
+    bootstrap.elements.sort((a, b) => b.transfers_in - a.transfers_in);
+
+    // Get the top 5 most transferred-in players
+    // top5TransferredIn = bootstrap.elements.slice(0, 10);
+  } catch (error) {
+    console.error("Something went wrong... ", error);
+  }
+}
+getBootstrap();
+
+function injectUI() {
+  const app = document.getElementById("app-screen");
+  app.innerHTML = ""; // Clear previous content
+  app.className = "d-flex flex-column h-100";
+  const mainContainer = document.createElement("div");
+  mainContainer.className = "d-flex flex-column h-100";
+
+  const screenWrapper = document.createElement("div");
+  screenWrapper.id = "screen-wrapper";
+  screenWrapper.className = "flex-grow-1 overflow-auto";
+  createScreens(screenWrapper);
+
+  const nav = createNav();
+
+  mainContainer.appendChild(screenWrapper);
+  mainContainer.appendChild(nav);
+  app.appendChild(mainContainer);
+
+  injectDynamicStyles();
+  setupTabListeners();
+}
+document.getElementById("nav-container").addEventListener("click", (e) => {
+  const tab = e.target.closest(".nav-tab");
+  if (!tab) return;
+
+  // Clear 'active' class
+  document
+    .querySelectorAll(".nav-tab")
+    .forEach((t) => t.classList.remove("active"));
+
+  // Activate current tab
+  tab.classList.add("active");
+
+  // Handle navigation
+  if (tab.dataset.external) {
+    window.location.href = tab.dataset.external;
+    return;
+  }
+  if (tab.dataset.target === "tools") {
+    renderToolsScreenWithLeague();
+  } else if (tab.dataset.target === "settings") {
+    settingsScreen(); // your logic here
+  }
+});
+
+function createScreens(wrapper) {
+  const screenIds = ["tools", "settings"];
+  screenIds.forEach((id) => {
+    const screen = document.createElement("div");
+    screen.id = `screen-${id}`;
+    screen.className = `app-screen ${id === "home" ? "" : "d-none"}`;
+    screen.style.overflowY = "auto";
+    screen.style.flexGrow = "1";
+    screen.style.paddingBottom = "80px"; // enough space for nav
+    wrapper.appendChild(screen);
+  });
+}
+
+function createNav() {
+  const nav = document.createElement("div");
+  nav.className = "d-flex justify-content-around border-top bg-light";
+  nav.id = "nav-container";
+
+  const tabs = [
+    { icon: "tools", label: "Tools", target: "tools" },
+    { icon: "globe2", label: "Website", external: "https://fpltoolbox.com" },
+    { icon: "gear", label: "Settings", target: "settings" },
+  ];
+
+  tabs.forEach((tab) => {
+    const div = document.createElement("div");
+    div.className = "nav-tab text-center flex-fill py-2";
+    if (tab.target) div.dataset.target = tab.target;
+    if (tab.external) div.dataset.external = tab.external;
+    if (tab.target === "tools") div.classList.add("active");
+
+    div.innerHTML = `<i class="bi bi-${tab.icon}"></i><br><small>${tab.label}</small>`;
+    nav.appendChild(div);
+  });
+
+  return nav;
+}
+
+function setupTabListeners() {
+  const tabs = document.querySelectorAll(".nav-tab");
+  const screens = document.querySelectorAll(".app-screen");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const externalUrl = tab.dataset.external;
+      if (externalUrl) {
+        window.open(externalUrl, "_blank");
+        return;
+      }
+
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      const targetId = `screen-${tab.dataset.target}`;
+      screens.forEach((screen) => screen.classList.add("d-none"));
+      document.getElementById(targetId).classList.remove("d-none");
+    });
+  });
+}
+
+function toolsScreen() {
+  const homeScreen = document.getElementById("screen-tools");
+  homeScreen.innerHTML = "";
+
+  const container = document.createElement("div");
+  container.className = "container text-center py-3";
+
+  const row = document.createElement("div");
+  row.className = "row g-3";
+
+  const features = [
+    {
+      icon: "bi-person-badge",
+      label: "Team Name Generator",
+      action: generateTeamName,
+      tier: "free",
+      requiresData: false,
+    },
+    {
+      icon: "bi-person-badge",
+      label: "My Team",
+      action: showMyTeam,
+      tier: "free",
+      requiresData: false,
+    },
+    {
+      icon: "bi-bar-chart",
+      label: "GW Stats",
+      action: showGameweekStats,
+      tier: "free",
+      requiresData: true,
+    },
+    {
+      icon: "bi-boxes",
+      label: "Chip Usage",
+      action: showChipUsage,
+      tier: "free",
+      requiresData: true,
+    },
+    {
+      icon: "bi-binoculars",
+      label: "Rival Comparison",
+      action: showRivalDiff,
+      tier: "free",
+      requiresData: true,
+    },
+    {
+      icon: "bi-award",
+      label: "Season Summary",
+      action: showMySeasonSummary,
+      tier: "free",
+      requiresData: true,
+    },
+    {
+      icon: "bi-people",
+      label: "Benched Points League",
+      action: showBenchedPointsLeague,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-trophy",
+      label: "Captaincy Points League",
+      action: showCaptaincyPointsLeague,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-exclamation-triangle",
+      label: "Cards League",
+      action: showCardsLeague,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-shield-check",
+      label: "Golden Boot League",
+      action: showGoldenbootLeague,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-bullseye",
+      label: "Penalities Missed League",
+      action: showPensMissedLeague,
+      tier: "pro",
+      requiresData: true,
+    },
+
+    {
+      icon: "bi-calculator",
+      label: "Rivals Transfer Calculator",
+      action: showTransferCalculator,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-cash-coin",
+      label: "Team Value League",
+      action: showTeamValueLeague,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-person-check",
+      label: "Download My Season",
+      action: downloadMySeason,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-person-check",
+      label: "Catch A Copycat",
+      action: showCopycatFinder,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-graph-up-arrow",
+      label: "Season Stats",
+      action: showSeasonStats,
+      tier: "pro",
+      requiresData: true,
+    },
+    {
+      icon: "bi-sliders",
+      label: "COMPLETE UNTIL HERE", //////////////////// COMPLETE UNTIL HERE
+      action: testFunction2,
+      tier: "max",
+      requiresData: true,
+    },
+
+    {
+      icon: "bi-sliders",
+      label: "Planner",
+      action: testFunction,
+      tier: "max",
+      requiresData: true,
+    },
+
+    {
+      icon: "bi-emoji-smile",
+      label: "GW Memes",
+      action: showMemes,
+      tier: "free",
+      requiresData: true,
+    },
+
+    {
+      icon: "bi-arrow-repeat",
+      label: "GW Transfer Summaries",
+      action: handleStatsClick,
+      tier: "free",
+      requiresData: true,
+    },
+
+    {
+      icon: "bi-speedometer2",
+      label: "Season Max Dashboard",
+      action: createSeasonMaxDashboard,
+      tier: "max",
+      requiresData: true,
+    },
+    {
+      icon: "bi-cash-coin",
+      label: "Mini League Admin",
+      action: miniLeagueAdmin,
+      tier: "max",
+      requiresData: false,
+    },
+    {
+      icon: "bi-bag-plus",
+      label: "Feature Request",
+      action: featureRequest,
+      tier: "max",
+      requiresData: false,
+    },
+  ];
+
+  features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
+    const featureId = `feature-btn-${i}`;
+    const col = document.createElement("div");
+    col.className = "col-4 p-2";
+
+    const button = document.createElement("div");
+    button.id = featureId;
+    button.className =
+      "btn btn-light w-100 feature-icon d-flex flex-column align-items-center justify-content-center text-center position-relative";
+    button.style.height = "120px";
+
+    // Determine data readiness based on tier
+    let dataReady = true;
+
+    if (requiresData) {
+      switch (tier) {
+        case "free":
+          dataReady = !!window.FPLToolboxLeagueDataReady;
+          break;
+        case "pro":
+          dataReady = !!window.FPLToolboxProLeagueDataReady;
+          break;
+        case "max":
+          dataReady = !!window.FPLToolboxMaxLeagueDataReady;
+          break;
+      }
+    }
+
+    if (!dataReady) {
+      button.innerHTML = `
+      <div class="spinner-border text-secondary mb-2" role="status" style="width: 1.5rem; height: 1.5rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <small>${label}</small>
+    `;
+      button.classList.add("disabled");
+      button.style.opacity = "0.5";
+    } else {
+      button.innerHTML = `
+      <i class="bi ${icon} fs-2 mb-1"></i>
+      <small>${label}</small>
+    `;
+      button.addEventListener("click", action);
+    }
+
+    // Tier badge
+    const badge = document.createElement("span");
+    badge.className = "badge position-absolute top-0 end-0 m-1";
+    badge.style.fontSize = "0.6rem";
+    badge.style.padding = "0.25em 0.5em";
+    badge.textContent = tier.toUpperCase();
+
+    switch (tier) {
+      case "free":
+        badge.classList.add("bg-success", "text-light");
+        break;
+      case "pro":
+        badge.classList.add("bg-warning", "text-dark");
+        break;
+      case "max":
+        badge.classList.add("bg-danger", "text-light");
+        break;
+    }
+
+    button.appendChild(badge);
+    col.appendChild(button);
+    row.appendChild(col);
+  });
+
+  container.appendChild(row);
+  homeScreen.appendChild(container);
+
+  // 🔁 Check for league data and re-render individual buttons
+  const pendingButtons = features
+    .map((f, i) => ({ ...f, index: i }))
+    .filter((f) => f.requiresData);
+}
+
+
+function injectDynamicStyles() {
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  const body = document.body;
+  body.classList.toggle("bg-dark", darkMode);
+  body.classList.toggle("text-light", darkMode);
+
+  const navTabs = document.querySelectorAll(".nav-tab");
+  navTabs.forEach((tab) => {
+    tab.classList.toggle("bg-dark", darkMode);
+    tab.classList.toggle("text-light", darkMode);
+    tab.classList.toggle("border-top", true);
+  });
+
+  const buttons = document.querySelectorAll(".feature-icon");
+  buttons.forEach((btn) => {
+    btn.classList.toggle("btn-dark", darkMode);
+    btn.classList.toggle("btn-light", !darkMode);
+  });
+
+  // Update table theme
+  const tables = document.querySelectorAll("table");
+  tables.forEach((table) => {
+    table.classList.remove("table-dark", "table-light");
+    table.classList.add(darkMode ? "table-dark" : "table-light");
+  });
+}
+
+function settingsScreen() {
+  const settingsContainer = document.getElementById("screen-settings");
+
+  // Generate changelog HTML
+  let changelogHTML = `
+  <div class="mb-4">
+    <h5>Changelog</h5>
+    <ul class="small">
+`;
+
+  changelogData.forEach((entry) => {
+    changelogHTML += `<li>v${entry.version} – ${entry.description}</li>`;
+  });
+
+  changelogHTML += `
+    </ul>
+  </div>
+`;
+
+  // Clear container and add Bootstrap padding
+  settingsContainer.innerHTML = `
+<div class="p-4">
+  <h2 class="mb-3">Settings</h2>
+  <hr class="my-2"/>
+
+  <!-- Dark Mode Toggle -->
+  <div class="form-check form-switch mb-4">
+    <input class="form-check-input" type="checkbox" id="darkModeToggle">
+    <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+  </div>
+
+  <hr class="my-2"/>
+
+  <!-- League Selector -->
+  <div class="mb-4">
+    <label for="leagueSelector" class="form-label">Switch Mini League</label>
+    <select class="form-select" id="leagueSelector"></select>
+  </div>
+
+  <hr class="my-2"/>
+
+  <!-- Toolbox Account -->
+  <div class="mb-4">
+    <h5>My Toolbox Account</h5>
+    <a href="${profilePageUrl}" class="btn btn-outline-primary" target="_blank">View My Profile</a>
+  </div>
+
+  <hr class="my-2"/>
+
+ ${changelogHTML}
+ 
+
+  
+  <!-- Version -->
+<div class="mb-2 text-muted small">FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span></div>
+</div>
+
+  `;
+
+  // Dark mode toggle logic
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  darkModeToggle.checked = localStorage.getItem("darkMode") === "true";
+
+  darkModeToggle.addEventListener("change", () => {
+    localStorage.setItem("darkMode", darkModeToggle.checked);
+    injectDynamicStyles(); // apply styles immediately
+  });
+
+  injectDynamicStyles(); // apply styles on load
+
+  // League dropdown logic
+  const leagueSelector = document.getElementById("leagueSelector");
+
+  // Add default option
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "Select a league...";
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  leagueSelector.appendChild(defaultOption);
+
+  // Add league options
+  managerData.leagues.classic.forEach((league) => {
+    const option = document.createElement("option");
+    option.value = league.id;
+    option.textContent = league.name;
+    leagueSelector.appendChild(option);
+  });
+
+  // Pre-select saved value if exists
+  const savedLeagueId = localStorage.getItem("savedLeagueId");
+  if (savedLeagueId) {
+    leagueSelector.value = savedLeagueId;
+    defaultOption.selected = false; // ensure actual league is selected
+  }
+
+  // On league change
+  leagueSelector.addEventListener("change", (e) => {
+    if (!userHasAccess([12])) {
+      showModal({
+        title: "Paid Feature",
+        body: "This feature is only available to <strong>Max members</strong>.<br><br>Head over to your profile page to switch leagues",
+        confirmText: "Take me there",
+        onConfirm: () => {
+          window.location.href = profilePageUrl;
+        },
+      });
+      return;
+    }
+
+    const selectedLeagueId = e.target.value;
+    localStorage.setItem("savedLeagueId", selectedLeagueId);
+    location.reload();
+  });
+}
+
+// Map level IDs to tier names
+function getTierName(levelId) {
+  switch (levelId) {
+    case 1:
+      return "free";
+    case 10:
+      return "pro";
+    case 12:
+      return "max";
+    default:
+      return "free";
+  }
+}
+function userHasAccess(allowedLevels) {
+  const level = Number(theUser?.username?.data?.membership_level?.ID || 0);
+
+  if (Array.isArray(allowedLevels)) {
+    return allowedLevels.includes(level);
+  }
+
+  return level >= allowedLevels;
+}
+
+function handleStatsClick() {
+  if (!userHasAccess([3])) {
+    showModal({
+      title: "Pro Feature",
+      body: "This feature is only available to <strong>Pro members</strong>. <br><br>Upgrade to unlock Copycat mode!",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = subscriptionPageUrl;
+      },
+    });
+    return;
+  }
+  console.log("Stats clicked");
+  // Add logic here
+}
+
+function showModal({ title, body, confirmText = null, onConfirm = null }) {
+  const modal = document.getElementById("modal-popup");
+  const titleEl = modal.querySelector(".modal-title");
+  const bodyEl = modal.querySelector(".modal-body-content");
+  const closeBtn = modal.querySelector(".modal-close");
+  const confirmBtn = modal.querySelector(".modal-confirm-btn");
+
+  if (!modal || !titleEl || !bodyEl || !closeBtn || !confirmBtn) {
+    console.error("[showModal] ⚠️ Could not find modal or required elements.");
+    return;
+  }
+
+  // Populate content
+  titleEl.textContent = title;
+  bodyEl.innerHTML = body;
+
+  // Confirm button logic
+  if (confirmText && typeof onConfirm === "function") {
+    confirmBtn.textContent = confirmText;
+    confirmBtn.classList.remove("hidden");
+    confirmBtn.onclick = () => {
+      onConfirm();
+      closeModal();
+    };
+  } else {
+    confirmBtn.classList.add("hidden");
+    confirmBtn.onclick = null;
+  }
+
+  // Close behavior
+  closeBtn.onclick = closeModal;
+  modal.onclick = (e) => {
+    if (e.target === modal) closeModal();
+  };
+  document.addEventListener("keydown", handleEsc);
+
+  // Apply dark/light styling
+  applyModalTheme(modal);
+
+  // Show it
+  modal.classList.add("open");
+
+  function closeModal() {
+    modal.classList.remove("open");
+    document.removeEventListener("keydown", handleEsc);
+  }
+
+  function handleEsc(e) {
+    if (e.key === "Escape") closeModal();
+  }
+}
+function createBackButton() {
+  const btn = document.createElement("button");
+  btn.className = "btn btn-secondary mb-3";
+  btn.textContent = "X";
+  btn.addEventListener("click", toolsScreen);
+  return btn;
+}
+function applyModalTheme() {
+  const dark = localStorage.getItem("darkMode") === "true";
+  const root = document.documentElement;
+  if (dark) {
+    root.style.setProperty("--modal-bg", "#222");
+    root.style.setProperty("--modal-text", "#eee");
+  } else {
+    root.style.setProperty("--modal-bg", "#fff");
+    root.style.setProperty("--modal-text", "#000");
+  }
+}
+
+// Returns the max allowed pages for the user based on membership level.
+// Levels: 1 = Free, 10 = Pro, 12 = Max
+
+function getMaxPagesForUser() {
+  // console.log(theUser);
+  const level = parseInt(theUser.username.data.membership_level?.ID, 10);
+
+  switch (level) {
+    case 1: // Free
+      return 1;
+    case 10: // Pro
+      return 1;
+    case 12: // Max
+      return 1;
+    default:
+      console.warn("[getMaxPagesForUser] Unknown membership level:", level);
+      return 1;
+  }
+}
+
+function sliceStandingsForUser(standings) {
+  if (userHasAccess([12])) {
+    return standings; // Max access: full list
+  } else if (userHasAccess([10])) {
+    return standings.slice(0, 20); // Pro access
+  } else {
+    return standings.slice(0, 10); // Free access
+  }
+}
+
+async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
+  onStatusUpdate("started");
+
+  try {
+    if (testMode) {
+      console.log("simulating delay");
+      await sleep(addDelaySimulationTime);
+      onStatusUpdate("fetching test data");
+
+      return {
+        type: superLeagueTest.type,
+        leagueName: superLeagueTest.leagueName,
+        standings: sliceStandingsForUser(superLeagueTest.standings),
+      };
+    }
+
+    let maxPages = getMaxPagesForUser();
+    onStatusUpdate("maxPages", maxPages);
+
+    let standings = [];
+    let leagueName = "";
+
+    for (let i = 1; i <= maxPages; i++) {
+      onStatusUpdate("fetching", i);
+
+      const res = await fetch(
+        `${BASE_URL}leagues-classic/${leagueID}/standings?page_standings=${i}`
+      );
+      const data = await res.json();
+      console.error(data)
+      if (i === 1) leagueName = data.league.name;
+      standings.push(...(data.standings?.results ?? []));
+
+      if (!data.standings?.has_next) break;
+      if (i < maxPages) await sleep(250);
+    }
+
+    onStatusUpdate("fetched", standings.length);
+
+    return {
+      leagueName,
+      standings: sliceStandingsForUser(standings),
+      type: "Live League",
+    };
+  } catch (err) {
+    onStatusUpdate("error", err);
+    throw err;
+  }
+}
+
+function handleLeagueCreation(result) {
+  window.FPLToolboxLeagueData = {
+    leagueName: result.leagueName,
+    standings: result.standings,
+    lastUpdated: Date.now(),
+  };
+}
+
+async function processLeague(standings) {
+  // Free Tier
+  if (userHasAccess([1, 10, 12])) {
+    await addManagerDetailsToLeague(standings, null);
+
+    await addGameweeksToLeague(standings, null);
+    await addDetailedGameweeksToLeague(standings, null);
+    window.FPLToolboxLeagueDataReady = true;
+
+    toolsScreen(); // Re-render for free features
+  }
+
+  // Pro Tier
+  if (userHasAccess([10, 12])) {
+    await weeklyPicksForSuperLeague(standings, null);
+    await addAllTransfers(standings, null);
+    window.FPLToolboxProLeagueDataReady = true;
+    window.FPLToolboxMaxLeagueDataReady = true;
+
+    toolsScreen(); // Re-render for pro features
+  }
+
+  // Max Tier (only user 12)
+  if (userHasAccess([12])) {
+    toolsScreen(); // Re-render for max features
+  }
+  window.FPLToolboxLeagueDataReady = true;
+  window.FPLToolboxProLeagueDataReady = true;
+  window.FPLToolboxMaxLeagueDataReady = true;
+}
+
+async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
+  try {
+    const result = await createSelectedLeague(leagueId, onStatusUpdate);
+    handleLeagueCreation(result);
+    await processLeague(result.standings);
+
+    onStatusUpdate("complete", result); // Only mark complete after all done
+  } catch (err) {
+    onStatusUpdate("error", err);
+    console.error("❌ Failed to fetch and process league:", err);
+  }
+}
+
+async function renderToolsScreenWithLeague(leagueId) {
+  // Step 0: Use leagueId from localStorage if available
+  const savedLeagueId = localStorage.getItem("savedLeagueId");
+  console.log("Saved league ID", savedLeagueId);
+
+  if (!leagueId && savedLeagueId) {
+    leagueId = savedLeagueId;
+  }
+
+  // Step 1: Default to user's league ID if none is found
+  if (!leagueId) {
+    leagueId = theUser.info.league_id;
+  }
+
+  // Step 2: Show initial screen (spinners if needed)
+  toolsScreen();
+
+  const hasStandings = window.FPLToolboxLeagueData?.standings?.length;
+  const needsPro = userHasAccess([10]);
+  const needsMax = userHasAccess([12]);
+
+  const proReady = window.FPLToolboxProLeagueDataReady;
+  const maxReady = window.FPLToolboxMaxLeagueDataReady;
+
+  // Step 3: Skip fetch if all required data is already ready
+  if (hasStandings && (!needsPro || proReady) && (!needsMax || maxReady)) {
+    return;
+  }
+
+  // Step 4: Fetch league and process it
+  await fetchAndProcessLeague(leagueId, (status) => {
+    if (status === "complete") {
+      toolsScreen(); // Re-render after final data load
+    }
+  });
+}
+renderToolsScreenWithLeague(leagueId)
+
+async function addManagerDetailsToLeague(standings, div) {
+  const startTime = Date.now(); // Start the timer
+  if (testMode) {
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Manager Details",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "Old Data",
+      window.FPLToolboxLeagueData.standings
+    );
+
+    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
+      superLeagueManagerDataTest.standings
+    );
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Manager Details",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "New Data",
+      window.FPLToolboxLeagueData.standings
+    );
+    console.log("simulating delay");
+    await sleep(addDelaySimulationTime);
+
+    return; // Skip live fetching
+  }
+  const gwFetches = standings.map(async (team) => {
+    try {
+      const res = await fetch(BASE_URL + "/entry/" + team.entry + "/");
+      const data = await res.json();
+      //console.log(data)
+      team.managerDetails = data;
+
+      await sleep(1000);
+      console.log("delay here");
+      //div.innerText = `Adding Manager details for ${team.entry_name}`;
+      //console.log(`Adding Manager details for ${team.entry_name}`);
+    } catch (error) {
+      console.error(`Error fetching data for team ${team.entry}: `, error);
+    }
+  });
+
+  await Promise.all(gwFetches);
+  const endTime = Date.now(); // End the timer
+  console.log(
+    `Manager details added to league ${(endTime - startTime) / 1000} seconds.`
+  );
+  console.log(
+    "%c API CALL MADE - Adding Manager Details",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
+}
+async function addGameweeksToLeague(standings, div) {
+  const startTime = Date.now(); // Start the timer
+  if (testMode) {
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "Old Data",
+      window.FPLToolboxLeagueData.standings
+    );
+
+    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
+      superLeagueGameweekDataTest.standings
+    );
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Gameweek Details",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "New Data",
+      window.FPLToolboxLeagueData.standings
+    );
+    console.log("simulating delay");
+    await sleep(addDelaySimulationTime);
+    return; // Skip live fetching
+  }
+  const gwFetches = standings.map(async (team) => {
+    try {
+      const response = await fetch(`${BASE_URL}entry/${team.entry}/history/`);
+      const teamData = await response.json();
+      //console.log(teamData)
+      // Add all gameweeks data to a new array
+      team.everyGw = teamData.current.map((week) => ({
+        percentile_rank: week.percentile_rank,
+        bank: week.bank,
+        gameweek: week.event,
+        points: week.points,
+        rank: week.rank,
+        overall_rank: week.overall_rank,
+        value: week.value,
+        transfers: week.event_transfers,
+        transfers_cost: week.event_transfers_cost,
+        bench_points: week.points_on_bench,
+      }));
+
+      // Helper function to calculate a total for a specific field
+      const calculateTotal = (field) =>
+        teamData.current.reduce((sum, week) => sum + week[field], 0);
+
+      // Calculate totals
+      team.totalTransfers = calculateTotal("event_transfers");
+      team.totalMinusPoints = calculateTotal("event_transfers_cost");
+      team.totalPointsOnBench = calculateTotal("points_on_bench");
+
+      // Helper function to find best and worst weeks by a specified field
+      const findBestWorstWeek = (field) =>
+        teamData.current.reduce(
+          (result, week) => {
+            if (week[field] > result.best[field]) result.best = week;
+            if (week[field] < result.worst[field]) result.worst = week;
+            return result;
+          },
+          { best: teamData.current[0], worst: teamData.current[0] }
+        );
+
+      // Set best and worst week by points and overall rank
+      const { best: bestWeek, worst: worstWeek } = findBestWorstWeek("points");
+      team.bestWeek = bestWeek;
+      team.worstWeek = worstWeek;
+
+      const { best: bestOverallRankWeek, worst: worstOverallRankWeek } =
+        findBestWorstWeek("overall_rank");
+      team.bestOverallRankWeek = bestOverallRankWeek;
+      team.worstOverallRankWeek = worstOverallRankWeek;
+
+      // Find the highest team value week
+      team.highestValueWeek = teamData.current.reduce(
+        (highest, week) => (week.value > highest.value ? week : highest),
+        teamData.current[0]
+      );
+
+      // Add chips data (limited to 6 chips)
+      //console.log(teamData)
+      team.chips = teamData.chips.slice(0, 6).map((chip) => ({
+        name: chip.name,
+        time: chip.time,
+        gw: chip.event,
+      }));
+
+      team.past = teamData.past;
+
+      // Other team data
+      team.seasons = teamData.past.length;
+      team.seasons_managed = teamData.past[0]?.season_name || "NEW";
+      team.previousRank =
+        teamData.current[teamData.current.length - 2]?.overall_rank || "";
+      // Add a small delay between requests (e.g., 500ms)
+      await sleep(1000);
+      //div.innerText = `Adding general gameweek stats for ${team.entry_name}`;
+      console.log("delay here");
+    } catch (error) {
+      console.error(`Error fetching data for team ${team.entry}: `, error);
+    }
+  });
+
+  await Promise.all(gwFetches);
+  const endTime = Date.now(); // End the timer
+  console.log(
+    `All weeks data for all teams added in ${
+      (endTime - startTime) / 1000
+    } seconds.`
+  );
+  console.log(
+    "%c API CALL MADE - Adding Gameweek Details",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
+
+  return standings;
+}
+async function addAllTransfers(standings, div) {
+  const startTime = Date.now(); // Start the timer
+  if (testMode) {
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Added Manager Transfers",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "Old Data",
+      window.FPLToolboxLeagueData.standings
+    );
+
+    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
+      superLeagueTransfersAddedDataTest.standings
+    );
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Added Manager Transfers",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "New Data",
+      window.FPLToolboxLeagueData.standings
+    );
+    console.log("simulating delay");
+    await sleep(addDelaySimulationTime);
+    return; // Skip live fetching
+  }
+  const allTransfersFetch = standings.map(async (team) => {
+    try {
+      const transfersPromises = [];
+
+      // Fetch transfer data for each team
+      transfersPromises.push(
+        fetch(`${BASE_URL}/entry/${team.entry}/transfers/`).then((response) =>
+          response.json()
+        )
+      );
+
+      // Wait for all transfer data to resolve
+      const transfersData = await Promise.all(transfersPromises);
+
+      // Add transfers data to the team's object
+      team.transfers = transfersData;
+
+      // Add a small delay between requests (e.g., 500ms)
+      await sleep(200);
+      console.log("delay here");
+    } catch (error) {
+      console.error(`Error fetching transfers for team ${team.entry}: `, error);
+    }
+  });
+
+  await Promise.all(allTransfersFetch);
+  console.log(
+    "%c API CALL MADE - All Transfers Added",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
+  const endTime = Date.now(); // End the timer
+  console.log(
+    `All transfers added in ${(endTime - startTime) / 1000} seconds.`
+  );
+}
+async function addDetailedGameweeksToLeague(standings, div) {
+  const startTime = Date.now(); // Start the timer
+  console.log(`Searching database for Detailed Gameweek stats`);
+  if (testMode) {
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Detailed Gameweek Details",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "Old Data",
+      window.FPLToolboxLeagueData.standings
+    );
+
+    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
+      superLeagueDetailedGameweekDataTest.standings
+    );
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Detailed Gameweek Details",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "New Data",
+      window.FPLToolboxLeagueData.standings
+    );
+    console.log("simulating delay");
+    await sleep(addDelaySimulationTime);
+    return; // Skip live fetching
+  }
+  const allGwFetches = standings.map(async (team) => {
+    try {
+      const allGwPromises = [];
+
+      // Fetch picks data for each gameweek from 1 to currentGw
+      for (let gw = 1; gw <= currentGw; gw++) {
+        allGwPromises.push(
+          fetch(`${BASE_URL}entry/${team.entry}/event/${gw}/picks/`)
+            .then((response) => response.json())
+            .then((data) => ({
+              gameweek: gw,
+              picks: data.picks || [],
+              active_chip: data.active_chip || null,
+            }))
+        );
+        await sleep(1000); // Add small delay between requests
+        console.log(
+          `Calculating detailed stats about FPL Gameweek ${gw} for your league`
+        );
+      }
+
+      // Wait for all gameweek data to resolve
+      const allGwData = await Promise.all(allGwPromises);
+
+      // Add all gameweek picks data to the new array
+      team.everyGwPicks = allGwData;
+
+      // Add current week data
+      const currentWeekData = allGwData.find(
+        (gwData) => gwData.gameweek === currentGw
+      );
+      team.currentWeek = currentWeekData ? [currentWeekData] : [];
+
+      // Create an array for weekly captain picks
+      team.weeklyCaptainPicks = allGwData.map((gwData) => {
+        const captainPick = gwData.picks.find((pick) => pick.is_captain);
+        return {
+          gameweek: gwData.gameweek,
+          captain: captainPick || null,
+          captainName: captainPick
+            ? getPlayerWebName(captainPick.element)
+            : null,
+        };
+      });
+
+      // Count played stats per gameweek
+      team.playedCount = allGwData.map((gwData) => {
+        const playedCount = gwData.picks.filter(
+          (pick) =>
+            pick.multiplier === 1 ||
+            pick.multiplier === 2 ||
+            pick.multiplier === 3
+        ).length;
+
+        const noPlayedCount = gwData.picks.filter(
+          (pick) => pick.multiplier === 0
+        ).length;
+
+        return {
+          gameweek: gwData.gameweek,
+          playedCount,
+          noPlayedCount,
+        };
+      });
+
+      // Total across all weeks
+      team.totalPlayedStats = team.playedCount.reduce(
+        (totals, gwStats) => {
+          totals.totalPlayed += gwStats.playedCount;
+          totals.totalNotPlayed += gwStats.noPlayedCount;
+          return totals;
+        },
+        { totalPlayed: 0, totalNotPlayed: 0 }
+      );
+
+      // Track frequency of each element across all gameweeks
+      const elementFrequencyMap = {};
+      allGwData.forEach((gwData) => {
+        gwData.picks.forEach((pick) => {
+          if (!elementFrequencyMap[pick.element]) {
+            elementFrequencyMap[pick.element] = 0;
+          }
+          elementFrequencyMap[pick.element]++;
+        });
+      });
+
+      // Convert to readable player names and sort by count descending
+      const sortedFrequency = Object.entries(elementFrequencyMap)
+        .map(([elementId, count]) => ({
+          playerName: getPlayerWebName(Number(elementId)),
+          count,
+        }))
+        .sort((a, b) => b.count - a.count);
+
+      team.pickElementFrequency = sortedFrequency;
+
+      await sleep(1000); // Small delay before moving to next team
+      console.log("delay here");
+      console.log(`Adding detailed gameweek stats for ${team.entry_name}`);
+    } catch (error) {
+      console.error(
+        `Error fetching all gameweeks picks for team ${team.entry}: `,
+        error
+      );
+    }
+  });
+
+  await Promise.all(allGwFetches);
+
+  const endTime = Date.now(); // End the timer
+  console.log(
+    `All current weeks data added in ${(endTime - startTime) / 1000} seconds.`
+  );
+  console.log(
+    "%c API CALL MADE - Adding Detailed Gameweek Details",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
+}
+async function weeklyPicksForSuperLeague(standings, div) {
+  console.time("Weekly Picks Fetch");
+  if (testMode) {
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Weekly Picks",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "Old Data",
+      window.FPLToolboxLeagueData.standings
+    );
+
+    window.FPLToolboxLeagueData.standings = sliceStandingsForUser(
+      superLeagueAddWeeklyPicksTest.standings
+    );
+    console.log(
+      "%c TEST MODE - NO API CALL MADE - Adding Weekly Picks",
+      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      "New Data",
+      window.FPLToolboxLeagueData.standings
+    );
+    console.log("simulating longer delay");
+    await sleep(addDelaySimulationTime);
+    return; // Skip live fetching
+  }
+  const cache = new Map();
+
+  for (let i = 0; i < standings.length; i++) {
+    console.log(`Looking for red cards, yellow cards, own goals etc`);
+    const team = standings[i];
+
+    if (!team.everyGwPicks || team.everyGwPicks.length === 0) {
+      console.warn(`No weekly data available for team ${team.entry}`);
+      continue;
+    }
+
+    // Initialize stats
+    team.total_goals_scored = 0;
+    team.total_red_cards = 0;
+    team.total_yellow_cards = 0;
+    team.total_cards = 0;
+    team.total_minutes = 0;
+    team.total_assists = 0;
+    team.total_clean_sheets = 0;
+    team.total_goals_conceded = 0;
+    team.total_own_goals = 0;
+    team.total_penalties_missed = 0;
+    team.total_home_games = 0;
+    team.total_away_games = 0;
+    team.total_captaincy_points = 0;
+    team.allCaptains = [];
+    team.total_saves = 0;
+
+    const apiRequests = new Map();
+
+    for (const gameweek of team.everyGwPicks) {
+      console.log(`Fetching player stats for ${team.entry_name}.`);
+      for (const pick of gameweek.picks) {
+        if (pick.position >= 1 && pick.position <= 11) {
+          const playerId = pick.element;
+          if (cache.has(playerId)) continue;
+
+          const apiUrl = `${BASE_URL}/element-summary/${playerId}/`;
+          apiRequests.set(
+            playerId,
+            fetch(apiUrl).then((res) => res.json())
+          );
+        }
+        console.log(
+          `Gathering detailed gameweek starting 11 for ${team.entry_name}.`
+        );
+      }
+    }
+
+    const responses = await Promise.allSettled(apiRequests.values());
+
+    let index = 0;
+    for (const [playerId] of apiRequests) {
+      const result = responses[index++];
+      if (result.status === "fulfilled") {
+        cache.set(playerId, result.value);
+      } else {
+        console.error(`Failed to fetch data for player ${playerId}`);
+      }
+    }
+
+    for (const gameweek of team.everyGwPicks) {
+      for (const pick of gameweek.picks) {
+        if (pick.position >= 1 && pick.position <= 11) {
+          const playerData = cache.get(pick.element);
+          if (!playerData) continue;
+
+          const matchingHistories = playerData.history.filter(
+            (entry) => entry.round === gameweek.gameweek
+          );
+
+          if (matchingHistories.length === 0) continue;
+
+          // Aggregate stats across all matching histories
+          const combined = matchingHistories.reduce(
+            (acc, curr) => {
+              acc.goals_scored += curr.goals_scored;
+              acc.red_cards += curr.red_cards;
+              acc.yellow_cards += curr.yellow_cards;
+              acc.minutes += curr.minutes;
+              acc.assists += curr.assists;
+              acc.clean_sheets += curr.clean_sheets;
+              acc.goals_conceded += curr.goals_conceded;
+              acc.own_goals += curr.own_goals;
+              acc.penalties_missed += curr.penalties_missed;
+              acc.total_points += curr.total_points;
+              acc.saves += curr.saves;
+
+              // Count home/away games
+              if (curr.was_home) {
+                acc.home_games += 1;
+              } else {
+                acc.away_games += 1;
+              }
+
+              return acc;
+            },
+            {
+              goals_scored: 0,
+              red_cards: 0,
+              yellow_cards: 0,
+              minutes: 0,
+              assists: 0,
+              clean_sheets: 0,
+              goals_conceded: 0,
+              own_goals: 0,
+              penalties_missed: 0,
+              total_points: 0,
+              saves: 0,
+              home_games: 0,
+              away_games: 0,
+            }
+          );
+
+          team.total_goals_scored += combined.goals_scored;
+          team.total_red_cards += combined.red_cards;
+          team.total_yellow_cards += combined.yellow_cards;
+          team.total_cards += combined.yellow_cards + combined.red_cards;
+          team.total_minutes += combined.minutes;
+          team.total_assists += combined.assists;
+          team.total_clean_sheets += combined.clean_sheets;
+          team.total_goals_conceded += combined.goals_conceded;
+          team.total_own_goals += combined.own_goals;
+          team.total_penalties_missed += combined.penalties_missed;
+          team.total_saves += combined.saves;
+          team.total_home_games += combined.home_games;
+          team.total_away_games += combined.away_games;
+
+          if (pick.is_captain) {
+            //console.log("GW" + gameweek.gameweek, getPlayerWebName(pick.element), combined.total_points);
+            team.total_captaincy_points +=
+              combined.total_points * pick.multiplier;
+          }
+        }
+      }
+    }
+
+    //Weekly Scoresheets
+    team.gwScoreSheet = [];
+    team.gwBenchSheet = [];
+
+    for (const gameweek of team.everyGwPicks) {
+      const starters = [];
+      const bench = [];
+
+      const gameweekNumber = gameweek.gameweek;
+
+      for (let i = 0; i < gameweek.picks.length; i++) {
+        const pick = gameweek.picks[i];
+        const playerData = cache.get(pick.element);
+
+        let points = 0;
+        if (playerData) {
+          const history = playerData.history.find(
+            (entry) => entry.round === gameweekNumber
+          );
+          points = history ? history.total_points * pick.multiplier : 0;
+        }
+
+        const pickObj = {
+          playerId: pick.element,
+          name: getPlayerWebName(pick.element),
+          points,
+        };
+
+        if (i < 11) {
+          starters.push(pickObj);
+        } else {
+          bench.push(pickObj);
+        }
+      }
+
+      team.gwScoreSheet.push({
+        gameweek: gameweekNumber,
+        starters,
+      });
+
+      team.gwBenchSheet.push({
+        gameweek: gameweekNumber,
+        bench,
+      });
+      console.log(`Calculating bench scores for ${team.entry_name}.`);
+    }
+
+    console.log(`Add all gameweek picks for ${team.entry_name}.`);
+  }
+  console.log(
+    "%c API CALL MADE - Weekly Picks Added",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
+  console.timeEnd("Weekly Picks Fetch");
+}
+
+async function testFunction() {
+  alert("working");
+  console.log(window.FPLToolboxLeagueData);
+}
+
+async function testFunction2() {
+  if (!userHasAccess([12])) {
+    showModal({
+      title: "Pro Feature",
+      body: "This feature is only available to <strong>Pro members</strong>. <br><br>Upgrade to unlock!",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = subscriptionPageUrl;
+      },
+    });
+    return;
+  }
+
+  if (window.FPLToolboxLeagueData?.standings?.length) {
+    console.log(window.FPLToolboxLeagueData);
+  }
+}
+
+function generateTeamName() {
+  // Inject HTML
+  const app = document.getElementById("screen-tools");
+
+  const teamNamesForGenerator = [
+    // Arsenal
+    { name: "Livin' Saliba Loca", tags: ["arsenal", "music"] },
+
+    { name: "Old Havertz Kai Hard", tags: ["arsenal"] },
+    { name: "Ødegaardians of the Galaxy", tags: ["arsenal"] },
+    { name: "Curious Jorginho", tags: ["arsenal"] },
+    { name: "Major League Saka", tags: ["arsenal"] },
+    { name: "The Cesc Pistols", tags: ["classic", "arsenal", "music"] },
+    { name: "Trossard Marks", tags: ["arsenal"] },
+    { name: "You Gotta Havertz", tags: ["arsenal", "chelsea"] },
+    { name: "Arteta-tete", tags: ["arsenal"] },
+    { name: "The Arteta's Apprentice", tags: ["arsenal"] },
+    {
+      name: "Havertz Your Way",
+      tags: ["classic", "arsenal", "chelsea", "music"],
+    },
+
+    // Aston Villa
+    { name: "Stranger Mings", tags: ["aston-villa", "TV & Film"] },
+    { name: "Come Digne With Me", tags: ["aston-villa"] },
+    { name: "Out on Bailey", tags: ["aston-villa"] },
+    { name: "Put a Dendonck on it", tags: ["aston-villa"] },
+    { name: "Tea for the Tielemans", tags: ["aston-villa"] },
+    {
+      name: "Bangers and Rashford",
+      tags: ["classic", "aston-villa", "manchester-united"],
+    },
+    { name: "Aston Village People", tags: ["aston-villa", "music"] },
+    { name: "Rubber Digne Rapids", tags: ["aston-villa"] },
+    { name: "Matty Cash Hoes", tags: ["aston-villa", "music"] },
+    { name: "MattyCashInTheAttic", tags: ["aston-villa", "music"] },
+    { name: "McGinn and Tonic", tags: ["aston-villa"] },
+    { name: "Comme Ci Konsa", tags: ["aston-villa"] },
+
+    // Brentford
+    { name: "Throwing Schade", tags: ["brentford"] },
+    { name: "Mee, Myself and I", tags: ["brentford"] },
+    { name: "Dasilva Lining", tags: ["brentford"] },
+    { name: "Thomas The Frank Engine", tags: ["brentford", "TV & Film"] },
+    { name: "Kinder Mbeumo", tags: ["brentford"] },
+    { name: "Mbeumo No.5", tags: ["classic", "brentford", "music"] },
+    { name: "Wissa Khalifa", tags: ["classic", "brentford", "TV & Film"] },
+
+    // Bournemouth
+    { name: "El Vina Did Flow", tags: ["bournemouth"] },
+    { name: "Dango Unchained", tags: ["bournemouth", "TV & Film"] },
+    { name: "Back of the Neto", tags: ["bournemouth"] },
+    { name: "High Faivre", tags: ["bournemouth"] },
+    { name: "Billing Me Softly", tags: ["bournemouth", "music"] },
+
+    // Brighton
+    { name: "Gilmour Girls", tags: ["brighton", "TV & Film"] },
+    { name: "Dunkytown", tags: ["brighton"] },
+    { name: "Moder on the Dancefloor", tags: ["brighton"] },
+    { name: "Boys In Dahoud", tags: ["brighton", "TV & Film"] },
+    { name: "Estupiña Colada", tags: ["brighton"] },
+    { name: "Groß Misconduct", tags: ["classic", "brighton"] },
+    { name: "Estupina Colada", tags: ["brighton"] },
+    { name: "Kids See Groß", tags: ["classic", "brighton"] },
+
+    // Chelsea
+    { name: "I'm Sorry Nic Jackson", tags: ["chelsea", "music"] },
+    { name: "Stuck in the Mudryk", tags: ["chelsea"] },
+    { name: "Under My Cucurella", tags: ["chelsea", "music"] },
+    { name: "Reece's Set Pieces", tags: ["chelsea"] },
+    { name: "Palmer Violets", tags: ["chelsea"] },
+    { name: "Chilwell Soon", tags: ["chelsea"] },
+    { name: "Petr Cech Yourself", tags: ["classic", "chelsea"] },
+    { name: "Mudryk To Life", tags: ["classic", "chelsea"] },
+    { name: "Malo Gusto: Bad Fart", tags: ["chelsea"] },
+
+    // Crystal Palace
+    { name: "Hakuna Mateta", tags: ["crystal-palace", "music", "TV & Film"] },
+    { name: "Ayew Kidding Me", tags: ["crystal-palace"] },
+    { name: "Jairoglyphics", tags: ["crystal-palace"] },
+    { name: "Schlupptown Funk", tags: ["crystal-palace", "music"] },
+    { name: "Eze Come Eze Go", tags: ["crystal-palace"] },
+    { name: "Bacuna Mateta", tags: ["crystal-palace", "TV & Film"] },
+    { name: "Ayew Being Served", tags: ["crystal-palace"] },
+
+    // Everton
+    { name: "Raiders of the Lost Tark", tags: ["everton", "TV & Film"] },
+    { name: "Taking the Mykolenko", tags: ["everton"] },
+    { name: "Roll the Dyche", tags: ["everton"] },
+    { name: "Tesco McNeil Deal", tags: ["everton"] },
+    { name: "Torn DCL", tags: ["everton"] },
+    {
+      name: "Backstreet Moyes",
+      tags: [
+        "everton",
+        "classic",
+        "manchester-united",
+        "west-ham-united",
+        "music",
+      ],
+    },
+    { name: "Gueye Pride", tags: ["everton"] },
+
+    // Fulham
+    { name: "Iwobi Wan-Kenobi", tags: ["fulham"] },
+    { name: "That's So Craven", tags: ["fulham"] },
+    { name: "I Like To Muniz Muniz", tags: ["fulham", "music"] },
+    { name: "Willian The Conqueror", tags: ["fulham"] },
+    { name: "Diop It Like It's Hot", tags: ["fulham", "music"] },
+    { name: "Smith Rowe Your Boat", tags: ["fulham", "arsenal"] },
+
+    // Ipswich Town
+    { name: "Hungry like the Woolf", tags: ["ipswich-town"] },
+    { name: "Morsy Code", tags: ["ipswich-town"] },
+    { name: "Starsky and Hutchinson", tags: ["ipswich-town"] },
+    { name: "Burgess and Fries", tags: ["ipswich-town"] },
+    { name: "Leif Blower", tags: ["ipswich-town"] },
+    { name: "Hawk Tuanzebe", tags: ["ipswich-town"] },
+
+    // Leicester City
+    { name: "Hey, Wout's Wrong With You", tags: ["leicester-city"] },
+    { name: "Yes Ndidi", tags: ["leicester-city"] },
+    { name: "That's Soumare", tags: ["leicester-city"] },
+    { name: "Champagne Coopernova", tags: ["leicester-city"] },
+    { name: "House of Vards", tags: ["leicester-city", "classic"] },
+    { name: "Vardy Boys FC", tags: ["leicester-city", "classic"] },
+    { name: "Egg On Your Faes", tags: ["classic", "leicester-city"] },
+
+    // Liverpool
+    { name: "Alisson Wonderland", tags: ["liverpool"] },
+    { name: "The 40 Year Old Virgil", tags: ["liverpool", "TV & Film"] },
+    { name: "Pain in Diaz", tags: ["liverpool"] },
+    { name: "The Konate Kid", tags: ["liverpool"] },
+    { name: "Slot Machine", tags: ["liverpool"] },
+    { name: "Haven't Jota Clue", tags: ["liverpool"] },
+    { name: "Salah-vation Army", tags: ["liverpool"] },
+    { name: "Darwinning FC", tags: ["liverpool"] },
+    { name: "Alisson Blunderland", tags: ["liverpool", "TV & Film"] },
+    { name: "Arne Hole's A Goal", tags: ["liverpool"] },
+    { name: "When Harry Met Salah", tags: ["classic", "liverpool"] },
+    { name: "DropItLikeIt'sSlot", tags: ["liverpool", "music"] },
+    { name: "The Salah Doink", tags: ["liverpool"] },
+    { name: "ChickenTikkaMoSalah", tags: ["classic", "liverpool"] },
+    { name: "Darwin Theory", tags: ["classic", "liverpool"] },
+    { name: "Jota than the Son", tags: ["liverpool"] },
+    { name: "Endo Story", tags: ["liverpool", "TV & Film"] },
+    { name: "Szoboszlai 4 Now", tags: ["liverpool"] },
+
+    // Manchester City
+    { name: "Haalandaise Sauce", tags: ["manchester-city"] },
+    { name: "Ake Breaky Heart", tags: ["manchester-city"] },
+    { name: "Gvardiols of the Galaxy", tags: ["manchester-city", "TV & Film"] },
+    { name: "Silva Surfer", tags: ["manchester-city"] },
+    { name: "De Bruyne Ultimatum", tags: ["manchester-city", "TV & Film"] },
+    { name: "Cameroon Diaz", tags: ["manchester-city"] },
+    { name: "Luke Kyle Walker", tags: ["classic", "manchester-city"] },
+    { name: "Judy Haaland", tags: ["manchester-city"] },
+    { name: "Haaland Oates", tags: ["manchester-city"] },
+    { name: "Haalandaise Sauce", tags: ["manchester-city"] },
+    {
+      name: "Diaz Nother Day",
+      tags: ["manchester-city", "classic", "TV & Film"],
+    },
+
+    { name: "Ederson Ake & Palmer", tags: ["manchester-city"] },
+
+    // Manchester United
+    { name: "Bruno Dos Tres", tags: ["manchester-united"] },
+    { name: "Onana, What's My Name?", tags: ["manchester-united"] },
+    { name: "How Dalot Can You Go", tags: ["manchester-united"] },
+    { name: "Shaw and Order", tags: ["manchester-united", "TV & Film"] },
+    { name: "Ten Hag's Army", tags: ["manchester-united", "classic"] },
+    { name: "Mount Rushmore", tags: ["manchester-united"] },
+    { name: "BrokebackMount10", tags: ["manchester-united", "TV & Film"] },
+    { name: "Zirkzee Top Boy", tags: ["manchester-united", "classic"] },
+    {
+      name: "Shaw Shank Redemption",
+      tags: ["manchester-united", "classic", "TV & Film"],
+    },
+    { name: "Earth Wind & Maguire", tags: ["manchester-united", "music"] },
+    { name: "The Shaw Thing", tags: ["manchester-united"] },
+    { name: "Cheesy Garnachos", tags: ["classic", "manchester-united"] },
+    { name: "Garnacho Chips", tags: ["classic", "manchester-united"] },
+    { name: "Afternoon De Ligt", tags: ["manchester-united"] },
+    { name: "It'sOffToZirkzeeGo", tags: ["manchester-united"] },
+
+    // Newcastle United
+    { name: "Botman Begins", tags: ["newcastle-united", "TV & Film"] },
+    { name: "Abra Dubravka", tags: ["newcastle-united"] },
+    { name: "Burn Baby Burn", tags: ["newcastle-united", "music"] },
+    { name: "Krafth Dinner", tags: ["newcastle-united"] },
+    { name: "Trippier on Acid", tags: ["newcastle-united"] },
+    { name: "Born in a Barnes", tags: ["newcastle-united"] },
+    { name: "Botman and Robin", tags: ["newcastle-united"] },
+    { name: "AbraDubravka", tags: ["newcastle-united"] },
+    { name: "A Night In Lascelles", tags: ["newcastle-united"] },
+    { name: "Hall In One", tags: ["classic", "newcastle-united"] },
+    { name: "Not Isakly Sure", tags: ["newcastle-united"] },
+
+    // Nottingham Forest
+    { name: "Duel of the Yates", tags: ["nottingham-forest"] },
+    { name: "Boly and Clyde", tags: ["nottingham-forest"] },
+    { name: "Matz Sels Sea Shells", tags: ["nottingham-forest"] },
+    { name: "Finding Neco", tags: ["nottingham-forest", "TV & Film"] },
+    { name: "MacAwoniyi Cheese", tags: ["nottingham-forest"] },
+    {
+      name: "What the Elanga?",
+      tags: ["nottingham-forest", "manchester-united"],
+    },
+    {
+      name: "Boly Pocket",
+      tags: ["classic", "wolves", "nottingham-forest", "TV & Film"],
+    },
+
+    // Southampton
+    { name: "Escape from Alcaraz", tags: ["southampton"] },
+    { name: "Aribo Tangfastics", tags: ["southampton"] },
+    { name: "Onuachu (Bless you)", tags: ["southampton"] },
+    { name: "Heinz Bella-Kotchap", tags: ["southampton"] },
+    { name: "Lallanas in Pyjamas", tags: ["southampton"] },
+
+    // Spurs
+    { name: "Losing My Reguilon", tags: ["spurs", "music"] },
+    { name: "House of the Dragusin", tags: ["spurs"] },
+    { name: "Van de Ven Diagram", tags: ["spurs"] },
+    { name: "Empire of the Son", tags: ["spurs"] },
+    { name: "Los Porro Hermanos", tags: ["spurs"] },
+    { name: "Sonny and Schar", tags: ["spurs", "newcastle-united"] },
+    { name: "Men with Van De Ven", tags: ["spurs"] },
+    { name: "Ange Management", tags: ["spurs"] },
+    { name: "Son of a Gun", tags: ["spurs"] },
+    { name: "Son-sational", tags: ["spurs"] },
+    { name: "Son's Out, Guns Out", tags: ["spurs"] },
+
+    // West Ham United
+    { name: "Soucek Yourself", tags: ["west-ham-united"] },
+    { name: "WHU Tang Clan", tags: ["west-ham-united"] },
+    { name: "Paqueta Crisps", tags: ["west-ham-united"] },
+    { name: "Bad to the Bowen", tags: ["west-ham-united", "music"] },
+    { name: "Areola Grande", tags: ["west-ham-united", "music"] },
+
+    { name: "Bowen 747", tags: ["west-ham-united"] },
+    { name: "Bowen Arrow", tags: ["west-ham-united"] },
+    { name: "Exposed Areola", tags: ["west-ham-united"] },
+    { name: "Bad to the Bowen", tags: ["west-ham-united", "music"] },
+
+    // Wolves
+    { name: "Purple Rayan", tags: ["wolves", "music"] },
+    { name: "Pedro Lima Bean", tags: ["wolves"] },
+    { name: "Mama, Just Kilman", tags: ["wolves", "music"] },
+    { name: "Cunha Get Any Worse?", tags: ["wolves", "manchester-united"] },
+    { name: "Podence Dence Revolution", tags: ["wolves"] },
+    { name: "Ruthless Toothless Wolves", tags: ["wolves"] },
+    { name: "Ait Nouri Geller", tags: ["wolves"] },
+
+    // Classics
+
+    { name: "Absolutely Fabregas", tags: ["arsenal", "classic", "TV & Film"] },
+    { name: "Baines on Toast", tags: ["everton", "classic"] },
+    {
+      name: "Crouch Potato",
+      tags: ["classic", "spurs", "southampton", "liverpool"],
+    },
+    { name: "Ruud Health", tags: ["classic", "chelsea"] },
+    {
+      name: "How I Met Your Mata",
+      tags: ["manchester-united", "classic", "TV & Film"],
+    },
+    { name: "Two's Kompany", tags: ["classic", "manchester-city", "burnley"] },
+    { name: "Men Behaving Chadli", tags: ["classic", "spurs"] },
+    {
+      name: "3 Men and a Bebe",
+      tags: ["classic", "manchester-united", "TV & Film"],
+    },
+    { name: "50ShadesOfAndyGray", tags: ["classic", "TV & Film"] },
+    { name: "ABCDE FC", tags: ["classic"] },
+
+    { name: "Blink 1-Eto'o", tags: ["classic", "chelsea"] },
+
+    { name: "Cesc and the City", tags: ["classic", "arsenal"] },
+    { name: "Ctrl + Alt + De Laet", tags: ["classic"] },
+    { name: "Delph & Safety", tags: ["classic"] },
+    { name: "Dzeko & the Bunnymen", tags: ["classic", "music"] },
+    { name: "Fiddler on the Huth", tags: ["classic", "TV & Film"] },
+    { name: "Flying Without Ings", tags: ["classic", "music"] },
+    { name: "Game Of Throw-Ins", tags: ["classic"] },
+    { name: "Gangsters Allardyce", tags: ["classic", "music"] },
+    {
+      name: "Giroud Awakening",
+      tags: ["classic", "arsenal", "chelsea", "music"],
+    },
+    { name: "HuttonDressedAsLahm", tags: ["classic"] },
+
+    { name: "Klopps and Robbos", tags: ["classic", "liverpool"] },
+    { name: "Krul and the Gang", tags: ["classic"] },
+    { name: "Le Saux Solid Crew", tags: ["classic", "music"] },
+    { name: "Löw Island", tags: ["classic"] },
+
+    {
+      name: "Michu at De Gea Ba",
+      tags: ["classic", "manchester-united", "music"],
+    },
+    { name: "Neville Wears Prada", tags: ["classic", "TV & Film"] },
+    { name: "Norfolk n' Good", tags: ["classic"] },
+    { name: "Obi 1 Kenobi 0", tags: ["classic", "TV & Film"] },
+    { name: "Pjanic! At The Disco", tags: ["classic", "music"] },
+    {
+      name: "Smack My Bilic Up",
+      tags: ["classic", "west-ham-united", "music"],
+    },
+    { name: "Sound of the Lloris", tags: ["classic", "TV & Film", "music"] },
+    { name: "TAA Very Much", tags: ["classic", "liverpool"] },
+    {
+      name: "The Martial Mata LP",
+      tags: ["classic", "manchester-united", "music"],
+    },
+    { name: "Tinchy Sneijder", tags: ["classic", "music"] },
+    { name: "Who Ate All Depays?", tags: ["classic", "manchester-united"] },
+
+    { name: "Bellerin Than Out", tags: ["classic"] },
+    { name: "Better Call Saúl", tags: ["classic", "chelsea"] },
+
+    { name: "Elneny and the Jets", tags: ["classic", "arsenal"] },
+
+    { name: "GuardianOfTheGulasci", tags: ["classic", "TV & Film"] },
+
+    { name: "Hotel? Thiago", tags: ["classic", "chelsea"] },
+    { name: "Howe Toon Is Now", tags: ["classic"] },
+    { name: "Isco Inferno", tags: ["classic"] },
+
+    { name: "Just 1 Cornet 0", tags: ["classic"] },
+    { name: "Klich and Collect", tags: ["classic"] },
+    { name: "Kodja and Maja", tags: ["classic"] },
+    { name: "Krafth Beer", tags: ["classic"] },
+    { name: "MacAwoniyi Cheese", tags: ["classic"] },
+
+    { name: "ModerOnTheDancefloor", tags: ["classic"] },
+
+    { name: "NotMikeDeanForever", tags: ["classic"] },
+
+    { name: "Run The Kewells", tags: ["classic"] },
+    { name: "Sancho Unchained", tags: ["classic"] },
+    { name: "TeaForTheTielemans", tags: ["classic"] },
+
+    { name: "Ake Breaky Heart", tags: ["classic"] },
+
+    { name: "Ashley Old", tags: ["classic", "arsenal", "chelsea"] },
+
+    { name: "Back of the Neto", tags: ["classic"] },
+
+    { name: "Ballon D'awson", tags: ["classic"] },
+
+    { name: "Ben Mee Shake Mee", tags: ["classic"] },
+    { name: "Berge King", tags: ["classic"] },
+    { name: "Bernard's Poch", tags: ["classic"] },
+    {
+      name: "Blazinchenko Squad",
+      tags: ["classic", "arsenal", "manchester-city"],
+    },
+
+    { name: "Boys In Dahoud", tags: ["classic", , "TV & Film"] },
+    { name: "Brennan Jerry's", tags: ["classic"] },
+
+    { name: "Calafiori Sunshine", tags: ["classic"] },
+    { name: "Carson Dioxide", tags: ["classic"] },
+    { name: "Castagne Me Now", tags: ["classic"] },
+    { name: "Castagne Supernova", tags: ["classic", "music"] },
+    { name: "Champagne De Cordova", tags: ["classic"] },
+
+    { name: "Clyne of Duty", tags: ["classic", "liverpool", "southampton"] },
+    { name: "Cobra Kai Havertz", tags: ["classic"] },
+
+    { name: "Curious Jorginho", tags: ["classic", "arsenal", "chelsea"] },
+
+    { name: "Fee Fi Foden", tags: ["classic"] },
+    { name: "FeelsLikeSummerville", tags: ["classic"] },
+    { name: "Femme Fatawu", tags: ["classic"] },
+    { name: "FullKrugMetalJacket", tags: ["classic"] },
+
+    { name: "Gilmour Girls", tags: ["classic"] },
+    { name: "Guantana Maupay", tags: ["classic"] },
+    { name: "GvardiolsOfTheGalaxy", tags: ["classic", "TV & Film"] },
+
+    { name: "Hellmans Mainoonaise", tags: ["classic"] },
+    { name: "Heung Like A Horse", tags: ["classic"] },
+    { name: "High Faivre", tags: ["classic"] },
+    { name: "HouseOfTheDragusin", tags: ["classic"] },
+    { name: "I Love Lamp(tey)", tags: ["classic"] },
+    { name: "I'm Yelling Timber", tags: ["classic", "music"] },
+    { name: "IncogNeto", tags: ["classic"] },
+    { name: "IngsCanOnlyGetBetter", tags: ["classic", "music"] },
+    { name: "Issa Ring Toss Game", tags: ["classic"] },
+
+    { name: "Just like Evans", tags: ["classic"] },
+    { name: "Kai Me A River", tags: ["classic", "music"] },
+    { name: "Kamada Harris", tags: ["classic"] },
+    { name: "Keita Mooy Hart", tags: ["classic", "music"] },
+
+    { name: "Kilman Me Softly", tags: ["classic", "music"] },
+    { name: "Kinder Mbeumo", tags: ["classic"] },
+    { name: "KudusToYou", tags: ["classic"] },
+    { name: "Leif Right Now", tags: ["classic"] },
+    { name: "Lil Eze Vert", tags: ["classic"] },
+
+    { name: "Lord and Savio", tags: ["classic"] },
+    { name: "Los Porro Hermanos", tags: ["classic"] },
+    { name: "Losing My Reguilon", tags: ["classic", "music"] },
+    { name: "LoveTheWaySzoboszlai", tags: ["classic"] },
+
+    { name: "McKenna Kick It?", tags: ["classic", "music"] },
+
+    { name: "Mings of Power", tags: ["classic"] },
+    { name: "Minteh Fresh", tags: ["classic"] },
+    { name: "Mitomavirus", tags: ["classic"] },
+    { name: "More Tea Vicario?", tags: ["classic", "TV & Film"] },
+
+    { name: "Name's Not Andre M8", tags: ["classic"] },
+    { name: "Netflix and Chilwell", tags: ["classic", "TV & Film"] },
+    { name: "Nkunku Clock", tags: ["classic"] },
+
+    { name: "Now I'm a Baleba", tags: ["classic"] },
+    { name: "Øde Toilette", tags: ["classic"] },
+    { name: "Odegaarden Partey", tags: ["classic"] },
+    { name: "Ødeparfum", tags: ["classic"] },
+    { name: "Okoli Dokily", tags: ["classic"] },
+
+    { name: "Omari Me", tags: ["classic"] },
+    { name: "OnanaMataPlea", tags: ["classic"] },
+
+    { name: "Paqueta Crisps", tags: ["classic", "west-ham-united"] },
+    { name: "PARTEYNEXTDOOR", tags: ["classic", "music"] },
+    { name: "Pavard the Builder", tags: ["classic", "TV & Film"] },
+    { name: "Pepe Pig", tags: ["classic", "TV & Film"] },
+    { name: "Pitch Perfect", tags: ["classic", "music", "TV & Film"] },
+    { name: "Pope Fiction", tags: ["classic", "TV & Film"] },
+    { name: "Postecog-Low Block", tags: ["classic", "spurs"] },
+    { name: "Praise the Lord", tags: ["classic"] },
+    { name: "Prowse Control", tags: ["classic", "music"] },
+    { name: "Push It To The Neto", tags: ["classic"] },
+    { name: "Rage Against Fabianski", tags: ["classic", "music"] },
+    { name: "Rashford's Recovery Room", tags: ["classic"] },
+    { name: "Reek 'em Ralph", tags: ["classic"] },
+    { name: "Rice Rice Baby", tags: ["classic"] },
+    { name: "Rico Suave", tags: ["classic"] },
+    { name: "Ritchie Richarlison", tags: ["classic"] },
+    { name: "Rodri or Not", tags: ["classic"] },
+    { name: "Rolly Gusto", tags: ["classic"] },
+    { name: "Roque The Kasper", tags: ["classic"] },
+    { name: "Run the Jules", tags: ["classic"] },
+
+    { name: "Saliba Your Face", tags: ["classic"] },
+    { name: "Samba de Doucoure", tags: ["classic"] },
+    { name: "Sanch-Oh No", tags: ["classic"] },
+    { name: "Sangaré-oke", tags: ["classic"] },
+    { name: "Saša And The Sun", tags: ["classic"] },
+    { name: "Sarr Trek", tags: ["classic", "TV & Film"] },
+    { name: "Sat Nav Simms", tags: ["classic"] },
+    { name: "Save Our Sancho", tags: ["classic"] },
+    { name: "Scammaca Rhythm", tags: ["classic"] },
+    { name: "Schär Wars", tags: ["classic", "TV & Film"] },
+    { name: "Schick Moves", tags: ["classic"] },
+    { name: "ScottCarson FC", tags: ["classic"] },
+    { name: "Sesko Mode", tags: ["classic"] },
+    { name: "Sessegnon's Eleven", tags: ["classic"] },
+
+    { name: "Shawcrossed Lovers", tags: ["classic", "TV & Film"] },
+    { name: "She Wore A Trippier", tags: ["classic"] },
+    { name: "Silva Lining", tags: ["classic"] },
+    { name: "Simakan the Beast", tags: ["classic"] },
+    { name: "Simakan You Feel It", tags: ["classic"] },
+    { name: "Sinisterra Squad", tags: ["classic"] },
+    { name: "SlottingOneIn", tags: ["classic"] },
+
+    { name: "Snoochie Doku", tags: ["classic"] },
+    { name: "So I Skipp-ed", tags: ["classic"] },
+    { name: "Soler Power", tags: ["classic"] },
+
+    { name: "Southgate's Tears FC", tags: ["classic"] },
+    { name: "Spence It Like Beckham", tags: ["classic", "TV & Film"] },
+    { name: "Steele or No Steele", tags: ["classic"] },
+    { name: "Sterling Silvers", tags: ["classic"] },
+    { name: "Stones Unturned", tags: ["classic"] },
+    { name: "Struijk and Awe", tags: ["classic"] },
+    { name: "Sue Per Sarr", tags: ["classic"] },
+
+    ,
+    { name: "Take it to the McTominay", tags: ["classic"] },
+    { name: "Targett Practice", tags: ["classic"] },
+    { name: "Taylor Made FC", tags: ["classic"] },
+    { name: "Teemu and the Gang", tags: ["classic"] },
+
+    { name: "The Boys Are Barkley", tags: ["classic", "music"] },
+    { name: "The Full Nelson", tags: ["classic"] },
+
+    {
+      name: "Toney Award Winners",
+      tags: ["classic", "brentford", "TV & Film", "music"],
+    },
+    { name: "Toti Africa", tags: ["classic"] },
+
+    { name: "Turn the Page FC", tags: ["classic"] },
+    { name: "Udogie Style", tags: ["classic"] },
+    { name: "Up the du-Couré", tags: ["classic"] },
+
+    { name: "Vazquez and Furious", tags: ["classic", "TV & Film"] },
+    { name: "Vini Vidi Vicario", tags: ["classic"] },
+    { name: "Viva La Veltman", tags: ["classic"] },
+    { name: "Wataru You Waiting For", tags: ["classic"] },
+    { name: "Watts on Earth?", tags: ["classic"] },
+    { name: "Weghorst Gump", tags: ["classic", "TV & Film"] },
+
+    { name: "Who Let the Kökçüs Out?", tags: ["classic", "music"] },
+    { name: "Wilson's World", tags: ["classic"] },
+
+    { name: "Wright Said Fred", tags: ["classic", "manchester-united"] },
+
+    { name: "You're the Øne", tags: ["classic"] },
+    { name: "Zaniolo Express", tags: ["classic"] },
+    { name: "Zanka You Very Much", tags: ["classic"] },
+    { name: "Zemura's Finesse", tags: ["classic"] },
+
+    // worldwide
+    {
+      name: "Murder on Zidane's Floor",
+      tags: ["worldwide", "classic", "music"],
+    },
+    { name: "De Jong Trousers", tags: ["worldwide", "TV & Film"] },
+    { name: "Muller Reus Corner", tags: ["worldwide", "classic"] },
+    { name: "Baby Reijnders", tags: ["worldwide"] },
+    { name: "CommethTheAouar", tags: ["worldwide"] },
+    { name: "Daylight Ribery", tags: ["worldwide"] },
+    { name: "DeJong&WindingRoad", tags: ["worldwide"] },
+    { name: "DiMarco Polo", tags: ["worldwide"] },
+    { name: "Dunk Your Busquets", tags: ["worldwide"] },
+    { name: "Inglorious Bas Dost", tags: ["worldwide", "TV & Film"] },
+    { name: "Itsy Bitsy Chiellini", tags: ["worldwide", "music"] },
+    { name: "Kroos Control", tags: ["worldwide"] },
+    { name: "Lemon and Laimer", tags: ["worldwide"] },
+    { name: "Mbappe Feet", tags: ["worldwide"] },
+    { name: "Orban Legend", tags: ["worldwide"] },
+    { name: "PassionOfTheCruyff", tags: ["worldwide"] },
+    { name: "Pedri Dish", tags: ["worldwide"] },
+    { name: "Pique Blinders", tags: ["worldwide"] },
+    { name: "PutJohansUp4DeCruyff", tags: ["worldwide"] },
+    { name: "Savic Garden", tags: ["worldwide", "music"] },
+    { name: "Schick's Creek", tags: ["worldwide"] },
+    { name: "Taribo Westlife", tags: ["worldwide", "music"] },
+    { name: "Under My Barella", tags: ["worldwide", "music"] },
+    { name: "Where'sTheLahmSauce", tags: ["worldwide"] },
+    { name: "AC/DC United", tags: ["worldwide", "classic", "music"] },
+    { name: "Ajax Trees Down", tags: ["worldwide"] },
+    { name: "Anderlecht my balls", tags: ["worldwide"] },
+    { name: "Bayer Neverlosin'", tags: ["worldwide"] },
+    { name: "Bayern Bru", tags: ["worldwide"] },
+    { name: "Bayern Maiden", tags: ["worldwide"] },
+    { name: "Bilbao Baggins", tags: ["worldwide", "TV & Film"] },
+    { name: "Borussia Teeth", tags: ["worldwide"] },
+    { name: "ChampagneSuperRovers", tags: ["worldwide", "music"] },
+    { name: "Cry Me A River Plate", tags: ["worldwide", "music"] },
+    { name: "Expected Toulouse", tags: ["worldwide"] },
+    { name: "Fiorentina Turner", tags: ["worldwide", "music"] },
+    { name: "good kid mAAn city", tags: ["worldwide"] },
+    { name: "Imaginary Madrid", tags: ["worldwide"] },
+    { name: "Inter Yermam", tags: ["worldwide"] },
+    { name: "Pathetico Madrid", tags: ["worldwide"] },
+    { name: "Pfizer Chiefs", tags: ["worldwide"] },
+    { name: "Real SoSoBad", tags: ["worldwide"] },
+    { name: "Sexandthe City", tags: ["worldwide", "TV & Film"] },
+    { name: "Spartak Costco", tags: ["worldwide"] },
+    { name: "Sub-standard Liege", tags: ["worldwide"] },
+    { name: "The Molde Peaches", tags: ["worldwide"] },
+    { name: "Vladimir Luton", tags: ["worldwide"] },
+    { name: "Khedira Pin Drop", tags: ["worldwide", "classic"] },
+    { name: "Surreal Madrid", tags: ["worldwide", "classic"] },
+  ];
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  app.className = darkMode
+    ? "bg-dark text-light p-4"
+    : "bg-light text-dark p-4";
+
+  app.innerHTML = `
+<div id="generatorContainer" class="container">
+
+  <div class="mb-4">
+    <h5>Step 1:</h5>
+    <label for="teamFilter" class="form-label">Select a category</label>
+    <select id="teamFilter" class="form-select"></select>
+  </div>
+
+
+
+  
+    <div class="mb-4">
+    <h5>Step 2:</h5>
+        <p class="fs-6">Press the button until you find a name that suits your style.</p>
+    <button id="generateBtn" class="btn btn-primary mb-2">Generate Team Name</button>
+
+  </div>
+
+  <div class="mb-4">
+    <h5>Step 3:</h5>
+    <p id="teamNameDisplay" class="fs-4">Click the button to get a name</p>
+    <p class="fs-6">Tap copy if you like what you see!</p>
+    <button id="copyBtn" class="btn btn-outline-secondary" style="display:none;">📋 Copy</button>
+  </div>
+
+
+
+</div>
+
+`;
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  app.prepend(backBtn);
+  // Style elements via JS
+  const styles = {
+    "#generatorContainer": {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      alignSelf: "center",
+      fontFamily: "Arial, sans-serif",
+      textAlign: "center",
+      padding: "2rem",
+      maxWidth: "600px",
+    },
+    "#generateBtn": {
+      padding: "0.5rem 1rem",
+      fontSize: "1rem",
+      cursor: "pointer",
+      marginTop: "1rem",
+    },
+    "#teamNameDisplay": {
+      fontSize: "2rem",
+    },
+    "#teamFilter": {
+      padding: "0.3rem",
+      fontSize: "1rem",
+      marginTop: "0.5rem",
+    },
+    "#copyBtn": {
+      padding: "0.4rem 1rem",
+      marginTop: "1rem",
+      fontSize: "1rem",
+      cursor: "pointer",
+    },
+  };
+  for (const selector in styles) {
+    const element = document.querySelector(selector);
+    if (element) Object.assign(element.style, styles[selector]);
+  }
+
+  // Populate filter dropdown
+  const allTags = new Set();
+  teamNamesForGenerator.forEach((team) =>
+    team.tags.forEach((tag) => allTags.add(tag))
+  );
+
+  const filterSelect = document.getElementById("teamFilter");
+  const createOption = (value, label) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    return option;
+  };
+  filterSelect.appendChild(createOption("all", "All"));
+  [...allTags].sort().forEach((tag) => {
+    const label = tag.charAt(0).toUpperCase() + tag.slice(1).replace(/-/g, " ");
+    filterSelect.appendChild(createOption(tag, label));
+  });
+
+  // Generate button logic
+  const display = document.getElementById("teamNameDisplay");
+  const copyBtn = document.getElementById("copyBtn");
+
+  let generationCount = 0;
+
+  document.getElementById("generateBtn").addEventListener("click", () => {
+    const selectedFilter = filterSelect.value;
+
+    const filtered = teamNamesForGenerator.filter(
+      (team) => selectedFilter === "all" || team.tags.includes(selectedFilter)
+    );
+
+    if (filtered.length === 0) {
+      display.textContent = "No names match your filter.";
+      copyBtn.style.display = "none";
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * filtered.length);
+    const selectedName = filtered[randomIndex].name;
+    display.textContent = selectedName;
+    copyBtn.style.display = "inline-block";
+    copyBtn.textContent = "📋 Copy";
+
+    // Increment generation counter
+    generationCount++;
+
+    // Show modal after 5 generations (only for non-pro users)
+    if (generationCount === 5 && !userHasAccess([10, 12])) {
+      showModal({
+        title: "Having fun?",
+        body: "Consider updgrading to a paid membership for more amazing <strong>FPL Tools</strong>.<br><br>",
+        confirmText: "Upgrade Now",
+        onConfirm: () => {
+          window.location.href = subscriptionPageUrl;
+        },
+      });
+
+      //Optional: reset count so they see it again every 5
+      generationCount = 0;
+    }
+  });
+
+  // Copy to clipboard logic
+  copyBtn.addEventListener("click", () => {
+    const textToCopy = display.textContent;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      copyBtn.textContent = "✅ Copied!";
+      setTimeout(() => {
+        copyBtn.textContent = "📋 Copy";
+      }, 1500);
+    });
+  });
+
+  if (!userHasAccess([10, 12])) {
+    // Card wrapper
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("card", "shadow-sm", "mb-4", "text-center");
+    wrapper.style.maxWidth = "500px";
+    wrapper.style.margin = "0 auto";
+
+    // Apply dark mode or light mode classes
+    if (darkMode) {
+      wrapper.classList.add("bg-dark", "text-light", "border-light");
+    } else {
+      wrapper.classList.add("bg-light", "text-dark", "border-dark");
+    }
+
+    // Card body
+    const cardBody = document.createElement("div");
+    cardBody.classList.add("card-body");
+
+    // Card title
+    const title = document.createElement("h5");
+    title.classList.add("card-title", "mb-3");
+    title.textContent = "Unlock More Tools";
+
+    // Card text
+    const cardText = document.createElement("p");
+    cardText.classList.add("card-text", "mb-3");
+    cardText.textContent = "Subscribe to access premium tools and features.";
+
+    // Subscribe button
+    const btn = document.createElement("button");
+    btn.classList.add("btn", "btn-primary");
+    btn.textContent = "Subscribe for more tools";
+    btn.onclick = () => {
+      window.location.href = subscriptionPageUrl; // Change this URL to your real subscribe page
+    };
+
+    // Build card
+    cardBody.appendChild(title);
+    cardBody.appendChild(cardText);
+    cardBody.appendChild(btn);
+    wrapper.appendChild(cardBody);
+
+    // Append to app
+    app.append(wrapper);
+  }
+}
+
+async function showMyTeam() {
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  // Show the spinner
+  showBootstrapSpinner(container);
+  const myScore = createScoreCard();
+  const pitch = createPitch();
+  container.append(myScore, pitch);
+
+  const data = await fetchGwTeamData();
+  await renderTeam(data);
+  await fetchAndRenderUpcomingFixtures(data);
+  //calculatePlayersPlayed(data);
+  document.getElementById("expected-points").innerHTML = "";
+
+  if (userHasAccess([10, 12])) {
+    await fetchAndRenderAdditionalStats(data);
+    await fetchAndRenderTransferStats(data);
+    await fetchAndRenderXpStats(data);
+
+    //await fetchAndRenderFixturesForNonOwned(data);
+  }
+  await fetchAndRenderFixturesForAllSeason(data);
+  await createProWidget();
+  removeSpinner();
+}
+// Render the team based on fetched data
+
+async function renderTeam(data) {
+  const { picks } = data;
+  // Show the spinner
+
+  let captainPick, viceCaptainPick;
+  let tripleCaptain = false;
+
+  for (const pick of picks) {
+    if (pick.position > 15) continue; // Stop the loop if pick.position is greater than 15
+
+    //console.log(pick);
+    let pointsMultiplier = pick.multiplier || 1;
+    const playerEP = getPlayerEP(pick.element) * pointsMultiplier;
+    const playerScore = (await getPlayerScore(pick.element)) * pointsMultiplier;
+
+    if (pick.is_vice_captain) viceCaptainPick = pick.element;
+    if (pick.is_captain) captainPick = pick.element;
+
+    const card = await createPlayerCardNew(
+      pick.element,
+      playerScore,
+      pick.is_captain,
+      pick.is_vice_captain,
+      pointsMultiplier
+    );
+
+    const position =
+      pick.position > 11
+        ? "my-bench"
+        : getPositionSection(await getPlayerType(pick.element));
+
+    document.getElementById(position).appendChild(card);
+  }
+  //Assistant Manager
+  for (const pick of picks) {
+    if (pick.position !== 16) continue; // Skip all picks that are not position 16
+
+    //console.log(pick);
+    let pointsMultiplier = pick.multiplier || 1;
+    const playerEP = getPlayerEP(pick.element) * pointsMultiplier;
+    const playerScore = getPlayerScore(pick.element) * pointsMultiplier;
+
+    if (pick.is_vice_captain) viceCaptainPick = pick.element;
+    if (pick.is_captain) captainPick = pick.element;
+
+    const card = createManagerCard(
+      pick.element,
+      playerScore,
+      pick.is_captain,
+      pick.is_vice_captain
+    );
+    const position =
+      pick.position > 11
+        ? "my-bench"
+        : getPositionSection(getPlayerType(pick.element));
+
+    document.getElementById(position).prepend(card);
+  }
+
+  updateScoreCard(data);
+
+  addCaptainBadge();
+
+  //addSantaHatsToPlayers();
+}
+async function createProWidget() {
+  // Create the floating widget container
+  const floatingWidget = document.createElement("div");
+  floatingWidget.className = "floating-widget";
+
+  // Create the main button
+  const widgetButton = document.createElement("button");
+  widgetButton.className = "widget-button";
+  widgetButton.textContent = "☰";
+
+  function toggleStats(showClass, hideClasses) {
+    // Hide elements of specified classes
+    hideClasses.forEach((hideClass) => {
+      document.querySelectorAll(`.${hideClass}`).forEach((element) => {
+        element.style.display = "none"; // Hide element
+      });
+    });
+
+    // Toggle the display of elements for the showClass
+    document.querySelectorAll(`.${showClass}`).forEach((element) => {
+      element.style.display =
+        element.style.display === "flex" ? "none" : "flex"; // Toggle element
+    });
+  }
+
+  function toggleGameStats() {
+    toggleStats("additional-stats", ["transfer-stats", "xp-stats"]);
+  }
+
+  function toggleTransferStats() {
+    toggleStats("transfer-stats", ["additional-stats", "xp-stats"]);
+  }
+
+  function toggleXpStats() {
+    toggleStats("xp-stats", ["additional-stats", "transfer-stats"]);
+  }
+
+  const isPro = userHasAccess([10, 12]);
+
+  const menuItems = [
+    {
+      text: isPro ? "⚽ Game Info" : "🔒 Game Info",
+      onclick: isPro ? toggleGameStats : proFeaturePopUp,
+    },
+    {
+      text: isPro ? "↔️ Round Transfers" : "🔒 Round Transfers",
+      onclick: isPro ? toggleTransferStats : proFeaturePopUp,
+    },
+    {
+      text: isPro ? "🅿️ Expected Points" : "🔒 Expected Points",
+      onclick: isPro ? toggleXpStats : proFeaturePopUp,
+    },
+    {
+      text: isPro ? "🔁 Auto-Subs" : "🔒 Auto-Subs",
+      onclick: isPro ? autoSubsNotification : proFeaturePopUp,
+    },
+    {
+      text: "🏟️ Fixtures",
+      onclick: toggleUpComingFixtures,
+    },
+  ];
+
+  // Create the menu container
+  const widgetMenu = document.createElement("div");
+  widgetMenu.className = "widget-menu";
+
+  // Add menu items to the menu container
+  menuItems.forEach((item) => {
+    // Create a div element for each menu item
+    const menuItem = document.createElement("div");
+    menuItem.textContent = item.text;
+    menuItem.className = "menu-item";
+
+    // Add the click event listener to trigger the function
+    if (item.onclick) {
+      menuItem.addEventListener("click", () => {
+        item.onclick();
+      });
+    }
+
+    widgetMenu.appendChild(menuItem);
+  });
+
+  // Append button and menu to the widget container
+  floatingWidget.appendChild(widgetButton);
+  floatingWidget.appendChild(widgetMenu);
+
+  // Append the widget container to the body
+  const app = document.getElementById("screen-tools");
+  app.appendChild(floatingWidget);
+  // Toggle menu display on button click
+  widgetButton.addEventListener("click", () => {
+    widgetMenu.style.display =
+      widgetMenu.style.display === "flex" ? "none" : "flex";
+  });
+}
+
+function toggleUpComingFixtures() {
+  const fixturesDivs = document.querySelectorAll(".homeawaygame");
+  fixturesDivs.forEach((div) => {
+    const isHidden =
+      div.style.display === "none" || getComputedStyle(div).display === "none";
+    div.style.display = isHidden ? "flex" : "none";
+  });
+}
+function autoSubsNotification() {
+  // Get all field players not in the bench
+  const initialFieldPlayers = Array.from(
+    document.querySelectorAll(
+      ".player.type1, .player.type2, .player.type3, .player.type4"
+    )
+  ).filter((player) => !player.closest("#my-bench"));
+
+  // Get all bench players
+  const benchPlayers = document.querySelectorAll("#my-bench .player");
+
+  // A mutable copy of the field players to reflect swaps
+  let currentFieldPlayers = [...initialFieldPlayers];
+
+  // Count players by type
+  const countPlayerTypes = (players) => ({
+    goalkeepers: players.filter((player) => player.classList.contains("type1"))
+      .length, // Assuming type1 is goalkeepers
+    defenders: players.filter((player) => player.classList.contains("type2"))
+      .length, // Assuming type2 is defenders
+    midfielders: players.filter((player) => player.classList.contains("type3"))
+      .length, // Assuming type3 is midfielders
+    strikers: players.filter((player) => player.classList.contains("type4"))
+      .length, // Assuming type4 is forwards
+  });
+
+  // Check if a formation is valid
+  const isFormationValid = (counts) =>
+    counts.goalkeepers === 1 &&
+    counts.defenders >= 3 &&
+    counts.midfielders >= 2 &&
+    counts.strikers >= 1;
+
+  // Log initial formation
+  const initialCounts = countPlayerTypes(currentFieldPlayers);
+  console.log(
+    `Initial team formation: ${initialCounts.defenders}${initialCounts.midfielders}${initialCounts.strikers}`
+  );
+
+  // Variables to track the swaps and message details
+  let changesLogged = false;
+  let goalkeeperChecked = false;
+  let swapDetails = [];
+
+  currentFieldPlayers.forEach((fieldPlayer, fieldIndex) => {
+    // If this is a goalkeeper and we've already processed one, skip further checks
+    if (fieldPlayer.classList.contains("type1") && goalkeeperChecked) {
+      return;
+    }
+
+    // Find the stat4Div inside the field player
+    const fieldStat4Div = fieldPlayer.querySelector("#stat4 .breakdown-stats");
+
+    // Check if stat4Div exists and its value is "❌"
+    if (fieldStat4Div && fieldStat4Div.textContent.trim() === "❌") {
+      // Loop through bench players to find an eligible swap
+      for (let benchPlayer of benchPlayers) {
+        // Goalkeeper-specific check
+        if (
+          fieldPlayer.classList.contains("type1") &&
+          !benchPlayer.classList.contains("type1")
+        ) {
+          continue; // Skip if the field player is a goalkeeper and the bench player isn't
+        }
+
+        // Find the stat4Div inside the bench player
+        const benchStat4Div = benchPlayer.querySelector(
+          "#stat4 .breakdown-stats"
+        );
+
+        // Check if stat4Div exists and its value is "⏳" or "✅"
+        if (
+          benchStat4Div &&
+          ["⏳", "✅"].includes(benchStat4Div.textContent.trim())
+        ) {
+          // Simulate the swap in the mutable copy
+          const updatedFieldPlayers = [...currentFieldPlayers];
+          updatedFieldPlayers[fieldIndex] = benchPlayer;
+
+          // Count players after the swap
+          const updatedCounts = countPlayerTypes(updatedFieldPlayers);
+
+          // Check if the swap maintains a valid formation
+          if (isFormationValid(updatedCounts)) {
+            // Log the swap
+            swapDetails.push(
+              `${getPlayerWebName(
+                fieldPlayer.id
+              )} will be subbed off for ${getPlayerWebName(benchPlayer.id)}`
+            );
+            changesLogged = true;
+
+            // Apply the swap to the current lineup
+            currentFieldPlayers = updatedFieldPlayers;
+
+            // Mark goalkeeper as checked if this player is a goalkeeper
+            if (fieldPlayer.classList.contains("type1")) {
+              goalkeeperChecked = true;
+            }
+            break; // Stop checking once the swap is logged
+          }
+        }
+      }
+    }
+  });
+
+  if (!changesLogged) {
+    console.log("No eligible auto-subs were identified.");
+  }
+
+  // Log final formation based on the updated lineup
+  const finalCounts = countPlayerTypes(currentFieldPlayers);
+  console.log(
+    `Final team formation: ${finalCounts.defenders}${finalCounts.midfielders}${finalCounts.strikers}`
+  );
+
+  // Prepare the alert message
+  const alertMessage = `Current Formation: ${initialCounts.defenders}${
+    initialCounts.midfielders
+  }${initialCounts.strikers}
+    \nLikely auto-subs: ${
+      swapDetails.length > 0 ? swapDetails.join("\n") : "No eligible auto-subs"
+    }
+    \nFormation after auto-subs: ${finalCounts.defenders}${
+    finalCounts.midfielders
+  }${finalCounts.strikers}
+    \nCheck your auto-subs and more here
+  `;
+
+  showModal({
+    title: "Auto Subs",
+    body: alertMessage,
+    confirmText: "OK",
+    onConfirm: () => {}, // No action taken
+  });
+}
+function proFeaturePopUp() {
+  showModal({
+    title: "Paid Feature",
+    body: `Hey, ${managerData.player_first_name}, this is a pro feature! You can unlock this and many more features, instantly for only £14.99 GBP a year! \n`,
+    confirmText: "Upgrade Now",
+    onConfirm: () => {
+      window.location.href = subscriptionPageUrl;
+    },
+  });
+}
+
+// Update score card with total points
+async function updateScoreCard(data) {
+  //console.log(data);
+  const myScore = document.getElementById("my-score");
+  const {
+    points,
+    total_points: totalPoints,
+    overall_rank: overallRank,
+    rank: gwRank,
+  } = data.entry_history;
+
+  let liveScore = 0; // Use 'let' so the value can be updated
+  let highestScore = 0; // Variable to track the highest raw score
+  let highestScoringPlayer = null; // Variable to track the player with the highest raw score
+  console.log(data);
+  for (let i = 0; i < 11; i++) {
+    const player = data.picks[i]; // Get the player data
+    const playerRawScore = await getPlayerScore(player.element); // Raw score without multiplier
+    const playerScore = playerRawScore * player.multiplier; // Calculate the player's total score
+    liveScore += playerScore; // Increment liveScore by the player's score
+
+    // Check if this player's raw score is the highest so far
+    if (playerRawScore > highestScore) {
+      highestScore = playerRawScore; // Update the highest raw score
+      highestScoringPlayer = player; // Store the player with the highest raw score
+    }
+  }
+
+  // Output the total live score and the player with the highest raw score
+  //console.log(`Total live score: ${liveScore}`);
+  // if (highestScoringPlayer) {
+  //   console.log(
+  //     `Highest scoring player: ${getPlayerWebName(
+  //       highestScoringPlayer.element
+  //     )} with ${highestScore} raw points`
+  //   );
+  // }
+
+  const playerOfTheWeek = await createPlayerOfTheWeekCard(
+    highestScoringPlayer.element
+  );
+
+  playerOfTheWeek.classList.add("player-of-the-week");
+
+  async function createPlayerOfTheWeekCard(elementId) {
+    const card = document.createElement("div");
+    card.classList.add("player");
+    const type = await getPlayerType(elementId);
+    card.classList.add("type" + type);
+
+    const img = document.createElement("img");
+    img.setAttribute("class", "player-img");
+    console.log(await getPlayerPhoto(elementId));
+
+    const photo = await getPlayerPhoto(elementId);
+    img.src = `https://resources.premierleague.com/premierleague/photos/players/250x250/p${photo.slice(
+      0,
+      -3
+    )}png`;
+
+    const name = document.createElement("div");
+    name.className = "my-player-name";
+    name.textContent = await getPlayerWebName(elementId);
+    name.textContent.slice(0, 10);
+    const scoreText = document.createElement("div");
+    scoreText.className = "my-player-xp";
+    scoreText.textContent = await getPlayerScore(elementId);
+
+    // Create a new image element
+    const star = document.createElement("div");
+    star.innerHTML = "⭐";
+    star.style.textAlign = "left";
+    star.style.width = "30px";
+    star.style.marginBottom = "-5px";
+    star.style.zIndex = "20";
+    star.margin = "0";
+    //star.style.transform = "rotate(10deg)"; // Rotate the image slightly
+
+    card.append(star, img, name, scoreText);
+
+    return card;
+  }
+
+  const formattedOverallRank = overallRank.toLocaleString();
+  const formattedGwRank = gwRank ? gwRank.toLocaleString() : "";
+
+  // Fetch previous gameweek data
+  const previousData = await fetchPreviousGwTeamData();
+  const previousRank = previousData.entry_history.overall_rank;
+  console.log(previousRank);
+
+  // Determine rank change and difference
+  const isRankImproved = previousRank > overallRank;
+  const rankArrow = isRankImproved
+    ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
+    : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
+
+  const rankDifference = previousRank - overallRank;
+  const rankDifferenceDisplay = `
+    <div class="rank-difference" style="color:${
+      isRankImproved ? "#05FA87" : "#FC2C80"
+    };">
+      ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
+    </div>`;
+
+  function calculatePercentileRank(userRank, totalTeams) {
+    if (totalTeams <= 0 || userRank <= 0) {
+      throw new Error("Total teams and user rank must be positive numbers.");
+    }
+
+    let percentileRank = (1 - userRank / totalTeams) * 100;
+    let topPercentage = (100 - percentileRank).toFixed(2);
+    return topPercentage;
+  }
+
+  // Update the scorecard
+  myScore.innerHTML = `
+  <div id="score-panel">
+ 
+ 
+      <div id="first-panel">
+      <div class="rank-percentile">Top: ${calculatePercentileRank(
+        overallRank,
+        bootstrap.total_players
+      )}%</div>
+      <div id="rank-container"><div id="rank-change">${rankArrow}</div><div id="rank-difference-text" style="font-size:1.2rem">${rankDifferenceDisplay}</div></div>
+      <div style="font-size:0.7rem">OR: ${formattedOverallRank}</div>
+          <div style="font-size:0.7rem">Total: ${totalPoints}pts</div>
+           
+        
+       
+      </div>
+
+      <div id="middle-panel">
+        <div id="team-name">${loggedInTeamName}</div>
+        <div id="gameweek-identifier">GW ${currentGw}:</div>
+        <div id="actual-points">${points}</div>
+        <div id="players-played"></div>
+        <div id="expected-points">...calculating</div>
+      </div>
+
+      <div id="third-panel">
+        
+        ${playerOfTheWeek.outerHTML}
+      </div>
+    </div>
+    <div id="points-summary"></div>`;
+
+  //<div id:"live-score">Live: ${liveScore}</div>
+}
+// Fetch and render upcoming fixtures for each player
+async function fetchAndRenderUpcomingFixtures(data) {
+  for (let i = 0; i < data.picks.length && i < 16; i++) {
+    const pick = data.picks[i];
+    const fixtures = await fetchPlayerFixtures(pick.element);
+    const playerDiv = document.getElementById(pick.element);
+    const upcomingFixturesDiv = createUpcomingFixtures(fixtures);
+    playerDiv.appendChild(upcomingFixturesDiv);
+  }
+}
+// Create stats display for a player
+function createAdditionalStats(fixtures) {
+  const statsDiv = document.createElement("div");
+  statsDiv.setAttribute("id", "additional-stats");
+  statsDiv.classList.add("additional-stats");
+
+  fixtures.forEach((fixture) => {
+    const stat0Div = document.createElement("div");
+    stat0Div.id = "stat0";
+    const stat1Div = document.createElement("div");
+    stat1Div.id = "stat1";
+    const stat2Div = document.createElement("div");
+    stat2Div.id = "stat2";
+    const stat3Div = document.createElement("div");
+    stat3Div.id = "stat3";
+    const stat4Div = document.createElement("div");
+    stat4Div.id = "stat4";
+    const stat5Div = document.createElement("div");
+    stat5Div.id = "stat5";
+    const stat6Div = document.createElement("div");
+    stat6Div.id = "stat6";
+    const stat7Div = document.createElement("div");
+    stat7Div.id = "stat7";
+
+    // Check if fixture has kicked off
+    const dateString = fixture.kickoff_time;
+    const fixtureDate = new Date(dateString);
+    const now = new Date();
+
+    // Conditionally set innerHTML for each stat
+    if (fixture.clean_sheets > 0 && getPlayerType(fixture.element) < 4) {
+      stat0Div.innerHTML = "<div class='breakdown-stats'>🆑</div>";
+    }
+    stat1Div.innerHTML = "<div class='breakdown-stats'>⚽</div>".repeat(
+      fixture.goals_scored
+    );
+
+    stat2Div.innerHTML = "<div class='breakdown-stats'>🅰️</div>".repeat(
+      fixture.assists
+    );
+
+    if (fixture.bonus >= 1) {
+      stat3Div.innerHTML = "<div class='breakdown-stats'>🅱️</div>";
+    }
+    // Extract components
+    const dayName = fixtureDate.toDateString().split(" ")[0]; // "Tue"
+    // Extract hours and minutes
+    const hours = String(fixtureDate.getHours()).padStart(2, "0"); // Ensures 2 digits
+    const minutes = String(fixtureDate.getMinutes()).padStart(2, "0"); // Ensures 2 digits
+
+    // Combine into the desired format
+    const formattedDate = `${dayName} ${hours}:${minutes}`;
+    if (fixture.minutes == 0 && fixtureDate > now) {
+      stat4Div.innerHTML = `<div class='breakdown-stats'>${formattedDate}</div>`;
+    } else if (fixture.minutes > 0) {
+      stat4Div.innerHTML = "<div class='breakdown-stats'>✅</div>";
+    } else {
+      stat4Div.innerHTML = "<div class='breakdown-stats'>❌</div>";
+    }
+
+    if (fixture.yellow_cards != 0) {
+      stat5Div.innerHTML = "<div class='breakdown-stats'>🟨</div>";
+    }
+    if (fixture.red_cards != 0) {
+      stat6Div.innerHTML = "🟥";
+    }
+    if (fixture.red_cards != 0) {
+      stat7Div.innerHTML = "🟥";
+    }
+
+    // Append each div to the statsDiv only if it has content
+    if (stat0Div.innerHTML) {
+      statsDiv.appendChild(stat0Div);
+    }
+    if (stat1Div.innerHTML) {
+      statsDiv.appendChild(stat1Div);
+    }
+    if (stat2Div.innerHTML) {
+      statsDiv.appendChild(stat2Div);
+    }
+    if (stat3Div.innerHTML) {
+      statsDiv.appendChild(stat3Div);
+    }
+    if (stat4Div.innerHTML) {
+      statsDiv.appendChild(stat4Div);
+    }
+    if (stat5Div.innerHTML) {
+      statsDiv.appendChild(stat5Div);
+    }
+    if (stat6Div.innerHTML) {
+      statsDiv.appendChild(stat6Div);
+    }
+    if (stat7Div.innerHTML) {
+      statsDiv.appendChild(stat7Div);
+    }
+
+    if (fixture.round == currentGw) {
+      console.log("current gw");
+    } else {
+      statsDiv.innerHTML = "❌";
+    }
+  });
+
+  return statsDiv;
+}
+// Fetch and render additional stats for each player
+async function fetchAndRenderAdditionalStats(data) {
+  for (let i = 0; i < data.picks.length && i < 16; i++) {
+    const pick = data.picks[i];
+    const fixtures = await fetchPlayerCurrentStats(pick.element);
+
+    const playerDiv = document.getElementById(pick.element);
+    const additionlStatsDiv = createAdditionalStats(fixtures);
+
+    playerDiv.prepend(additionlStatsDiv);
+  }
+}
+// Fetch and render transfer stats for each player
+async function fetchAndRenderTransferStats(data) {
+  for (let i = 0; i < data.picks.length && i < 11; i++) {
+    const pick = data.picks[i];
+    const fixtures = await fetchPlayerCurrentStats(pick.element);
+
+    const playerDiv = document.getElementById(pick.element);
+    const transferStatsDiv = createTransferStats(fixtures);
+    playerDiv.prepend(transferStatsDiv);
+  }
+}
+// Create stats display for a player
+function createTransferStats(fixtures) {
+  const statsDiv = document.createElement("div");
+  statsDiv.setAttribute("id", "transfer-stats");
+  statsDiv.classList.add("transfer-stats");
+  fixtures.forEach((fixture) => {
+    //console.log(fixture);
+    const stat1Div = document.createElement("div");
+    const stat2Div = document.createElement("div");
+    const stat3Div = document.createElement("div");
+
+    // Check if game has kicked off
+    const dateString = fixture.kickoff_time;
+    const fixtureDate = new Date(dateString);
+    const now = new Date();
+
+    // Conditionally set innerHTML for each stat
+
+    stat1Div.innerHTML = "⬅️" + fixture.transfers_in;
+
+    stat2Div.innerHTML = "➡️" + fixture.transfers_out;
+
+    // Append each div to the statsDiv only if it has content
+    if (stat1Div.innerHTML) {
+      statsDiv.appendChild(stat1Div);
+    }
+    if (stat2Div.innerHTML) {
+      statsDiv.appendChild(stat2Div);
+    }
+    if (stat3Div.innerHTML) {
+      statsDiv.appendChild(stat3Div);
+    }
+  });
+
+  return statsDiv;
+}
+
+const expectedPointsArray = [];
+function updateXp() {
+  //console.log(expectedPointsArray);
+  if (expectedPointsArray.length == 11) {
+    const xpSum = expectedPointsArray.reduce((sum, val) => sum + val, 0);
+    document.getElementById("expected-points").innerHTML = "xp " + xpSum;
+  }
+}
+// Create xp stats display for a player
+async function createXpStats(fixtures) {
+  const statsDiv = document.createElement("div");
+  statsDiv.setAttribute("id", "xp-stats");
+  statsDiv.classList.add("xp-stats");
+
+  //console.log(fixtures);
+
+  const playerEP = await getPlayerEP(fixtures[0].element);
+  expectedPointsArray.push(parseInt(playerEP));
+
+  const stat1Div = document.createElement("div");
+  console.log(playerEP);
+  stat1Div.innerHTML = playerEP;
+
+  // Append each div to the statsDiv only if it has content
+  if (stat1Div.innerHTML) {
+    statsDiv.appendChild(stat1Div);
+  }
+
+  updateXp();
+  return statsDiv;
+}
+// Fetch and render xp stats for each player
+async function fetchAndRenderXpStats(data) {
+  for (let i = 0; i < data.picks.length && i < 11; i++) {
+    const pick = data.picks[i];
+    const fixtures = await fetchPlayerCurrentStats(pick.element);
+    console.log(fixtures);
+    const playerDiv = document.getElementById(pick.element);
+    const xpStatsDiv = await createXpStats(fixtures);
+    playerDiv.prepend(xpStatsDiv);
+  }
+}
+
+// Helper to create score card
+function createScoreCard() {
+  const myScore = document.createElement("div");
+  myScore.setAttribute("id", "my-score");
+  const gwIdentifier = document.createElement("div");
+  gwIdentifier.setAttribute("id", "gameweek-identifier");
+  myScore.appendChild(gwIdentifier);
+  return myScore;
+}
+// Fetch player's fixtures from API
+async function fetchPlayerFixtures(elementId) {
+  const response = await fetch(`${BASE_URL}/element-summary/${elementId}/`);
+  const data = await response.json();
+
+  return data.fixtures.slice(0, 5);
+}
+
+// Create fixtures display for a player
+function createUpcomingFixtures(fixtures) {
+  const fixturesDiv = document.createElement("div");
+  fixturesDiv.classList.add("up-coming-fixtures");
+
+  fixtures.forEach((fixture) => {
+    //console.log(fixture)
+    const fixtureDiv = document.createElement("div");
+    fixtureDiv.id = `diff${fixture.difficulty}`;
+    fixtureDiv.setAttribute("class", "fixtureDiv");
+    let homeAway;
+    if (fixture.is_home == true) {
+      homeAway =
+        "<div class='homeawaygame'>" +
+        getTeamShortName(fixture.team_a) +
+        "</div><div class='homeaway'>H</div>";
+    } else {
+      homeAway =
+        "<div class='homeawaygame'>" +
+        getTeamShortName(fixture.team_h) +
+        "</div><div class='homeaway'>A</div>";
+    }
+    fixtureDiv.innerHTML = homeAway;
+    fixturesDiv.appendChild(fixtureDiv);
+  });
+
+  return fixturesDiv;
+}
+
+// Fetch and render fixtures for whole season
+async function fetchAndRenderFixturesForAllSeason(data) {
+  if (currentGw == 38) {
+    return;
+  }
+
+  const app = document.getElementById("screen-tools");
+  const tableHeader = document.createElement("h6");
+  tableHeader.innerText = "Fixtures for the rest of the season:";
+  tableHeader.style.textAlign = "center";
+  app.appendChild(tableHeader);
+
+  const container = document.createElement("div");
+  container.setAttribute("id", "season-container");
+  app.appendChild(container);
+  // Add a header above the table
+  const gwHeaders = document.createElement("div");
+  gwHeaders.setAttribute("id", "gw-headers");
+
+  for (let i = 0; i < data.picks.length && i < 16; i++) {
+    const pick = data.picks[i];
+    const fixtures = await fetchPlayerFixturesForSeason(pick.element);
+    const playerDiv = document.createElement("div");
+    playerDiv.setAttribute("id", "season-fixtures");
+    playerDiv.style.display = "flex";
+    const player = document.createElement("img");
+    player.setAttribute("class", "player-fixture-img");
+
+    const photo = await getPlayerPhoto(pick.element);
+    player.src = `https://resources.premierleague.com/premierleague/photos/players/250x250/p${photo.slice(
+      0,
+      -3
+    )}png`;
+
+    // const photo = await getPlayerPhoto(data.picks[i].element)
+    // photo.slice(0, -3);
+    // player.src =
+    //   "https://resources.premierleague.com/premierleague/photos/players/250x250/p" +
+    //   photo + "png";
+
+    playerDiv.appendChild(player);
+
+    const upcomingFixturesDiv = await createUpcomingFixturesForAllSeason(
+      fixtures
+    );
+    playerDiv.appendChild(upcomingFixturesDiv);
+
+    container.appendChild(playerDiv);
+  }
+}
+
+// Fetch player's fixtures for the whole season from API
+async function fetchPlayerFixturesForSeason(elementId) {
+  const response = await fetch(`${BASE_URL}/element-summary/${elementId}/`);
+  const data = await response.json();
+  return data.fixtures;
+}
+// Create fixtures display for a player
+async function createUpcomingFixturesForAllSeason(fixtures) {
+  const fixturesDiv = document.createElement("div");
+  fixturesDiv.classList.add("up-coming-season-fixtures");
+  fixtures.forEach((fixture) => {
+    const fixtureDiv = document.createElement("div");
+
+    if (userHasAccess([10, 12])) {
+      let homeAway;
+      if (fixture.is_home == true) {
+        homeAway = "H";
+      } else {
+        homeAway = "A";
+      }
+      fixtureDiv.innerHTML =
+        getTeamShortName(`${fixture.team_h}`) +
+        "<br>" +
+        getTeamShortName(`${fixture.team_a}`) +
+        "<br>" +
+        "(" +
+        homeAway +
+        ")";
+      fixtureDiv.id = `diff${fixture.difficulty}`;
+    } else {
+      fixtureDiv.innerHTML = "🔒";
+    }
+
+    fixturesDiv.appendChild(fixtureDiv);
+  });
+
+  return fixturesDiv;
+}
+
+// Fetch and render fixtures for whole season
+async function fetchAndRenderFixturesForNonOwned(data) {
+  const app = document.getElementById("screen-tools");
+  const tableHeader = document.createElement("h6");
+  tableHeader.innerText = "Fixtures for Top Players that you don't own:";
+  tableHeader.style.textAlign = "center";
+  app.appendChild(tableHeader);
+
+  const container = document.createElement("div");
+  container.setAttribute("id", "season-container");
+  app.appendChild(container);
+  // Add a header above the table
+  //console.log(data.picks);
+  //console.log(top5TransferredIn);
+
+  // Filter `data.picks` to find picks where `element` is not in `top5TransferredIn.id`
+  // let unmatchedPicks = top5TransferredIn.filter(
+  //   (pick) => !data.picks.some((player) => player.element === pick.id)
+  // );
+
+  //console.log(
+  //  "Picks with elements not found in top5TransferredIn:",
+  //  unmatchedPicks
+  //);
+
+  // for (let i = 0; i < unmatchedPicks.length; i++) {
+  //   const fixtures = await fetchPlayerFixturesForNonOwned(unmatchedPicks[i].id);
+
+  //   const playerDiv = document.createElement("div");
+  //   playerDiv.setAttribute("id", "season-fixtures-non-owned");
+  //   playerDiv.style.display = "flex";
+  //   const player = document.createElement("img");
+  //   player.setAttribute("class", "player-fixture-img");
+  //   player.src =
+  //     "https://resources.premierleague.com/premierleague/photos/players/250x250/p" +
+  //     getPlayerPhoto(unmatchedPicks[i].id).slice(0, -3) +
+  //     "png";
+
+  //   playerDiv.appendChild(player);
+
+  //   const upcomingFixturesDiv = createUpcomingFixturesForNonOwned(fixtures);
+  //   playerDiv.appendChild(upcomingFixturesDiv);
+
+  //   container.appendChild(playerDiv);
+  // }
+}
+// Fetch player's fixtures for the whole season from API
+async function fetchPlayerFixturesForNonOwned(elementId) {
+  const response = await fetch(`${BASE_URL}/element-summary/${elementId}/`);
+  const data = await response.json();
+  return data.fixtures;
+}
+// Create fixtures display for a player
+function createUpcomingFixturesForNonOwned(fixtures) {
+  const fixturesDiv = document.createElement("div");
+  fixturesDiv.classList.add("up-coming-season-fixtures");
+  //console.log(fixtures);
+
+  fixtures.forEach((fixture) => {
+    const fixtureDiv = document.createElement("div");
+    let homeAway;
+    if (fixture.is_home == true) {
+      homeAway = "H";
+    } else {
+      homeAway = "A";
+    }
+    fixtureDiv.innerHTML =
+      getTeamShortName(`${fixture.team_h}`) +
+      "<br>" +
+      getTeamShortName(`${fixture.team_a}`) +
+      "<br>" +
+      "(" +
+      homeAway +
+      ")";
+    fixtureDiv.id = `diff${fixture.difficulty}`;
+    fixturesDiv.appendChild(fixtureDiv);
+  });
+
+  return fixturesDiv;
+}
+// Get the section ID for a player type
+function getPositionSection(playerType) {
+  return {
+    1: "my-keeper",
+    2: "my-defenders",
+    3: "my-midfielders",
+    4: "my-strikers",
+  }[playerType];
+}
+// Helper to create pitch
+function createPitch() {
+  const pitch = document.createElement("div");
+  pitch.setAttribute("id", "pitch");
+
+  // Apply theme immediately
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  pitch.classList.add(darkMode ? "pitch-dark" : "pitch-light");
+
+  [
+    "my-keeper",
+    "my-defenders",
+    "my-midfielders",
+    "my-strikers",
+    "my-bench",
+  ].forEach((id) => {
+    const section = document.createElement("div");
+    section.setAttribute("id", id);
+    pitch.appendChild(section);
+  });
+
+  return pitch;
+}
+// Fetch the team data for the gameweek
+async function fetchGwTeamData() {
+  const response = await fetch(
+    `${BASE_URL}entry/${theUser.info.team_id}/event/${currentGw}/picks/`
+  );
+
+  return response.json();
+}
+
+// Fetch the team data for the gameweek
+async function fetchPreviousGwTeamData() {
+  console.log(currentGw);
+  const response = await fetch(
+    `${BASE_URL}entry/${theUser.info.team_id}/event/${currentGw - 1}/picks/`
+  );
+  return response.json();
+}
+async function createPlayerCardNew(
+  elementId,
+  score,
+  isCaptain,
+  isViceCaptain,
+  isTriple
+) {
+  //console.log(getPlayerType(elementId));
+  const card = document.createElement("div");
+  card.classList.add("player");
+  const type = await getPlayerType(elementId); // if async
+  card.classList.add("type" + type);
+  card.classList.add("player-new");
+  card.id = elementId;
+  const img = document.createElement("img");
+  img.setAttribute("class", "player-img");
+  const photo = await getPlayerTeamCode(elementId);
+  img.src = `https://fpltoolbox.com/wp-content/uploads/2025/04/shirt_${photo}.webp`;
+  if (type == 1) {
+    img.src = `https://fpltoolbox.com/wp-content/uploads/2025/04/shirt_${photo}_1.webp`;
+  }
+
+  //console.log(elementId, score, isCaptain, isViceCaptain, isTriple)
+
+  const name = document.createElement("div");
+  if (isCaptain) {
+    name.className = "my-captain-name";
+  } else if (isViceCaptain) {
+    name.className = "my-vice-captain-name";
+  } else {
+    name.className = "my-player-name";
+  }
+  if (isTriple == 3) {
+    name.className = "my-triple-captain-name";
+  }
+
+  name.textContent = await getPlayerWebName(elementId);
+  name.textContent.slice(0, 10);
+  const scoreText = document.createElement("div");
+  scoreText.className = "my-player-xp";
+  scoreText.textContent = score;
+
+  card.append(img, name, scoreText);
+
+  return card;
+}
+async function createManagerCard(elementId, score, isCaptain, isViceCaptain) {
+  //console.log(getPlayerPhoto(elementId));
+  const card = document.createElement("div");
+  card.classList.add("player");
+  const playerType = await getPlayerType(elementId);
+  card.classList.add("type" + playerType);
+  card.id = elementId;
+  const img = document.createElement("img");
+  img.setAttribute("class", "player-img");
+  img.src = `https://fpltoolbox.com/wp-content/uploads/2025/02/icons8-manager-50.png`;
+
+  const name = document.createElement("div");
+  if (isCaptain) {
+    name.className = "my-captain-name";
+  } else if (isViceCaptain) {
+    name.className = "my-vice-captain-name";
+  } else {
+    name.className = "my-player-name";
+  }
+
+  name.textContent = getPlayerWebName(elementId).slice(0, 10);
+
+  const scoreText = document.createElement("div");
+  scoreText.className = "my-player-xp";
+  scoreText.textContent = score;
+
+  card.append(img, name, scoreText);
+
+  return card;
+}
+async function showGameweekStats1() {
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  // Back button
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const tableHeader = document.createElement("h6");
+  tableHeader.classList.add("text-center", "mb-3");
+  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Gameweek Activity`;
+
+  container.appendChild(tableHeader);
+
+  const tableWrapper = document.createElement("div");
+  tableWrapper.className = "table-responsive";
+
+  const table = document.createElement("table");
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered",
+    "align-middle",
+    darkMode ? "table-dark" : "table-light"
+  );
+
+  const thead = document.createElement("thead");
+  thead.classList.add("text-center");
+
+  const headerRow = document.createElement("tr");
+  const headers = [
+    "Pos",
+    "Team",
+    "Chip",
+    "Captain",
+    "Score",
+    "Total",
+    "xfrs",
+    "Minus P",
+    "Bench P",
+  ];
+
+  headers.forEach((headerText) => {
+    const th = document.createElement("th");
+    th.innerText = headerText;
+    headerRow.appendChild(th);
+  });
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  try {
+    for (const element of window.FPLToolboxLeagueData.standings) {
+      const tr = document.createElement("tr");
+
+      if (element.entry == theUser.info.team_id) {
+        tr.classList.add("table-primary");
+      }
+
+      // Position and movement
+      const pos = document.createElement("td");
+      pos.className = "text-center fw-bold";
+      const rankMovement = document.createElement("span");
+
+      if (element.rank < element.last_rank) {
+        rankMovement.innerText = " ▲";
+        rankMovement.className = "text-success";
+      } else if (element.rank > element.last_rank) {
+        rankMovement.innerText = " ▼";
+        rankMovement.className = "text-danger";
+      } else {
+        rankMovement.innerText = " ●";
+        rankMovement.className = "text-muted";
+      }
+
+      pos.innerText = element.rank;
+      pos.appendChild(rankMovement);
+      tr.appendChild(pos);
+
+      // Team
+
+      const teamNameCell = document.createElement("td");
+      teamNameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
+      tr.appendChild(teamNameCell);
+
+      // Chip
+      const chip = document.createElement("td");
+      chip.className = "text-center";
+      if (element.currentWeek[0].active_chip) {
+        const chipName = convertChipName(element.currentWeek[0].active_chip);
+        chip.innerText = chipName;
+        chip.classList.add(`chip-${chipName.toLowerCase()}`);
+      } else {
+        chip.innerHTML = "-";
+      }
+      tr.appendChild(chip);
+
+      // Captain
+      const captain = document.createElement("td");
+
+      const activeChip = convertChipName(element.currentWeek[0].active_chip);
+
+      for (const player of element.currentWeek[0].picks) {
+        if (player.is_captain) {
+          const score = await getPlayerScore(player.element);
+          const scoreMultiplier = activeChip === "TC" ? 3 : 2;
+          const card = await createPlayerCardNew(
+            player.element,
+            score,
+            true,
+            false,
+            scoreMultiplier
+          );
+          captain.append(card);
+        }
+      }
+
+      tr.appendChild(captain);
+
+      // GW Score
+      const score = document.createElement("td");
+      score.className = "text-center";
+      score.innerText = element.event_total;
+      tr.appendChild(score);
+
+      // Total Points
+      const total = document.createElement("td");
+      total.className = "text-center";
+      total.innerText = element.total;
+      tr.appendChild(total);
+
+      // Transfers
+      const transfers = document.createElement("td");
+      transfers.className = "text-center";
+      transfers.innerText = element.everyGw.at(-1).transfers;
+      tr.appendChild(transfers);
+
+      // Transfer cost
+      const minus = document.createElement("td");
+      minus.className = "text-center";
+      const cost = element.everyGw.at(-1).transfers_cost;
+      minus.innerText = cost;
+      if (cost > 0) {
+        minus.classList.add("text-danger", "fw-bold");
+      }
+      tr.appendChild(minus);
+
+      // Bench Points
+      const bench = document.createElement("td");
+      bench.className = "text-center";
+      bench.innerText = element.everyGw.at(-1).bench_points;
+      tr.appendChild(bench);
+
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+    tableWrapper.appendChild(table);
+    container.appendChild(tableWrapper);
+  } catch (error) {
+    console.error("Error building table:", error);
+  }
+}
+async function showGameweekStats() {
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  // Back button
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const tableHeader = document.createElement("h6");
+  tableHeader.classList.add("text-center", "mb-3");
+  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Gameweek Activity`;
+  container.appendChild(tableHeader);
+
+  const tableWrapper = document.createElement("div");
+  tableWrapper.className = "table-responsive";
+
+  const table = document.createElement("table");
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered",
+    "align-middle",
+    darkMode ? "table-dark" : "table-light"
+  );
+
+  const thead = document.createElement("thead");
+  thead.classList.add("text-center");
+
+  const headerRow = document.createElement("tr");
+  const headers = [
+    "Pos",
+    "Team",
+    "Chip",
+    "Captain",
+    "Score",
+    "Total",
+    "xfrs",
+    "Minus P",
+    "Bench P",
+  ];
+
+  headers.forEach((headerText) => {
+    const th = document.createElement("th");
+    th.innerText = headerText;
+    headerRow.appendChild(th);
+  });
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  // Track highest GW scorer
+  let highestScore = -Infinity;
+  let highestRow = null;
+  let highestRank = null;
+
+  try {
+    for (const element of window.FPLToolboxLeagueData.standings) {
+      const tr = document.createElement("tr");
+
+      if (element.entry == theUser.info.team_id) {
+        tr.classList.add("table-primary");
+      }
+
+      // Position and movement
+      const pos = document.createElement("td");
+      pos.className = "text-center fw-bold";
+      const rankMovement = document.createElement("span");
+
+      if (element.rank < element.last_rank) {
+        rankMovement.innerText = " ▲";
+        rankMovement.className = "text-success";
+      } else if (element.rank > element.last_rank) {
+        rankMovement.innerText = " ▼";
+        rankMovement.className = "text-danger";
+      } else {
+        rankMovement.innerText = " ●";
+        rankMovement.className = "text-muted";
+      }
+
+      pos.innerText = element.rank;
+      pos.appendChild(rankMovement);
+      tr.appendChild(pos);
+
+      // Team
+      const teamNameCell = document.createElement("td");
+      teamNameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
+      tr.appendChild(teamNameCell);
+
+      // Chip
+      const chip = document.createElement("td");
+      chip.className = "text-center";
+      if (element.currentWeek[0].active_chip) {
+        const chipName = convertChipName(element.currentWeek[0].active_chip);
+        chip.innerText = chipName;
+        chip.classList.add(`chip-${chipName.toLowerCase()}`);
+      } else {
+        chip.innerHTML = "-";
+      }
+      tr.appendChild(chip);
+
+      // Captain
+      const captain = document.createElement("td");
+      const activeChip = convertChipName(element.currentWeek[0].active_chip);
+
+      for (const player of element.currentWeek[0].picks) {
+        if (player.is_captain) {
+          const score = await getPlayerScore(player.element);
+          const scoreMultiplier = activeChip === "TC" ? 3 : 2;
+          const card = await createPlayerCardNew(
+            player.element,
+            score,
+            true,
+            false,
+            scoreMultiplier
+          );
+          captain.append(card);
+        }
+      }
+
+      tr.appendChild(captain);
+
+      // GW Score
+      const score = document.createElement("td");
+      score.className = "text-center";
+      score.innerText = element.event_total;
+      tr.appendChild(score);
+
+      // Total Points
+      const total = document.createElement("td");
+      total.className = "text-center";
+      total.innerText = element.total;
+      tr.appendChild(total);
+
+      // Transfers
+      const transfers = document.createElement("td");
+      transfers.className = "text-center";
+      transfers.innerText = element.everyGw.at(-1).transfers;
+      tr.appendChild(transfers);
+
+      // Transfer cost
+      const minus = document.createElement("td");
+      minus.className = "text-center";
+      const cost = element.everyGw.at(-1).transfers_cost;
+      minus.innerText = cost;
+      if (cost > 0) {
+        minus.classList.add("text-danger", "fw-bold");
+      }
+      tr.appendChild(minus);
+
+      // Bench Points
+      const bench = document.createElement("td");
+      bench.className = "text-center";
+      bench.innerText = element.everyGw.at(-1).bench_points;
+      tr.appendChild(bench);
+
+      // Track top GW scorer
+      if (element.event_total > highestScore) {
+        highestScore = element.event_total;
+        highestRow = tr.cloneNode(true);
+        highestRank = element.rank;
+      }
+
+      tbody.appendChild(tr);
+    }
+
+    // Prepend the highest scorer at top
+    if (highestRow) {
+      highestRow.classList.add("table-success"); // Bootstrap highlight color
+
+      // Optional: Add badge or label to Pos cell
+      const posCell = highestRow.children[0];
+      const badge = document.createElement("span");
+      badge.className = "badge bg-success ms-2";
+      badge.innerText = "Top GW Score";
+      posCell.appendChild(badge);
+
+      tbody.insertBefore(highestRow, tbody.firstChild);
+    }
+
+    table.appendChild(tbody);
+    tableWrapper.appendChild(table);
+    container.appendChild(tableWrapper);
+  } catch (error) {
+    console.error("Error building table:", error);
+  }
+}
+
+async function showSeasonStats() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+  console.log(leagueToDisplay);
+  // Back button
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const tableHeader = document.createElement("h6");
+  tableHeader.classList.add("text-center", "mb-3");
+  tableHeader.innerText = `${leagueToDisplay.leagueName} \n Gameweek Activity`;
+
+  container.appendChild(tableHeader);
+
+  const tableWrapper = document.createElement("div");
+  tableWrapper.className = "table-responsive";
+
+  const table = document.createElement("table");
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered",
+    "align-middle",
+    darkMode ? "table-dark" : "table-light"
+  );
+
+  const thead = document.createElement("thead");
+  thead.classList.add("text-center");
+
+  const headerRow = document.createElement("tr");
+  const headers = [
+    "Pos",
+    "Team",
+    "Chips Used",
+    "Total",
+    "Trasnfers",
+    "Transfers with chips",
+    "Minus Points",
+    "Bench Points",
+    "Captaincy Points",
+    "Goals Scored",
+    "Goals Conceded",
+    "Pens Missed",
+    "Red Cards",
+    "Yellow Cards",
+    "Saves",
+    "Best GW",
+    "Worst GW",
+  ];
+
+  headers.forEach((headerText) => {
+    const th = document.createElement("th");
+    th.innerText = headerText;
+    headerRow.appendChild(th);
+  });
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  try {
+    for (const element of leagueToDisplay.standings) {
+      const tr = document.createElement("tr");
+
+      if (element.entry == theUser.info.team_id) {
+        tr.classList.add("table-primary");
+      }
+
+      // Position and movement
+      const pos = document.createElement("td");
+      pos.className = "text-center fw-bold";
+      const rankMovement = document.createElement("span");
+
+      if (element.rank < element.last_rank) {
+        rankMovement.innerText = " ▲";
+        rankMovement.className = "text-success";
+      } else if (element.rank > element.last_rank) {
+        rankMovement.innerText = " ▼";
+        rankMovement.className = "text-danger";
+      } else {
+        rankMovement.innerText = " ●";
+        rankMovement.className = "text-muted";
+      }
+
+      pos.innerText = element.rank;
+      pos.appendChild(rankMovement);
+      tr.appendChild(pos);
+
+      // Team
+
+      const teamNameCell = document.createElement("td");
+      teamNameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
+      tr.appendChild(teamNameCell);
+
+      // Chip
+      const chip = document.createElement("td");
+      chip.className = "text-center";
+      if (element.chips) {
+        chip.innerText = element.chips.length;
+      } else {
+        chip.innerHTML = "-";
+      }
+      tr.appendChild(chip);
+
+      // Total Points
+      const total = document.createElement("td");
+      total.className = "text-center";
+      total.innerText = element.total;
+      tr.appendChild(total);
+
+      // Transfers
+      const transfers = document.createElement("td");
+      transfers.className = "text-center";
+      transfers.innerText = element.totalTransfers;
+      tr.appendChild(transfers);
+
+      // Total Transfers with chips
+      const xfrsWithChips = document.createElement("td");
+      xfrsWithChips.className = "text-center";
+      xfrsWithChips.innerText = element.transfers.length;
+      tr.appendChild(xfrsWithChips);
+
+      // Transfer cost
+      const minus = document.createElement("td");
+      minus.className = "text-center";
+      const cost = element.totalMinusPoints;
+      minus.innerText = cost;
+      if (cost > 0) {
+        minus.classList.add("text-danger", "fw-bold");
+      }
+      tr.appendChild(minus);
+
+      // Bench Points
+      const bench = document.createElement("td");
+      bench.className = "text-center";
+      bench.innerText = element.totalPointsOnBench;
+      tr.appendChild(bench);
+
+      // Captaincy Points
+      const captainPoints = document.createElement("td");
+      captainPoints.className = "text-center";
+      captainPoints.innerText = element.total_captaincy_points;
+      tr.appendChild(captainPoints);
+
+      // Goals Scored
+      const goalsScored = document.createElement("td");
+      goalsScored.className = "text-center";
+      goalsScored.innerText = element.total_goals_scored;
+      tr.appendChild(goalsScored);
+
+      // Goals Conceded
+      const goalsConceded = document.createElement("td");
+      goalsConceded.className = "text-center";
+      goalsConceded.innerText = element.total_goals_conceded;
+      tr.appendChild(goalsConceded);
+
+      // Penalties Missed
+      const penaltiesMissed = document.createElement("td");
+      penaltiesMissed.className = "text-center";
+      penaltiesMissed.innerText = element.total_penalties_missed;
+      tr.appendChild(penaltiesMissed);
+
+      // Red Cards
+      const redCards = document.createElement("td");
+      redCards.className = "text-center";
+      redCards.innerText = element.total_red_cards;
+      tr.appendChild(redCards);
+
+      // Yellow Cards
+      const yellowCards = document.createElement("td");
+      yellowCards.className = "text-center";
+      yellowCards.innerText = element.total_yellow_cards;
+      tr.appendChild(yellowCards);
+
+      // Saves
+      const saves = document.createElement("td");
+      saves.className = "text-center";
+      saves.innerText = element.total_saves;
+      tr.appendChild(saves);
+
+      // Best Week (GW)
+      const bestWeek = document.createElement("td");
+      bestWeek.className = "text-center";
+      bestWeek.innerText = element.bestWeek
+        ? `GW  ${element.bestWeek.event} (${element.bestWeek.points})`
+        : "-";
+      tr.appendChild(bestWeek);
+
+      // Worst Week (GW)
+      const worstWeek = document.createElement("td");
+      worstWeek.className = "text-center";
+      worstWeek.innerText = element.worstWeek
+        ? `GW ${element.worstWeek.event} (${element.worstWeek.points})`
+        : "-";
+      tr.appendChild(worstWeek);
+
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+    tableWrapper.appendChild(table);
+    container.appendChild(tableWrapper);
+  } catch (error) {
+    console.error("Error building table:", error);
+  }
+}
+
+///////////////////////////Rival Differences Compare START////////////////
+
+async function showRivalDiff() {
+  const app = document.getElementById("screen-tools");
+  app.innerHTML = "";
+  // Add back button (styled with Bootstrap)
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  app.appendChild(backBtn);
+  showBootstrapSpinner(app);
+
+  // Add a header above the table
+  const tableHeader = document.createElement("h6");
+  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Tap Team To Compare`;
+  tableHeader.className = "text-center my-3";
+  app.appendChild(tableHeader);
+
+  const tableWrapper = document.createElement("div");
+  tableWrapper.className = "table-responsive";
+
+  const table = document.createElement("table");
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered",
+    "align-middle",
+    darkMode ? "table-dark" : "table-light"
+  );
+
+  // Create thead
+  const thead = document.createElement("thead");
+
+  const headers = ["Pos", "Team", "GW" + currentGw];
+  headers.forEach((text) => {
+    const th = document.createElement("th");
+    th.innerText = text;
+    thead.appendChild(th);
+  });
+  table.appendChild(thead);
+
+  // Create tbody
+  const tbody = document.createElement("tbody");
+  tbody.id = "league-table";
+  table.appendChild(tbody);
+
+  // Fetch user's team
+  try {
+    const res = await fetch(
+      `${BASE_URL}/entry/${theUser.info.team_id}/event/${currentGw}/picks/`
+    );
+    const data = await res.json();
+    const myTeam = data;
+
+    // Populate table rows
+    FPLToolboxLeagueData.standings.forEach((element) => {
+      const tr = document.createElement("tr");
+      if (element.entry == theUser.info.team_id) {
+        tr.className = "table-primary";
+      }
+
+      // Pos
+      const pos = document.createElement("td");
+      pos.className = "fw-bold";
+      const rankMovement = document.createElement("span");
+      rankMovement.classList.add("ms-1");
+      if (element.rank == element.last_rank) {
+        rankMovement.innerText = "●";
+        rankMovement.classList.add("text-muted");
+      } else if (element.rank < element.last_rank) {
+        rankMovement.innerText = "▲";
+        rankMovement.classList.add("text-success");
+      } else {
+        rankMovement.innerText = "▼";
+        rankMovement.classList.add("text-danger");
+      }
+      pos.innerText = element.rank;
+      pos.appendChild(rankMovement);
+      tr.appendChild(pos);
+
+      // Team name + manager
+      const team = document.createElement("td");
+      team.className = "text-start";
+      const name = document.createElement("div");
+      name.className = "fw-semibold";
+      name.innerText = element.entry_name;
+      const manager = document.createElement("div");
+      manager.className = "text-muted small";
+      manager.innerText = element.player_name.slice(0, 40);
+      team.appendChild(name);
+      team.appendChild(manager);
+      tr.appendChild(team);
+
+      // Score
+      const score = document.createElement("td");
+      score.className = "fw-semibold";
+      score.innerText = element.event_total;
+      tr.appendChild(score);
+
+      // Click listener
+      tr.addEventListener("click", function () {
+        console.log(myTeam, element);
+        getUniquePlayers(myTeam, element);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    // Append table to wrapper and wrapper to app
+    tableWrapper.appendChild(table);
+    app.appendChild(tableWrapper);
+  } catch (error) {
+    console.error("Error fetching team data:", error);
+    app.innerHTML = `<div class="alert alert-danger">Failed to load team data.</div>`;
+  } finally {
+    removeSpinner();
+  }
+}
+
+async function getUniquePlayers(team1, team2) {
+  const app = document.getElementById("screen-tools");
+  if (document.getElementById("pitches")) {
+    document.getElementById("pitches").remove();
+    document.getElementById("comparison-heading").remove();
+    document.getElementById("comparison-text").remove();
+    document.getElementById("share-button").remove();
+  }
+
+  const comparisonHeadingDiv = document.createElement("div");
+  comparisonHeadingDiv.setAttribute("id", "comparison-heading");
+  app.appendChild(comparisonHeadingDiv);
+
+  const comparisonTextDiv = document.createElement("div");
+  comparisonTextDiv.setAttribute("id", "comparison-text");
+  app.appendChild(comparisonTextDiv);
+
+  const pitches = document.createElement("div");
+  pitches.setAttribute("id", "pitches");
+  app.appendChild(pitches);
+
+  const pitch1 = document.createElement("div");
+  pitch1.setAttribute("id", "pitch1");
+  pitches.appendChild(pitch1);
+
+  const pitch2 = document.createElement("div");
+  pitch2.setAttribute("id", "pitch2");
+  pitches.appendChild(pitch2);
+
+  const gwIdentifier = document.createElement("div");
+  gwIdentifier.setAttribute("id", "gameweek-identifier");
+
+  //Team A
+
+  const myScore = document.createElement("div");
+  myScore.innerHTML = team1.entry_history.points;
+  myScore.setAttribute("id", "my-score");
+  myScore.classList.add("comparison-score");
+
+  myScore.appendChild(gwIdentifier);
+
+  pitch1.appendChild(myScore);
+
+  const keeper = document.createElement("div");
+  keeper.setAttribute("id", "my-keeper");
+  pitch1.appendChild(keeper);
+
+  const defenders = document.createElement("div");
+  defenders.setAttribute("id", "my-defenders");
+  pitch1.appendChild(defenders);
+
+  const midfielders = document.createElement("div");
+  midfielders.setAttribute("id", "my-midfielders");
+  pitch1.appendChild(midfielders);
+
+  const strikers = document.createElement("div");
+  strikers.setAttribute("id", "my-strikers");
+  pitch1.appendChild(strikers);
+
+  const bench = document.createElement("div");
+  bench.setAttribute("id", "my-bench");
+  pitch1.appendChild(bench);
+
+  const team1name = document.createElement("div");
+  team1name.setAttribute("id", "team1name");
+  pitch1.appendChild(team1name);
+
+  //Team B
+
+  const myScore2 = document.createElement("div");
+  myScore2.innerHTML = team2.event_total;
+  myScore2.setAttribute("id", "my-score2");
+  myScore2.classList.add("comparison-score");
+
+  myScore2.appendChild(gwIdentifier);
+
+  pitch2.appendChild(myScore2);
+
+  const keeper2 = document.createElement("div");
+  keeper2.setAttribute("id", "my-keeper2");
+  pitch2.appendChild(keeper2);
+
+  const defenders2 = document.createElement("div");
+  defenders2.setAttribute("id", "my-defenders2");
+  pitch2.appendChild(defenders2);
+
+  const midfielders2 = document.createElement("div");
+  midfielders2.setAttribute("id", "my-midfielders2");
+  pitch2.appendChild(midfielders2);
+
+  const strikers2 = document.createElement("div");
+  strikers2.setAttribute("id", "my-strikers2");
+  pitch2.appendChild(strikers2);
+
+  const bench2 = document.createElement("div");
+  bench2.setAttribute("id", "my-bench2");
+  pitch2.appendChild(bench2);
+
+  const team2name = document.createElement("div");
+  team2name.setAttribute("id", "team2name");
+  pitch2.appendChild(team2name);
+
+  //////
+
+  //console.log(team1)
+  //console.log(team2)
+
+  let t1Array = [];
+  let t2Array = [];
+
+  team1.picks.forEach((pick) => t1Array.push(pick.element));
+  team2.currentWeek[0].picks.forEach((pick) => t2Array.push(pick.element));
+
+  let difference1Text = [];
+  const difference1 = t1Array.filter((element) => !t2Array.includes(element));
+  difference1.forEach((pick) => difference1Text.push(getPlayerWebName(pick)));
+
+  let difference2Text = [];
+  const difference2 = t2Array.filter((element) => !t1Array.includes(element));
+  difference2.forEach((pick) => difference2Text.push(getPlayerWebName(pick)));
+
+  setTimeout(() => {
+    difference1.forEach((id) => {
+      const div = document.getElementById(id);
+      if (div) {
+        div.classList.add("different-players");
+      }
+    });
+    difference2.forEach((id) => {
+      const div = document.getElementById(id);
+      if (div) {
+        div.classList.add("different-players");
+      }
+    });
+  }, "1000");
+
+  const comparisonHeadingText = loggedInTeamName + " v " + team2.entry_name;
+  const h6Div = document.createElement("h6");
+  const h6Content = document.createTextNode(comparisonHeadingText);
+  h6Div.appendChild(h6Content);
+  const currenth6Div = document.getElementById("comparison-heading");
+  currenth6Div.appendChild(h6Div);
+
+  const comparisonText =
+    "These are the players that are going to make a difference for you against " +
+    team2.entry_name +
+    ": " +
+    difference1Text.join(", ");
+  // create a new div element
+  const comparisonDiv = document.createElement("p");
+  // and give it some content
+  const comparisonContent = document.createTextNode(comparisonText);
+  // add the text node to the newly created div
+  comparisonDiv.appendChild(comparisonContent);
+  // add the newly created element and its content into the DOM
+  const currentDiv = document.getElementById("comparison-text");
+  //currentDiv.appendChild(comparisonDiv);
+
+  const comparisonText2 =
+    "The players that might hurt you in this battle are:  " +
+    difference2Text.join(", ") +
+    " Good luck!";
+  // create a new div element
+  const comparisonDiv2 = document.createElement("p");
+  // and give it some content
+  const comparisonContent2 = document.createTextNode(comparisonText2);
+  // add the text node to the newly created div
+  comparisonDiv2.appendChild(comparisonContent2);
+  // add the newly created element and its content into the DOM
+
+  //currentDiv.appendChild(comparisonDiv2);
+
+  const shareData = {
+    title: "Team Comparison",
+    text:
+      "Hey, the players that I've got that you haven't are: " +
+      " \n" +
+      difference1Text.join(", ") +
+      " \n\n" +
+      "The players that you've got that I haven't are: " +
+      difference2Text.join(", ") +
+      "\n\n" +
+      " You can compare your team too by clicking the link",
+    url: "https://fpltoolbox.com/team-comparison",
+  };
+
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share";
+  shareButton.setAttribute("id", "share-button");
+  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+
+  // Share must be triggered by "user activation"
+  shareButton.addEventListener("click", async () => {
+    try {
+      await navigator.share(shareData);
+    } catch (err) {
+      console.log(`Error: ${err}`);
+    }
+  });
+  app.append(shareButton);
+
+  //My Team
+
+  for (var i = 0; i < team1.picks.length; i++) {
+    if (team1.picks[i].position <= 11) {
+      const playerScore = await getPlayerScore(team1.picks[i].element);
+      const card = await createPlayerCardNew(
+        team1.picks[i].element,
+        playerScore,
+        team1.picks[i].is_captain,
+        team1.picks[i].is_vice_captain,
+        team1.picks[i].multiplier
+      );
+
+      const playerType = await getPlayerType(team1.picks[i].element);
+
+      if (playerType == 1) {
+        document.getElementById("my-keeper").appendChild(card);
+      }
+      if (playerType == 2) {
+        document.getElementById("my-defenders").appendChild(card);
+      }
+      if (playerType == 3) {
+        document.getElementById("my-midfielders").appendChild(card);
+      }
+      if (playerType == 4) {
+        document.getElementById("my-strikers").appendChild(card);
+      }
+    }
+
+    //Benched Players
+    if (team1.picks[i].position > 11 && team1.picks[i].position < 16) {
+      const playerScore = await getPlayerScore(team1.picks[i].element);
+      const card = await createPlayerCardNew(
+        team1.picks[i].element,
+        playerScore,
+        false,
+        false,
+        0
+      );
+      document.getElementById("my-bench").appendChild(card);
+    }
+    //Manager
+    if (team1.picks[i].position == 16) {
+      const card = createManagerCard(
+        team1.picks[i].element,
+        getPlayerScore(team1.picks[i].element),
+        false,
+        false,
+        false
+      );
+      card.style.transform = "scale(1.2)";
+      card.style.marginLeft = "20px";
+      document.getElementById("my-strikers").append(card);
+    }
+  }
+
+  document.getElementById("team1name").innerHTML = loggedInTeamName;
+  console.log(t2Array);
+  console.log(team2.currentWeek[0].picks);
+  const testPlayer = await getPlayerWebName(17);
+  console.log(testPlayer);
+  //Their Team
+
+  for (var i = 0; i < team2.currentWeek[0].picks.length; i++) {
+    if (team2.currentWeek[0].picks[i].position <= 11) {
+      const playerScore = await getPlayerScore(
+        team2.currentWeek[0].picks[i].element
+      );
+      const card = await createPlayerCardNew(
+        team2.currentWeek[0].picks[i].element,
+        playerScore,
+        team2.currentWeek[0].picks[i].is_captain,
+        team2.currentWeek[0].picks[i].is_vice_captain,
+        team2.currentWeek[0].picks[i].multiplier
+      );
+
+      const playerType = await getPlayerType(
+        team2.currentWeek[0].picks[i].element
+      );
+      if (playerType == 1) {
+        document.getElementById("my-keeper2").appendChild(card);
+      }
+      if (playerType == 2) {
+        document.getElementById("my-defenders2").appendChild(card);
+      }
+      if (playerType == 3) {
+        document.getElementById("my-midfielders2").appendChild(card);
+      }
+      if (playerType == 4) {
+        document.getElementById("my-strikers2").appendChild(card);
+      }
+    }
+
+    //Benched Players
+    if (
+      team2.currentWeek[0].picks[i].position > 11 &&
+      team2.currentWeek[0].picks[i].position < 16
+    ) {
+      const playerScore = await getPlayerScore(
+        team2.currentWeek[0].picks[i].element
+      );
+      const card = await createPlayerCardNew(
+        team1.picks[i].element,
+        playerScore,
+        team2.currentWeek[0].picks[i].is_captain,
+        team2.currentWeek[0].picks[i].is_vice_captain,
+        team2.currentWeek[0].picks[i].multiplier
+      );
+
+      document.getElementById("my-bench2").appendChild(card);
+    }
+    //Manager
+    if (team2.currentWeek[0].picks[i].position == 16) {
+      const card = await createManagerCard(
+        team2.currentWeek[0].picks[i].element,
+        getPlayerScore(team2.currentWeek[0].picks[i].element),
+        false,
+        false,
+        false
+      );
+      card.style.transform = "scale(1.2)";
+      card.style.marginRight = "20px";
+      document.getElementById("my-strikers2").prepend(card);
+    }
+  }
+
+  document.getElementById("team2name").innerHTML = team2.entry_name;
+  addCaptainBadge();
+  window.location.href = "#comparison-heading";
+}
+//////////////////////////Rival Differences Comapre END //////////////////
+
+//Side Leagues for Pro
+function getLeagueToDisplay(realLeague, dummyLeague, options = {}) {
+  const { accessRoles = [10, 12], showLockedModal = true } = options;
+
+  if (userHasAccess(accessRoles)) {
+    return realLeague;
+  }
+
+  if (showLockedModal) {
+    showModal({
+      title: "Paid Feature",
+      body: dummyLeagueMessage,
+      confirmText: "Ok",
+      onConfirm: () => {},
+    });
+  }
+
+  return dummyLeague;
+}
+
+async function showCaptaincyPointsLeague() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  // Add back button (styled with Bootstrap)
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  container.appendChild(leagueTable);
+
+  // Header
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Captaincy Points Leaderboard`;
+  tableDescription.classList.add("text-center", "mb-3");
+  leagueTable.appendChild(tableDescription);
+
+  // Create table with Bootstrap classes
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered"
+  );
+
+  // Detect dark mode if applicable
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  // Table header
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  const headers = ["#", "Team Name", "TOT"];
+  headers.forEach((headerText, index) => {
+    const th = document.createElement("th");
+    th.innerText = headerText;
+
+    if (headerText === "TOT") {
+      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
+    }
+
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  leagueToDisplay.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
+
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamNameCell);
+
+    const captaincyPointsCell = document.createElement("td");
+    captaincyPointsCell.innerText = team.total_captaincy_points || 0;
+    captaincyPointsCell.classList.add("text-end");
+    row.appendChild(captaincyPointsCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  // Sort logic
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((rowA, rowB) => {
+      const pointsA = parseFloat(rowA.cells[2].innerText);
+      const pointsB = parseFloat(rowB.cells[2].innerText);
+      return ascending ? pointsA - pointsB : pointsB - pointsA;
+    });
+
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+      tableBody.appendChild(row);
+    });
+
+    const sortIndicator = document.getElementById("sort-indicator");
+    sortIndicator.innerText = ascending ? "▲" : "▼";
+  };
+
+  // Initial sort
+  sortTable(false);
+
+  // Toggle sort on header click
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
+    sortTable(!isAscending);
+  });
+
+  // Share Button
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share League";
+  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+  shareButton.onclick = shareLeague;
+  leagueTable.appendChild(shareButton);
+
+  function shareLeague() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareMessage = `${leagueToDisplay.leagueName}\nCaptaincy Points Leaderboard:\n`;
+    rows.forEach((row, index) => {
+      const teamName = row.cells[1].innerText.split("\n")[0];
+      const captaincyPoints = row.cells[2].innerText;
+      shareMessage += `${
+        index + 1
+      }. ${teamName} - Captaincy Points: ${captaincyPoints}\n`;
+    });
+
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareMessage,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
+async function showBenchedPointsLeague() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  // Add back button (styled with Bootstrap)
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  console.log(leagueToDisplay);
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  container.appendChild(leagueTable);
+
+  // Header
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Benched Points Leaderboard`;
+  tableDescription.classList.add("text-center", "mb-3");
+  leagueTable.appendChild(tableDescription);
+
+  // Create table with Bootstrap classes
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered"
+  );
+
+  // Detect dark mode if applicable
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  // Table header
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  const headers = ["#", "Team Name", "TOT"];
+  headers.forEach((headerText, index) => {
+    const th = document.createElement("th");
+    th.innerText = headerText;
+
+    if (headerText === "TOT") {
+      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
+    }
+
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  leagueToDisplay.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
+
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamNameCell);
+
+    const benchedPointsCell = document.createElement("td");
+    benchedPointsCell.innerText = team.totalPointsOnBench || 0;
+    benchedPointsCell.classList.add("text-end");
+    row.appendChild(benchedPointsCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  // Sort logic
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((rowA, rowB) => {
+      const pointsA = parseFloat(rowA.cells[2].innerText);
+      const pointsB = parseFloat(rowB.cells[2].innerText);
+      return ascending ? pointsA - pointsB : pointsB - pointsA;
+    });
+
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+      tableBody.appendChild(row);
+    });
+
+    const sortIndicator = document.getElementById("sort-indicator");
+    sortIndicator.innerText = ascending ? "▲" : "▼";
+  };
+
+  // Initial sort
+  sortTable(false);
+
+  // Toggle sort on header click
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
+    sortTable(!isAscending);
+  });
+
+  // Share Button
+  let shareButton = document.createElement("button");
+  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+  shareButton.innerText = "Share League";
+
+  shareButton.onclick = shareLeague;
+  container.appendChild(shareButton);
+  function shareLeague() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareMessage = `${leagueToDisplay.leagueName}\nBenched Points Leaderboard:\n`;
+    rows.forEach((row, index) => {
+      const teamName = row.cells[1].innerText.split("\n")[0];
+      const benchedPoints = row.cells[2].innerText;
+      shareMessage += `${
+        index + 1
+      }. ${teamName} - Benched Points: ${benchedPoints}\n`;
+    });
+
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareMessage,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
+async function showCardsLeague() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  container.appendChild(leagueTable);
+
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Total Cards Leaderboard`;
+  tableDescription.classList.add("text-center", "mb-3");
+  leagueTable.appendChild(tableDescription);
+
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered"
+  );
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  // Table Header
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  const headers = ["#", "Team Name", "Total"];
+  headers.forEach((text, i) => {
+    const th = document.createElement("th");
+
+    if (text === "Total") {
+      th.innerHTML = `Total <span id="sort-indicator">▼</span>`;
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
+    }
+
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  leagueToDisplay.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    const rowNum = document.createElement("td");
+    rowNum.innerText = index + 1;
+    row.appendChild(rowNum);
+
+    const teamName = document.createElement("td");
+    teamName.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamName);
+
+    const total = document.createElement("td");
+    total.innerText = team.total_cards || 0;
+    total.classList.add("text-end");
+    row.appendChild(total);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  // Sort Logic (by Total Cards)
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((a, b) => {
+      const valA = parseFloat(a.cells[2].innerText) || 0;
+      const valB = parseFloat(b.cells[2].innerText) || 0;
+      return ascending ? valA - valB : valB - valA;
+    });
+
+    rows.forEach((row, i) => {
+      row.cells[0].innerText = i + 1;
+      tableBody.appendChild(row);
+    });
+
+    document.getElementById("sort-indicator").innerText = ascending ? "▲" : "▼";
+  };
+
+  sortTable(false);
+
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const current = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = current ? "desc" : "asc";
+    sortTable(!current);
+  });
+
+  // Share Button
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share League";
+  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+  shareButton.onclick = shareLeague;
+  leagueTable.appendChild(shareButton);
+
+  function shareLeague() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareText = `${leagueToDisplay.leagueName}\nTotal Cards Leaderboard:\n`;
+
+    rows.forEach((row, i) => {
+      const name = row.cells[1].innerText.split("\n")[0];
+      const total = row.cells[2].innerText;
+      shareText += `${i + 1}. ${name} - Cards: ${total}\n`;
+    });
+
+    shareText += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareText,
+        })
+        .catch((err) => console.log("Share failed", err));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
+async function showGoldenbootLeague() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  container.appendChild(leagueTable);
+
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Golden Boot Leaderboard`;
+  tableDescription.classList.add("text-center", "mb-3");
+  leagueTable.appendChild(tableDescription);
+
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered"
+  );
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  const headers = ["#", "Team Name", "TOT"];
+  headers.forEach((headerText) => {
+    const th = document.createElement("th");
+    if (headerText === "TOT") {
+      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
+    } else {
+      th.innerText = headerText;
+    }
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  leagueToDisplay.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
+
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamNameCell);
+
+    const goalsCell = document.createElement("td");
+    goalsCell.innerText = team.total_goals_scored || 0;
+    goalsCell.classList.add("text-end");
+    row.appendChild(goalsCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((rowA, rowB) => {
+      const goalsA = parseFloat(rowA.cells[2].innerText);
+      const goalsB = parseFloat(rowB.cells[2].innerText);
+      return ascending ? goalsA - goalsB : goalsB - goalsA;
+    });
+
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+      tableBody.appendChild(row);
+    });
+
+    const sortIndicator = document.getElementById("sort-indicator");
+    sortIndicator.innerText = ascending ? "▲" : "▼";
+  };
+
+  sortTable(false);
+
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
+    sortTable(!isAscending);
+  });
+
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share League";
+  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+  shareButton.onclick = shareLeague;
+  leagueTable.appendChild(shareButton);
+
+  function shareLeague() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareMessage = `${leagueToDisplay.leagueName}\nGolden Boot Leaderboard:\n`;
+
+    rows.forEach((row, index) => {
+      const teamName = row.cells[1].innerText.split("\n")[0];
+      const goals = row.cells[2].innerText;
+      shareMessage += `${index + 1}. ${teamName} - Goals: ${goals}\n`;
+    });
+
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareMessage,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
+
+async function showPensMissedLeague() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  container.appendChild(leagueTable);
+
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Penalities Missed Leaderboard`;
+  tableDescription.classList.add("text-center", "mb-3");
+  leagueTable.appendChild(tableDescription);
+
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered"
+  );
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  const headers = ["#", "Team Name", "TOT"];
+  headers.forEach((headerText) => {
+    const th = document.createElement("th");
+    if (headerText === "TOT") {
+      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
+    } else {
+      th.innerText = headerText;
+    }
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  leagueToDisplay.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
+
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamNameCell);
+
+    const goalsCell = document.createElement("td");
+    goalsCell.innerText = team.total_penalties_missed || 0;
+    goalsCell.classList.add("text-end");
+    row.appendChild(goalsCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((rowA, rowB) => {
+      const goalsA = parseFloat(rowA.cells[2].innerText);
+      const goalsB = parseFloat(rowB.cells[2].innerText);
+      return ascending ? goalsA - goalsB : goalsB - goalsA;
+    });
+
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+      tableBody.appendChild(row);
+    });
+
+    const sortIndicator = document.getElementById("sort-indicator");
+    sortIndicator.innerText = ascending ? "▲" : "▼";
+  };
+
+  sortTable(false);
+
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
+    sortTable(!isAscending);
+  });
+
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share League";
+  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+  shareButton.onclick = shareLeague;
+  leagueTable.appendChild(shareButton);
+
+  function shareLeague() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareMessage = `${leagueToDisplay.leagueName}\nGolden Boot Leaderboard:\n`;
+
+    rows.forEach((row, index) => {
+      const teamName = row.cells[1].innerText.split("\n")[0];
+      const goals = row.cells[2].innerText;
+      shareMessage += `${index + 1}. ${teamName} - Goals: ${goals}\n`;
+    });
+
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareMessage,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
+
+async function showChipUsage() {
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const tableHeader = document.createElement("h6");
+  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Chip Usage`;
+  tableHeader.style.textAlign = "center";
+  container.appendChild(tableHeader);
+
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-bordered",
+    "table-hover",
+    "table-striped"
+  );
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+
+  const chipOrder = [
+    "wildcard1",
+    "bboost",
+    "3xc",
+    "wildcard2",
+    "freehit",
+    "manager",
+  ];
+  const chipMap = {
+    wildcard1: "Wildcard 1",
+    wildcard2: "Wildcard 2",
+    bboost: "Bench Boost",
+    "3xc": "Triple Captain",
+    freehit: "Free Hit",
+    manager: "Assistant",
+  };
+
+  ["#", "Team", ...chipOrder.map((c) => chipMap[c])].forEach((header) => {
+    const th = document.createElement("th");
+    th.innerText = header;
+    th.style.whiteSpace = "nowrap";
+    headRow.appendChild(th);
+  });
+
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  FPLToolboxLeagueData.standings.forEach((element, index) => {
+    const tr = document.createElement("tr");
+
+    const numCell = document.createElement("td");
+    numCell.innerText = index + 1;
+    tr.appendChild(numCell);
+
+    const nameCell = document.createElement("td");
+    nameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
+    tr.appendChild(nameCell);
+
+    const wildcards = element.chips.filter((c) => c.name === "wildcard");
+
+    chipOrder.forEach((chipType) => {
+      let chipData = null;
+
+      if (chipType === "wildcard1") {
+        chipData = wildcards[0];
+      } else if (chipType === "wildcard2") {
+        chipData = wildcards[1];
+      } else {
+        chipData = element.chips.find((c) => c.name === chipType);
+      }
+
+      const td = document.createElement("td");
+      td.style.textAlign = "center";
+      td.style.whiteSpace = "nowrap";
+
+      const img = document.createElement("img");
+      img.src = `https://fpltoolbox.com/wp-content/uploads/2025/03/${chipType.replace(
+        /[12]/,
+        ""
+      )}.webp`;
+      img.style.maxWidth = "30px";
+      img.style.opacity = chipData ? "1" : "0.3";
+
+      const info = document.createElement("div");
+      info.style.fontSize = "0.75rem";
+      info.innerText = chipData ? `GW${chipData.gw}` : "—";
+
+      td.appendChild(img);
+      td.appendChild(info);
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+
+  const tableWrapper = document.createElement("div");
+  tableWrapper.className = "table-responsive";
+  tableWrapper.appendChild(table);
+  container.appendChild(tableWrapper);
+}
+async function showTransferCalculator() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const tableHeader = document.createElement("h6");
+  tableHeader.innerText = `${leagueToDisplay.leagueName} \n Free Transfers Available Next Week`;
+  tableHeader.style.textAlign = "center";
+  container.appendChild(tableHeader);
+
+  const tableWrapper = document.createElement("div");
+  tableWrapper.className = "table-responsive";
+  container.appendChild(tableWrapper);
+
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-bordered",
+    "table-hover",
+    "table-striped"
+  );
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+  tableWrapper.appendChild(table);
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+
+  ["Pos", "Team", "Available Transfers"].forEach((header) => {
+    const th = document.createElement("th");
+    th.innerText = header;
+    th.style.whiteSpace = "nowrap";
+    th.style.textAlign = header === "Transfers" ? "right" : "left";
+    headRow.appendChild(th);
+  });
+
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  table.appendChild(tbody);
+
+  try {
+    // Calculate available transfers
+    leagueToDisplay.standings.forEach((team) => {
+      team.availableTransfers = calculateAvailableTransfers(team);
+    });
+
+    // Sort standings
+    const sortedLeague = [...leagueToDisplay.standings].sort(
+      (a, b) => b.availableTransfers - a.availableTransfers
+    );
+
+    // Render rows
+    sortedLeague.forEach((team, index) => {
+      const tr = document.createElement("tr");
+
+      const posTd = document.createElement("td");
+      posTd.innerText = index + 1;
+      tr.appendChild(posTd);
+
+      const teamTd = document.createElement("td");
+      teamTd.innerHTML = `<strong>${
+        team.entry_name
+      }</strong><br><small>${team.player_name.slice(0, 40)}</small>`;
+      tr.appendChild(teamTd);
+
+      const transfersTd = document.createElement("td");
+      transfersTd.innerText = team.availableTransfers;
+      transfersTd.style.textAlign = "right";
+      tr.appendChild(transfersTd);
+
+      tbody.appendChild(tr);
+    });
+
+    // Share Button
+    const shareButton = document.createElement("button");
+    shareButton.innerText = "Share League";
+    shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+    shareButton.onclick = () => shareTopTen(sortedLeague);
+    container.appendChild(shareButton);
+  } catch (error) {
+    console.error("Error in transferCalculator:", error);
+  }
+
+  // Helper: Calculate Available Transfers
+  function calculateAvailableTransfers(team) {
+    let freeTransfers = 1;
+    const maxTransfers = 5;
+    const transfersByGW = {};
+
+    team.transfers[0]?.forEach((transfer) => {
+      if (!transfersByGW[transfer.event]) {
+        transfersByGW[transfer.event] = [];
+      }
+      transfersByGW[transfer.event].push(transfer);
+    });
+
+    for (let gw = 2; gw <= currentGw; gw++) {
+      freeTransfers = Math.min(freeTransfers + 1, maxTransfers);
+
+      const chipUsed = team.chips.find(
+        (chip) =>
+          (chip.name === "wildcard" || chip.name === "freehit") &&
+          chip.gw === gw
+      );
+      if (chipUsed) continue;
+
+      const transfersMade = transfersByGW[gw]?.length || 0;
+      freeTransfers -= transfersMade;
+      freeTransfers = Math.max(freeTransfers, 1);
+    }
+
+    return freeTransfers;
+  }
+
+  // Helper: Share top 10 teams
+  function shareTopTen(league) {
+    const topTen = league.slice(0, 10);
+    let shareMessage = `${FPLToolboxLeagueData.leagueName}\nAvailable Transfers:\n`;
+
+    topTen.forEach((team, index) => {
+      shareMessage += `${index + 1}. ${
+        team.entry_name
+      }\n (${team.player_name.slice(0, 10)}) - Available Transfers: ${
+        team.availableTransfers
+      }\n`;
+    });
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text:
+            shareMessage +
+            `\nCheck your own league here:\nhttps://fpltoolbox.com/fpl-toolbox-pro/`,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
+async function showTeamValueLeague() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  container.appendChild(leagueTable);
+
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Team Value Leaderboard`;
+  tableDescription.classList.add("text-center", "mb-3");
+  leagueTable.appendChild(tableDescription);
+
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered"
+  );
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  const headers = ["#", "Team Name", "Team Value (£m)"];
+  headers.forEach((headerText, i) => {
+    const th = document.createElement("th");
+
+    if (i === 2) {
+      th.innerHTML = `Team Value <span id="sort-indicator">▼</span>`;
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
+    } else {
+      th.innerText = headerText;
+    }
+
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  leagueToDisplay.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
+
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamNameCell);
+
+    const latestGw = team.everyGw?.[team.everyGw.length - 1];
+    const rawValue = latestGw?.value || 0;
+    const valueInMillions = (rawValue / 10).toFixed(1);
+
+    const valueCell = document.createElement("td");
+    valueCell.innerText = valueInMillions;
+    valueCell.classList.add("text-end");
+    row.appendChild(valueCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((rowA, rowB) => {
+      const valA = parseFloat(rowA.cells[2].innerText);
+      const valB = parseFloat(rowB.cells[2].innerText);
+      return ascending ? valA - valB : valB - valA;
+    });
+
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+      tableBody.appendChild(row);
+    });
+
+    const sortIndicator = document.getElementById("sort-indicator");
+    sortIndicator.innerText = ascending ? "▲" : "▼";
+  };
+
+  sortTable(false);
+
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
+    sortTable(!isAscending);
+  });
+
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share League";
+  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+  shareButton.onclick = shareLeague;
+  leagueTable.appendChild(shareButton);
+
+  function shareLeague() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareMessage = `${leagueToDisplay.leagueName}\nTeam Value Leaderboard:\n`;
+
+    rows.forEach((row, index) => {
+      const teamName = row.cells[1].innerText.split("\n")[0];
+      const value = row.cells[2].innerText;
+      shareMessage += `${index + 1}. ${teamName} - £${value}m\n`;
+    });
+
+    shareMessage += `\nView your own league here:\nhttps://fpltoolbox.com/fpl-toolbox-pro`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareMessage,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
+async function showMySeasonSummary() {
+  if (userHasAccess([1, 10, 12])) {
+    showModal({
+      title: "Coming Soon",
+      body: "Come back in a few weeks - we don't have enough info to yet to give you anything useful!",
+      confirmText: "Ok",
+      onConfirm: () => {}, // No action taken
+    });
+    return;
+  }
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+}
+async function downloadMySeason() {
+  if (userHasAccess([1, 10, 12])) {
+    showModal({
+      title: "Come back later!",
+      body: "Once the season is over, come back and download a season momento!",
+      confirmText: "Ok",
+      onConfirm: () => {}, // No action taken
+    });
+    return;
+  }
+  if (!userHasAccess([10, 12])) {
+    showModal({
+      title: "Paid Feature",
+      body: "This feature is only available to <strong>paid members</strong>.<br><br>Upgrade to unlock!",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = subscriptionPageUrl;
+      },
+    });
+    return;
+  }
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+  container.classList.add("container", "py-4");
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const startTime = new Date();
+  console.log(
+    `[${startTime.toLocaleTimeString()}] Starting fetchinig gameweek seasons`
+  );
+
+  const eventStatus = await getEventStatus();
+
+  const ignoredUrls = [
+    "https://fpltoolbox.com/tools-for-fpl-content/",
+    "http://127.0.0.1:5500/index.html",
+  ];
+
+  const currentUrl = window.location.href;
+
+  if (eventStatus.status[0].event != 38) {
+    container.innerHTML = "";
+    const loaderCard = document.createElement("div");
+    const loaderContainer = document.createElement("div");
+    loaderContainer.id = "loader-container";
+    loaderCard.id = "loader-card";
+    loaderCard.textContent = `Come back when the season is over to download all of your gameweeks with one click`;
+    loaderCard.className = "skeleton";
+    loaderContainer.appendChild(loaderCard);
+    container.append(loaderContainer);
+    return;
+  }
+
+  // Spinner setup
+  const spinnerWrapper = document.createElement("div");
+  spinnerWrapper.id = "loading-spinner";
+  spinnerWrapper.className = "d-flex justify-content-center my-5";
+
+  const spinner = document.createElement("div");
+  spinner.className = "spinner-border text-primary";
+  spinner.role = "status";
+
+  const spinnerText = document.createElement("span");
+  spinnerText.className = "visually-hidden";
+  spinnerText.innerText = "Loading...";
+
+  spinner.appendChild(spinnerText);
+  spinnerWrapper.appendChild(spinner);
+  container.appendChild(spinnerWrapper);
+
+  // Container placeholders
+  const season = document.createElement("div");
+  season.id = "season-view";
+  const firstHalf = document.createElement("div");
+  firstHalf.className = "col-lg-6";
+  const secondHalf = document.createElement("div");
+  secondHalf.className = "col-lg-6";
+
+  const nameHeader = document.createElement("h3");
+  nameHeader.className = "text-center fw-bold mb-0";
+  nameHeader.innerText =
+    theUser.info.player_first_name + " " + theUser.info.player_last_name;
+
+  const seasonDiv = document.createElement("div");
+  seasonDiv.className =
+    "badge bg-dark text-white mx-auto d-block my-2 px-3 py-2";
+  seasonDiv.innerText = "Your 24/25 Season";
+
+  let previousRank = undefined;
+
+  try {
+    const currentGw = eventStatus.status[0].event;
+
+    for (
+      let gameweekIdentifier = 1;
+      gameweekIdentifier <= currentGw;
+      gameweekIdentifier++
+    ) {
+      const response = await fetch(
+        `${BASE_URL}/entry/${theUser.info.team_id}/event/${gameweekIdentifier}/picks/`
+      );
+      const data = await response.json();
+
+      const gameweekView = document.createElement("div");
+      gameweekView.id = `gameweek-view-${gameweekIdentifier}`;
+
+      const gwSummary = document.createElement("div");
+      gwSummary.className = "text-center p-2";
+
+      let rankArrowBadge = document.createElement("img");
+      rankArrowBadge.style.width = "20px";
+      rankArrowBadge.style.height = "20px";
+
+      if (previousRank !== undefined) {
+        const currentRank = data.entry_history.overall_rank;
+        rankArrowBadge = document.createElement("img");
+        rankArrowBadge.id = "download-season-rank";
+        rankArrowBadge.style.width = "20px";
+        rankArrowBadge.style.height = "20px";
+
+        if (currentRank < previousRank) {
+          rankArrowBadge.src =
+            "https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png";
+        } else if (currentRank > previousRank) {
+          rankArrowBadge.src =
+            "https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png";
+          rankArrowBadge.style.transform = "rotate(180deg)";
+        }
+      }
+
+      previousRank = data.entry_history.overall_rank;
+
+      const summaryText = document.createElement("p");
+      summaryText.className = "mb-1 fw-semibold";
+      summaryText.innerText = `GW: ${gameweekIdentifier} | Points: ${data.entry_history.points} | Total: ${data.entry_history.total_points}`;
+      gwSummary.append(rankArrowBadge, summaryText);
+
+      if (data.active_chip) {
+        const chipTag = document.createElement("div");
+        chipTag.className = "small text-success mb-1";
+        chipTag.innerText = `${convertChipName(data.active_chip)} activated`;
+        gwSummary.append(chipTag);
+      }
+
+      const rankText = document.createElement("div");
+      rankText.className = "text-muted";
+      rankText.innerText = `Overall Rank: ${data.entry_history.overall_rank.toLocaleString(
+        "en"
+      )}`;
+      gwSummary.append(rankText);
+
+      gameweekView.appendChild(gwSummary);
+
+      const playersContainer = document.createElement("div");
+      playersContainer.className =
+        "d-flex flex-wrap justify-content-center gap-2 mb-2";
+
+      const benchContainer = document.createElement("div");
+      benchContainer.className =
+        "d-flex flex-wrap justify-content-center gap-2 p-2 bg-secondary bg-opacity-10 rounded";
+
+      for (const pick of data.picks) {
+        if (pick.position > 16) continue;
+
+        let pointsMultiplier = pick.multiplier || 1;
+        const playerScore =
+          (await getPlayerWeeklyScore(pick.element, gameweekIdentifier)) *
+          pointsMultiplier;
+
+        const card = await createPlayerCardNew(
+          pick.element,
+          playerScore,
+          pick.is_captain,
+          pick.is_vice_captain,
+          pointsMultiplier
+        );
+
+        const img = card.querySelector("img");
+        if (img) {
+          img.style.maxWidth = "100%";
+          img.style.height = "auto";
+        }
+
+        const col = document.createElement("div");
+        col.className = "col-4 col-sm-3 col-md-2 mb-2";
+        col.style.flex = "0 0 9.09%";
+        col.style.maxWidth = "9.09%";
+        card.style.maxWidth = "30px";
+        card.style.maxHeight = "30px";
+
+        col.appendChild(card);
+
+        if (pick.position > 11) {
+          benchContainer.appendChild(col);
+        } else {
+          playersContainer.appendChild(col);
+        }
+      }
+
+      gameweekView.appendChild(playersContainer);
+      gameweekView.appendChild(benchContainer);
+
+      const toolboxCom = document.createElement("p");
+      toolboxCom.innerText = "24/25 Season - fpltoolbox.com";
+      toolboxCom.className = "text-center small text-muted";
+      gameweekView.appendChild(toolboxCom);
+
+      const gameweekCard = document.createElement("div");
+      gameweekCard.className = "card mb-4 shadow-sm bg-light p-3";
+      gameweekCard.appendChild(gameweekView);
+
+      if (gameweekIdentifier <= 19) {
+        firstHalf.appendChild(gameweekCard);
+      } else {
+        secondHalf.appendChild(gameweekCard);
+      }
+    }
+
+    // Done loading
+    document.getElementById("loading-spinner")?.remove();
+
+    container.appendChild(nameHeader);
+    container.appendChild(seasonDiv);
+
+    const halvesWrapper = document.createElement("div");
+    halvesWrapper.className = "row";
+    halvesWrapper.appendChild(firstHalf);
+    halvesWrapper.appendChild(secondHalf);
+    season.appendChild(halvesWrapper);
+    container.appendChild(season);
+
+    const endTime = new Date();
+    console.log(
+      `[${endTime.toLocaleTimeString()}] Finished fetching gameweek seasons`
+    );
+
+    addCaptainBadge();
+
+    const shareBtn = document.createElement("button");
+    shareBtn.id = "shareBtn";
+    shareBtn.className = "btn btn-primary mt-4";
+    shareBtn.textContent = "Download";
+    container.appendChild(shareBtn);
+
+    shareBtn.addEventListener("click", () => {
+      document.body.classList.add("force-desktop");
+
+      html2canvas(season, { scale: 2 }).then((canvas) => {
+        document.body.classList.remove("force-desktop");
+        const imgData = canvas.toDataURL("image/png");
+
+        if (navigator.share) {
+          fetch(imgData)
+            .then((res) => res.blob())
+            .then((blob) => {
+              const file = new File([blob], "fpltoolbox-my-season.png", {
+                type: "image/png",
+              });
+              navigator
+                .share({
+                  title: "Your Season",
+                  text: "FPLTOOLBOX.com",
+                  files: [file],
+                })
+                .catch((err) => alert("Error sharing: " + err));
+            });
+        } else {
+          const link = document.createElement("a");
+          link.href = imgData;
+          link.download = "season.png";
+          link.click();
+          alert(
+            "Sharing is not supported on your device. Image downloaded instead."
+          );
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+// Simple cache object
+const weeklyPlayerDataCache = {};
+async function getPlayerWeeklyScore(playerId, gameweek) {
+  // Check if this player's data is already cached
+  if (weeklyPlayerDataCache[playerId]) {
+    const cachedData = weeklyPlayerDataCache[playerId];
+
+    const matchingHistories = cachedData.history.filter(
+      (entry) => entry.round === gameweek
+    );
+
+    if (matchingHistories.length > 0) {
+      return matchingHistories.reduce(
+        (sum, entry) => sum + (entry.total_points || 0),
+        0
+      );
+    } else {
+      console.warn(`No match found for player ${playerId} in GW ${gameweek}`);
+      return null;
+    }
+  }
+
+  const url = `${BASE_URL}/element-summary/${playerId}/`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.history || !Array.isArray(data.history)) {
+      console.warn(`Unexpected data format from ${url}`, data);
+      return null;
+    }
+
+    // Cache the full data for future use
+    weeklyPlayerDataCache[playerId] = data;
+
+    const matchingHistories = data.history.filter(
+      (entry) => entry.round === gameweek
+    );
+
+    if (matchingHistories.length > 0) {
+      return matchingHistories.reduce(
+        (sum, entry) => sum + (entry.total_points || 0),
+        0
+      );
+    } else {
+      console.warn(`No match found for player ${playerId} in GW ${gameweek}`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`Error fetching ${url}:`, error);
+    return null;
+  }
+}
+
+async function showMemes() {
+  if (!userHasAccess([1, 10, 12])) {
+    showModal({
+      title: "Coming Soon",
+      body: "Come back in a few weeks - we don't have enough info to yet to give you anything useful!",
+      confirmText: "Ok",
+      onConfirm: () => {}, // No action taken
+    });
+    return;
+  }
+
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  // Add a header above the table
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${FPLToolboxLeagueData.leagueName} - Gameweek ${currentGw} Memes \n Tap a meme to share`;
+  tableDescription.style.textAlign = "center";
+  container.appendChild(tableDescription);
+
+  const memeContainer = document.createElement("div");
+  memeContainer.id = "meme-container";
+  // Create and append the loading indicator
+  const memeLoaderContainer = document.createElement("div");
+  memeLoaderContainer.id = "meme-loader-container";
+
+  // List of URLs where you want to ignore the condition
+  const ignoredUrls = [
+    "https://fpltoolbox.com/tools-for-fpl-content/", // Example full URL
+    "http://127.0.0.1:5500/index.html",
+  ];
+
+  const currentUrl = window.location.href; // Get the full URL
+  const eventStatus = await getEventStatus();
+  console.log(eventStatus);
+  if (
+    currentGw !== 34 && // Ignore this whole check if we're in Gameweek 34
+    !ignoredUrls.includes(currentUrl) && // Check if the full URL is not in the ignore list
+    eventStatus.status[eventStatus.status.length - 1].bonus_added === false
+  ) {
+    const memeLoader = document.createElement("div");
+    memeLoader.id = "meme-loader";
+    memeLoader.innerText = `Hold up - Let's wait for the gameweek to end before we start making accusations 👀`;
+    memeLoader.className = "skeleton";
+    memeLoaderContainer.appendChild(memeLoader);
+    container.append(memeLoaderContainer);
+    return;
+  }
+
+  const memeLoader = document.createElement("div");
+  memeLoader.id = "meme-loader";
+  memeLoader.innerText = "Memes loading..."; // Optional text
+  memeLoader.innerText = `Loading some juicy memes for you... 👀`;
+  memeLoader.className = "skeleton";
+
+  for (let i = 0; i < 4; i++) {
+    memeLoaderContainer.appendChild(memeLoader.cloneNode(true));
+  }
+
+  container.append(memeLoaderContainer);
+
+  memeLoaderContainer.remove();
+
+  function getRandomTeam(league) {
+    return league[Math.floor(Math.random() * league.length)];
+  }
+  const pointingAtYouMemes = [
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/ronaldo.gif",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/vaya.gif",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/3845a815f8746f8cb96c6effd98d37c9.jpg",
+  ];
+  const surprisedMemes = [
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/omg-ohmygod.gif",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/wow.png",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/1grvjo.jpg",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/yeah-excellent.gif",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/lego-lego-batman.gif",
+  ];
+
+  const suicidalMemes = [
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/Ben-Affleck-Smoking-meme-1.jpg",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/suicidal.gif",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/oh-ffs-8abb884c90.jpg",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/crying-crying-meme.gif",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/caught-out.webp",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/giphy.gif",
+  ];
+
+  const utterWokeMemes = [
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/sean-dyche-football.gif",
+    "https://fpltoolbox.com/wp-content/uploads/2025/02/r7vfc0oych5e1.jpeg",
+  ];
+
+  function findCaptaincyFailDrake() {
+    for (const team of FPLToolboxLeagueData.standings) {
+      let captain = null;
+      let vice = null;
+
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.is_captain) captain = player;
+        if (player.is_vice_captain) vice = player;
+      });
+
+      if (captain && vice) {
+        if (getPlayerScore(vice.element) > getPlayerScore(captain.element)) {
+          const message = `Bro making gameweek ${currentGw} captaincy decisions`;
+
+          const capCard = createPlayerCardNew(
+            captain.element,
+            getPlayerScore(captain.element),
+            true,
+            null,
+            null
+          );
+          const viceCard = createPlayerCardNew(
+            vice.element,
+            getPlayerScore(vice.element),
+            null,
+            true,
+            null
+          );
+
+          if (capCard instanceof HTMLElement) {
+            capCard.style.marginLeft = "-70%";
+            viceCard.style.marginLeft = "-70%";
+            capCard.style.transform = "scale(1.2)";
+            viceCard.style.transform = "scale(1.2)";
+          } else {
+            console.warn("message2 is not a DOM element:", capCard);
+          }
+          const footer = `Spoiler alert, It's ${team.player_name.substring(
+            0,
+            team.player_name.indexOf(" ")
+          )}`;
+          // Image URL for meme
+          const img =
+            "https://fpltoolbox.com/wp-content/uploads/2025/02/30b1gx-1.jpg";
+
+          const meme = createMeme4Corners(
+            message,
+            " ",
+            viceCard,
+            capCard,
+            " ",
+            footer,
+            img
+          );
+
+          memeContainer.append(meme);
+
+          return; // Stop searching after finding the first qualifying team
+        }
+      }
+    }
+    console.log("No team found with a captaincy fail.");
+  }
+  function findCaptaincyFailDoggo() {
+    for (const team of FPLToolboxLeagueData.standings) {
+      let captain = null;
+      let vice = null;
+
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.is_captain) captain = player;
+        if (player.is_vice_captain) vice = player;
+      });
+
+      if (captain && vice) {
+        if (getPlayerScore(vice.element) > getPlayerScore(captain.element)) {
+          const message = `${team.player_name.substring(
+            0,
+            team.player_name.indexOf(" ")
+          )}'s vice captain vs actual captain`;
+
+          const capCard = createPlayerCardNew(
+            captain.element,
+            getPlayerScore(captain.element),
+            true,
+            null,
+            null
+          );
+          const viceCard = createPlayerCardNew(
+            vice.element,
+            getPlayerScore(vice.element),
+            null,
+            true,
+            null
+          );
+
+          if (capCard instanceof HTMLElement) {
+            // capCard.style.marginLeft = "-70%";
+            // viceCard.style.marginLeft = "-70%";
+            capCard.style.transform = "scale(1.2)";
+            viceCard.style.transform = "scale(1.2)";
+          } else {
+            console.warn("message2 is not a DOM element:", capCard);
+          }
+          const footer = `www.fpltoolbox.com`;
+          // Image URL for meme
+          const img =
+            "https://fpltoolbox.com/wp-content/uploads/2025/02/430zkq.webp";
+
+          const meme = createMeme4Corners(
+            message,
+            null,
+            capCard,
+            null,
+            viceCard,
+            footer,
+            img
+          );
+
+          memeContainer.append(meme);
+
+          return; // Stop searching after finding the first qualifying team
+        }
+      }
+    }
+    console.log("No team found with a captaincy fail.");
+  }
+
+  function findKeeperFail() {
+    for (const team of FPLToolboxLeagueData.standings) {
+      let keeper = null;
+      let benchedKeeper = null;
+
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.element_type == 1 && player.position == 1) keeper = player;
+        if (player.element_type == 1 && player.position == 12)
+          benchedKeeper = player;
+      });
+
+      if (keeper && benchedKeeper) {
+        if (
+          getPlayerScore(benchedKeeper.element) > getPlayerScore(keeper.element)
+        ) {
+          const message = `${team.player_name.substring(
+            0,
+            team.player_name.indexOf(" ")
+          )}'s thought process when deciding which keeper to start in gameweek ${currentGw}`;
+
+          const capCard = createPlayerCardNew(
+            keeper.element,
+            getPlayerScore(keeper.element),
+            null,
+            null,
+            null
+          );
+          const viceCard = createPlayerCardNew(
+            benchedKeeper.element,
+            getPlayerScore(benchedKeeper.element),
+            null,
+            null,
+            null
+          );
+
+          if (capCard instanceof HTMLElement) {
+            capCard.style.marginLeft = "-70%";
+            viceCard.style.marginLeft = "-70%";
+            capCard.style.transform = "scale(1.2)";
+            viceCard.style.transform = "scale(1.2)";
+          } else {
+            console.warn("message2 is not a DOM element:", capCard);
+          }
+
+          // Image URL for meme
+          const img =
+            "https://fpltoolbox.com/wp-content/uploads/2025/02/30b1gx-1.jpg";
+
+          const meme = createMeme4Corners(
+            message,
+            " ",
+            viceCard,
+            capCard,
+            " ",
+            null,
+            img
+          );
+
+          memeContainer.append(meme);
+
+          return; // Stop searching after finding the first qualifying team
+        }
+      }
+    }
+    console.log("No team found with a keeper bench fail.");
+  }
+
+  function findHighestandLowest() {
+    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
+      return team.event_total < lowest.event_total ? team : lowest;
+    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
+    const highestTeam = FPLToolboxLeagueData.standings.reduce(
+      (highest, team) => {
+        return team.event_total > highest.event_total ? team : highest;
+      },
+      FPLToolboxLeagueData.standings[0]
+    ); // Start with the first team
+
+    console.log(lowestTeam);
+    console.log(highestTeam);
+    const team1 = `${lowestTeam.player_name.substring(
+      0,
+      lowestTeam.player_name.indexOf(" ")
+    )}`;
+    const team2 = `${highestTeam.player_name.substring(
+      0,
+      highestTeam.player_name.indexOf(" ")
+    )}`;
+    const img =
+      "https://fpltoolbox.com/wp-content/uploads/2025/02/Batman-Slapping-Robin.jpg";
+    const meme = createMeme4Corners(
+      null,
+      `GW${currentGw} locked in!`,
+      `Nah mate, \n not this week!`,
+      `${team2}`,
+      `${team1}`,
+      null,
+      img
+    );
+    memeContainer.append(meme);
+  }
+
+  function findWorstRun() {
+    const worstRankRun = FPLToolboxLeagueData.standings.find((team) => {
+      const totalGWs = team.everyGw.length;
+
+      // Ensure at least 3 gameweeks exist
+      if (totalGWs < 3) return false;
+
+      // Extract last 3 gameweek ranks
+      const lastThreeRanks = team.everyGw
+        .slice(-3)
+        .map((gw) => gw.overall_rank);
+
+      // Check if rank is consistently getting worse
+      return (
+        lastThreeRanks[0] < lastThreeRanks[1] &&
+        lastThreeRanks[1] < lastThreeRanks[2]
+      );
+    });
+
+    console.log(worstRankRun);
+
+    if (worstRankRun) {
+      const message1 = `When ${worstRankRun.player_name.substring(
+        0,
+        worstRankRun.player_name.indexOf(" ")
+      )} realises that ${
+        worstRankRun.entry_name
+      } has had red arrows for three weeks in a row`;
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/Monkey-Puppet-e1739162235444.jpg";
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        null,
+
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findBestMiniLeagueRun() {
+    if (
+      FPLToolboxLeagueData.standings[0].rank ==
+      FPLToolboxLeagueData.standings[0].last_rank
+    ) {
+      const message1 = `${FPLToolboxLeagueData.standings[0].player_name.substring(
+        0,
+        FPLToolboxLeagueData.standings[0].player_name.indexOf(" ")
+      )} being handed the award from last week's mini-league number 1`;
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/download-1.png";
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        null,
+
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findChillGuy() {
+    if (
+      FPLToolboxLeagueData.standings[0].rank ==
+      FPLToolboxLeagueData.standings[0].last_rank
+    ) {
+      const message1 = `Just ${FPLToolboxLeagueData.standings[0].player_name.substring(
+        0,
+        FPLToolboxLeagueData.standings[0].player_name.indexOf(" ")
+      )} being a chill guy at the top of the mini-league again`;
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/9au02y.jpg";
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findStrikerFail() {
+    for (const team of FPLToolboxLeagueData.standings) {
+      let striker = null;
+      let benchedStriker = null;
+      //console.log(team);
+      team.currentWeek[0].picks.forEach((player) => {
+        if (
+          player.element_type == 4 &&
+          player.position > 1 &&
+          player.position < 12
+        )
+          striker = player;
+        if (player.element_type == 4 && player.position > 11)
+          benchedStriker = player;
+      });
+
+      if (striker && benchedStriker) {
+        if (
+          getPlayerScore(benchedStriker.element) >
+          getPlayerScore(striker.element)
+        ) {
+          const message1 = `Imagine starting ${getPlayerWebName(
+            striker.element
+          )} but leaving ${getPlayerWebName(
+            benchedStriker.element
+          )} on the bench this week`;
+
+          const message2 = `${team.player_name.substring(
+            0,
+            team.player_name.indexOf(" ")
+          )}, \n to pick a striker!`;
+
+          const img =
+            "https://fpltoolbox.com/wp-content/uploads/2025/02/4lts08-e1739170546997.jpg";
+
+          const benchCard = createPlayerCardNew(
+            benchedStriker.element,
+            getPlayerScore(benchedStriker.element),
+            null,
+            null,
+            null
+          );
+
+          const footer = document.createElement("div");
+          footer.style.display = "flex"; // Optional: Arrange elements in a row
+          footer.style.alignItems = "center"; // Optional: Align content nicely
+          footer.style.gap = "10px"; // Optional: Add space between them
+          footer.style.color = "black";
+          footer.style.backgroundColor = "white";
+          footer.style.paddingLeft = "30px";
+          footer.style.paddingright = "30px";
+          footer.style.paddingTop = "10px";
+          footer.style.paddingBottom = "10px";
+
+          // Append benchCard (if it's an HTML element)
+          if (benchCard instanceof HTMLElement) {
+            footer.appendChild(benchCard);
+          } else {
+            console.warn("benchCard is not a valid HTMLElement", benchCard);
+          }
+
+          // Append message2 (if it's a string)
+          if (typeof message2 === "string") {
+            const messageText = document.createElement("span");
+            messageText.textContent = message2;
+            messageText.style.textAlign = "center";
+            messageText.classList.add("whitespace-fix");
+            footer.appendChild(messageText);
+          } else {
+            console.warn("message2 is not a string", message2);
+          }
+
+          const meme = createMeme4Corners(
+            message1,
+            null,
+            null,
+            null,
+            null,
+            footer,
+            img
+          );
+          memeContainer.append(meme);
+          return; // Stop searching after finding the first qualifying team
+        }
+      }
+    }
+    console.log("No team found with a striker bench fail.");
+  }
+
+  function findLowestScorer() {
+    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
+      return team.event_total < lowest.event_total ? team : lowest;
+    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
+
+    console.log(lowestTeam);
+
+    const message1 = `I bet he's thinking about other women`;
+    const message2 = `${lowestTeam.player_name.substring(
+      0,
+      lowestTeam.player_name.indexOf(" ")
+    )}: How have I only got ${lowestTeam.event_total} FPL points this week`;
+
+    const img = "https://fpltoolbox.com/wp-content/uploads/2025/02/1tl71a.jpg";
+
+    const meme = createMeme4Corners(
+      message1,
+      null,
+      null,
+      null,
+      null,
+      message2,
+      img
+    );
+    memeContainer.append(meme);
+  }
+
+  function findLowestScorer1() {
+    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
+      return team.event_total < lowest.event_total ? team : lowest;
+    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
+
+    console.log(lowestTeam);
+
+    const message1 = `POV: Realising that you've got to listen to another year of "We got ____ before GTA 6... "`;
+    const message2 = `and ${lowestTeam.player_name.substring(
+      0,
+      lowestTeam.player_name.indexOf(" ")
+    )} being shit at FPL`;
+
+    const img =
+      "https://fpltoolbox.com/wp-content/uploads/2025/05/disgusted.webp";
+
+    const meme = createMeme4Corners(
+      message1,
+      null,
+      null,
+      null,
+      null,
+      message2,
+      img
+    );
+    memeContainer.append(meme);
+  }
+
+  function findLowestScorerAlternative() {
+    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
+      return team.event_total < lowest.event_total ? team : lowest;
+    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
+
+    console.log(lowestTeam);
+
+    const message1 = `POV: ${lowestTeam.player_name.substring(
+      0,
+      lowestTeam.player_name.indexOf(" ")
+    )} waiting for some FPL points this week`;
+
+    const img = "https://fpltoolbox.com/wp-content/uploads/2025/02/1c1uej.jpg";
+
+    const meme = createMeme4Corners(
+      message1,
+      null,
+      null,
+      null,
+      null,
+      null,
+      img
+    );
+    memeContainer.append(meme);
+  }
+
+  function findBelowAverage() {
+    let gwAverage = bootstrap.events[currentGw - 1].average_entry_score;
+
+    const lowestAverage = FPLToolboxLeagueData.standings.filter(
+      (team) => team.event_total < gwAverage
+    );
+
+    console.log(lowestAverage);
+    if (lowestAverage > 0) {
+      const randomTeam = getRandomTeam(lowestAverage);
+
+      const message1 = `POV: ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} waiting to get at least the gameweek average this week`;
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/1c1uej.jpg";
+
+      const message2 = `${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} needs ${gwAverage - randomTeam.event_total} more points 😅 `;
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        message2,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function find100Plus() {
+    const club100 = FPLToolboxLeagueData.standings.filter(
+      (team) => team.event_total > 99
+    );
+
+    const randomTeam = getRandomTeam(club100);
+
+    if (randomTeam) {
+      const message1 = `POV: Your bro ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} enters the 100 club this week`;
+
+      const message2 = `(GW ${currentGw} score: ${randomTeam.event_total})`;
+
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/aplausos-clapped.gif";
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        message2,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findHighBench() {
+    const teamsWithHighBenchPoints = []; // Array to store teams with bench points > 10
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      let totalBenchPoints = 0;
+      //console.log(team);
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.position > 11 && player.position < 16) {
+          totalBenchPoints += getPlayerScore(player.element);
+        }
+      });
+
+      //console.log("Player Bench Points: " + totalBenchPoints);
+
+      // Only store teams with bench points greater than 10
+      if (totalBenchPoints > 10) {
+        teamsWithHighBenchPoints.push({ team, totalBenchPoints });
+      }
+    }
+
+    //console.log(teamsWithHighBenchPoints); // Check the stored teams
+
+    if (teamsWithHighBenchPoints.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithHighBenchPoints);
+
+      const message1 = `POV: ${randomTeam.team.player_name.substring(
+        0,
+        randomTeam.team.player_name.indexOf(" ")
+      )} after leaving ${
+        randomTeam.totalBenchPoints
+      } points on the bench this week`;
+      const img =
+        suicidalMemes[Math.floor(Math.random() * suicidalMemes.length)];
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findLowBench() {
+    const teamsWithHighBenchPoints = []; // Array to store teams with bench points > 10
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      let totalBenchPoints = 0;
+      //console.log(team);
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.position > 11 && player.position < 16) {
+          totalBenchPoints += getPlayerScore(player.element);
+        }
+      });
+
+      //console.log("Player Bench Points: " + totalBenchPoints);
+
+      // Only store teams with bench points greater than 10
+      if (totalBenchPoints == 4) {
+        teamsWithHighBenchPoints.push({ team, totalBenchPoints });
+      }
+    }
+
+    //console.log(teamsWithHighBenchPoints); // Check the stored teams
+
+    if (teamsWithHighBenchPoints.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithHighBenchPoints);
+
+      const message1 = `POV: ${randomTeam.team.player_name.substring(
+        0,
+        randomTeam.team.player_name.indexOf(" ")
+      )}'s masterclass of a bench this gameweek`;
+      const img =
+        suicidalMemes[Math.floor(Math.random() * suicidalMemes.length)];
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findFailedhBench() {
+    const teamsWithHighBenchPoints = []; // Array to store teams with bench points > 10
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      let totalBenchPoints = 0;
+      //console.log(team);
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.position > 11 && player.position < 16) {
+          totalBenchPoints += getPlayerScore(player.element);
+        }
+      });
+
+      //console.log("Player Bench Points: " + totalBenchPoints);
+
+      // Only store teams with bench points greater than 10
+      if (totalBenchPoints > 10) {
+        teamsWithHighBenchPoints.push({ team, totalBenchPoints });
+      }
+    }
+
+    //console.log(teamsWithHighBenchPoints); // Check the stored teams
+
+    if (teamsWithHighBenchPoints.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithHighBenchPoints);
+
+      const message1 = document.createElement("div");
+      message1.innerText = `Seeing your players score `;
+      message1.style.color = "black";
+
+      const message2 = document.createElement("div");
+      message2.innerText = `${randomTeam.team.player_name.substring(
+        0,
+        randomTeam.team.player_name.indexOf(" ")
+      )} after leaving them on the bench in GW${currentGw}`;
+      message2.style.color = "black";
+
+      const img = "https://fpltoolbox.com/wp-content/uploads/2025/03/pep.jpg";
+
+      const meme = createMeme4Corners(
+        null,
+        message1,
+        null,
+        null,
+        message2,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  async function findRedCards() {
+    const teamsWithRedCards = [];
+    const playerStatsCache = new Map(); // Cache for storing player stats
+
+    // Create and append the loading indicator
+    const memeLoader = document.createElement("div");
+    memeLoader.id = "meme-loader";
+    memeLoader.innerText =
+      "There might be a juicy meme loading here, just gotta do some more digging...";
+    memeLoader.className = "skeleton";
+    memeContainer.append(memeLoader);
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
+
+      for (const player of team.currentWeek[0].picks) {
+        let playerStats;
+
+        // Check if player's stats are already cached
+        if (playerStatsCache.has(player.element)) {
+          playerStats = playerStatsCache.get(player.element);
+        } else {
+          // Fetch and store in cache
+          playerStats = await fetchPlayerCurrentStats(player.element);
+          playerStatsCache.set(player.element, playerStats);
+        }
+
+        if (playerStats[0].red_cards > 0) {
+          console.log(playerStats);
+          teamsWithRedCards.push(team);
+          team.redCardPlayer = player.element;
+          break; // Stop checking this team's players and move to the next team
+        }
+      }
+    }
+
+    if (teamsWithRedCards.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithRedCards);
+      console.log(randomTeam);
+
+      const message1 = `When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} gets a player sent off:`;
+
+      const img =
+        utterWokeMemes[Math.floor(Math.random() * utterWokeMemes.length)];
+
+      const message2 = createPlayerCardNew(
+        randomTeam.redCardPlayer,
+        getPlayerScore(randomTeam.redCardPlayer),
+        null,
+        null,
+        null
+      );
+      if (message2 instanceof HTMLElement) {
+        message2.style.marginRight = "1.5rem";
+        message2.style.transform = "scale(1.5)";
+      } else {
+        console.warn("message2 is not a DOM element:", message2);
+      }
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        message2,
+        null,
+        null,
+        null,
+        img
+      );
+
+      // ✅ Replace the loader with the actual meme
+      memeLoader.replaceWith(meme);
+    } else {
+      memeLoader.remove();
+    }
+  }
+
+  async function findTwoYellows() {
+    const teamsWithTwoYellows = [];
+    const playerStatsCache = new Map(); // Cache for storing player stats
+
+    // Create and append the loading indicator
+    const memeLoader = document.createElement("div");
+    memeLoader.id = "meme-loader";
+    memeLoader.innerText =
+      "There might be a juicy meme loading here, just gotta do some more digging...";
+    memeLoader.className = "skeleton";
+    memeContainer.append(memeLoader);
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
+
+      for (const player of team.currentWeek[0].picks) {
+        let playerStats;
+
+        // Check if player's stats are already cached
+        if (playerStatsCache.has(player.element)) {
+          playerStats = playerStatsCache.get(player.element);
+        } else {
+          // Fetch and store in cache
+          playerStats = await fetchPlayerCurrentStats(player.element);
+          playerStatsCache.set(player.element, playerStats);
+        }
+
+        //console.log(playerStats);
+        if (playerStats[0].yellow_cards > 2) {
+          //console.log(playerStats);
+          teamsWithTwoYellows.push(team);
+          team.twoYellowCardsPlayer = player.element;
+          break; // Stop checking this team's players and move to the next team
+        }
+      }
+    }
+
+    if (teamsWithTwoYellows.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithTwoYellows);
+      console.log(randomTeam);
+
+      const message1 = `When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} sees a player get two yellow cards:`;
+
+      const img =
+        utterWokeMemes[Math.floor(Math.random() * utterWokeMemes.length)];
+
+      const message2 = createPlayerCardNew(
+        randomTeam.twoYellowCardsPlayer,
+        getPlayerScore(randomTeam.twoYellowCardsPlayer),
+        null,
+        null,
+        null
+      );
+      if (message2 instanceof HTMLElement) {
+        message2.style.marginRight = "1.5rem";
+        message2.style.transform = "scale(1.5)";
+      } else {
+        console.warn("message2 is not a DOM element:", message2);
+      }
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        message2,
+        null,
+        null,
+        null,
+        img
+      );
+
+      // ✅ Replace the loader with the actual meme
+      memeLoader.replaceWith(meme);
+    } else {
+      memeLoader.remove();
+    }
+  }
+
+  async function find59Minutes() {
+    const teamsWith59Minutes = [];
+    const playerStatsCache = new Map(); // Cache for storing player stats
+
+    // Create and append the loading indicator
+    const memeLoader = document.createElement("div");
+    memeLoader.id = "meme-loader";
+    memeLoader.innerText =
+      "There might be a juicy meme loading here, just gotta do some more digging...";
+    memeLoader.className = "skeleton";
+    memeContainer.append(memeLoader);
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
+
+      for (const player of team.currentWeek[0].picks) {
+        if (player.element_type === 2) {
+          let playerStats;
+
+          // Check if player's stats are already cached
+          if (playerStatsCache.has(player.element)) {
+            playerStats = playerStatsCache.get(player.element);
+          } else {
+            // Fetch and store in cache
+            playerStats = await fetchPlayerCurrentStats(player.element);
+            playerStatsCache.set(player.element, playerStats);
+          }
+
+          const { minutes, was_home, team_a_score, team_h_score } =
+            playerStats[0];
+
+          if (
+            minutes > 44 &&
+            minutes < 60 &&
+            ((was_home && team_a_score === 0) ||
+              (!was_home && team_h_score === 0))
+          ) {
+            console.log(playerStats);
+            teamsWith59Minutes.push(team);
+            team.fiftyNineMinutePlayer = player.element;
+            break; // Stop checking this team's players and move to the next team
+          }
+        }
+      }
+    }
+
+    // Example of updating the text later
+    setTimeout(() => {
+      memeLoader.innerText = "Finding the perfect meme...";
+    }, 2000);
+
+    if (teamsWith59Minutes.length > 0) {
+      const randomTeam = getRandomTeam(teamsWith59Minutes);
+      console.log(randomTeam);
+
+      const message1 = `POV: When your defender comes off before 60 minutes and doesn't even lock in the cleansheet. Looking at you ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )}`;
+
+      const img =
+        suicidalMemes[Math.floor(Math.random() * suicidalMemes.length)];
+
+      const message2 = createPlayerCardNew(
+        randomTeam.fiftyNineMinutePlayer,
+        getPlayerScore(randomTeam.fiftyNineMinutePlayer),
+        null,
+        null,
+        null
+      );
+      if (message2 instanceof HTMLElement) {
+        message2.style.marginRight = "1.5rem";
+        message2.style.transform = "scale(1.5)";
+      } else {
+        console.warn("message2 is not a DOM element:", message2);
+      }
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        message2,
+        null,
+        null,
+        null,
+        img
+      );
+
+      // ✅ Replace the loader with the actual meme
+      memeLoader.replaceWith(meme);
+    } else {
+      memeLoader.innerText = `naaah, thought I had something, but not today`;
+      setTimeout(() => {
+        memeLoader.remove();
+        console.log("No 59-minute players");
+      }, 2000);
+    }
+  }
+  async function findMissedPen() {
+    const teamsWith59Minutes = [];
+    const playerStatsCache = new Map(); // Cache for storing player stats
+
+    // Create and append the loading indicator
+    const memeLoader = document.createElement("div");
+    memeLoader.id = "meme-loader";
+    memeLoader.innerText =
+      "There might be a juicy meme loading here, just gotta do some more digging...";
+    memeLoader.className = "skeleton";
+    memeContainer.append(memeLoader);
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
+
+      for (const player of team.currentWeek[0].picks) {
+        let playerStats;
+
+        // Check if player's stats are already cached
+        if (playerStatsCache.has(player.element)) {
+          playerStats = playerStatsCache.get(player.element);
+        } else {
+          // Fetch and store in cache
+          playerStats = await fetchPlayerCurrentStats(player.element);
+          playerStatsCache.set(player.element, playerStats);
+        }
+
+        console.log(player);
+        console.log(playerStats);
+        if (playerStats[0].penalties_missed > 0) {
+          teamsWith59Minutes.push(team);
+          team.fiftyNineMinutePlayer = player.element;
+          break; // Stop checking this team's players and move to the next team
+        }
+      }
+    }
+
+    // Example of updating the text later
+    setTimeout(() => {
+      memeLoader.innerText = "Finding the perfect meme...";
+    }, 2000);
+
+    if (teamsWith59Minutes.length > 0) {
+      const randomTeam = getRandomTeam(teamsWith59Minutes);
+      console.log(randomTeam);
+
+      const message1 = `POV: When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )}'s player misses a pen!`;
+
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/dogshit.jpeg";
+
+      const message2 = createPlayerCardNew(
+        randomTeam.fiftyNineMinutePlayer,
+        getPlayerScore(randomTeam.fiftyNineMinutePlayer),
+        null,
+        null,
+        null
+      );
+      if (message2 instanceof HTMLElement) {
+        message2.style.marginRight = "1.5rem";
+        message2.style.transform = "scale(1.5)";
+      } else {
+        console.warn("message2 is not a DOM element:", message2);
+      }
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        message2,
+        null,
+        null,
+        null,
+        img
+      );
+
+      // ✅ Replace the loader with the actual meme
+      memeLoader.replaceWith(meme);
+    } else {
+      memeLoader.innerText = `naaah, thought I had something, but not today`;
+      setTimeout(() => {
+        memeLoader.remove();
+        console.log("No missed pens");
+      }, 2000);
+    }
+  }
+  function findHigestTransferMaker() {
+    let gwAverage = bootstrap.events[currentGw - 1].average_entry_score;
+
+    const lowestAverage = FPLToolboxLeagueData.standings.filter(
+      (team) => team.event_total < gwAverage
+    );
+
+    console.log(lowestAverage);
+    if (lowestAverage > 0) {
+      const randomTeam = getRandomTeam(lowestAverage);
+
+      const message1 = `POV: ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} after making the most transfers this week`;
+      const video =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/homer-bush.gif";
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        video
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findFailedScorer() {
+    // Select a random team from the league
+    const randomTeam = getRandomTeam(FPLToolboxLeagueData.standings);
+
+    // Generate message based on the random team
+    const message1 = `Mood right now if your name is ${
+      randomTeam.player_name.split(" ")[0]
+    }`;
+
+    // Select a random player from the team's picks
+    const randomPlayer =
+      randomTeam.currentWeek[0].picks[
+        Math.floor(Math.random() * randomTeam.currentWeek[0].picks.length)
+      ];
+
+    // Get the player's score
+    const playerScore = getPlayerScore(randomPlayer.element);
+
+    let message2 = null;
+
+    // If player score is exactly 2, create a player card
+    if (playerScore < 0 || playerScore == 1) {
+      console.log("Player score = 2");
+
+      message2 = createPlayerCardNew(
+        randomPlayer.element,
+        playerScore,
+        null,
+        null,
+        null
+      );
+
+      if (message2 instanceof HTMLElement) {
+        message2.style.marginLeft = "75%";
+        message2.style.marginTop = "50%";
+        message2.style.transform = "scale(1.5)";
+      } else {
+        console.warn("message2 is not a DOM element:", message2);
+      }
+    }
+
+    // Image URL for meme
+    const img =
+      "https://fpltoolbox.com/wp-content/uploads/2025/02/download-2.png";
+
+    // Create and append meme only if message2 exists
+    if (message2) {
+      const meme = createMeme4Corners(
+        message1,
+        message2,
+        null,
+        null,
+        null,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findFailedTransfer() {
+    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
+    //   {
+    //     "element_in": 336,
+    //     "element_in_cost": 63,
+    //     "element_out": 398,
+    //     "element_out_cost": 74,
+    //     "entry": 18620,
+    //     "event": 24,
+    //     "time": "2025-02-01T01:02:49.163163Z"
+    // }
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          teamsWithFailedTranfers.push(team);
+        }
+      });
+    }
+    console.log(teamsWithFailedTranfers);
+
+    if (teamsWithFailedTranfers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
+      console.log(randomTeam);
+
+      let xfrTracker = [];
+      randomTeam.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          xfrTracker.push(xfr);
+        }
+      });
+
+      console.log(xfrTracker);
+      function findBiggestScoreDifference(xfrTracker) {
+        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
+          return null; // Return null if xfrTracker is empty or not an array
+        }
+
+        let biggestDiffXfr = null;
+        let maxDifference = -Infinity;
+
+        for (const xfr of xfrTracker) {
+          const inScore = getPlayerScore(xfr.element_in);
+          const outScore = getPlayerScore(xfr.element_out);
+          const difference = Math.abs(inScore - outScore); // Absolute difference
+
+          if (difference > maxDifference) {
+            maxDifference = difference;
+            biggestDiffXfr = xfr;
+          }
+        }
+
+        return biggestDiffXfr;
+      }
+
+      // Example Usage
+      const biggestXfr = findBiggestScoreDifference(xfrTracker);
+      console.log(biggestXfr);
+
+      const xfrIN = createPlayerCardNew(
+        biggestXfr.element_in,
+        getPlayerScore(biggestXfr.element_in),
+        null,
+        null,
+        null
+      );
+      const xfrOUT = createPlayerCardNew(
+        biggestXfr.element_out,
+        getPlayerScore(biggestXfr.element_out),
+        null,
+        null,
+        null
+      );
+
+      const message1 = `POV: The grass is always greener if you're ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} making gameweek transfers`;
+
+      images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/download-3.png",
+      ];
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        xfrOUT,
+        null,
+        xfrIN,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+  function findFailedTransferSecond() {
+    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
+    //   {
+    //     "element_in": 336,
+    //     "element_in_cost": 63,
+    //     "element_out": 398,
+    //     "element_out_cost": 74,
+    //     "entry": 18620,
+    //     "event": 24,
+    //     "time": "2025-02-01T01:02:49.163163Z"
+    // }
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          teamsWithFailedTranfers.push(team);
+        }
+      });
+    }
+    console.log(teamsWithFailedTranfers);
+
+    if (teamsWithFailedTranfers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
+      console.log(randomTeam);
+
+      let xfrTracker = [];
+      randomTeam.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          xfrTracker.push(xfr);
+        }
+      });
+
+      console.log(xfrTracker);
+      function findBiggestScoreDifference(xfrTracker) {
+        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
+          return null; // Return null if xfrTracker is empty or not an array
+        }
+
+        let biggestDiffXfr = null;
+        let maxDifference = -Infinity;
+
+        for (const xfr of xfrTracker) {
+          const inScore = getPlayerScore(xfr.element_in);
+          const outScore = getPlayerScore(xfr.element_out);
+          const difference = Math.abs(inScore - outScore); // Absolute difference
+
+          if (difference > maxDifference) {
+            maxDifference = difference;
+            biggestDiffXfr = xfr;
+          }
+        }
+
+        return biggestDiffXfr;
+      }
+
+      const biggestXfr = findBiggestScoreDifference(xfrTracker);
+      console.log(biggestXfr);
+
+      const xfrIN = createPlayerCardNew(
+        biggestXfr.element_in,
+        getPlayerScore(biggestXfr.element_in),
+        null,
+        null,
+        null
+      );
+      const xfrOUT = createPlayerCardNew(
+        biggestXfr.element_out,
+        getPlayerScore(biggestXfr.element_out),
+        null,
+        null,
+        null
+      );
+
+      const message1 = `POV: ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} after transferring out ${getPlayerWebName(
+        biggestXfr.element_out
+      )} for ${getPlayerWebName(biggestXfr.element_in)}`;
+      const img =
+        suicidalMemes[Math.floor(Math.random() * suicidalMemes.length)];
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        xfrIN,
+        xfrOUT,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+  function findFailedTransferThird() {
+    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
+    //   {
+    //     "element_in": 336,
+    //     "element_in_cost": 63,
+    //     "element_out": 398,
+    //     "element_out_cost": 74,
+    //     "entry": 18620,
+    //     "event": 24,
+    //     "time": "2025-02-01T01:02:49.163163Z"
+    // }
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          teamsWithFailedTranfers.push(team);
+        }
+      });
+    }
+    console.log(teamsWithFailedTranfers);
+
+    if (teamsWithFailedTranfers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
+      console.log(randomTeam);
+
+      let xfrTracker = [];
+      randomTeam.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          xfrTracker.push(xfr);
+        }
+      });
+
+      console.log(xfrTracker);
+      function findBiggestScoreDifference(xfrTracker) {
+        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
+          return null; // Return null if xfrTracker is empty or not an array
+        }
+
+        let biggestDiffXfr = null;
+        let maxDifference = -Infinity;
+
+        for (const xfr of xfrTracker) {
+          const inScore = getPlayerScore(xfr.element_in);
+          const outScore = getPlayerScore(xfr.element_out);
+          const difference = Math.abs(inScore - outScore); // Absolute difference
+
+          if (difference > maxDifference) {
+            maxDifference = difference;
+            biggestDiffXfr = xfr;
+          }
+        }
+
+        return biggestDiffXfr;
+      }
+
+      const biggestXfr = findBiggestScoreDifference(xfrTracker);
+      console.log(biggestXfr);
+
+      const xfrIN = createPlayerCardNew(
+        biggestXfr.element_in,
+        getPlayerScore(biggestXfr.element_in),
+        null,
+        null,
+        null
+      );
+      const xfrOUT = createPlayerCardNew(
+        biggestXfr.element_out,
+        getPlayerScore(biggestXfr.element_out),
+        null,
+        null,
+        null
+      );
+
+      const message1 = `The group chat watching ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} transfer out ${getPlayerWebName(
+        biggestXfr.element_out
+      )} for ${getPlayerWebName(biggestXfr.element_in)}`;
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/henry-rio.gif";
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        xfrIN,
+        xfrOUT,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+  function findFailedTransferFourth() {
+    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
+    //   {
+    //     "element_in": 336,
+    //     "element_in_cost": 63,
+    //     "element_out": 398,
+    //     "element_out_cost": 74,
+    //     "entry": 18620,
+    //     "event": 24,
+    //     "time": "2025-02-01T01:02:49.163163Z"
+    // }
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          teamsWithFailedTranfers.push(team);
+        }
+      });
+    }
+    console.log(teamsWithFailedTranfers);
+
+    if (teamsWithFailedTranfers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
+      let randomTeam2 = getRandomTeam(FPLToolboxLeagueData.standings);
+
+      while (randomTeam2.player_name === randomTeam.player_name) {
+        randomTeam2 = getRandomTeam(FPLToolboxLeagueData.standings);
+      }
+
+      let xfrTracker = [];
+      randomTeam.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          xfrTracker.push(xfr);
+        }
+      });
+
+      console.log(xfrTracker);
+      function findBiggestScoreDifference(xfrTracker) {
+        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
+          return null; // Return null if xfrTracker is empty or not an array
+        }
+
+        let biggestDiffXfr = null;
+        let maxDifference = -Infinity;
+
+        for (const xfr of xfrTracker) {
+          const inScore = getPlayerScore(xfr.element_in);
+          const outScore = getPlayerScore(xfr.element_out);
+          const difference = Math.abs(inScore - outScore); // Absolute difference
+
+          if (difference > maxDifference) {
+            maxDifference = difference;
+            biggestDiffXfr = xfr;
+          }
+        }
+
+        return biggestDiffXfr;
+      }
+
+      const biggestXfr = findBiggestScoreDifference(xfrTracker);
+      console.log(biggestXfr);
+
+      const xfrIN = createPlayerCardNew(
+        biggestXfr.element_in,
+        getPlayerScore(biggestXfr.element_in),
+        null,
+        null,
+        null
+      );
+      const xfrOUT = createPlayerCardNew(
+        biggestXfr.element_out,
+        getPlayerScore(biggestXfr.element_out),
+        null,
+        null,
+        null
+      );
+
+      const message1 = `${randomTeam2.player_name.substring(
+        0,
+        randomTeam2.player_name.indexOf(" ")
+      )}
+      seeing ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} transfer out ${getPlayerWebName(
+        biggestXfr.element_out
+      )} for ${getPlayerWebName(biggestXfr.element_in)}`;
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/1641347298.webp";
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        xfrIN,
+        xfrOUT,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findFailedTransferFifth() {
+    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
+    //   {
+    //     "element_in": 336,
+    //     "element_in_cost": 63,
+    //     "element_out": 398,
+    //     "element_out_cost": 74,
+    //     "entry": 18620,
+    //     "event": 24,
+    //     "time": "2025-02-01T01:02:49.163163Z"
+    // }
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          teamsWithFailedTranfers.push(team);
+        }
+      });
+    }
+    console.log(teamsWithFailedTranfers);
+
+    if (teamsWithFailedTranfers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
+      let randomTeam2 = getRandomTeam(FPLToolboxLeagueData.standings);
+
+      while (randomTeam2.player_name === randomTeam.player_name) {
+        randomTeam2 = getRandomTeam(FPLToolboxLeagueData.standings);
+      }
+
+      let xfrTracker = [];
+      randomTeam.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          xfrTracker.push(xfr);
+        }
+      });
+
+      console.log(xfrTracker);
+      function findBiggestScoreDifference(xfrTracker) {
+        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
+          return null; // Return null if xfrTracker is empty or not an array
+        }
+
+        let biggestDiffXfr = null;
+        let maxDifference = -Infinity;
+
+        for (const xfr of xfrTracker) {
+          const inScore = getPlayerScore(xfr.element_in);
+          const outScore = getPlayerScore(xfr.element_out);
+          const difference = Math.abs(inScore - outScore); // Absolute difference
+
+          if (difference > maxDifference) {
+            maxDifference = difference;
+            biggestDiffXfr = xfr;
+          }
+        }
+
+        return biggestDiffXfr;
+      }
+
+      const biggestXfr = findBiggestScoreDifference(xfrTracker);
+      console.log(biggestXfr);
+
+      const xfrIN = createPlayerCardNew(
+        biggestXfr.element_in,
+        getPlayerScore(biggestXfr.element_in),
+        null,
+        null,
+        null
+      );
+      const xfrOUT = createPlayerCardNew(
+        biggestXfr.element_out,
+        getPlayerScore(biggestXfr.element_out),
+        null,
+        null,
+        null
+      );
+      console.log(
+        getPlayerScore(biggestXfr.element_in),
+        getPlayerScore(biggestXfr.element_out)
+      );
+      const message1 = document.createElement("p");
+
+      message1.innerText = `"What happened to ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )}?"`;
+
+      const xfrOutMsg = document.createElement("p");
+      xfrOutMsg.style.color = "black";
+      xfrOutMsg.innerText = `"He transferred out ${getPlayerWebName(
+        biggestXfr.element_out
+      )}"`;
+
+      const playerName = document.createElement("p");
+      playerName.style.color = "black";
+      playerName.innerText = `${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )}:`;
+
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/what-happened.webp";
+
+      const meme = createMeme4Corners(
+        message1,
+        playerName,
+        null,
+        xfrOutMsg,
+        xfrOUT,
+        null,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findFailedTransferSixth() {
+    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          teamsWithFailedTranfers.push(team);
+        }
+      });
+    }
+    console.log(teamsWithFailedTranfers);
+
+    if (teamsWithFailedTranfers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
+      console.log(randomTeam);
+
+      let xfrTracker = [];
+      randomTeam.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
+        ) {
+          xfrTracker.push(xfr);
+        }
+      });
+
+      console.log(xfrTracker);
+      function findBiggestScoreDifference(xfrTracker) {
+        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
+          return null; // Return null if xfrTracker is empty or not an array
+        }
+
+        let biggestDiffXfr = null;
+        let maxDifference = -Infinity;
+
+        for (const xfr of xfrTracker) {
+          const inScore = getPlayerScore(xfr.element_in);
+          const outScore = getPlayerScore(xfr.element_out);
+          const difference = Math.abs(inScore - outScore); // Absolute difference
+
+          if (difference > maxDifference) {
+            maxDifference = difference;
+            biggestDiffXfr = xfr;
+          }
+        }
+
+        return biggestDiffXfr;
+      }
+
+      // Example Usage
+      const biggestXfr = findBiggestScoreDifference(xfrTracker);
+      console.log(biggestXfr);
+      if (biggestXfr) {
+        const xfrIN = createPlayerCardNew(
+          biggestXfr.element_in,
+          getPlayerScore(biggestXfr.element_in),
+          null,
+          null,
+          null
+        );
+
+        const tInArrow = document.createElement("img");
+        tInArrow.src =
+          "https://fpltoolbox.com/wp-content/uploads/2024/12/svgexport-9.png";
+        tInArrow.setAttribute("id", "transfer-direction-in");
+        xfrIN.prepend(tInArrow);
+
+        const xfrOUT = createPlayerCardNew(
+          biggestXfr.element_out,
+          getPlayerScore(biggestXfr.element_out),
+          null,
+          null,
+          null
+        );
+        const tOutArrow = document.createElement("img");
+        tOutArrow.src =
+          "https://fpltoolbox.com/wp-content/uploads/2024/12/svgexport-9.png";
+        tOutArrow.setAttribute("id", "transfer-direction-out");
+        xfrOUT.prepend(tOutArrow);
+        const message1 = `${randomTeam.player_name.substring(
+          0,
+          randomTeam.player_name.indexOf(" ")
+        )} making transfer decisions like this:`;
+
+        images = [
+          "https://fpltoolbox.com/wp-content/uploads/2025/04/sweating.png",
+        ];
+        const img = images[Math.floor(Math.random() * images.length)];
+
+        const meme = createMeme4Corners(
+          message1,
+          xfrOUT,
+          xfrIN,
+          null,
+          null,
+          null,
+          img
+        );
+        memeContainer.append(meme);
+      }
+    }
+  }
+
+  function findSuccesfulTransfer() {
+    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) < getPlayerScore(xfr.element_in)
+        ) {
+          teamsWithFailedTranfers.push(team);
+        }
+      });
+    }
+    console.log(teamsWithFailedTranfers);
+
+    if (teamsWithFailedTranfers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
+      console.log(randomTeam);
+
+      let xfrTracker = [];
+      randomTeam.transfers[0].forEach((xfr) => {
+        if (
+          xfr.event === currentGw &&
+          getPlayerScore(xfr.element_out) < getPlayerScore(xfr.element_in)
+        ) {
+          xfrTracker.push(xfr);
+        }
+      });
+
+      console.log(xfrTracker);
+      function findBiggestScoreDifference(xfrTracker) {
+        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
+          return null; // Return null if xfrTracker is empty or not an array
+        }
+
+        let biggestDiffXfr = null;
+        let maxDifference = -Infinity;
+
+        for (const xfr of xfrTracker) {
+          const inScore = getPlayerScore(xfr.element_in);
+          const outScore = getPlayerScore(xfr.element_out);
+          const difference = Math.abs(inScore - outScore); // Absolute difference
+
+          if (difference > maxDifference) {
+            maxDifference = difference;
+            biggestDiffXfr = xfr;
+          }
+        }
+
+        return biggestDiffXfr;
+      }
+
+      // Example Usage
+      const biggestXfr = findBiggestScoreDifference(xfrTracker);
+      console.log(biggestXfr);
+      if (biggestXfr) {
+        const xfrIN = createPlayerCardNew(
+          biggestXfr.element_in,
+          getPlayerScore(biggestXfr.element_in),
+          null,
+          null,
+          null
+        );
+
+        const tInArrow = document.createElement("img");
+        tInArrow.src =
+          "https://fpltoolbox.com/wp-content/uploads/2024/12/svgexport-9.png";
+        tInArrow.setAttribute("id", "transfer-direction-in");
+        xfrIN.prepend(tInArrow);
+
+        const xfrOUT = createPlayerCardNew(
+          biggestXfr.element_out,
+          getPlayerScore(biggestXfr.element_out),
+          null,
+          null,
+          null
+        );
+        const tOutArrow = document.createElement("img");
+        tOutArrow.src =
+          "https://fpltoolbox.com/wp-content/uploads/2024/12/svgexport-9.png";
+        tOutArrow.setAttribute("id", "transfer-direction-out");
+        xfrOUT.prepend(tOutArrow);
+        const message1 = `${randomTeam.player_name.substring(
+          0,
+          randomTeam.player_name.indexOf(" ")
+        )} making the right transfer decision this week`;
+
+        images = [
+          "https://fpltoolbox.com/wp-content/uploads/2025/04/note-dead.webp",
+          "https://fpltoolbox.com/wp-content/uploads/2025/04/very-nice.png",
+
+          ,
+        ];
+        const img = images[Math.floor(Math.random() * images.length)];
+
+        const meme = createMeme4Corners(
+          message1,
+          xfrOUT,
+          xfrIN,
+          null,
+          null,
+          null,
+          img
+        );
+        memeContainer.append(meme);
+      }
+    }
+  }
+  function findSolidDefence() {
+    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      let allDefendersScoredFiveOrMore = true;
+
+      team.currentWeek[0].picks.forEach((player) => {
+        //console.log(player, getPlayerWebName(player.element))
+        if (player.element_type === 2 && getPlayerScore(player.element) < 5) {
+          allDefendersScoredFiveOrMore = false;
+        }
+      });
+
+      if (allDefendersScoredFiveOrMore) {
+        teamsWithAllDefendersScoring.push(team);
+      }
+    }
+
+    console.log(teamsWithAllDefendersScoring); // Check the stored teams
+
+    if (teamsWithAllDefendersScoring.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
+      console.log(randomTeam);
+      const message1 = `POV: When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )}'s defenders all pull their socks up`;
+      const img =
+        surprisedMemes[Math.floor(Math.random() * surprisedMemes.length)];
+
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+      randomTeam.currentWeek[0].picks.forEach((player) => {
+        if (player.element_type === 2) {
+          const card = createPlayerCardNew(
+            player.element,
+            getPlayerScore(player.element),
+            null,
+            null,
+            null
+          );
+          defenderRow.appendChild(card);
+        }
+      });
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        defenderRow,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+  function findSolidStrikeForce() {
+    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      let allDefendersScoredFiveOrMore = true;
+
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.element_type === 4 && getPlayerScore(player.element) < 5) {
+          allDefendersScoredFiveOrMore = false;
+        }
+      });
+
+      if (allDefendersScoredFiveOrMore) {
+        teamsWithAllDefendersScoring.push(team);
+      }
+    }
+
+    console.log(teamsWithAllDefendersScoring); // Check the stored teams
+
+    if (teamsWithAllDefendersScoring.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
+      console.log(randomTeam);
+      const message1 = `POV: When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )}'s strikers all pull their socks up`;
+      const img =
+        surprisedMemes[Math.floor(Math.random() * surprisedMemes.length)];
+
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+      randomTeam.currentWeek[0].picks.forEach((player) => {
+        if (player.element_type === 4) {
+          const card = createPlayerCardNew(
+            player.element,
+            getPlayerScore(player.element),
+            null,
+            null,
+            null
+          );
+          defenderRow.appendChild(card);
+        }
+      });
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        defenderRow,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+  function findPlayersWithOnePoint() {
+    console.log("Failed row");
+    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.currentWeek[0].picks.forEach((player) => {
+        if (getPlayerScore(player.element) === 1) {
+          teamsWithAllDefendersScoring.push(team);
+          return;
+        }
+      });
+    }
+
+    console.log(teamsWithAllDefendersScoring); // Check the stored teams
+
+    if (teamsWithAllDefendersScoring.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
+      console.log(randomTeam);
+      const message1 = `POV: When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} opens the FPL app`;
+
+      images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/03/fine-this-is-fine.png",
+
+        ,
+      ];
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+      randomTeam.currentWeek[0].picks.forEach((player) => {
+        if (getPlayerScore(player.element) === 1) {
+          const card = createPlayerCardNew(
+            player.element,
+            getPlayerScore(player.element),
+            null,
+            null,
+            null
+          );
+          defenderRow.appendChild(card);
+        }
+      });
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        defenderRow,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+  function findPlayersWithOnePointSecond() {
+    console.log("Failed row");
+    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      team.currentWeek[0].picks.forEach((player) => {
+        if (getPlayerScore(player.element) === 1) {
+          teamsWithAllDefendersScoring.push(team);
+          return;
+        }
+      });
+    }
+
+    console.log(teamsWithAllDefendersScoring); // Check the stored teams
+
+    if (teamsWithAllDefendersScoring.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
+      console.log(randomTeam);
+      const message1 = `"Bro, how's your gameweek going...?"`;
+
+      images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/thumbs-up.png",
+      ];
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+      randomTeam.currentWeek[0].picks.forEach((player) => {
+        if (getPlayerScore(player.element) === 1) {
+          const card = createPlayerCardNew(
+            player.element,
+            getPlayerScore(player.element),
+            null,
+            null,
+            null
+          );
+          defenderRow.appendChild(card);
+        }
+      });
+
+      const randomName = document.createElement("div");
+      randomName.innerText = `${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )}:`;
+
+      randomName.style.fontSize = "1.5rem";
+      randomName.style.fontWeight = "bold";
+      randomName.style.color = "black";
+      randomName.style.backgroundColor = "white";
+      randomName.style.padding = "0.5rem";
+
+      const meme = createMeme4Corners(
+        message1,
+        randomName,
+        null,
+        null,
+        null,
+        defenderRow,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findPlayerSuccess() {
+    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      //console.log(team);
+      if (team) {
+        team.currentWeek[0].picks.forEach((player) => {
+          if (getPlayerScore(player.element) > 8) {
+            teamsWithAllDefendersScoring.push(team);
+            return;
+          }
+        });
+      }
+    }
+
+    console.log(teamsWithAllDefendersScoring); // Check the stored teams
+
+    if (teamsWithAllDefendersScoring.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
+      console.log(randomTeam);
+      const message1 = `POV: When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} opens the FPL app`;
+
+      images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/03/8d30zh.jpg",
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/liplicking.png",
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/iamjose.webp",
+      ];
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+      randomTeam.currentWeek[0].picks.forEach((player) => {
+        if (getPlayerScore(player.element) > 8) {
+          const card = createPlayerCardNew(
+            player.element,
+            getPlayerScore(player.element),
+            null,
+            null,
+            null
+          );
+          defenderRow.appendChild(card);
+        }
+      });
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        defenderRow,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function findCaptaincyResults() {
+    console.log("finding captains");
+    const successfulCaptains = [];
+    const failedCaptains = [];
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      let captain = null;
+
+      // Find the captain
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.is_captain) captain = player;
+      });
+
+      if (captain) {
+        const captainScore = getPlayerScore(captain.element);
+
+        if (captainScore > 4) {
+          successfulCaptains.push({ team, captain, score: captainScore });
+        } else {
+          failedCaptains.push({ team, captain, score: captainScore });
+        }
+      }
+    }
+    let result = [];
+    // Check if there is at least one failed captain
+    if (failedCaptains.length > 0) {
+      // Pick a random failed captain
+      const randomFailedCaptain =
+        failedCaptains[Math.floor(Math.random() * failedCaptains.length)];
+      result.push(randomFailedCaptain);
+    }
+
+    // Check how many successful captains exist
+    if (successfulCaptains.length >= 2) {
+      const count = successfulCaptains.length >= 3 ? 3 : 2;
+
+      // Shuffle the array and pick the required number of successful captains
+      const shuffledSuccessful = successfulCaptains.sort(
+        () => 0.5 - Math.random()
+      );
+      result.push(...shuffledSuccessful.slice(0, count));
+    }
+    console.log(result);
+
+    if (result.length > 2) {
+      const message = `There's always one...`;
+
+      const captainCards = document.createElement("div");
+      captainCards.id = "dragon-meme-footer";
+
+      function addCaptainToFooter(teamNumber) {
+        const cap = document.createElement("div");
+        const capCard = createPlayerCardNew(
+          result[teamNumber].captain.element,
+          result[teamNumber].score,
+          true,
+          null,
+          null
+        );
+        const capCardText = document.createElement("div");
+        capCardText.id = "dragon-meme-footer-text";
+        capCardText.innerText = `${result[
+          teamNumber
+        ].team.player_name.substring(
+          0,
+          result[teamNumber].team.player_name.indexOf(" ")
+        )}`;
+
+        cap.appendChild(capCard);
+        cap.appendChild(capCardText);
+
+        captainCards.appendChild(cap);
+      }
+
+      addCaptainToFooter(1);
+      addCaptainToFooter(2);
+
+      let img = "https://fpltoolbox.com/wp-content/uploads/2025/02/9e2.jpg";
+
+      if (result.length === 4) {
+        addCaptainToFooter(3);
+        img = "https://fpltoolbox.com/wp-content/uploads/2025/02/4p4zc2.jpg";
+      }
+
+      addCaptainToFooter(0);
+      // if (capCard1 instanceof HTMLElement) {
+      //   capCard1.style.marginLeft = "-70%";
+      //   capCard1.style.transform = "scale(1.2)";
+      // } else {
+      //   console.warn("capCard is not a DOM element:", capCard1);
+      // }
+
+      const meme = createMeme4Corners(
+        message,
+        null,
+        null,
+        null,
+        null,
+        captainCards,
+        img
+      );
+
+      memeContainer.append(meme);
+    } else {
+      console.log("Captain Dragons Meme unavailable");
+    }
+
+    console.log("Successful Captains:", successfulCaptains);
+    console.log("Failed Captains:", failedCaptains);
+  }
+
+  function gwSpecificMeme() {
+    const teamsWithKeyPlayers = []; // Array to store teams with both target players
+    const playersToTarget = [668, 366, 424];
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      if (team) {
+        const pickedPlayerElements = team.currentWeek[0].picks.map(
+          (player) => player.element
+        );
+
+        // Check if ALL playersToTarget are in pickedPlayerElements
+        const hasAllTargetPlayers = playersToTarget.every((targetId) =>
+          pickedPlayerElements.includes(targetId)
+        );
+
+        if (hasAllTargetPlayers) {
+          teamsWithKeyPlayers.push(team);
+        }
+      }
+    }
+
+    console.log(teamsWithKeyPlayers); // Check the stored teams
+
+    if (teamsWithKeyPlayers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithKeyPlayers);
+      console.log(randomTeam);
+      const message1 = `${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} owning these three this gameweek`;
+
+      images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/03/8d30zh.jpg",
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/liplicking.png",
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/iamjose.webp",
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/very-nice.png",
+      ];
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+      randomTeam.currentWeek[0].picks.forEach((player) => {
+        if (playersToTarget.includes(player.element)) {
+          const card = createPlayerCardNew(
+            player.element,
+            getPlayerScore(player.element),
+            null,
+            null,
+            null
+          );
+          defenderRow.appendChild(card);
+        }
+      });
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        defenderRow,
+        img
+      );
+      memeContainer.append(meme);
+    }
+  }
+
+  function runAllRandomly() {
+    const functionsList = [
+      findFailedScorer,
+      findHigestTransferMaker,
+      findHighBench,
+      find100Plus,
+      gwSpecificMeme,
+      findMissedPen,
+      findBelowAverage,
+      findLowestScorer,
+      findLowestScorer1,
+      findStrikerFail,
+      findFailedTransferSixth,
+      findChillGuy,
+      findLowBench,
+      findBestMiniLeagueRun,
+      findWorstRun,
+      findHighestandLowest,
+      findKeeperFail,
+      findCaptaincyFailDrake,
+      findCaptaincyFailDoggo,
+      findFailedTransfer,
+      findRedCards,
+      find59Minutes,
+      //findSolidDefence,
+      findPlayersWithOnePoint,
+      findTwoYellows,
+      findLowestScorerAlternative,
+      findCaptaincyResults,
+      findFailedTransferSecond,
+      findPlayerSuccess,
+      //findSolidStrikeForce,
+      findSuccesfulTransfer,
+      findFailedTransferThird,
+      findFailedTransferFourth,
+      findFailedTransferFifth,
+      findPlayersWithOnePointSecond,
+      findFailedhBench,
+    ];
+
+    // Shuffle the list randomly
+    const shuffled = functionsList.sort(() => Math.random() - 0.5);
+
+    // Execute each function in the new random order
+    shuffled.forEach((fn) => fn());
+  }
+
+  function endOfMemes() {
+    const message1 = `Guess who's had enough FPL memes for one day:`;
+    const img =
+      pointingAtYouMemes[Math.floor(Math.random() * pointingAtYouMemes.length)];
+
+    const meme = createMeme4Corners(
+      message1,
+      null,
+      null,
+      null,
+      null,
+      "www.fpltoolbox.com",
+      img
+    );
+    memeContainer.append(meme);
+  }
+
+  function subscribeToProMeme() {
+    const message1 = `POV: You just subscribed to FPL Toolbox Pro and got instant access to even more personalised FPL memes`;
+    const img =
+      surprisedMemes[Math.floor(Math.random() * surprisedMemes.length)];
+
+    const meme = createMeme4Corners(
+      message1,
+      null,
+      null,
+      null,
+      null,
+      "www.fpltoolbox.com",
+      img
+    );
+    memeContainer.append(meme);
+  }
+
+  if (
+    theUser.username.data.membership_level.ID == 10 ||
+    theUser.username.data.membership_level.ID == 12
+  ) {
+    // Call the function to execute all in random order
+    runAllRandomly();
+    endOfMemes();
+    addCaptainBadge();
+  } else if (
+    theUser.username.data.membership_level.ID != 10 ||
+    theUser.username.data.membership_level.ID != 12
+  ) {
+    runAllRandomly(); //Turn off after testing
+    subscribeToProMeme();
+    endOfMemes();
+    addCaptainBadge();
+  } else {
+    ontainer.append("You need to be a pro member to access this feature");
+  }
+  const refreshButton = document.createElement("button");
+  refreshButton.innerHTML = "Refresh Memes";
+  refreshButton.addEventListener("click", showMemes);
+  memeContainer.prepend(refreshButton);
+  container.appendChild(memeContainer);
+  addCaptainBadge();
+}
+
+function shareMeme(meme) {
+  html2canvas(meme).then((canvas) => {
+    const imgData = canvas.toDataURL("image/png");
+
+    if (navigator.share) {
+      // Create a Blob from the image
+      fetch(imgData)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const file = new File([blob], "comparison.png", {
+            type: "image/png",
+          });
+          navigator
+            .share({
+              title: "Check out this FPL meme!",
+              text: "Get personalised FPL memes with just one click at \n www.FPLToolbox.com",
+              files: [file], // Share the image as a file
+            })
+            .catch((err) => alert("Error sharing: " + err));
+        });
+    } else {
+      // Fallback: Download the image if sharing isn't supported
+      const link = document.createElement("a");
+      link.href = imgData;
+      link.download = "fpltoolbox-meme.png";
+      link.click();
+      alert(
+        "Sharing is not supported on your device. Image downloaded instead."
+      );
+    }
+  });
+}
+
+function createMeme4Corners(
+  header,
+  topLeft,
+  topRight,
+  bottomRight,
+  bottomLeft,
+  footer,
+  imageSrc
+) {
+  // Main meme container
+  const meme = document.createElement("div");
+  meme.className = "custom-meme";
+  meme.style.position = "relative";
+  meme.style.width = "100%";
+  meme.style.display = "flex";
+  meme.style.flexDirection = "column";
+  meme.style.alignItems = "center";
+
+  // Utility function to handle text or elements
+  function appendContent(container, content) {
+    if (typeof content === "string") {
+      container.textContent = content;
+    } else if (content instanceof HTMLElement) {
+      container.appendChild(content);
+    }
+  }
+
+  // Header
+  if (header) {
+    const headerContainer = document.createElement("div");
+    headerContainer.className = "meme-header";
+
+    // Watermark Container
+    const watermarkContainer = document.createElement("div");
+    watermarkContainer.id = "watermark-container";
+
+    const watermarkLogo = document.createElement("img");
+    watermarkLogo.src =
+      "https://fpltoolbox.com/wp-content/uploads/2024/01/Blog-Graphic-Mobile-1-e1733487933669.jpg";
+    watermarkLogo.id = "watermark-logo";
+
+    const watermarkText = document.createElement("p");
+    watermarkText.textContent = "FPLToolbox";
+    watermarkText.id = "watermark-text";
+
+    watermarkContainer.appendChild(watermarkLogo);
+    watermarkContainer.appendChild(watermarkText);
+
+    // Create a header wrapper for text
+    const headerContent = document.createElement("div");
+    appendContent(headerContent, header); // This handles both text & elements
+
+    // Append watermark & header text separately
+    headerContainer.appendChild(watermarkContainer);
+    headerContainer.appendChild(headerContent);
+
+    // Add header to meme
+    meme.appendChild(headerContainer);
+  }
+
+  // Image container
+  const imgContainer = document.createElement("div");
+  imgContainer.style.position = "relative";
+  imgContainer.style.width = "100%";
+  imgContainer.id = "meme-image-container";
+
+  const img = document.createElement("img");
+  img.src = imageSrc;
+  img.style.width = "100%";
+  img.style.display = "block";
+
+  // Overlay Text Positions
+  const overlayTextStyles = {
+    position: "absolute",
+    color: "white",
+    maxWidth: "45%",
+  };
+
+  const overlayPositions = {
+    topLeft: { top: "10%", left: "5%" },
+    topRight: { top: "10%", right: "5%", textAlign: "right" },
+    bottomRight: { bottom: "10%", right: "5%", textAlign: "right" },
+    bottomLeft: { bottom: "10%", left: "5%" },
+  };
+
+  function createOverlay(position, content) {
+    if (content) {
+      const overlay = document.createElement("div");
+      Object.assign(overlay.style, overlayTextStyles, position);
+      appendContent(overlay, content);
+      imgContainer.appendChild(overlay);
+    }
+  }
+
+  createOverlay(overlayPositions.topLeft, topLeft);
+  createOverlay(overlayPositions.topRight, topRight);
+  createOverlay(overlayPositions.bottomRight, bottomRight);
+  createOverlay(overlayPositions.bottomLeft, bottomLeft);
+
+  imgContainer.appendChild(img);
+  meme.appendChild(imgContainer);
+
+  // Footer
+  if (footer) {
+    const footerContainer = document.createElement("div");
+    footerContainer.className = "meme-footer";
+
+    appendContent(footerContainer, footer);
+    meme.appendChild(footerContainer);
+  }
+  // Share functionality
+  meme.addEventListener("click", () => shareMeme(meme));
+  return meme;
+}
+
+function featureRequest() {
+  if (userHasAccess([10, 12])) {
+    showModal({
+      title: "Feature Request",
+      body: "Got a great idea for feature? Tell me all about it! <strong>If</strong> I can do it - I will try my best to add it to the toolbox. <br><br>Head over to your profile page to submit your request",
+      confirmText: "Take me there",
+      onConfirm: () => {
+        window.location.href = profilePageUrlPageUrl;
+      },
+    });
+  } else {
+    showModal({
+      title: "Paid Feature",
+      body: "Feature requests are only availble to <strong>Paid members</strong>. <br><br>Upgrade to unlock!",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = subscriptionPageUrl;
+      },
+    });
+  }
+}
+
+//Copycat Code
+const influencersList = [
+  {
+    influencer: "FPL Harry",
+    entry: 3544,
+    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/channels4_profile.jpg",
+  },
+  {
+    influencer: "Let's Talk FPL",
+    entry: 24,
+    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/LTFPL_Icon-1-480x480-1.webp",
+  },
+  {
+    influencer: "FPL Raptor",
+    entry: 746,
+    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/channels4_profile-1.jpg",
+  },
+  {
+    influencer: "FPL Focal",
+    entry: 1301,
+    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/ab67656300005f1f8105233ce9dc6cb312e54569.jpg",
+  },
+  {
+    influencer: "Holly Shand",
+    entry: 9,
+    img: "https://fpltoolbox.com/wp-content/uploads/2025/01/0Fn-qMWH_400x400.jpg",
+  },
+];
+
+function getinfluencerName(entry) {
+  for (let i = 0; i < influencersList.length; i++) {
+    if (entry === influencersList[i].entry)
+      return influencersList[i].influencer;
+  }
+}
+function getinfluencerImg(entry) {
+  for (let i = 0; i < influencersList.length; i++) {
+    if (entry === influencersList[i].entry) return influencersList[i].img;
+  }
+}
+function extractTeamIds(arrayOfTeams) {
+  return arrayOfTeams.map((team) => team.entry);
+}
+
+async function showCopycatFinder() {
+  if (currentGw < 38) {
+    showModal({
+      title: "Coming Soon",
+      body: "Come back in a few weeks (around gameweek 6) - we don't have enough info to yet to give you anything useful!",
+      confirmText: "Ok",
+      onConfirm: () => {}, // No action taken
+    });
+    return;
+  }
+
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+  const app = document.getElementById("screen-tools");
+  app.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  app.appendChild(backBtn);
+
+  // Add a header above the cards
+  const header = document.createElement("h6");
+  header.innerText = `Catch a copycat! \n Tap Team To Reveal the Truth`;
+  header.style.textAlign = "center";
+  app.appendChild(header);
+  showBootstrapSpinner(app);
+
+  // Fetch data for influencers
+  const arrayOfTeamIds = extractTeamIds(influencersList);
+  const influencers = await createInfluencerLeague(arrayOfTeamIds);
+
+  console.log(influencers);
+
+  // Fetch data for the user's team
+  fetch(
+    BASE_URL +
+      "/entry/" +
+      theUser.info.team_id +
+      "/event/" +
+      currentGw +
+      "/picks/"
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      let myTeam = data;
+      console.log(myTeam);
+      removeSpinner();
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-responsive";
+
+      const table = document.createElement("table");
+      const darkMode = localStorage.getItem("darkMode") === "true";
+
+      table.classList.add(
+        "table",
+        "table-striped",
+        "table-hover",
+        "table-bordered",
+        "align-middle",
+        darkMode ? "table-dark" : "table-light"
+      );
+
+      const thead = document.createElement("thead");
+      thead.classList.add("text-center");
+
+      const headerRow = document.createElement("tr");
+      const headers = ["Pos", "Team", "Total"];
+
+      headers.forEach((headerText) => {
+        const th = document.createElement("th");
+        th.innerText = headerText;
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      // Loop through league standings and add table rows
+      leagueToDisplay.standings.forEach((element) => {
+        const row = document.createElement("tr");
+
+        // Position
+        const posCell = document.createElement("td");
+        posCell.innerText = element.rank;
+        row.appendChild(posCell);
+
+        // Team and Manager Name
+        const teamCell = document.createElement("td");
+        teamCell.innerHTML = `
+    <strong>${element.entry_name}</strong><br>
+    <small>${element.player_name}</small>
+  `;
+        row.appendChild(teamCell);
+
+        // Total Points
+        const totalCell = document.createElement("td");
+        totalCell.innerText = element.total;
+        row.appendChild(totalCell);
+
+        // Optional: make row clickable
+        row.style.cursor = "pointer";
+        row.addEventListener("click", function () {
+          selectInfluencer(element, influencers);
+        });
+
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      app.appendChild(tableWrapper);
+    })
+    .then(() => {
+      const div = document.createElement("a");
+      div.href = "https://fpltoolbox.com/help";
+      div.innerHTML = "Want to know more on about how this works? Click here";
+      div.style.padding = "20px";
+      app.appendChild(div);
+    });
+}
+
+async function selectInfluencer(team2, influencers) {
+  console.log(team2);
+  console.log(influencers);
+  if (team2.everyGw[0].gameweek != 1) {
+    alert(
+      `${team2.player_name} missed a few games at the begining of the season, I don't quite have enough evidence to make comparisons here.`
+    );
+    console.log(team2);
+  }
+  const t2Picks = team2.everyGwPicks;
+
+  // Extract elements and active_chip for team2's picks for each gameweek
+  const t2Elements = t2Picks.map((gw) =>
+    gw.picks.slice(0, 11).map((pick) => pick.element)
+  );
+  const t2ActiveChips = t2Picks.map((gw) => gw.active_chip);
+
+  // Extract elements and active_chip for each influencer's picks for each gameweek
+  const influencersPicks = influencers.map((influencer) => {
+    return influencer.everyGwPicks.map((gw) => {
+      return {
+        elements: gw.picks.slice(0, 11).map((pick) => pick.element),
+        active_chip: gw.active_chip,
+      };
+    });
+  });
+
+  // Function to calculate added and removed elements
+  function trackElementChanges(prevElements, currentElements) {
+    const added = currentElements.filter(
+      (element) => !prevElements.includes(element)
+    );
+    const removed = prevElements.filter(
+      (element) => !currentElements.includes(element)
+    );
+    return { added, removed };
+  }
+
+  // Function to calculate the percentage of matching elements and track active_chip
+  function calculateMatchPercentage(
+    t2Elements,
+    t2ActiveChips,
+    influencerElements,
+    influencerActiveChips
+  ) {
+    let totalMatches = 0;
+    let gameweeksWithMatches = [];
+    let bothTeamsActiveChip = [];
+    let elementChanges = []; // To track changes
+
+    t2Elements.forEach((gwElements, index) => {
+      const influencerGwElements = influencerElements[index];
+      const matchCount = gwElements.filter((element) =>
+        influencerGwElements.includes(element)
+      ).length;
+      const matchPercentage = (matchCount / gwElements.length) * 100;
+      totalMatches += matchPercentage;
+
+      // Track the gameweek with the highest match percentage
+      const activeChip =
+        t2ActiveChips[index] && t2ActiveChips[index] !== "null"
+          ? ` (Active chip: ${t2ActiveChips[index]})`
+          : "";
+      gameweeksWithMatches.push({
+        gameweek: index + 1,
+        matchPercentage,
+        activeChip,
+      });
+
+      // Check if both teams have an active_chip for the same gameweek
+      if (
+        t2ActiveChips[index] &&
+        t2ActiveChips[index] !== "null" &&
+        influencerActiveChips[index] &&
+        influencerActiveChips[index] !== "null"
+      ) {
+        bothTeamsActiveChip.push(index + 1); // Store the gameweek number
+      }
+
+      // Track added and removed elements for each gameweek, only if the changes match
+      if (index > 0) {
+        const prevT2Elements = t2Elements[index - 1];
+        const prevInfluencerElements = influencerElements[index - 1];
+
+        const t2Changes = trackElementChanges(prevT2Elements, gwElements);
+        const influencerChanges = trackElementChanges(
+          prevInfluencerElements,
+          influencerGwElements
+        );
+
+        // Only include gameweek if the changes are exactly the same
+        if (
+          JSON.stringify(t2Changes.added) ===
+            JSON.stringify(influencerChanges.added) &&
+          JSON.stringify(t2Changes.removed) ===
+            JSON.stringify(influencerChanges.removed)
+        ) {
+          elementChanges.push({
+            gameweek: index + 1,
+            t2: t2Changes,
+            influencer: influencerChanges,
+          });
+        }
+      }
+    });
+
+    // Sort gameweeks by match percentage in descending order
+    gameweeksWithMatches.sort((a, b) => b.matchPercentage - a.matchPercentage);
+
+    // Return the total match percentage, the most similar gameweeks, and gameweeks where both teams had active_chip
+    return {
+      averageMatchPercentage: totalMatches / t2Elements.length,
+      mostSimilarGameweeks: gameweeksWithMatches.slice(0, 3), // Top 3 most similar gameweeks
+      bothTeamsActiveChip, // Gameweeks where both teams had active_chip
+      elementChanges, // Track element changes for each gameweek
+    };
+  }
+
+  // Find the influencer with the highest match percentage
+  let bestMatch = {
+    influencer: null,
+    matchPercentage: 0,
+    mostSimilarGameweeks: [],
+    bothTeamsActiveChip: [],
+    elementChanges: [],
+  };
+
+  influencersPicks.forEach((influencerPicks, index) => {
+    const {
+      averageMatchPercentage,
+      mostSimilarGameweeks,
+      bothTeamsActiveChip,
+      elementChanges,
+    } = calculateMatchPercentage(
+      t2Elements,
+      t2ActiveChips,
+      influencerPicks.map((pick) => pick.elements),
+      influencerPicks.map((pick) => pick.active_chip)
+    );
+    if (averageMatchPercentage > bestMatch.matchPercentage) {
+      bestMatch = {
+        influencer: influencers[index],
+        matchPercentage: averageMatchPercentage,
+        mostSimilarGameweeks,
+        bothTeamsActiveChip,
+        elementChanges,
+      };
+    }
+  });
+
+  // Reusable function to track captain's element for a team's gameweeks
+  const trackCaptains = (everyGwPicks) => {
+    return everyGwPicks.map((gw) => {
+      const captain = gw.picks.find((pick) => pick.is_captain);
+      return {
+        gameweek: gw.gameweek, // Include gameweek info if available
+        captainElement: captain ? captain.element : null, // Record captain's element or null if no captain
+      };
+    });
+  };
+
+  // Use the reusable function for both bestMatch and team2
+  const trackedBestMatchCaptains = trackCaptains(
+    bestMatch.influencer.everyGwPicks
+  );
+  const trackedt2Captains = trackCaptains(team2.everyGwPicks);
+
+  console.log(trackedBestMatchCaptains);
+  console.log(trackedt2Captains);
+
+  // Calculate how many times both picked the same captainElement
+  const matchingCaptains = trackedBestMatchCaptains.reduce(
+    (count, bm, index) => {
+      const t2 = trackedt2Captains[index];
+      return bm.captainElement === t2.captainElement ? count + 1 : count;
+    },
+    0
+  );
+
+  let matchingCaptainMessage;
+  if (`${matchingCaptains}` == currentGw) {
+    matchingCaptainMessage = `Both have had the same captain pick EVERY gameweek. Sounds a bit fishy to me!\n`;
+  } else if (`${matchingCaptains}` != currentGw) {
+    matchingCaptainMessage = `Make of this what you will, but both ${
+      team2.player_name
+    } and ${getinfluencerName(
+      bestMatch.influencer.entry
+    )} picked the same captain for ${matchingCaptains} out of ${currentGw} gameweeks. It might have just been a common strategy in those gameweeks!\n`;
+  }
+
+  // Create a div element to display the best match, most similar gameweeks, the active_chip comparison, and element changes
+  const div = document.createElement("div");
+  div.id = "copycat-popup-body";
+
+  const similarGameweeks = bestMatch.mostSimilarGameweeks
+    .map(
+      (gw) =>
+        `<li>Gameweek ${gw.gameweek}: ${gw.matchPercentage.toFixed(0)}%</li>`
+    )
+    .join("");
+
+  const activeChipMessage =
+    bestMatch.bothTeamsActiveChip.length > 0
+      ? `Both teams had a chip activated in Gameweeks: ${bestMatch.bothTeamsActiveChip.join(
+          ", "
+        )}. Just saying 👀. Add that to your evidence.`
+      : "They've never had a chip activated in the same week.";
+
+  // Create the elementChanges message (only if there are changes)
+  const elementChangesMessage = bestMatch.elementChanges
+    .filter((change) => {
+      // Check if there are actual changes (added or removed elements)
+      return (
+        change.t2.added.length > 0 ||
+        change.t2.removed.length > 0 ||
+        change.influencer.added.length > 0 ||
+        change.influencer.removed.length > 0
+      );
+    })
+    .map((change) => {
+      const t2Added = change.t2.added.length
+        ? `${team2.player_name} transferred in: ${change.t2.added
+            .map(getPlayerWebName)
+            .join(", ")}`
+        : "";
+      const t2Removed = change.t2.removed.length
+        ? `${team2.player_name} transferred out: ${change.t2.removed
+            .map(getPlayerWebName)
+            .join(", ")}`
+        : "";
+      const influencerAdded = change.influencer.added.length
+        ? `${getinfluencerName(
+            bestMatch.influencer.entry
+          )} transferred in: ${change.influencer.added
+            .map(getPlayerWebName)
+            .join(", ")}`
+        : "";
+      const influencerRemoved = change.influencer.removed.length
+        ? `${getinfluencerName(
+            bestMatch.influencer.entry
+          )} transferred out: ${change.influencer.removed
+            .map(getPlayerWebName)
+            .join(", ")}`
+        : "";
+
+      return `
+  <li>Gameweek ${change.gameweek}: 
+${t2Added}
+${influencerAdded} 
+${t2Removed} 
+${influencerRemoved}
+</li>
+  `;
+    })
+    .join("");
+
+  // Only include the element changes section if there are any changes
+  const elementChangesSection = elementChangesMessage
+    ? `<br>Look what else I found:<ul>${elementChangesMessage}</ul>`
+    : "";
+  console.log(bestMatch.influencer);
+  const influencerScore =
+    bestMatch.influencer.everyGwPicks[
+      bestMatch.influencer.everyGwPicks.length - 1
+    ].total_points;
+  console.log(influencerScore);
+  let scoreMessage;
+  if (team2.total > influencerScore) {
+    scoreMessage = `<p>It's worth noting that ${team2.player_name} has ${
+      team2.total - influencerScore
+    } more points anyway, so be careful with those accusations! What if ${getinfluencerName(
+      bestMatch.influencer.entry
+    )} is copying ${team2.player_name}?</p>`;
+  } else if (team2.total < influencerScore) {
+    scoreMessage = `<p>By the way, ${team2.player_name} has ${
+      influencerScore - team2.total
+    } fewer points than ${getinfluencerName(
+      bestMatch.influencer.entry
+    )}. Take that into consideration.</p>`;
+  } else {
+    scoreMessage = `<p>WTF! They have the same amount of points! Coincidence?</p>`;
+  }
+
+  let matchMessage;
+
+  if (bestMatch.matchPercentage >= 90) {
+    matchMessage = `<strong><h2>Caught Red Handed</h2></strong><p>AWKWARD! - there's enough here to throw the book at ${team2.player_name}! Approach with caution, suspect could turn violent.</p>`;
+  } else if (bestMatch.matchPercentage >= 80) {
+    matchMessage = `<strong><h2>Hot Match!</h2></strong><p>${team2.player_name} seems heavily influenced by an outsider. Keep a close eye on this situation and monitor them for a few more weeks.</p>`;
+  } else if (bestMatch.matchPercentage >= 70) {
+    matchMessage = `<strong><h2>Warm Warning</h2></strong><p>Things are starting to heat up! Could ${team2.player_name} be borrowing ideas? Check the stats and decide for yourself.</p>`;
+  } else if (bestMatch.matchPercentage >= 60) {
+    matchMessage = `<strong><h2>Warm Match</h2></strong><p>No major drama here, but it’s worth keeping ${team2.player_name} on your radar. Have a look at the stats below for clarity.</p>`;
+  } else if (bestMatch.matchPercentage >= 50) {
+    matchMessage = `<strong><h2>Luke Warm</h2></strong><p>Nothing conclusive yet. ${team2.player_name} might just be playing it safe and sticking to common strategies.</p>`;
+  } else if (bestMatch.matchPercentage >= 40) {
+    matchMessage = `<strong><h2>Chilly Match</h2></strong><p>No need to worry too much. ${team2.player_name} seems to be taking an independent approach to their FPL team.</p>`;
+  } else if (bestMatch.matchPercentage >= 30) {
+    matchMessage = `<strong><h2>Cold Match</h2></strong><p>It’s unlikely that ${team2.player_name} is being influenced. They appear to be paving their own path in FPL.</p>`;
+  } else if (bestMatch.matchPercentage >= 20) {
+    matchMessage = `<strong><h2>Subtle Chill</h2></strong><p>${team2.player_name} is almost certainly playing their own game. Nothing to see here!</p>`;
+  } else {
+    matchMessage = `<strong><h2>Sub Zero</h2></strong><p>${team2.player_name} is an FPL maverick with a completely unique strategy. No signs of influence detected.</p>`;
+  }
+
+  let influencerContainer = `<h4 style="text-align:center">FPLToolbox Copycat Rating:</h4>  
+<div class="best-match-percentage-bar-container">
+  <div class="best-match-bar"></div>
+  <div class="copycat-pointer" style="left: 0%">▼</div>
+</div>
+  <div class="influencer-container">
+The best match I found was with ${getinfluencerName(
+    bestMatch.influencer.entry
+  )}, they had a copycat percentage of ${bestMatch.matchPercentage.toFixed(
+    0
+  )}%<br>
+  <img id="influencer-profile-pic" src="${getinfluencerImg(
+    bestMatch.influencer.entry
+  )}">  
+  </div>`;
+
+  // Animate the pointer to the desired position
+  setTimeout(() => {
+    // Select the pointer element
+    const pointer = document.querySelector(".copycat-pointer");
+    pointer.style.left = `${bestMatch.matchPercentage}%`;
+  }, 500); // Optional slight delay to ensure styles are applied smoothly
+
+  div.innerHTML = `
+${matchMessage}
+${influencerContainer}
+${scoreMessage}
+<div class="similar-gameweeks">
+<p>The gameweeks where their starting 11 were the most similar:</p>
+<ul>${similarGameweeks}</ul>
+</div>
+${matchingCaptainMessage}
+
+${activeChipMessage}
+${elementChangesSection}
+`;
+
+  // Assuming `createAndShowInfluencerComparison` is defined elsewhere to display the comparison
+  createAndShowInfluencerComparison(div);
+}
+
+async function createInfluencerLeague(arrayOfTeamIds) {
+  const manuallyMadeLeague = [];
+
+  for (const entry of arrayOfTeamIds) {
+    const everyGwPicks = [];
+
+    for (let gw = 1; gw <= currentGw; gw++) {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/entry/${entry}/event/${gw}/picks/`
+        );
+        const data = await response.json();
+        everyGwPicks.push({
+          active_chip: data.active_chip,
+          gameweek: data.entry_history.event,
+          total_points: data.entry_history.total_points,
+          picks: data.picks,
+        });
+      } catch (error) {
+        console.error(
+          `Failed to fetch data for team ID ${entry}, gameweek ${gw}:`,
+          error
+        );
+      }
+    }
+
+    manuallyMadeLeague.push({ entry, everyGwPicks });
+  }
+
+  return manuallyMadeLeague;
+}
+function createAndShowInfluencerComparison(content) {
+  // Create modal elements
+  const modal = document.createElement("div");
+  modal.id = "share-influencer-comparison";
+
+  const modalContent = document.createElement("div");
+  modalContent.id = "influencer-comparison-modal";
+
+  const modalMessage = document.createElement("div");
+  modalMessage.id = "influencer-comparison-message";
+
+  // Append the content (DOM element or string) to the modal message
+  if (typeof content === "string") {
+    modalMessage.textContent = content;
+  } else if (content instanceof HTMLElement) {
+    modalMessage.appendChild(content);
+  } else {
+    modalMessage.textContent = "Invalid content provided for the modal.";
+  }
+
+  const shareBtn = document.createElement("button");
+  shareBtn.id = "shareBtn";
+  shareBtn.style.marginRight = "10px";
+  shareBtn.style.fontSize = "1rem";
+  shareBtn.textContent = "Share";
+
+  const closeModal = document.createElement("button");
+  closeModal.id = "closeModal";
+  closeModal.style.marginRight = "10px";
+  closeModal.style.fontSize = "1rem";
+  closeModal.textContent = "Close";
+
+  // Append elements to the modal
+  modalContent.appendChild(modalMessage);
+  modalContent.appendChild(shareBtn);
+  modalContent.appendChild(closeModal);
+  modal.appendChild(modalContent);
+
+  // Append the modal to the body
+  document.body.appendChild(modal);
+
+  // Close the modal
+  closeModal.addEventListener("click", () => {
+    document.body.removeChild(modal);
+  });
+
+  // Share button functionality
+  shareBtn.addEventListener("click", () => {
+    html2canvas(modalContent).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+
+      if (navigator.share) {
+        // Create a Blob from the image
+        fetch(imgData)
+          .then((res) => res.blob())
+          .then((blob) => {
+            const file = new File([blob], "comparison.png", {
+              type: "image/png",
+            });
+            navigator
+              .share({
+                title: "Catch an FPL Copycat",
+                text: "Check out this influencer comparison!",
+                files: [file], // Share the image as a file
+              })
+              .catch((err) => alert("Error sharing: " + err));
+          });
+      } else {
+        // Fallback: Download the image if sharing isn't supported
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = "comparison.png";
+        link.click();
+        alert(
+          "Sharing is not supported on your device. Image downloaded instead."
+        );
+      }
+    });
+  });
+}
+
+//MAX Features
+
+// Helper to create a chart container
+function createChartContainer(divID) {
+  const container = document.createElement("div");
+  container.style.marginBottom = "20px";
+  container.classList.add("chart-js-container");
+  const canvas = document.createElement("canvas");
+  container.appendChild(canvas);
+  divID.appendChild(container);
+  return canvas;
+}
+function createTopStatTable({
+  standings,
+  containerDiv,
+  titleText,
+  statKeys,
+  statLabels,
+  limit = 3,
+  sortOrder = "desc",
+  statExtractor,
+  rowInfoExtractor = () => "",
+}) {
+  const getStatValue = statExtractor
+    ? statExtractor
+    : (team) => statKeys.reduce((sum, key) => sum + (team[key] || 0), 0);
+
+  const sorted = [...standings]
+    .sort((a, b) =>
+      sortOrder === "asc"
+        ? getStatValue(a) - getStatValue(b)
+        : getStatValue(b) - getStatValue(a)
+    )
+    .slice(0, limit);
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  // Card wrapper
+const wrapper = document.createElement("div");
+wrapper.classList.add("card", "shadow-sm", "mb-3");
+if (darkMode) wrapper.classList.add("bg-dark", "text-white", "border-secondary");
+
+const cardBody = document.createElement("div");
+cardBody.classList.add("card-body");
+
+const title = document.createElement("h5");
+title.classList.add("card-title", "mb-3");
+title.textContent = titleText;
+
+// Table with Bootstrap classes
+const table = document.createElement("table");
+table.className = `table table-striped table-hover table-sm mb-0 ${darkMode ? "table-dark" : ""}`;
+
+const thead = document.createElement("thead");
+const headerCells = statLabels
+  .map((label) => `<th class="text-end">${label}</th>`)
+  .join("");
+
+thead.innerHTML = `
+  <tr>
+    <th class="text-start">#</th>
+    <th class="text-start">Team</th>
+    ${headerCells}
+  </tr>
+`;
+
+  const medals = ["🥇", "🥈", "🥉"];
+  const tbody = document.createElement("tbody");
+
+  sorted.forEach((team, index) => {
+    const rankDisplay = medals[index] || index + 1;
+    const rowInfo = rowInfoExtractor(team);
+
+    const statCells = statExtractor
+      ? `<td class="text-end">${getStatValue(team)}</td>`
+      : statKeys
+          .map((key) => `<td class="text-end">${team[key]}</td>`)
+          .join("");
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${rankDisplay}</td>
+      <td>${team.entry_name}${rowInfo}</td>
+      ${statCells}
+    `;
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+
+  // Assemble card
+  cardBody.appendChild(title);
+  cardBody.appendChild(table);
+  wrapper.appendChild(cardBody);
+  containerDiv.appendChild(wrapper);
+}
+
+async function createSeasonMaxDashboard() {
+
+  
+  let leagueToDisplay = dummyLeague.standings;
+  if (userHasAccess([12])) {
+    leagueToDisplay = window.FPLToolboxLeagueData.standings;
+  }
+  console.log(leagueToDisplay);
+
+  const app = document.getElementById("screen-tools");
+  app.innerHTML = ""; // Clear existing content
+    // Back button
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  app.appendChild(backBtn);
+  // Create Bootstrap container
+  const container = document.createElement("div");
+  container.className = "container my-4";
+
+  // Create row to contain stats and sidebar
+  const row = document.createElement("div");
+  row.className = "row";
+
+  // === MAIN STATS GRID ===
+  const seasonStats = document.createElement("div");
+  seasonStats.id = "season-stats";
+  seasonStats.className = "row g-3"; // Bootstrap grid spacing
+
+
+  // Example stat cards
+  // for (let i = 1; i <= 6; i++) {
+  //   const statCard = document.createElement("div");
+  //   statCard.className = "col-12 col-md-6";
+  //   statCard.innerHTML = `
+  //   <div class="card shadow-sm text-center">
+  //     <div class="card-body">
+  //       <h6 class="card-title">Stat ${i}</h6>
+  //       <p class="card-text">Value ${i * 10}</p>
+  //     </div>
+  //   </div>
+  // `;
+  //   seasonStats.appendChild(statCard);
+  // }
+
+  // === SIDEBAR CONTENT ===
+  const sidebarCol = document.createElement("div");
+  sidebarCol.className = "col-12 col-lg-3";
+  sidebarCol.id = "sidebar-container";
+
+  const sidebarContent = document.createElement("div");
+  sidebarContent.id = "season-stats-sidebar";
+
+  // === MAIN STATS COLUMN ===
+  const statsCol = document.createElement("div");
+  statsCol.className = "col-12 col-lg-9 mb-4";
+  statsCol.appendChild(seasonStats);
+
+  // === Assemble the layout ===
+  row.appendChild(statsCol);
+  row.appendChild(sidebarCol);
+  container.appendChild(row);
+  app.appendChild(container);
+
+  await createSeasonMaxTable(leagueToDisplay, seasonStats);
+  const chipsChart = await createChipsUsedChart(leagueToDisplay);
+  seasonStats.appendChild(chipsChart);
+
+  const managerOfTheMonth = await findManagersOfTheMonth(leagueToDisplay, bootstrap.phases);
+  seasonStats.appendChild(managerOfTheMonth);
+
+  // Most Captaincy Points
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Captaincy Points",
+    statKeys: ["total_captaincy_points"],
+    statLabels: ["Points"],
+    limit: 10, // top 10
+    sortOrder: "desc",
+  });
+
+  // Fewest Captaincy Points
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Fewest Captaincy Points",
+    statKeys: ["total_captaincy_points"],
+    statLabels: ["Points"],
+    limit: 10,
+    sortOrder: "asc", // you'll need to add this option below
+  });
+
+  // Most Benched Points
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Benched Points",
+    statKeys: ["totalPointsOnBench"],
+    statLabels: ["Points"],
+    limit: 10, // top 10
+    sortOrder: "desc",
+  });
+
+  // Fewest Benched Points
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Fewest Benched Points",
+    statKeys: ["totalPointsOnBench"],
+    statLabels: ["Points"],
+    limit: 10,
+    sortOrder: "asc", // you'll need to add this option below
+  });
+
+  // Most goals scored
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Goals Scored",
+    statKeys: ["total_goals_scored"],
+    statLabels: ["Goals"],
+    limit: 10, // top 10
+    sortOrder: "desc",
+  });
+
+  // Fewest goals scored
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Fewest Goals Scored",
+    statKeys: ["total_goals_scored"],
+    statLabels: ["Goals"],
+    limit: 10,
+    sortOrder: "asc", // you'll need to add this option below
+  });
+
+  // Most goals conceded
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Goals Conceded",
+    statKeys: ["total_goals_conceded"],
+    statLabels: ["Goals Conceded"],
+    limit: 3, // top 10
+    sortOrder: "desc",
+  });
+
+  // Fewest goals conceded
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Fewest Goals Conceded",
+    statKeys: ["total_goals_conceded"],
+    statLabels: ["Goals Conceded"],
+    limit: 3,
+    sortOrder: "asc", // you'll need to add this option below
+  });
+
+  // Most minutes played
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Minutes Played",
+    statKeys: ["total_minutes"],
+    statLabels: ["Minutes"],
+    limit: 3,
+    sortOrder: "desc",
+  });
+
+  // Most own goals
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Own Goals",
+    statKeys: ["total_own_goals"],
+    statLabels: ["Own Goals"],
+    limit: 3,
+    sortOrder: "desc",
+  });
+
+  // Most penalties missed
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Penalties Missed",
+    statKeys: ["total_penalties_missed"],
+    statLabels: ["Penalties Missed"],
+    limit: 3,
+    sortOrder: "desc",
+  });
+  // Most cards
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Cards",
+    statKeys: ["total_yellow_cards", "total_red_cards"],
+    statLabels: ["Yellow", "Red"],
+    limit: 3,
+    sortOrder: "desc",
+  });
+  // Most Saves
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Saves",
+    statKeys: ["total_saves"],
+    statLabels: ["Saves"],
+    limit: 3,
+    sortOrder: "desc",
+  });
+  // Most Cleansheets
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Cleansheets",
+    statKeys: ["total_clean_sheets"],
+    statLabels: ["CleanSheets"],
+    limit: 3,
+    sortOrder: "desc",
+  });
+
+  // Most Experienced
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Most Experienced",
+    statKeys: ["seasons"],
+    statLabels: ["Years"],
+    limit: 3,
+    sortOrder: "desc",
+  });
+
+  //Best Week
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Best Week",
+    statLabels: ["Points"],
+    limit: 3,
+    sortOrder: "desc",
+    statExtractor: (team) => team.bestWeek?.points ?? 0,
+    rowInfoExtractor: (team) =>
+      team.bestWeek?.event
+        ? ` <span style="color: gray; font-size: 0.85em;">(GW${team.bestWeek.event})</span>`
+        : "",
+  });
+  //Worst Week
+  createTopStatTable({
+    standings: leagueToDisplay,
+    containerDiv: sidebarCol,
+    titleText: "Worst Week",
+    statLabels: ["Points"],
+    limit: 3,
+    sortOrder: "asc",
+    statExtractor: (team) => team.worstWeek?.points ?? 0,
+    rowInfoExtractor: (team) =>
+      team.worstWeek?.event
+        ? ` <span style="color: gray; font-size: 0.85em;">(GW${team.worstWeek.event})</span>`
+        : "",
+  });
+}
+
+async function createSeasonMaxTable(standings, containerDiv) {
+
+  
+  const table = document.createElement("table");
+  table.id = "league-table";
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered",
+    "align-middle",
+    darkMode ? "table-dark" : "table-light"
+  );
+
+  const headers = [
+    { label: "Rank", key: "rank" },
+    { label: "Team Name", key: "entry_name" },
+    { label: "First Name", key: "managerDetails.player_first_name" },
+    { label: "Last Name", key: "managerDetails.player_last_name" },
+    {
+      label: "Favourite Team",
+      value: async (team) => {
+        const name = await getTeamName(team.managerDetails.favourite_team);
+       
+        return (name == null || name === 'undefined') ? "" : name;
+      },
+    },
+    { label: "Total Points", key: "managerDetails.summary_overall_points" },
+    {
+      label: "Chips Used",
+      value: async (team) => await team.chips?.length || 0,
+    },
+
+    { label: "Minus Points", key: "totalMinusPoints" },
+    { label: "Bench Points", key: "totalPointsOnBench" },
+    { label: "Transfers", key: "totalTransfers" },
+    { label: "Region", key: "managerDetails.player_region_name" },
+    { label: "Years Active", key: "managerDetails.years_active" },
+    { label: "Overall Rank", key: "managerDetails.summary_overall_rank" },
+    { label: "Total Transfers", key: "totalTransfers" },
+    { label: "Total Assists", key: "total_assists" },
+    { label: "Total Home Games", key: "total_home_games" },
+    { label: "Total Away Games", key: "total_away_games" },
+    { label: "Total Captaincy Points", key: "total_captaincy_points" },
+    { label: "Total Cards", key: "total_cards" },
+    { label: "Total Clean Sheets", key: "total_clean_sheets" },
+    { label: "Total Goals Conceded", key: "total_goals_conceded" },
+    { label: "Total Goals Scored", key: "total_goals_scored" },
+    { label: "Total Minutes", key: "total_minutes" },
+    { label: "Total Own Goals", key: "total_own_goals" },
+    { label: "Total Penalties Missed", key: "total_penalties_missed" },
+    { label: "Total Red Cards", key: "total_red_cards" },
+    { label: "Total Saves", key: "total_saves" },
+    { label: "Total Yellow Cards", key: "total_yellow_cards" },
+  ];
+
+  let sortDirection = {};
+  headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
+
+  function getValue(obj, path) {
+    return path.split(".").reduce((acc, key) => acc?.[key], obj);
+  }
+
+  function renderHeader() {
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    headers.forEach((header) => {
+      const th = document.createElement("th");
+      th.textContent = header.label;
+
+      th.addEventListener("click", async () => {
+        const sortKey = header.key || header.label;
+        const dir = sortDirection[sortKey];
+
+        const sortableStandings = await Promise.all(standings.map(async (team) => {
+          const val = header.value ? await header.value(team) : getValue(team, header.key);
+          return { team, sortVal: val };
+        }));
+
+        sortableStandings.sort((a, b) => {
+          const valA = a.sortVal;
+          const valB = b.sortVal;
+
+          if (typeof valA === "number" && typeof valB === "number") {
+            return dir === "asc" ? valA - valB : valB - valA;
+          } else {
+            return dir === "asc"
+              ? String(valA).localeCompare(String(valB))
+              : String(valB).localeCompare(String(valA));
+          }
+        });
+
+        standings = sortableStandings.map(item => item.team);
+
+        sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
+        await renderTableBody();
+      });
+
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    return thead;
+  }
+
+  async function renderTableBody() {
+    const oldTbody = table.querySelector("tbody");
+    if (oldTbody) oldTbody.remove();
+
+    const tbody = document.createElement("tbody");
+
+    for (const team of standings) {
+      const row = document.createElement("tr");
+
+      for (const header of headers) {
+        const td = document.createElement("td");
+
+        let value;
+        if (header.value) {
+          value = await header.value(team);
+        } else if (header.key) {
+          value = getValue(team, header.key);
+        }
+
+        td.textContent = value ?? "";
+        td.style.border = "1px solid #ccc";
+        td.style.padding = "8px";
+        row.appendChild(td);
+      }
+
+      tbody.appendChild(row);
+    }
+
+    table.appendChild(tbody);
+  }
+
+  table.appendChild(renderHeader());
+  await renderTableBody();
+
+  containerDiv.innerHTML = "";
+  const scrollWrapper = document.createElement("div");
+  scrollWrapper.style.overflowX = "auto";
+  scrollWrapper.style.width = "100%";
+  scrollWrapper.appendChild(table);
+
+    // Title
+  const title = document.createElement("h4");
+  title.textContent = "Season Stats";
+  console.log(title, containerDiv)
+  containerDiv.appendChild(title);
+
+  containerDiv.appendChild(scrollWrapper);
+}
+
+
+async function createChipsUsedChart(standings) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "col-12"; // full-width column
+
+  const card = document.createElement("div");
+  card.className = "card shadow-sm mb-3";
+
+  const cardBody = document.createElement("div");
+  cardBody.className = "card-body";
+
+  const title = document.createElement("h5");
+  title.className = "card-title";
+  title.textContent = "Number of Chips Used";
+  cardBody.appendChild(title);
+
+  const canvas = document.createElement("canvas");
+  canvas.height = 300;
+  cardBody.appendChild(canvas);
+
+  card.appendChild(cardBody);
+  wrapper.appendChild(card);
+
+  // Now generate the chart
+  const sortedStandings = [...standings].sort(
+    (a, b) => a.chips.length - b.chips.length
+  );
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  const backgroundColor = "#0d6efd"; // Bootstrap primary
+  const textColor = darkMode ? "#ffffff" : "#212529";
+  const gridColor = darkMode ? "#444" : "#ddd";
+
+  new Chart(canvas.getContext("2d"), {
+    type: "bar",
+    data: {
+      labels: sortedStandings.map((team) => team.entry_name),
+      datasets: [
+        {
+          label: "Chips Used",
+          data: sortedStandings.map((team) => team.chips.length),
+          backgroundColor,
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "x",
+      responsive: true,
+      plugins: {
+        title: {
+          display: false,
+        },
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          ticks: {
+            color: textColor,
+            stepSize: 1,
+          },
+          grid: {
+            color: gridColor,
+          },
+        },
+        y: {
+          ticks: {
+            color: textColor,
+            autoSkip: false,
+          },
+          grid: {
+            color: gridColor,
+          },
+        },
+      },
+    },
+  });
+
+  return wrapper;
+}
+
+
+
+async function findManagersOfTheMonth(standings, phases, currentGw) {
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  // Create holding container
+  const holdingContainer = document.createElement("div");
+  holdingContainer.classList.add("mb-4");
+
+  // Title
+  const title = document.createElement("h4");
+  title.textContent = "Manager of the Month";
+  holdingContainer.appendChild(title);
+
+  // Grid Container (Bootstrap grid)
+  const gridContainer = document.createElement("div");
+  gridContainer.className = "row g-3";
+
+  // Filter out the "Overall" phase (id: 1)
+  const monthlyPhases = phases.filter((phase) => phase.id !== 1);
+
+  monthlyPhases.forEach((phase) => {
+    const col = document.createElement("div");
+    col.className = "col-md-4";
+
+    const card = document.createElement("div");
+    card.className = `card h-100 ${darkMode ? "bg-dark text-white border-secondary" : ""}`;
+
+    const cardBody = document.createElement("div");
+    cardBody.className = "card-body text-center";
+
+    const cardTitle = document.createElement("h5");
+    cardTitle.className = "card-title";
+    cardTitle.textContent = phase.name + "🎉";
+    cardBody.appendChild(cardTitle);
+
+    // Check if phase is currently in progress (skip May, etc.)
+    if (currentGw >= phase.start_event && currentGw <= phase.stop_event) {
+      const msg = document.createElement("p");
+      msg.className = "card-text";
+      msg.textContent = "Winner coming soon";
+      cardBody.appendChild(msg);
+    } else {
+      let bestTeam = null;
+      let highestPoints = -1;
+
+      standings.forEach((team) => {
+        const monthlyPoints = team.everyGw
+          .filter(
+            (gw) =>
+              gw.gameweek >= phase.start_event &&
+              gw.gameweek <= phase.stop_event
+          )
+          .reduce((total, gw) => total + (gw.points - gw.transfers_cost), 0);
+
+        if (monthlyPoints > highestPoints) {
+          highestPoints = monthlyPoints;
+          bestTeam = team;
+        }
+      });
+
+      if (bestTeam) {
+        const teamName = document.createElement("p");
+        teamName.className = "mb-1 fw-bold";
+        teamName.textContent = bestTeam.entry_name;
+        cardBody.appendChild(teamName);
+
+        const points = document.createElement("p");
+        points.className = "mb-0";
+        points.textContent = `${highestPoints} points`;
+        cardBody.appendChild(points);
+      }
+    }
+
+    card.appendChild(cardBody);
+    col.appendChild(card);
+    gridContainer.appendChild(col);
+  });
+
+  holdingContainer.appendChild(gridContainer);
+
+  return holdingContainer;
+}
+
+function miniLeagueAdmin(){
+      if (!userHasAccess([12])) {
+      showModal({
+        title: "Paid Feature",
+        body: "This feature is only available to <strong>Max members</strong>.<br><br>If you're a mini league organiser/commissioner, upgrade to import your mini leagues and keep track on who's paid and who hasn't!",
+        confirmText: "Take me there",
+        onConfirm: () => {
+          window.location.href = subscriptionPageUrl;
+        },
+      });
+      return;
+    }
+    window.location.href = miniLeagueAdminPageUrl
+}
+
+async function createLeagueDashboardOLD() {
+  //My Team Tab
+  const myTeam = findManagerTeam(standings, managerData);
+  console.log("My Team", myTeam);
+  const playerPointsMap = {};
+
+  if (myTeam != undefined) {
+    console.log("Checking GW sheets:", myTeam.gwScoreSheet.length);
+    myTeam.gwScoreSheet.forEach((gw, gwIndex) => {
+      //console.log(`GW${gwIndex + 1}: starters count =`, gw.starters.length);
+
+      gw.starters.forEach((player) => {
+        const id = player.playerId;
+        const name = player.name;
+
+        if (!playerPointsMap[id]) {
+          playerPointsMap[id] = {
+            playerId: id,
+            name: name,
+            totalPoints: 0,
+            appearances: 0,
+            seasonPoints: getPlayerTotalPoints(id),
+          };
+        }
+
+        playerPointsMap[id].totalPoints += player.points;
+        playerPointsMap[id].appearances += 1;
+
+        //console.log(`→ ${name} (${id}) now has ${playerPointsMap[id].appearances} appearances`);
+      });
+    });
+  }
+
+  const playerPointsArray = Object.values(playerPointsMap);
+  console.log(playerPointsArray);
+  // Helper: get nested value from object
+  function getValue(obj, path) {
+    return path.split(".").reduce((acc, key) => acc?.[key], obj);
+  }
+
+  // Create Table for Team Player Stats
+  function createPlayerStatsTable(players, containerDiv) {
+    const tableContainer = document.createElement("div");
+    tableContainer.id = "my-team-table-container";
+    tableContainer.style.overflowX = "auto";
+    tableContainer.style.width = "100%";
+    const table = document.createElement("table");
+    table.id = "my-team-table";
+
+    // Define the columns and their respective data sources
+    const headers = [
+      { label: "Rank", key: "rank" },
+      { label: "Player", key: "name" },
+      { label: "Team Points", key: "totalPoints" },
+      { label: "Apps", key: "appearances" },
+      { label: "Total Points", key: "seasonPoints" },
+    ];
+
+    let sortDirection = {};
+    headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
+
+    // Helper function to render header
+    function renderHeader() {
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+
+      headers.forEach((header) => {
+        const th = document.createElement("th");
+        th.textContent = header.label;
+        th.style.border = "1px solid #ccc";
+        th.style.padding = "8px";
+        th.style.backgroundColor = "#f5f5f5";
+        th.style.cursor = "pointer";
+
+        th.addEventListener("click", () => {
+          const sortKey = header.key || header.label;
+          const dir = sortDirection[sortKey];
+
+          players.sort((a, b) => {
+            const valA = getValue(a, header.key);
+            const valB = getValue(b, header.key);
+
+            if (typeof valA === "number" && typeof valB === "number") {
+              return dir === "asc" ? valA - valB : valB - valA;
+            } else {
+              return dir === "asc"
+                ? String(valA).localeCompare(String(valB))
+                : String(valB).localeCompare(String(valA));
+            }
+          });
+
+          sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
+          renderTableBody();
+        });
+
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      return thead;
+    }
+
+    // Helper function to render table body
+    function renderTableBody() {
+      const oldTbody = table.querySelector("tbody");
+      if (oldTbody) oldTbody.remove();
+
+      const tbody = document.createElement("tbody");
+
+      players.forEach((player) => {
+        const row = document.createElement("tr");
+
+        headers.forEach((header) => {
+          const td = document.createElement("td");
+          let value;
+          if (header.key === "rank") {
+            value = players.indexOf(player) + 1;
+          } else {
+            value = getValue(player, header.key);
+          }
+          td.textContent = value ?? "-";
+          td.style.border = "1px solid #ccc";
+          td.style.padding = "8px";
+          row.appendChild(td);
+        });
+
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+    }
+
+    table.appendChild(renderHeader());
+    renderTableBody();
+
+    containerDiv.innerHTML = ""; // Clear previous content
+    tableContainer.appendChild(table);
+    containerDiv.appendChild(tableContainer);
+  }
+  if (myTeam !== undefined) {
+    createPlayerStatsTable(playerPointsArray, myTeamStats);
+  } else {
+    const teamMessage = document.createElement("p");
+    teamMessage.textContent =
+      "No data available for your team. Select a league in which you're in the top 100 to calculate data";
+    myTeamStats.appendChild(teamMessage);
+  }
+
+  // Gameweek Tab
+  function createGameweekLeagueTable(standings, containerDiv) {
+    const table = document.createElement("table");
+    table.id = "league-table";
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+
+    const headers = [
+      { label: "First Name", key: "managerDetails.player_first_name" },
+      { label: "Last Name", key: "managerDetails.player_last_name" },
+      { label: "Team Name", key: "entry_name" },
+
+      { label: "GW Points", key: "event_total" },
+      {
+        label: "Active Chip",
+        value: (team) =>
+          convertChipName(team.currentWeek?.[0]?.active_chip) || "",
+      },
+      {
+        label: "Captain ID",
+        value: (team) => {
+          const picks = team.currentWeek?.[0]?.picks || [];
+          const captain = picks.find((p) => p.is_captain);
+          return captain ? getPlayerWebName(captain.element) : "None";
+        },
+      },
+      {
+        label: "Bench Points",
+        value: (team) =>
+          team.everyGw[team.everyGw.length - 1].bench_points || "0",
+      },
+      {
+        label: "Transfers",
+        value: (team) => team.everyGw[team.everyGw.length - 1].transfers || "0",
+      },
+      {
+        label: "Hits",
+        value: (team) =>
+          team.everyGw[team.everyGw.length - 1].transfers_cost || "0",
+      },
+      {
+        label: "Percentile Rank",
+        value: (team) =>
+          team.everyGw[team.everyGw.length - 1].percentile_rank || "0",
+      },
+
+      { label: "Overall Rank", key: "managerDetails.summary_overall_rank" },
+    ];
+
+    let sortDirection = {};
+    headers.forEach((h) => (sortDirection[h.key || h.label] = "asc"));
+
+    // Helper: get nested value from object
+    function getValue(obj, path) {
+      return path.split(".").reduce((acc, key) => acc?.[key], obj);
+    }
+
+    function renderHeader() {
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+
+      headers.forEach((header) => {
+        const th = document.createElement("th");
+        th.textContent = header.label;
+        th.style.border = "1px solid #ccc";
+        th.style.padding = "8px";
+        th.style.backgroundColor = "#f5f5f5";
+        th.style.cursor = "pointer";
+
+        th.addEventListener("click", () => {
+          const sortKey = header.key || header.label;
+          const dir = sortDirection[sortKey];
+
+          standings.sort((a, b) => {
+            const valA = header.value
+              ? header.value(a)
+              : getValue(a, header.key);
+            const valB = header.value
+              ? header.value(b)
+              : getValue(b, header.key);
+
+            if (typeof valA === "number" && typeof valB === "number") {
+              return dir === "asc" ? valA - valB : valB - valA;
+            } else {
+              return dir === "asc"
+                ? String(valA).localeCompare(String(valB))
+                : String(valB).localeCompare(String(valA));
+            }
+          });
+
+          sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
+          renderTableBody();
+        });
+
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      return thead;
+    }
+
+    function renderTableBody() {
+      const oldTbody = table.querySelector("tbody");
+      if (oldTbody) oldTbody.remove();
+
+      const tbody = document.createElement("tbody");
+
+      standings.forEach((team) => {
+        const row = document.createElement("tr");
+
+        headers.forEach((header) => {
+          const td = document.createElement("td");
+          const value = header.value
+            ? header.value(team)
+            : getValue(team, header.key);
+          td.textContent = value ?? "";
+          td.style.border = "1px solid #ccc";
+          td.style.padding = "8px";
+          row.appendChild(td);
+        });
+
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+    }
+
+    table.appendChild(renderHeader());
+    renderTableBody();
+
+    containerDiv.innerHTML = "";
+
+    const scrollWrapper = document.createElement("div");
+    scrollWrapper.style.overflowX = "auto";
+    scrollWrapper.style.width = "100%";
+
+    scrollWrapper.appendChild(table);
+    containerDiv.appendChild(scrollWrapper);
+  }
+  createGameweekLeagueTable(standings, gameweekStats);
+
+  function createTopPlayerOwnershipChart(standings, containerDiv) {
+    const playerCounts = {};
+
+    standings.forEach((team) => {
+      const picks = team.currentWeek[0].picks.slice(0, 11); // Starting XI only
+      picks.forEach((pick) => {
+        const elementId = pick.element;
+        if (playerCounts[elementId]) {
+          playerCounts[elementId]++;
+        } else {
+          playerCounts[elementId] = 1;
+        }
+      });
+    });
+
+    const topPlayerEntries = Object.entries(playerCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 11);
+
+    const topPlayerLabels = topPlayerEntries.map(([elementId]) =>
+      getPlayerWebName(elementId)
+    );
+
+    const data = topPlayerEntries.map(([_, count]) => count);
+    const popularPlayersCanvas = createChartContainer(containerDiv);
+
+    const totalTeams = standings.length;
+    const percentageData = data.map((count) =>
+      ((count / totalTeams) * 100).toFixed(1)
+    );
+
+    new Chart(popularPlayersCanvas.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: topPlayerLabels,
+        datasets: [
+          {
+            axis: "y",
+            label: "Mini League Player Ownership %",
+            data: percentageData,
+            backgroundColor: colors.dashboardBlue,
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        plugins: {
+          title: {
+            display: true,
+            text: "Top 20 Most Picked Players (By % of Teams)",
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.label}: ${context.raw}% of teams`,
+            },
+          },
+          legend: { display: false },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              stepSize: 10,
+              callback: (value) => value + "%",
+            },
+            title: {
+              display: true,
+              text: "% of Teams",
+            },
+          },
+        },
+      },
+    });
+  }
+  createTopPlayerOwnershipChart(standings, gameweekStats); // draws inside the gameweekStats container
+
+  //Remove when finished testing
+  //Chip usage pie charts
+  function createChipUsageChartsTest(standings, containerDiv) {
+    console.log("working");
+    const chipTypes = [
+      "wildcard1",
+      "wildcard2",
+      "freehit",
+      "manager",
+      "bboost",
+      "3xc",
+    ];
+    const chipUsage = Object.fromEntries(
+      chipTypes.map((type) => [type, { used: 0, unused: 0 }])
+    );
+
+    // Step 1: Count chip usage
+    standings.forEach((team) => {
+      const usedChips = team.chips || [];
+      const usedSet = new Set();
+
+      usedChips.forEach((chip) => {
+        if (chip.name === "wildcard") {
+          const key = chip.gw <= 18 ? "wildcard1" : "wildcard2";
+          chipUsage[key].used++;
+          usedSet.add(key);
+        } else {
+          chipUsage[chip.name].used++;
+          usedSet.add(chip.name);
+        }
+      });
+
+      chipTypes.forEach((chip) => {
+        if (!usedSet.has(chip)) {
+          chipUsage[chip].unused++;
+        }
+      });
+    });
+
+    // Step 2: Create UI + charts
+    const chipLabels = {
+      wildcard1: "Wildcard 1",
+      wildcard2: "Wildcard 2",
+      freehit: "Free Hit",
+      manager: "Assistant Manager",
+      bboost: "Bench Boost",
+      "3xc": "Triple Captain",
+    };
+
+    if (!containerDiv) return;
+
+    const chipContainer = document.createElement("div");
+    chipContainer.id = "sidebar-chip-container";
+    chipContainer.style.display = "grid";
+    chipContainer.style.gridTemplateColumns =
+      "repeat(auto-fit, minmax(250px, 1fr))";
+    chipContainer.style.gap = "10px";
+    containerDiv.appendChild(chipContainer);
+
+    chipTypes.forEach((chipType) => {
+      const chipCard = document.createElement("div");
+      chipCard.style.display = "flex";
+      chipCard.style.flexDirection = "column";
+      chipCard.style.alignItems = "center";
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 100;
+      canvas.height = 100;
+      chipCard.appendChild(canvas);
+
+      const info = document.createElement("div");
+      info.innerHTML = `
+        <strong>${chipLabels[chipType]}</strong><br>
+        Used: ${chipUsage[chipType].used} &nbsp;|&nbsp; 
+        Unused: ${chipUsage[chipType].unused}
+      `;
+      info.style.textAlign = "center";
+      info.style.marginTop = "8px";
+      chipCard.appendChild(info);
+
+      chipContainer.appendChild(chipCard);
+
+      new Chart(canvas.getContext("2d"), {
+        type: "pie",
+        data: {
+          labels: ["Used", "Unused"],
+          datasets: [
+            {
+              data: [chipUsage[chipType].used, chipUsage[chipType].unused],
+              backgroundColor: ["#1A73E8", "#ccc"],
+            },
+          ],
+        },
+        options: {
+          responsive: false,
+          plugins: {
+            title: { display: false },
+            legend: { display: false },
+          },
+        },
+      });
+    });
+  }
+  createChipUsageChartsTest(standings, gameweekStatsSidebar);
+
+  //Season Tab
+
+  //Total Points Charts
+  function createTotalPointsChart(standings, containerDiv) {
+    const canvas = createChartContainer(containerDiv);
+
+    new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: standings.map((team) => team.entry_name),
+        datasets: [
+          {
+            label: "Total Points",
+            data: standings.map((team) => team.total),
+            backgroundColor: "#1A73E8",
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: "Total Points by Team",
+          },
+          legend: { display: false },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            ticks: {
+              autoSkip: false,
+            },
+          },
+        },
+      },
+    });
+  }
+  createTotalPointsChart(standings, seasonStats); // draws inside the seasonStats container
+
+  //Chip usage pie charts
+  function createChipUsageCharts(standings, containerDiv) {
+    const chipTypes = [
+      "wildcard1",
+      "wildcard2",
+      "freehit",
+      "manager",
+      "bboost",
+      "3xc",
+    ];
+    const chipUsage = Object.fromEntries(
+      chipTypes.map((type) => [type, { used: 0, unused: 0 }])
+    );
+
+    // Step 1: Count chip usage
+    standings.forEach((team) => {
+      const usedChips = team.chips || [];
+      const usedSet = new Set();
+
+      usedChips.forEach((chip) => {
+        if (chip.name === "wildcard") {
+          const key = chip.gw <= 18 ? "wildcard1" : "wildcard2";
+          chipUsage[key].used++;
+          usedSet.add(key);
+        } else {
+          chipUsage[chip.name].used++;
+          usedSet.add(chip.name);
+        }
+      });
+
+      chipTypes.forEach((chip) => {
+        if (!usedSet.has(chip)) {
+          chipUsage[chip].unused++;
+        }
+      });
+    });
+
+    // Step 2: Create UI + charts
+    const chipLabels = {
+      wildcard1: "Wildcard 1",
+      wildcard2: "Wildcard 2",
+      freehit: "Free Hit",
+      manager: "Assistant Manager",
+      bboost: "Bench Boost",
+      "3xc": "Triple Captain",
+    };
+
+    if (!containerDiv) return;
+
+    const chipContainer = document.createElement("div");
+    chipContainer.id = "sidebar-chip-container";
+    chipContainer.style.display = "grid";
+    chipContainer.style.gridTemplateColumns =
+      "repeat(auto-fit, minmax(250px, 1fr))";
+    chipContainer.style.gap = "10px";
+
+    const title = document.createElement("h4");
+    title.textContent = `League Chip Usage`;
+    title.style.marginBottom = "0.5rem";
+    chipContainer.appendChild(title);
+    const blank = document.createElement("h4");
+    blank.textContent = ` `;
+    blank.style.marginBottom = "0.5rem";
+    chipContainer.appendChild(blank);
+
+    containerDiv.appendChild(chipContainer);
+
+    chipTypes.forEach((chipType) => {
+      const chipCard = document.createElement("div");
+      chipCard.style.display = "flex";
+      chipCard.style.flexDirection = "column";
+      chipCard.style.alignItems = "center";
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 100;
+      canvas.height = 100;
+      chipCard.appendChild(canvas);
+
+      const info = document.createElement("div");
+      info.innerHTML = `
+        <strong>${chipLabels[chipType]}</strong><br>
+        Used: ${chipUsage[chipType].used} &nbsp;|&nbsp; 
+        Unused: ${chipUsage[chipType].unused}
+      `;
+      info.style.textAlign = "center";
+      info.style.marginTop = "8px";
+      chipCard.appendChild(info);
+
+      chipContainer.appendChild(chipCard);
+
+      new Chart(canvas.getContext("2d"), {
+        type: "pie",
+        data: {
+          labels: ["Used", "Unused"],
+          datasets: [
+            {
+              data: [chipUsage[chipType].used, chipUsage[chipType].unused],
+              backgroundColor: ["#1A73E8", "#ccc"],
+            },
+          ],
+        },
+        options: {
+          responsive: false,
+          plugins: {
+            title: { display: false },
+            legend: { display: false },
+          },
+        },
+      });
+    });
+  }
+  createChipUsageCharts(standings, seasonStatsSidebar);
+
+  function createMyTeamStatTable({
+    players,
+    containerDiv,
+    titleText,
+    statKeys,
+    statLabels,
+    sortOrder = "desc",
+    limit = null,
+  }) {
+    // Helper function to get the stat value for sorting
+    const getStatValue = (player, key) => player[key] || 0;
+
+    // Sort players based on the chosen stat key
+    let sorted = [...players];
+
+    // Sort the rows when the column header is clicked
+    const sortTable = (columnIndex, sortOrder) => {
+      sorted.sort((a, b) => {
+        const aValue = getStatValue(a, statKeys[columnIndex]);
+        const bValue = getStatValue(b, statKeys[columnIndex]);
+
+        if (sortOrder === "asc") {
+          return aValue - bValue;
+        } else {
+          return bValue - aValue;
+        }
+      });
+      renderTable(); // Re-render the table after sorting
+    };
+
+    // Render the table
+    const renderTable = () => {
+      const wrapper = document.createElement("div");
+      wrapper.style.marginTop = "1rem";
+
+      const title = document.createElement("h4");
+      title.textContent = titleText;
+      title.style.marginBottom = "0.5rem";
+
+      const table = document.createElement("table");
+      table.style.width = "100%";
+      table.style.borderCollapse = "collapse";
+
+      const thead = document.createElement("thead");
+      const headerCells = statLabels
+        .map((label, index) => {
+          return `
+          <th 
+            style="text-align: left; padding: 8px; border-bottom: 1px solid #ccc; cursor: pointer;"
+            onclick="sortTable(${index}, '${
+            sortOrder === "desc" ? "asc" : "desc"
+          }')">
+            ${label}
+          </th>
+        `;
+        })
+        .join("");
+
+      thead.innerHTML = `
+      <tr>
+        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ccc;">#</th>
+        <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ccc;">Player</th>
+        ${headerCells}
+      </tr>
+    `;
+
+      const tbody = document.createElement("tbody");
+      const medals = ["🥇", "🥈", "🥉"];
+
+      // Limit the number of rows if needed
+      const limited = limit ? sorted.slice(0, limit) : sorted;
+
+      limited.forEach((player, index) => {
+        const rankDisplay = medals[index] || index + 1;
+        const statCells = statKeys
+          .map(
+            (key) =>
+              `<td style="text-align: right; padding: 8px; border-bottom: 1px solid #eee;">${getStatValue(
+                player,
+                key
+              )}</td>`
+          )
+          .join("");
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${rankDisplay}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${player.name}</td>
+        ${statCells}
+      `;
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      wrapper.appendChild(title);
+      wrapper.appendChild(table);
+      containerDiv.appendChild(wrapper);
+    };
+
+    // Initial render of the table
+    renderTable();
+  }
+
+  //Rank progression charts
+  function createRankProgressionChart(standings, containerDiv, getRandomColor) {
+    const canvas = createChartContainer(containerDiv);
+    //canvas.style.minHeight = "600px"
+    // Generate labels from the first team's gameweek data
+    const labels = standings[0]?.everyGw.map((gw) => `GW${gw.gameweek}`) || [];
+
+    new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: standings.map((team) => ({
+          label: team.entry_name,
+          data: team.everyGw.map((gw) => gw.overall_rank),
+          fill: false,
+          borderColor: getRandomColor(),
+          tension: 0.3,
+          hidden: true, // Start hidden
+        })),
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Overall Rank Progression",
+          },
+        },
+        scales: {
+          y: {
+            reverse: true, // Higher rank = lower number
+            beginAtZero: false,
+          },
+        },
+      },
+    });
+  }
+  createRankProgressionChart(standings, seasonStats, getRandomColor);
+
+  //Benched Points Chart
+  function createBenchPointsChart(standings, containerDiv, colors) {
+    const canvas = createChartContainer(containerDiv);
+
+    // Step 1: Sort by bench points
+    const sortedStandings = [...standings].sort(
+      (a, b) => b.totalPointsOnBench - a.totalPointsOnBench
+    );
+
+    // Step 2: Extract labels and data
+    const benchLabels = sortedStandings.map((team) => team.entry_name);
+    const benchPoints = sortedStandings.map((team) => team.totalPointsOnBench);
+    const totalPoints = sortedStandings.map((team) => team.total / 5); // Adjusted if intentional
+
+    // Step 3: Render bar chart
+    new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: benchLabels,
+        datasets: [
+          {
+            label: "Bench Points",
+            data: benchPoints,
+            backgroundColor: colors.dashboardBlue,
+          },
+          {
+            label: "Total Points / 5",
+            data: totalPoints,
+            backgroundColor: colors.greenNeon,
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Bench Points vs Total Points by Manager",
+          },
+          legend: {
+            position: "top",
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.dataset.label}: ${context.raw}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            stacked: false,
+            ticks: {
+              stepSize: 50,
+            },
+          },
+          y: {
+            stacked: false,
+          },
+        },
+      },
+    });
+  }
+  createBenchPointsChart(standings, seasonStats, colors);
+
+  //Country Chart
+  function createPlayersByCountryChart(standings, containerDiv) {
+    const canvas = createChartContainer(containerDiv);
+
+    // Step 1: Count players per country
+    const countryCounts = {};
+    standings.forEach((team) => {
+      const country = team.managerDetails?.player_region_name;
+      if (country) {
+        countryCounts[country] = (countryCounts[country] || 0) + 1;
+      }
+    });
+
+    // Step 2: Sort descending
+    const sortedData = Object.entries(countryCounts).sort(
+      (a, b) => b[1] - a[1]
+    );
+
+    const countryLabels = sortedData.map(([country]) => country);
+    const playerCountryCounts = sortedData.map(([, count]) => count);
+
+    // Step 3: Create chart
+    new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: countryLabels,
+        datasets: [
+          {
+            label: "Players per Country",
+            data: playerCountryCounts,
+            backgroundColor: getRandomColor(),
+          },
+        ],
+      },
+      options: {
+        indexAxis: "x",
+        plugins: {
+          title: {
+            display: true,
+            text: "Number of Players by Country",
+          },
+          legend: { display: false },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            stepSize: 1,
+          },
+        },
+      },
+    });
+  }
+  createPlayersByCountryChart(standings, seasonStats);
+
+  //Years Active chart
+  function createYearsActiveChart(standings, containerDiv) {
+    const canvas = createChartContainer(containerDiv);
+
+    // Sort by years_active descending (default to 0 if missing)
+    const sortedStandings = [...standings].sort(
+      (a, b) =>
+        (b.managerDetails?.years_active || 0) -
+        (a.managerDetails?.years_active || 0)
+    );
+
+    const teamLabels = sortedStandings.map((team) => team.entry_name);
+    const yearsData = sortedStandings.map(
+      (team) => team.managerDetails?.years_active || 0
+    );
+
+    new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: teamLabels,
+        datasets: [
+          {
+            label: "Years Active",
+            data: yearsData,
+            backgroundColor: "#1A73E8",
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: "Years Active per Manager (Sorted)",
+          },
+          legend: { display: false },
+        },
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+            },
+          },
+          x: {
+            ticks: {
+              autoSkip: false,
+              maxRotation: 90,
+              minRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+  createYearsActiveChart(standings, seasonStats);
+
+
+}
+
+
+
+
+
+
+//HELPERS
+// Convert FPL chip name to user-friendly chip names
+function convertChipName(chip) {
+  const chipMap = {
+    wildcard: "WC",
+    freehit: "FH",
+    bboost: "BB",
+    manager: "AM",
+    "3xc": "TC",
+    "": "",
+  };
+  return chipMap[chip] || chip;
+}
+// Fetch player's current game stats from API
+async function fetchPlayerCurrentStats(elementId) {
+  const response = await fetch(`${BASE_URL}/element-summary/${elementId}/`);
+  const data = await response.json();
+  return data.history.slice(-1);
+}
+// Make getFootballerObject return a Promise
+function getFootballerObject(playerId) {
+  return new Promise((resolve, reject) => {
+    const player = bootstrap.elements.find((el) => el.id == playerId);
+
+    if (!player) {
+      reject(`Player with ID ${playerId} not found.`);
+      return;
+    }
+
+    const team = bootstrap.teams.find((t) => t.id == player.team);
+
+    const footballer = {
+      web_name: player.web_name,
+      first_name: player.first_name,
+      second_name: player.second_name,
+      event_points: player.event_points,
+      dreamteam: player.in_dreamteam,
+      points_per_game: player.points_per_game,
+      transfers_in: player.transfers_in,
+      transfers_in_event: player.transfers_in_event,
+      transfers_out: player.transfers_out,
+      transfers_out_event: player.transfers_out_event,
+      price_change: player.cost_change_event,
+      news: player.news,
+      team_code: player.team_code,
+      element_type: player.element_type,
+      ep_this: player.ep_this,
+      ep_next: player.ep_next,
+      photo: player.photo,
+      total_points: player.total_points,
+      goals_scored: player.goals_scored,
+      assists: player.assists,
+      type: player.element_type,
+      team: team ? team.name : "Unknown",
+    };
+
+    resolve(footballer);
+  });
+}
+
+// Make getPlayerWebName async
+async function getPlayerWebName(playerId) {
+  const footballer = await getFootballerObject(playerId); // Store the returned object
+  return footballer.web_name;
+}
+
+function getTeamName(teamCode) {
+  for (var i = 0; i < bootstrap.teams.length; i++) {
+    if (bootstrap.teams[i].id == teamCode) {
+      return bootstrap.teams[i].name;
+    }
+  }
+}
+
+function getTeamShortName(teamCode) {
+  for (var i = 0; i < bootstrap.teams.length; i++) {
+    if (bootstrap.teams[i].id == teamCode) {
+      return bootstrap.teams[i].short_name;
+    }
+  }
+}
+
+async function getPlayerScore(playerId) {
+  const footballer = await getFootballerObject(playerId); // Store the returned object
+  return footballer.event_points;
+}
+async function getPlayerAssists(playerId) {
+  const footballer = await getFootballerObject(playerId);
+  return footballer.assists;
+}
+async function getPlayerGoals(playerId) {
+  const footballer = await getFootballerObject(playerId);
+  return footballer.goals_scored;
+}
+
+async function getPlayerTeam(playerId) {
+  const footballer = await getFootballerObject(playerId);
+  return footballer.team;
+}
+async function getPlayerTeamCode(playerId) {
+  const footballer = await getFootballerObject(playerId);
+  return footballer.team_code;
+}
+async function getPlayerEP(playerId) {
+  const footballer = await getFootballerObject(playerId);
+  return footballer.ep_this;
+}
+
+async function getPlayerTotalPoints(playerId) {
+  const footballer = await getFootballerObject(playerId);
+  return footballer.total_points;
+}
+
+async function getPlayerType(playerId) {
+  const footballer = await getFootballerObject(playerId);
+  return footballer.element_type;
+}
+
+async function getPlayerPhoto(playerId) {
+  const footballer = await getFootballerObject(playerId);
+  return footballer.photo;
+}
+
+function addCaptainBadge() {
+  //console.log("Adding Captain Badges");
+  // Select all elements with the class 'player'
+  const players = document.querySelectorAll(".player");
+
+  players.forEach((player) => {
+    if (player.querySelectorAll(".my-captain-name")[0]) {
+      // Create a new image element
+      const img = document.createElement("img");
+      img.src = "https://fpltoolbox.com/wp-content/uploads/2024/12/Captain.png";
+      img.setAttribute("class", "captain-badge");
+      // Append the image to the player element
+      player.prepend(img);
+    }
+    if (player.querySelectorAll(".my-vice-captain-name")[0]) {
+      // Create a new image element
+      const img = document.createElement("img");
+      img.src =
+        "https://fpltoolbox.com/wp-content/uploads/2024/12/Captain-1.png";
+      img.setAttribute("class", "my-vice-captain-badge");
+      // Append the image to the player element
+      player.prepend(img);
+    }
+    if (player.querySelectorAll(".my-triple-captain-name")[0]) {
+      // Create a new image element
+      const img = document.createElement("img");
+      img.src =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/svgexport-10.png";
+      img.setAttribute("class", "my-triple-captain-badge");
+      // Append the image to the player element
+      player.prepend(img);
+    }
+  });
+}
+
+function showBootstrapSpinner(div) {
+  const spinnerWrapper = document.createElement("div");
+  spinnerWrapper.id = "fpl-spinner"; // <- Add an ID for targeting
+  spinnerWrapper.className = "d-flex justify-content-center align-items-center";
+  spinnerWrapper.style.height = "200px";
+
+  const spinner = document.createElement("div");
+  spinner.className = "spinner-border text-primary";
+  spinner.setAttribute("role", "status");
+
+  const srText = document.createElement("span");
+  srText.className = "visually-hidden";
+  srText.textContent = "Loading...";
+
+  spinner.appendChild(srText);
+  spinnerWrapper.appendChild(spinner);
+  div.appendChild(spinnerWrapper);
+}
+function removeSpinner() {
+  const spinner = document.getElementById("fpl-spinner");
+  if (spinner) spinner.remove();
+}
+
