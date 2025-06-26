@@ -1623,9 +1623,7 @@ async function testFunction2() {
 function generateTeamName() {
   // Inject HTML
   const app = document.getElementById("screen-tools");
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  app.appendChild(backBtn);
+
   const teamNamesForGenerator = [
     // Arsenal
     { name: "Livin' Saliba Loca", tags: ["arsenal", "music"] },
@@ -2234,7 +2232,9 @@ function generateTeamName() {
 </div>
 
 `;
-
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  app.prepend(backBtn);
   // Style elements via JS
   const styles = {
     "#generatorContainer": {
