@@ -62,7 +62,7 @@ const FPLToolboxVersion = changelogData[0].version;
   }
 })();
 
-console.log(theUser.meta);
+console.log(theUser);
 
 const dummyLeagueMessage = `This feature is only available to <strong>paid members</strong>. <br><br>You'll see dummy data here until you subscribe`;
 
@@ -505,7 +505,7 @@ function toolsScreen() {
       icon: "bi-bag-plus",
       label: "Feature Request",
       action: featureRequest,
-      tier: "Max",
+      tier: "max",
       requiresData: false,
     },
   ];
@@ -900,7 +900,7 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
         `${BASE_URL}leagues-classic/${leagueID}/standings?page_standings=${i}`
       );
       const data = await res.json();
-
+      console.error(data)
       if (i === 1) leagueName = data.league.name;
       standings.push(...(data.standings?.results ?? []));
 
@@ -1623,7 +1623,9 @@ async function testFunction2() {
 function generateTeamName() {
   // Inject HTML
   const app = document.getElementById("screen-tools");
-
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  app.appendChild(backBtn);
   const teamNamesForGenerator = [
     // Arsenal
     { name: "Livin' Saliba Loca", tags: ["arsenal", "music"] },
@@ -10916,6 +10918,11 @@ async function createLeagueDashboardOLD() {
 
 
 }
+
+
+
+
+
 
 //HELPERS
 // Convert FPL chip name to user-friendly chip names
