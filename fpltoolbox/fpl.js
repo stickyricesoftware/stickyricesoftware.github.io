@@ -45722,7 +45722,7 @@ window.FPLToolboxMaxLeagueDataReady = false;
 
 let subscriptionPageUrl = "/subscribe";
 let profilePageUrl = "/profile";
-let miniLeagueAdminPageUrl = "https://fpltoolbox.com/private-test-page/"
+let miniLeagueAdminPageUrl = "https://fpltoolbox.com/mini-league-admin-page/"
 
 window.FPLToolboxLeagueData = {
   leagueName: null,
