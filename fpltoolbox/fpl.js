@@ -595,6 +595,7 @@ function toolsScreen() {
     .filter((f) => f.requiresData);
 }
 
+
 function injectDynamicStyles() {
   const darkMode = localStorage.getItem("darkMode") === "true";
 
@@ -1016,6 +1017,7 @@ async function renderToolsScreenWithLeague(leagueId) {
     }
   });
 }
+renderToolsScreenWithLeague(leagueId)
 
 async function addManagerDetailsToLeague(standings, div) {
   const startTime = Date.now(); // Start the timer
