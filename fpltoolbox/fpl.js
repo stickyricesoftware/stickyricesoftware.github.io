@@ -13,6 +13,7 @@ import superLeagueDetailedGameweekDataTest from "./testData/superLeagueDetailedG
 import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
 import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
 
+const preSeason = false
 let testMode = false;
 if (
   window.location.href.includes("http://127.0.0.1:5500/fpltoolbox/") ||
@@ -45824,7 +45825,7 @@ if (theUser.info.team_id) {
   getManagerData(theUser.info.team_id);
 }
 
-if (theUser.info.league_id[0] != "") {
+if (theUser.info.league_id != "" || !theUser.info.league_id) {
   //createLeague(theUser.info.league_id);
 } else {
   showModal({
@@ -45898,7 +45899,7 @@ function injectUI() {
   mainContainer.appendChild(screenWrapper);
   mainContainer.appendChild(nav);
   app.appendChild(mainContainer);
-
+  homeScreen()
   injectDynamicStyles();
   setupTabListeners();
 }
@@ -45927,7 +45928,7 @@ document.getElementById("nav-container").addEventListener("click", (e) => {
 });
 
 function createScreens(wrapper) {
-  const screenIds = ["tools", "settings"];
+  const screenIds = ["home","tools", "settings"];
   screenIds.forEach((id) => {
     const screen = document.createElement("div");
     screen.id = `screen-${id}`;
@@ -45945,6 +45946,7 @@ function createNav() {
   nav.id = "nav-container";
 
   const tabs = [
+        { icon: "house", label: "Home", target: "home" },
     { icon: "tools", label: "Tools", target: "tools" },
     { icon: "globe2", label: "Website", external: "https://fpltoolbox.com" },
     { icon: "gear", label: "Settings", target: "settings" },
@@ -45985,10 +45987,61 @@ function setupTabListeners() {
     });
   });
 }
+function homeScreen() {
+  const homeContainer = document.getElementById("screen-home");
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+homeContainer.innerHTML = `
+
+<div class="p-4 ${darkMode ? 'bg-dark text-light' : ''}">
+
+  <h2 class="mb-3">Welcome to the all new FPL Toolbox</h2>
+
+<p class="lead">
+  The ultimate companion for your mini league.
+</p>
+<p class="mb-1">
+Keep everyone active, engaged, and involved all season long with stats, banter, and tools that shine a light on every triumph and disaster.
+</p>
+
+  <hr class="my-3"/>
+
+  ${!preSeason ? `
+    <div class="mb-4">
+      <p class="mb-1"><strong>It's pretty early on so we won't have much data at the moment</strong> Switch between your mini leagues at any time from the settings.</p>
+    </div>
+    <hr class="my-3"/>
+  ` : ''}
+
+  <div class="mb-4">
+    <h5>Your Toolbox Account</h5>
+    <p>Manage your profile, check your subscription status, or update your details anytime.</p>
+    <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-outline-light' : 'btn-outline-primary'}">View My Profile</a>
+  </div>
+
+  <hr class="my-3"/>
+
+  <div class="text-muted small">
+    FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span>
+  </div>
+
+</div>
+
+`;
+
+
+
+
+
+  injectDynamicStyles(); // apply styles on load
+
+
+
+}
 
 function toolsScreen() {
-  const homeScreen = document.getElementById("screen-tools");
-  homeScreen.innerHTML = "";
+  const toolsScreen = document.getElementById("screen-tools");
+  toolsScreen.innerHTML = "";
 
   const container = document.createElement("div");
   container.className = "container text-center py-3";
@@ -46009,7 +46062,7 @@ function toolsScreen() {
       label: "My Team",
       action: showMyTeam,
       tier: "free",
-      requiresData: false,
+      requiresData: true,
     },
     {
       icon: "bi-bar-chart",
@@ -46036,6 +46089,13 @@ function toolsScreen() {
       icon: "bi-award",
       label: "Season Summary",
       action: showMySeasonSummary,
+      tier: "free",
+      requiresData: true,
+    },
+       {
+      icon: "bi-arrow-repeat",
+      label: "GW Transfer Summaries",
+      action: handleStatsClick,
       tier: "free",
       requiresData: true,
     },
@@ -46117,29 +46177,11 @@ function toolsScreen() {
       tier: "pro",
       requiresData: true,
     },
-    {
-      icon: "bi-sliders",
-      label: "COMPLETE UNTIL HERE", //////////////////// COMPLETE UNTIL HERE
-      action: testFunction2,
-      tier: "max",
-      requiresData: true,
-    },
 
-    {
-      icon: "bi-sliders",
-      label: "Planner",
-      action: testFunction,
-      tier: "max",
-      requiresData: true,
-    },
 
-   {
-      icon: "bi-arrow-repeat",
-      label: "GW Transfer Summaries",
-      action: handleStatsClick,
-      tier: "free",
-      requiresData: true,
-    },
+
+
+
 
     {
       icon: "bi-speedometer2",
@@ -46153,14 +46195,14 @@ function toolsScreen() {
       label: "Mini League Admin",
       action: miniLeagueAdmin,
       tier: "max",
-      requiresData: false,
+      requiresData: true,
     },
     {
       icon: "bi-bag-plus",
       label: "Feature Request",
       action: featureRequest,
       tier: "max",
-      requiresData: false,
+      requiresData: true,
     },
   ];
 
@@ -46234,7 +46276,7 @@ function toolsScreen() {
   });
 
   container.appendChild(row);
-  homeScreen.appendChild(container);
+  toolsScreen.appendChild(container);
 
   // 🔁 Check for league data and re-render individual buttons
   const pendingButtons = features
@@ -46273,6 +46315,7 @@ function injectDynamicStyles() {
 
 function settingsScreen() {
   const settingsContainer = document.getElementById("screen-settings");
+  const darkMode = localStorage.getItem("darkMode") === "true";
 
   // Generate changelog HTML
   let changelogHTML = `
@@ -46290,10 +46333,14 @@ function settingsScreen() {
   </div>
 `;
 
-  // Clear container and add Bootstrap padding
-  settingsContainer.innerHTML = `
+
+    // Clear container and add Bootstrap padding
+settingsContainer.innerHTML = `
+
 <div class="p-4">
+
   <h2 class="mb-3">Settings</h2>
+
   <hr class="my-2"/>
 
   <!-- Dark Mode Toggle -->
@@ -46304,31 +46351,34 @@ function settingsScreen() {
 
   <hr class="my-2"/>
 
-  <!-- League Selector -->
+  ${!preSeason ? `
+    <!-- League Selector -->
+    <div class="mb-4">
+      <label for="leagueSelector" class="form-label">Switch Mini League</label>
+      <select class="form-select" id="leagueSelector"></select>
+    </div>
+
+    <hr class="my-2"/>
+  ` : ''}
+
   <div class="mb-4">
-    <label for="leagueSelector" class="form-label">Switch Mini League</label>
-    <select class="form-select" id="leagueSelector"></select>
+    <h5>Your Toolbox Account</h5>
+    <p>Manage your profile, check your subscription status, or update your details anytime.</p>
+    <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-primary' : 'btn-outline-primary'}">View My Profile</a>
   </div>
 
   <hr class="my-2"/>
 
-  <!-- Toolbox Account -->
-  <div class="mb-4">
-    <h5>My Toolbox Account</h5>
-    <a href="${profilePageUrl}" class="btn btn-outline-primary" target="_blank">View My Profile</a>
-  </div>
+  ${changelogHTML}
 
-  <hr class="my-2"/>
-
- ${changelogHTML}
- 
-
-  
   <!-- Version -->
-<div class="mb-2 text-muted small">FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span></div>
+  <div class="mb-2 text-muted small">FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span></div>
+
 </div>
 
-  `;
+`;
+
+  
 
   // Dark mode toggle logic
   const darkModeToggle = document.getElementById("darkModeToggle");
@@ -46632,6 +46682,22 @@ async function renderToolsScreenWithLeague(leagueId) {
   // Step 0: Use leagueId from localStorage if available
   const savedLeagueId = localStorage.getItem("savedLeagueId");
   console.log("Saved league ID", savedLeagueId);
+  
+  if (preSeason){
+
+      showModal({
+      title: "Pre Season",
+      body: "Limited access until season begins. <strong><br><br>Feel free to use the team name generator while you wait</strong>. <br><br>Not a paid member? Why not!!",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = subscriptionPageUrl;
+      },
+    });
+    toolsScreen();
+    return;
+
+  }
+
 
   if (!leagueId && savedLeagueId) {
     leagueId = savedLeagueId;
@@ -46664,7 +46730,8 @@ async function renderToolsScreenWithLeague(leagueId) {
     }
   });
 }
-renderToolsScreenWithLeague(leagueId)
+
+
 
 async function addManagerDetailsToLeague(standings, div) {
   const startTime = Date.now(); // Start the timer
@@ -49108,175 +49175,7 @@ async function createManagerCard(elementId, score, isCaptain, isViceCaptain) {
 
   return card;
 }
-async function showGameweekStats1() {
-  const container = document.getElementById("screen-tools");
-  container.innerHTML = "";
 
-  // Back button
-  const backBtn = createBackButton();
-  backBtn.classList.add("btn", "btn-secondary", "mb-3");
-  container.appendChild(backBtn);
-
-  const tableHeader = document.createElement("h6");
-  tableHeader.classList.add("text-center", "mb-3");
-  tableHeader.innerText = `${FPLToolboxLeagueData.leagueName} \n Gameweek Activity`;
-
-  container.appendChild(tableHeader);
-
-  const tableWrapper = document.createElement("div");
-  tableWrapper.className = "table-responsive";
-
-  const table = document.createElement("table");
-  const darkMode = localStorage.getItem("darkMode") === "true";
-
-  table.classList.add(
-    "table",
-    "table-striped",
-    "table-hover",
-    "table-bordered",
-    "align-middle",
-    darkMode ? "table-dark" : "table-light"
-  );
-
-  const thead = document.createElement("thead");
-  thead.classList.add("text-center");
-
-  const headerRow = document.createElement("tr");
-  const headers = [
-    "Pos",
-    "Team",
-    "Chip",
-    "Captain",
-    "Score",
-    "Total",
-    "xfrs",
-    "Minus P",
-    "Bench P",
-  ];
-
-  headers.forEach((headerText) => {
-    const th = document.createElement("th");
-    th.innerText = headerText;
-    headerRow.appendChild(th);
-  });
-
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement("tbody");
-
-  try {
-    for (const element of window.FPLToolboxLeagueData.standings) {
-      const tr = document.createElement("tr");
-
-      if (element.entry == theUser.info.team_id) {
-        tr.classList.add("table-primary");
-      }
-
-      // Position and movement
-      const pos = document.createElement("td");
-      pos.className = "text-center fw-bold";
-      const rankMovement = document.createElement("span");
-
-      if (element.rank < element.last_rank) {
-        rankMovement.innerText = " ▲";
-        rankMovement.className = "text-success";
-      } else if (element.rank > element.last_rank) {
-        rankMovement.innerText = " ▼";
-        rankMovement.className = "text-danger";
-      } else {
-        rankMovement.innerText = " ●";
-        rankMovement.className = "text-muted";
-      }
-
-      pos.innerText = element.rank;
-      pos.appendChild(rankMovement);
-      tr.appendChild(pos);
-
-      // Team
-
-      const teamNameCell = document.createElement("td");
-      teamNameCell.innerHTML = `<strong>${element.entry_name}</strong><br><small>${element.player_name}</small>`;
-      tr.appendChild(teamNameCell);
-
-      // Chip
-      const chip = document.createElement("td");
-      chip.className = "text-center";
-      if (element.currentWeek[0].active_chip) {
-        const chipName = convertChipName(element.currentWeek[0].active_chip);
-        chip.innerText = chipName;
-        chip.classList.add(`chip-${chipName.toLowerCase()}`);
-      } else {
-        chip.innerHTML = "-";
-      }
-      tr.appendChild(chip);
-
-      // Captain
-      const captain = document.createElement("td");
-
-      const activeChip = convertChipName(element.currentWeek[0].active_chip);
-
-      for (const player of element.currentWeek[0].picks) {
-        if (player.is_captain) {
-          const score = await getPlayerScore(player.element);
-          const scoreMultiplier = activeChip === "TC" ? 3 : 2;
-          const card = await createPlayerCardNew(
-            player.element,
-            score,
-            true,
-            false,
-            scoreMultiplier
-          );
-          captain.append(card);
-        }
-      }
-
-      tr.appendChild(captain);
-
-      // GW Score
-      const score = document.createElement("td");
-      score.className = "text-center";
-      score.innerText = element.event_total;
-      tr.appendChild(score);
-
-      // Total Points
-      const total = document.createElement("td");
-      total.className = "text-center";
-      total.innerText = element.total;
-      tr.appendChild(total);
-
-      // Transfers
-      const transfers = document.createElement("td");
-      transfers.className = "text-center";
-      transfers.innerText = element.everyGw.at(-1).transfers;
-      tr.appendChild(transfers);
-
-      // Transfer cost
-      const minus = document.createElement("td");
-      minus.className = "text-center";
-      const cost = element.everyGw.at(-1).transfers_cost;
-      minus.innerText = cost;
-      if (cost > 0) {
-        minus.classList.add("text-danger", "fw-bold");
-      }
-      tr.appendChild(minus);
-
-      // Bench Points
-      const bench = document.createElement("td");
-      bench.className = "text-center";
-      bench.innerText = element.everyGw.at(-1).bench_points;
-      tr.appendChild(bench);
-
-      tbody.appendChild(tr);
-    }
-
-    table.appendChild(tbody);
-    tableWrapper.appendChild(table);
-    container.appendChild(tableWrapper);
-  } catch (error) {
-    console.error("Error building table:", error);
-  }
-}
 async function showGameweekStats() {
   const container = document.getElementById("screen-tools");
   container.innerHTML = "";
@@ -50141,7 +50040,7 @@ async function getUniquePlayers(team1, team2) {
 function getLeagueToDisplay(realLeague, dummyLeague, options = {}) {
   const { accessRoles = [10, 12], showLockedModal = true } = options;
 
-  if (userHasAccess(accessRoles)) {
+  if (userHasAccess(accessRoles) && !preSeason) {
     return realLeague;
   }
 
@@ -50156,6 +50055,8 @@ function getLeagueToDisplay(realLeague, dummyLeague, options = {}) {
 
   return dummyLeague;
 }
+
+
 
 async function showCaptaincyPointsLeague() {
   let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
