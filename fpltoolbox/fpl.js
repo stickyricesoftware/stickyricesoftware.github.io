@@ -45957,7 +45957,7 @@ function createNav() {
     div.className = "nav-tab text-center flex-fill py-2";
     if (tab.target) div.dataset.target = tab.target;
     if (tab.external) div.dataset.external = tab.external;
-    if (tab.target === "tools") div.classList.add("active");
+    if (tab.target === "home") div.classList.add("active");
 
     div.innerHTML = `<i class="bi bi-${tab.icon}"></i><br><small>${tab.label}</small>`;
     nav.appendChild(div);
@@ -45991,61 +45991,185 @@ function homeScreen() {
   const homeContainer = document.getElementById("screen-home");
   const darkMode = localStorage.getItem("darkMode") === "true";
 
-homeContainer.innerHTML = `
+  // First clear any previous dark/light mode classes
+  homeContainer.classList.remove("bg-dark", "text-light");
 
-<div class="p-4 ${darkMode ? 'bg-dark text-light' : ''}">
+  // Then reapply dark mode class if needed
+  if (darkMode) {
+    homeContainer.classList.add("bg-dark", "text-light");
+  }
 
-  <h2 class="mb-3">Welcome to the all new FPL Toolbox</h2>
+  homeContainer.innerHTML = `
 
-<p class="lead">
-  The ultimate companion for your mini league.
-</p>
-<p class="mb-1">
-Keep everyone active, engaged, and involved all season long with stats, banter, and tools that shine a light on every triumph and disaster.
-</p>
+    <div class="p-4">
 
-  <hr class="my-3"/>
+      <h2 class="mb-3">Welcome to the all new FPL Toolbox</h2>
+
+      <p class="lead">
+        The ultimate companion for your mini league.
+      </p>
+
+      <p class="mb-1">
+        Keep everyone active, engaged, and involved all season long with stats, banter, and tools that shine a light on every triumph and disaster.
+      </p>
+
+      <hr class="my-3"/>
+
+      ${!preSeason ? `
+        <div class="mb-4">
+          <p class="mb-1"><strong>It's pretty early on so we won't have much data at the moment.</strong> Switch between your mini leagues at any time from the settings.</p>
+        </div>
+        <hr class="my-3"/>
+      ` : ''}
+
+      <div class="mb-4">
+        <h5>Your Toolbox Account</h5>
+        <p>Manage your profile, check your subscription status, or update your details anytime.</p>
+        <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-outline-light' : 'btn-outline-primary'}">View My Profile</a>
+      </div>
+
+      <hr class="my-3"/>
+
+      <div class="text-muted small">
+        FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span>
+      </div>
+
+    </div>
+  `;
+
+  injectDynamicStyles(); // Apply any additional dynamic styling
+}
+function settingsScreen() {
+  const settingsContainer = document.getElementById("screen-settings");
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  // Generate changelog HTML
+  let changelogHTML = `
+  <div class="mb-4">
+    <h5>Changelog</h5>
+    <ul class="small">
+`;
+
+  changelogData.forEach((entry) => {
+    changelogHTML += `<li>v${entry.version} – ${entry.description}</li>`;
+  });
+
+  changelogHTML += `
+    </ul>
+  </div>
+`;
+
+
+    // Clear container and add Bootstrap padding
+settingsContainer.innerHTML = `
+
+<div class="p-4">
+
+  <h2 class="mb-3">Settings</h2>
+
+  <hr class="my-2"/>
+
+  <!-- Dark Mode Toggle -->
+  <div class="form-check form-switch mb-4">
+    <input class="form-check-input" type="checkbox" id="darkModeToggle">
+    <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+  </div>
+
+  <hr class="my-2"/>
 
   ${!preSeason ? `
+    <!-- League Selector -->
     <div class="mb-4">
-      <p class="mb-1"><strong>It's pretty early on so we won't have much data at the moment</strong> Switch between your mini leagues at any time from the settings.</p>
+      <label for="leagueSelector" class="form-label">Switch Mini League</label>
+      <select class="form-select" id="leagueSelector"></select>
     </div>
-    <hr class="my-3"/>
+
+    <hr class="my-2"/>
   ` : ''}
 
   <div class="mb-4">
     <h5>Your Toolbox Account</h5>
     <p>Manage your profile, check your subscription status, or update your details anytime.</p>
-    <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-outline-light' : 'btn-outline-primary'}">View My Profile</a>
+    <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-primary' : 'btn-outline-primary'}">View My Profile</a>
   </div>
 
-  <hr class="my-3"/>
+  <hr class="my-2"/>
 
-  <div class="text-muted small">
-    FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span>
-  </div>
+  ${changelogHTML}
+
+  <!-- Version -->
+  <div class="mb-2 text-muted small">FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span></div>
 
 </div>
 
 `;
 
+  
 
+  // Dark mode toggle logic
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  darkModeToggle.checked = localStorage.getItem("darkMode") === "true";
 
-
+  darkModeToggle.addEventListener("change", () => {
+    localStorage.setItem("darkMode", darkModeToggle.checked);
+    injectDynamicStyles(); // apply styles immediately
+  });
 
   injectDynamicStyles(); // apply styles on load
 
+  // League dropdown logic
+  const leagueSelector = document.getElementById("leagueSelector");
 
+  // Add default option
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "Select a league...";
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  leagueSelector.appendChild(defaultOption);
 
+  // Add league options
+  managerData.leagues.classic.forEach((league) => {
+    const option = document.createElement("option");
+    option.value = league.id;
+    option.textContent = league.name;
+    leagueSelector.appendChild(option);
+  });
+
+  // Pre-select saved value if exists
+  const savedLeagueId = localStorage.getItem("savedLeagueId");
+  if (savedLeagueId) {
+    leagueSelector.value = savedLeagueId;
+    defaultOption.selected = false; // ensure actual league is selected
+  }
+
+  // On league change
+  leagueSelector.addEventListener("change", (e) => {
+    if (!userHasAccess([12])) {
+      showModal({
+        title: "Paid Feature",
+        body: "This feature is only available to <strong>Max members</strong>.<br><br>Head over to your profile page to switch leagues manually",
+        confirmText: "Take me there",
+        onConfirm: () => {
+          window.location.href = profilePageUrl;
+        },
+      });
+      return;
+    }
+
+    const selectedLeagueId = e.target.value;
+    localStorage.setItem("savedLeagueId", selectedLeagueId);
+    location.reload();
+  });
 }
 
 function toolsScreen() {
   const toolsScreen = document.getElementById("screen-tools");
   toolsScreen.innerHTML = "";
-
-  const container = document.createElement("div");
-  container.className = "container text-center py-3";
-
+  toolsScreen.style.marginBottom = "50px"
+const container = document.createElement("div");
+container.className = "container text-center py-3";
+  
   const row = document.createElement("div");
   row.className = "row g-3";
 
@@ -46313,129 +46437,7 @@ function injectDynamicStyles() {
   });
 }
 
-function settingsScreen() {
-  const settingsContainer = document.getElementById("screen-settings");
-  const darkMode = localStorage.getItem("darkMode") === "true";
 
-  // Generate changelog HTML
-  let changelogHTML = `
-  <div class="mb-4">
-    <h5>Changelog</h5>
-    <ul class="small">
-`;
-
-  changelogData.forEach((entry) => {
-    changelogHTML += `<li>v${entry.version} – ${entry.description}</li>`;
-  });
-
-  changelogHTML += `
-    </ul>
-  </div>
-`;
-
-
-    // Clear container and add Bootstrap padding
-settingsContainer.innerHTML = `
-
-<div class="p-4">
-
-  <h2 class="mb-3">Settings</h2>
-
-  <hr class="my-2"/>
-
-  <!-- Dark Mode Toggle -->
-  <div class="form-check form-switch mb-4">
-    <input class="form-check-input" type="checkbox" id="darkModeToggle">
-    <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
-  </div>
-
-  <hr class="my-2"/>
-
-  ${!preSeason ? `
-    <!-- League Selector -->
-    <div class="mb-4">
-      <label for="leagueSelector" class="form-label">Switch Mini League</label>
-      <select class="form-select" id="leagueSelector"></select>
-    </div>
-
-    <hr class="my-2"/>
-  ` : ''}
-
-  <div class="mb-4">
-    <h5>Your Toolbox Account</h5>
-    <p>Manage your profile, check your subscription status, or update your details anytime.</p>
-    <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-primary' : 'btn-outline-primary'}">View My Profile</a>
-  </div>
-
-  <hr class="my-2"/>
-
-  ${changelogHTML}
-
-  <!-- Version -->
-  <div class="mb-2 text-muted small">FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span></div>
-
-</div>
-
-`;
-
-  
-
-  // Dark mode toggle logic
-  const darkModeToggle = document.getElementById("darkModeToggle");
-  darkModeToggle.checked = localStorage.getItem("darkMode") === "true";
-
-  darkModeToggle.addEventListener("change", () => {
-    localStorage.setItem("darkMode", darkModeToggle.checked);
-    injectDynamicStyles(); // apply styles immediately
-  });
-
-  injectDynamicStyles(); // apply styles on load
-
-  // League dropdown logic
-  const leagueSelector = document.getElementById("leagueSelector");
-
-  // Add default option
-  const defaultOption = document.createElement("option");
-  defaultOption.value = "";
-  defaultOption.textContent = "Select a league...";
-  defaultOption.disabled = true;
-  defaultOption.selected = true;
-  leagueSelector.appendChild(defaultOption);
-
-  // Add league options
-  managerData.leagues.classic.forEach((league) => {
-    const option = document.createElement("option");
-    option.value = league.id;
-    option.textContent = league.name;
-    leagueSelector.appendChild(option);
-  });
-
-  // Pre-select saved value if exists
-  const savedLeagueId = localStorage.getItem("savedLeagueId");
-  if (savedLeagueId) {
-    leagueSelector.value = savedLeagueId;
-    defaultOption.selected = false; // ensure actual league is selected
-  }
-
-  // On league change
-  leagueSelector.addEventListener("change", (e) => {
-    if (!userHasAccess([12])) {
-      showModal({
-        title: "Paid Feature",
-        body: "This feature is only available to <strong>Max members</strong>.<br><br>Head over to your profile page to switch leagues",
-        confirmText: "Take me there",
-        onConfirm: () => {
-          window.location.href = profilePageUrl;
-        },
-      });
-      return;
-    }
-
-    const selectedLeagueId = e.target.value;
-    localStorage.setItem("savedLeagueId", selectedLeagueId);
-    location.reload();
-  });
-}
 
 // Map level IDs to tier names
 function getTierName(levelId) {
