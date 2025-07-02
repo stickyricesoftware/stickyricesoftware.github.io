@@ -67,7 +67,7 @@ console.log(theUser);
 
 const dummyLeagueMessage = `This feature is only available to <strong>paid members</strong>. <br><br>You'll see dummy data here until you subscribe`;
 const dummyLeague = {
-  leagueName: "🔒 Subscribe to see your mini-league here 🔒",
+  leagueName: "🔒 PRESEASON - Subscribe to see your mini-league here 🔒",
   standings: [
     {
       id: 1450135,
@@ -45828,14 +45828,14 @@ if (theUser.info.team_id) {
 if (theUser.info.league_id != "" || !theUser.info.league_id) {
   //createLeague(theUser.info.league_id);
 } else {
-  let managerName = "Playa"
+  let managerName = "Bro"
   if(managerData.player_first_name){
   managerName = managerData.player_first_name
   }
   showModal({
     title: `Reminder`,
     body: `Hey, ${ managerName}! <br><br>Remember to input yout team and league ID in your profile when you know it!`,
-    confirmText: "Take me there",
+    confirmText: "Take me there now",
     onConfirm: () => {
       window.location.href = profilePageUrl;
     },
@@ -46003,11 +46003,17 @@ function homeScreen() {
     homeContainer.classList.add("bg-dark", "text-light");
   }
 
+const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
+const tierName = getTierName(levelId);
+const displayTier = tierName.charAt(0).toUpperCase() + tierName.slice(1);
+const memberColor = getTierColor(levelId)
+
+
   homeContainer.innerHTML = `
 
     <div class="p-4">
 
-      <div class="mb-3">Welcome to the all new FPL Toolbox</div>
+      <h2 class="mb-3">Welcome to the all new FPL Toolbox</h2>
 
       <p class="lead">
         The ultimate companion for your mini league.
@@ -46026,11 +46032,15 @@ function homeScreen() {
         <hr class="my-3"/>
       ` : ''}
 
-      <div class="mb-4">
-        <h5>Your Toolbox Account</h5>
-        <p>Manage your profile, check your subscription status, or update your details anytime.</p>
-        <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-outline-light' : 'btn-outline-primary'}">View My Profile</a>
-      </div>
+<div class="mb-4" style="background-color: ${memberColor}; color: black; padding: 2rem; border-radius: 0.5rem;">
+  <h2>Membership type: ${displayTier}</h2>
+</div>
+
+
+
+
+
+
 
       <hr class="my-3"/>
 
@@ -46060,18 +46070,28 @@ function settingsScreen() {
     </ul>
   </div>
 `;
-
+const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
+const tierName = getTierName(levelId);
+const displayTier = tierName.charAt(0).toUpperCase() + tierName.slice(1);
+const memberColor = getTierColor(levelId)
 
     // Clear container and add Bootstrap padding
 settingsContainer.innerHTML = `
 
 <div class="p-4">
 
-  <div class="mb-3">Settings</div>
+  <h4 class="mb-3">Settings</h4>
+
+    <div class="mb-4" style="background-color: ${memberColor}; color: black; padding: 2rem; border-radius: 0.5rem;">
+
+    <h2>Membership type: ${displayTier}</h2>
+</div>
+
 
   <hr class="my-2"/>
 
   <!-- Dark Mode Toggle -->
+
   <div class="form-check form-switch mb-4">
     <input class="form-check-input" type="checkbox" id="darkModeToggle">
     <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
@@ -46089,11 +46109,21 @@ settingsContainer.innerHTML = `
     <hr class="my-2"/>
   ` : ''}
 
+
+
+
+
+
+
   <div class="mb-4">
-    <h5>Your Toolbox Account</h5>
+  
+      <p>Features will be available when the season begins</p>  
+    <p>Your Toolbox Account</p>
     <p>Manage your profile, check your subscription status, or update your details anytime.</p>
     <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-primary' : 'btn-outline-primary'}">View My Profile</a>
   </div>
+
+
 
   <hr class="my-2"/>
 
@@ -46102,11 +46132,14 @@ settingsContainer.innerHTML = `
   <!-- Version -->
   <div class="mb-2 text-muted small">FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span></div>
 
+
+
 </div>
+
+
 
 `;
 
-  
 
   // Dark mode toggle logic
   const darkModeToggle = document.getElementById("darkModeToggle");
@@ -46260,13 +46293,13 @@ container.className = "container text-center py-3";
       tier: "pro",
       requiresData: true,
     },
-    {
-      icon: "bi-bullseye",
-      label: "Penalities Missed League",
-      action: showPensMissedLeague,
-      tier: "pro",
-      requiresData: true,
-    },
+    // {
+    //   icon: "bi-bullseye",
+    //   label: "Penalities Missed League",
+    //   action: showPensMissedLeague,
+    //   tier: "pro",
+    //   requiresData: true,
+    // },
 
     {
       icon: "bi-calculator",
@@ -46304,11 +46337,13 @@ container.className = "container text-center py-3";
       requiresData: true,
     },
 
-
-
-
-
-
+    {
+      icon: "bi-speedometer2",
+      label: "GW Max Dashboard",
+      action: createGWMaxDashboard,
+      tier: "max",
+      requiresData: true,
+    },
     {
       icon: "bi-speedometer2",
       label: "Season Max Dashboard",
@@ -46323,13 +46358,14 @@ container.className = "container text-center py-3";
       tier: "max",
       requiresData: true,
     },
-    {
+            {
       icon: "bi-bag-plus",
       label: "Feature Request",
       action: featureRequest,
-      tier: "max",
-      requiresData: true,
+      tier: "pro",
+      requiresData: false,
     },
+
   ];
 
   features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
@@ -46340,7 +46376,7 @@ container.className = "container text-center py-3";
     const button = document.createElement("div");
     button.id = featureId;
     button.className =
-      "btn btn-light w-100 feature-icon d-flex flex-column align-items-center justify-content-center text-center position-relative";
+      "btn bg-gray-500 btn-light w-100 feature-icon d-flex flex-column align-items-center justify-content-center text-center position-relative";
     button.style.height = "120px";
 
     // Determine data readiness based on tier
@@ -46386,13 +46422,16 @@ container.className = "container text-center py-3";
 
     switch (tier) {
       case "free":
-        badge.classList.add("bg-success", "text-light");
+        badge.classList.add("text-dark");
+        badge.style.backgroundColor = "#05FA87"
         break;
       case "pro":
-        badge.classList.add("bg-warning", "text-dark");
+        badge.classList.add("text-dark");
+        badge.style.backgroundColor = "#0BE5FF"
         break;
       case "max":
-        badge.classList.add("bg-danger", "text-light");
+        badge.classList.add( "text-dark");
+        badge.style.backgroundColor = "#FFE65B"
         break;
     }
 
@@ -46454,6 +46493,22 @@ function getTierName(levelId) {
       return "free";
   }
 }
+
+function getTierColor(levelId) {
+  switch (levelId) {
+    case 1:
+      return "#05FA87";
+    case 10:
+      return "#0BE5FF";
+    case 12:
+      return "#FFE65B";
+    default:
+      return "#05FA87";
+  }
+}
+
+
+
 function userHasAccess(allowedLevels) {
   const level = Number(theUser?.username?.data?.membership_level?.ID || 0);
 
@@ -46722,7 +46777,7 @@ async function renderToolsScreenWithLeague(leagueId) {
 
       showModal({
       title: "Pre Season",
-      body: "Limited access until season begins. <strong><br><br>Feel free to use the team name generator while you wait or explore some of the features ahead of the new season</strong>. <br><br>Not a paid member? Why not!! <br><br>If you've already subscribed, dont worry, you'll get all the pro features back when the season begins!",
+      body: "Limited access until season begins. <strong><br><br>Feel free to use the team name generator while you wait or explore some of the features ahead of the new season</strong>. <br><br>Not a paid member? Why not!! <br><br>If you've already subscribed for a paid account, dont worry, you'll get all your paid features back when the season begins!",
       confirmText: "Upgrade Now",
       onConfirm: () => {
         window.location.href = subscriptionPageUrl;
@@ -54252,7 +54307,7 @@ function featureRequest() {
       body: "Got a great idea for feature? Tell me all about it! <strong>If</strong> I can do it - I will try my best to add it to the toolbox. <br><br>Head over to your profile page to submit your request",
       confirmText: "Take me there",
       onConfirm: () => {
-        window.location.href = profilePageUrlPageUrl;
+        window.location.href = profilePageUrl;
       },
     });
   } else {
@@ -54312,6 +54367,18 @@ function extractTeamIds(arrayOfTeams) {
 }
 
 async function showCopycatFinder() {
+      if (preSeason){
+
+      showModal({
+      title: "Pre Season",
+      body: "Limited access until season begins. <strong><br><br>Feel free to use the team name generator while you wait or explore some of the features ahead of the new season</strong>. <br><br>Not a paid member? Why not!! <br><br>If you've already subscribed for a paid account, dont worry, you'll get all your paid features back when the season begins!",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = subscriptionPageUrl;
+      },
+    });
+    return
+  }
   if (currentGw < 38) {
     showModal({
       title: "Coming Soon",
@@ -54904,6 +54971,7 @@ function createChartContainer(divID) {
   divID.appendChild(container);
   return canvas;
 }
+
 function createTopStatTable({
   standings,
   containerDiv,
@@ -54926,38 +54994,44 @@ function createTopStatTable({
         : getStatValue(b) - getStatValue(a)
     )
     .slice(0, limit);
+
   const darkMode = localStorage.getItem("darkMode") === "true";
+
   // Card wrapper
-const wrapper = document.createElement("div");
-wrapper.classList.add("card", "shadow-sm", "mb-3");
-if (darkMode) wrapper.classList.add("bg-dark", "text-white", "border-secondary");
+  const wrapper = document.createElement("div");
+  wrapper.classList.add("card", "shadow-sm", "mb-3");
+  if (darkMode) wrapper.classList.add("bg-dark", "text-white", "border-secondary");
 
-const cardBody = document.createElement("div");
-cardBody.classList.add("card-body");
+  const cardBody = document.createElement("div");
+  cardBody.classList.add("card-body");
 
-const title = document.createElement("h5");
-title.classList.add("card-title", "mb-3");
-title.textContent = titleText;
+  // ===== Content to Capture (Title + Table) =====
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "card-content";
 
-// Table with Bootstrap classes
-const tableWrapper = document.createElement("div");
-tableWrapper.classList.add("table-responsive");
+  const title = document.createElement("h5");
+  title.classList.add("card-title", "mb-3");
+  title.textContent = titleText;
 
-const table = document.createElement("table");
-table.className = `table table-striped table-hover table-sm mb-0 ${darkMode ? "table-dark" : ""}`;
+  // Table setup
+  const tableWrapper = document.createElement("div");
+  tableWrapper.classList.add("table-responsive");
 
-const thead = document.createElement("thead");
-const headerCells = statLabels
-  .map((label) => `<th class="text-end">${label}</th>`)
-  .join("");
+  const table = document.createElement("table");
+  table.className = `table table-striped table-hover table-sm mb-0 ${darkMode ? "table-dark" : ""}`;
 
-thead.innerHTML = `
-  <tr>
-    <th class="text-start">#</th>
-    <th class="text-start">Team</th>
-    ${headerCells}
-  </tr>
-`;
+  const thead = document.createElement("thead");
+  const headerCells = statLabels
+    .map((label) => `<th class="text-end">${label}</th>`)
+    .join("");
+
+  thead.innerHTML = `
+    <tr>
+      <th class="text-start">#</th>
+      <th class="text-start">Team</th>
+      ${headerCells}
+    </tr>
+  `;
 
   const medals = ["🥇", "🥈", "🥉"];
   const tbody = document.createElement("tbody");
@@ -54983,17 +55057,121 @@ thead.innerHTML = `
 
   table.appendChild(thead);
   table.appendChild(tbody);
-
-  // Assemble card
-  cardBody.appendChild(title);
-  
   tableWrapper.appendChild(table);
 
-  cardBody.appendChild(tableWrapper);
+  // Build contentWrapper (only this part will be captured)
+  contentWrapper.appendChild(title);
+  contentWrapper.appendChild(tableWrapper);
+  cardBody.appendChild(contentWrapper);
 
+  // ===== Share Buttons (excluded from screenshot) =====
+  const buttonGroup = document.createElement("div");
+  buttonGroup.className = "d-flex flex-wrap gap-2 mt-2";
+
+  // --- Share as Text ---
+  // const shareTextBtn = document.createElement("button");
+  // shareTextBtn.className = `btn btn-sm ${darkMode ? "btn-outline-light" : "btn-outline-secondary"}`;
+  // shareTextBtn.textContent = "Share Stats 📋";
+
+  // shareTextBtn.addEventListener("click", () => {
+  //   let shareText = `${titleText}\n\n`;
+
+  //   sorted.forEach((team, index) => {
+  //     const rankDisplay = medals[index] || `${index + 1}.`;
+  //     const teamName = team.entry_name;
+  //     const stats = statExtractor
+  //       ? getStatValue(team)
+  //       : statKeys.map((key) => team[key]).join(" | ");
+
+  //     shareText += `${rankDisplay} ${teamName} - ${stats}\n`;
+  //   });
+
+  //   if (navigator.share) {
+  //     navigator.share({
+  //       title: titleText,
+  //       text: shareText,
+  //     });
+  //   } else {
+  //     navigator.clipboard.writeText(shareText).then(() => {
+  //       alert("Stats copied to clipboard!");
+  //     });
+  //   }
+  // });
+
+  // --- Share as Image ---
+  const shareImageBtn = document.createElement("button");
+  shareImageBtn.className = `btn btn-sm ${darkMode ? "btn-outline-light" : "btn-outline-secondary"}`;
+  shareImageBtn.textContent = "Share to chat 📷";
+
+shareImageBtn.addEventListener("click", () => {
+  html2canvas(contentWrapper, { backgroundColor: null }).then((originalCanvas) => {
+    const padding = 50; // pixels padding around the image
+    const watermarkText = "www.fpltoolbox.com";
+
+    // Create a larger canvas with padding
+    const canvas = document.createElement("canvas");
+    canvas.width = originalCanvas.width + padding * 2;
+    canvas.height = originalCanvas.height + padding * 2;
+
+    const ctx = canvas.getContext("2d");
+
+    // Fill background for light/dark mode (optional, or leave transparent)
+    ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the original content into the new padded canvas
+    ctx.drawImage(originalCanvas, padding, padding);
+
+    // Watermark styling
+    ctx.font = "bold 18px Arial";
+    ctx.fillStyle = darkMode ? "rgba(255, 255, 255, 0.8)" : "rgba(0, 0, 0, 0.7)";
+ctx.textAlign = "right";
+ctx.textBaseline = "top";
+
+    // Draw watermark with small padding from bottom-right corner
+
+ctx.fillText(watermarkText, canvas.width - 10, 10);
+
+    // Export the padded, watermarked image
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${titleText.replace(/\s+/g, "_")}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  });
+});
+
+
+  // Append both buttons
+  //buttonGroup.appendChild(shareTextBtn);
+  buttonGroup.appendChild(shareImageBtn);
+  cardBody.appendChild(buttonGroup);
+
+  // Final assembly
   wrapper.appendChild(cardBody);
   containerDiv.appendChild(wrapper);
 }
+
+
+
+
+
+async function createGWMaxDashboard(){
+  if (preSeason){
+      showModal({
+    title: "Hold your horses",
+    body: "Nothing to see here, come back when FPL is up and running again",
+    confirmText: "OK",
+    onConfirm: () => {}, // No action taken
+  });
+  return
+  }
+}
+
+
 
 async function createSeasonMaxDashboard() {
 
@@ -55558,23 +55736,29 @@ async function createChipsUsedChart(league) {
 
 
 
+
 async function findManagersOfTheMonth(standings, phases, currentGw) {
   const darkMode = localStorage.getItem("darkMode") === "true";
 
-  // Create holding container
   const holdingContainer = document.createElement("div");
   holdingContainer.classList.add("mb-4");
+
+  // ===== Content Wrapper (For full calendar capture) =====
+  const contentWrapper = document.createElement("div");
+  contentWrapper.className = "manager-of-the-month-content";
+  holdingContainer.appendChild(contentWrapper);
 
   // Title
   const title = document.createElement("h4");
   title.textContent = "Manager of the Month";
-  holdingContainer.appendChild(title);
+  contentWrapper.appendChild(title);
 
   // Grid Container (Bootstrap grid)
   const gridContainer = document.createElement("div");
   gridContainer.className = "row g-3";
+  contentWrapper.appendChild(gridContainer);
 
-  // Filter out the "Overall" phase (id: 1)
+  // Filter out "Overall" phase
   const monthlyPhases = phases.filter((phase) => phase.id !== 1);
 
   monthlyPhases.forEach((phase) => {
@@ -55589,10 +55773,9 @@ async function findManagersOfTheMonth(standings, phases, currentGw) {
 
     const cardTitle = document.createElement("h5");
     cardTitle.className = "card-title";
-    cardTitle.textContent = phase.name + "🎉";
+    cardTitle.textContent = phase.name + " 🎉";
     cardBody.appendChild(cardTitle);
 
-    // Check if phase is currently in progress (skip May, etc.)
     if (currentGw >= phase.start_event && currentGw <= phase.stop_event) {
       const msg = document.createElement("p");
       msg.className = "card-text";
@@ -55630,15 +55813,138 @@ async function findManagersOfTheMonth(standings, phases, currentGw) {
       }
     }
 
+    // ===== Per-month Share Button =====
+    const shareBtn = document.createElement("button");
+    shareBtn.className = `btn btn-sm ${darkMode ? "btn-outline-light" : "btn-outline-secondary"} mt-2`;
+    shareBtn.textContent = "Share This 📷";
+
+shareBtn.addEventListener("click", () => {
+  // Clone the card so we can edit it without changing the original
+  const clone = card.cloneNode(true);
+
+  // Remove the share button from the clone
+  const cloneShareBtn = clone.querySelector("button");
+  if (cloneShareBtn) cloneShareBtn.remove();
+
+  // Create and prepend the "Manager of the Month" heading
+  const heading = document.createElement("h4");
+  heading.textContent = "Manager of the Month";
+  heading.style.marginBottom = "1rem";
+  heading.style.textAlign = "center";
+  clone.querySelector(".card-body").insertBefore(heading, clone.querySelector(".card-title"));
+
+  // Temporarily add the clone to the DOM (offscreen) for html2canvas to render it
+  clone.style.position = "fixed";
+  clone.style.top = "-10000px";
+  clone.style.left = "-10000px";
+  clone.style.width = card.offsetWidth + "px"; // match width to avoid weird scaling
+  document.body.appendChild(clone);
+
+  html2canvas(clone).then((originalCanvas) => {
+    const padding = 50;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = originalCanvas.width + padding * 2;
+    canvas.height = originalCanvas.height + padding * 2;
+
+    const ctx = canvas.getContext("2d");
+
+    // Fill background
+    ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw original card with padding
+    ctx.drawImage(originalCanvas, padding, padding);
+
+    // Watermark
+    ctx.font = "bold 14px Arial";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "top";
+    ctx.fillText("www.fpltoolbox.com", canvas.width - 10, canvas.height - 10);
+
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${phase.name.replace(/\s+/g, "_")}_ManagerOfTheMonth.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // Clean up the clone from the DOM after capturing
+      clone.remove();
+    });
+  });
+});
+
+
+    cardBody.appendChild(shareBtn);
     card.appendChild(cardBody);
     col.appendChild(card);
+
     gridContainer.appendChild(col);
   });
 
-  holdingContainer.appendChild(gridContainer);
+  // ===== Full Calendar Share Button in its Own Card =====
+  const col = document.createElement("div");
+  col.className = "col-md-4";
+
+  const fullCard = document.createElement("div");
+  fullCard.className = `card h-100 ${darkMode ? "bg-dark text-white border-secondary" : ""}`;
+
+  const fullCardBody = document.createElement("div");
+  fullCardBody.className = "card-body text-center";
+
+  const fullCardTitle = document.createElement("h5");
+  fullCardTitle.className = "card-title";
+  fullCardTitle.textContent = "Full Calendar Share 📅";
+  fullCardBody.appendChild(fullCardTitle);
+
+  const fullShareBtn = document.createElement("button");
+  fullShareBtn.className = `btn btn-sm ${darkMode ? "btn-outline-light" : "btn-outline-secondary"} mt-2`;
+  fullShareBtn.textContent = "Share Full Calendar 📷";
+
+  fullShareBtn.addEventListener("click", () => {
+    html2canvas(contentWrapper, { backgroundColor: null }).then((originalCanvas) => {
+      const padding = 20;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = originalCanvas.width + padding * 2;
+      canvas.height = originalCanvas.height + padding * 2;
+
+      const ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.drawImage(originalCanvas, padding, padding);
+
+      ctx.font = "bold 16px Arial";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "bottom";
+      ctx.fillText("www.fpltoolbox.com", canvas.width - 10, canvas.height - 10);
+
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ManagerOfTheMonth_Calendar.png";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    });
+  });
+
+  fullCardBody.appendChild(fullShareBtn);
+  fullCard.appendChild(fullCardBody);
+  col.appendChild(fullCard);
+  gridContainer.appendChild(col);
 
   return holdingContainer;
 }
+
+
 
 async function createChipUsageCharts(standings) {
     const darkMode = localStorage.getItem("darkMode") === "true";
