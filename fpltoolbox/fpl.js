@@ -46072,6 +46072,10 @@ async function createStoriesDisplayBootstrap() {
 
   const WORDPRESS_URL = 'https://fpltoolbox.com/wp-json/wp/v2/posts?per_page=8&_embed';
 
+
+// Get the list of viewed story IDs from localStorage
+  const viewedStories = JSON.parse(localStorage.getItem('viewedFplStories')) || [];
+
   try {
     const response = await fetch(WORDPRESS_URL);
     if (!response.ok) {
@@ -46090,13 +46094,22 @@ async function createStoriesDisplayBootstrap() {
       storyWrapper.target = '_blank'; // Open in a new tab
       storyWrapper.className = 'd-flex flex-column align-items-center text-decoration-none';
       storyWrapper.style.cursor = 'pointer';
+storyWrapper.dataset.postId = post.id; // Store post ID for the click handler
 
       const storyCircle = document.createElement('div');
       storyCircle.className = 'rounded-circle p-1';
-      storyCircle.style.width = '66px';
-      storyCircle.style.height = '66px';
+      storyCircle.style.width = '90px';
+      storyCircle.style.height = '90px';
       storyCircle.style.flexShrink = '0';
-      storyCircle.style.background = 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%)';
+
+ // Check if the story has been viewed and apply the appropriate style
+      const isViewed = viewedStories.includes(post.id);
+      if (isViewed) {
+        storyCircle.style.background = '#dbdbdb'; // A simple gray for viewed stories
+      } else {
+        storyCircle.style.background = 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%)';
+      }
+
 
       const innerCircle = document.createElement('div');
       innerCircle.className = 'w-100 h-100 rounded-circle border border-2 border-white';
@@ -46119,6 +46132,22 @@ async function createStoriesDisplayBootstrap() {
 
       storyWrapper.appendChild(storyCircle);
       storyWrapper.appendChild(storyLabel);
+
+// Add click listener to mark the story as viewed
+      storyWrapper.addEventListener('click', () => {
+        const postId = parseInt(storyWrapper.dataset.postId, 10);
+        
+        // Update UI immediately
+        storyCircle.style.background = '#dbdbdb';
+
+        // Update localStorage
+        let currentViewed = JSON.parse(localStorage.getItem('viewedFplStories')) || [];
+        if (!currentViewed.includes(postId)) {
+          currentViewed.push(postId);
+          localStorage.setItem('viewedFplStories', JSON.stringify(currentViewed));
+        }
+      });
+
       storiesContainer.appendChild(storyWrapper);
     });
   } catch (error) {
