@@ -45991,7 +45991,7 @@ function setupTabListeners() {
     });
   });
 }
-function homeScreen() {
+async function homeScreen() {
   const homeContainer = document.getElementById("screen-home");
   const darkMode = localStorage.getItem("darkMode") === "true";
 
@@ -46002,6 +46002,10 @@ function homeScreen() {
   if (darkMode) {
     homeContainer.classList.add("bg-dark", "text-light");
   }
+
+
+
+
 
 const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
 const tierName = getTierName(levelId);
@@ -46049,8 +46053,84 @@ const memberColor = getTierColor(levelId)
     </div>
   `;
 
+
+ const storiesBar = await createStoriesDisplayBootstrap();
+ homeContainer.prepend(storiesBar)
+
   injectDynamicStyles(); // Apply any additional dynamic styling
 }
+
+/**
+ * Creates a container with 8 circular placeholder divs, styled like Instagram stories,
+ * using Bootstrap 5 utility classes.
+ * @returns {HTMLElement} The main container div for the stories display.
+ */
+async function createStoriesDisplayBootstrap() {
+  // The main container for the stories bar
+  const storiesContainer = document.createElement('div');
+  storiesContainer.className = 'd-flex gap-3 p-3 border-bottom overflow-x-auto';
+
+  const WORDPRESS_URL = 'https://fpltoolbox.com/wp-json/wp/v2/posts?per_page=8&_embed';
+
+  try {
+    const response = await fetch(WORDPRESS_URL);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const posts = await response.json();
+
+    if (posts.length === 0) {
+      storiesContainer.innerHTML = '<p class="text-muted m-0">No recent blog posts found.</p>';
+      return storiesContainer;
+    }
+
+    posts.forEach(post => {
+      const storyWrapper = document.createElement('a');
+      storyWrapper.href = post.link;
+      storyWrapper.target = '_blank'; // Open in a new tab
+      storyWrapper.className = 'd-flex flex-column align-items-center text-decoration-none';
+      storyWrapper.style.cursor = 'pointer';
+
+      const storyCircle = document.createElement('div');
+      storyCircle.className = 'rounded-circle p-1';
+      storyCircle.style.width = '66px';
+      storyCircle.style.height = '66px';
+      storyCircle.style.flexShrink = '0';
+      storyCircle.style.background = 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%)';
+
+      const innerCircle = document.createElement('div');
+      innerCircle.className = 'w-100 h-100 rounded-circle border border-2 border-white';
+      
+      const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+      if (featuredImage) {
+        innerCircle.style.backgroundImage = `url(${featuredImage})`;
+        innerCircle.style.backgroundSize = 'cover';
+        innerCircle.style.backgroundPosition = 'center';
+      } else {
+        innerCircle.classList.add('bg-light'); // Fallback color
+      }
+
+      storyCircle.appendChild(innerCircle);
+
+      const storyLabel = document.createElement('div');
+      storyLabel.className = 'small text-muted mt-1';
+      storyLabel.innerHTML = post.title.rendered; // Use innerHTML to decode HTML entities
+      storyLabel.style.cssText = 'max-width: 66px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
+
+      storyWrapper.appendChild(storyCircle);
+      storyWrapper.appendChild(storyLabel);
+      storiesContainer.appendChild(storyWrapper);
+    });
+  } catch (error) {
+    console.error('Error fetching WordPress posts for stories:', error);
+    storiesContainer.innerHTML = '<p class="text-danger m-0">Could not load stories.</p>';
+  }
+
+  return storiesContainer;
+}
+
+
+
 function settingsScreen() {
   const settingsContainer = document.getElementById("screen-settings");
   const darkMode = localStorage.getItem("darkMode") === "true";
@@ -55840,7 +55920,7 @@ shareBtn.addEventListener("click", () => {
   clone.style.width = card.offsetWidth + "px"; // match width to avoid weird scaling
   document.body.appendChild(clone);
 
-  html2canvas(clone).then((originalCanvas) => {
+  html2canvas(clone, { backgroundColor: null }).then((originalCanvas) => {
     const padding = 50;
 
     const canvas = document.createElement("canvas");
@@ -57298,4 +57378,3 @@ function removeSpinner() {
   const spinner = document.getElementById("fpl-spinner");
   if (spinner) spinner.remove();
 }
-
