@@ -46230,17 +46230,22 @@ settingsContainer.innerHTML = `
     <p>Manage your profile, check your subscription status, or update your details anytime.</p>
     <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-primary' : 'btn-outline-primary'}">View My Profile</a>
   </div>
+<hr class="my-2"/>
 
-
-
-  <hr class="my-2"/>
 
   ${changelogHTML}
 
   <!-- Version -->
   <div class="mb-2 text-muted small">FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span></div>
 
+  <div class="mb-4">
+  
 
+    
+    <a href="https://fpltoolbox.com/wp-login.php?action=logout" target="_blank" class="btn ${darkMode ? 'btn-primary' : 'btn-outline-primary'}">Logout</a>
+  </div>
+
+  <hr class="my-2"/>
 
 </div>
 
