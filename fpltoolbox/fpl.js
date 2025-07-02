@@ -31,11 +31,12 @@ if (
 
 
 const changelogData = [
-  { version: "4.4.0", description: "Manager of the Month"},
-  { version: "4.3.8", description: "Team of the week"},
-  { version: "3.8.0", description: "Max dashboard" },
-  { version: "1.1", description: "Added league selector" },
-  { version: "1.0", description: "Initial release" },
+  { version: "4.3.0", description: "Blog articles"},
+  { version: "4.2.0", description: "Manager of the Month"},
+  { version: "4.1.0", description: "Team of the week"},
+   { version: "4.0.0", description: "New interface"},
+  { version: "3.9.0", description: "Max dashboard" },
+
 ];
 const FPLToolboxVersion = changelogData[0].version;
 
@@ -46018,7 +46019,7 @@ const memberColor = getTierColor(levelId)
     <div class="p-4">
 
       <h2 class="mb-3">Welcome to the all new FPL Toolbox</h2>
-
+ <hr class="my-3"/>
       <p class="lead">
         The ultimate companion for your mini league.
       </p>
@@ -46036,17 +46037,7 @@ const memberColor = getTierColor(levelId)
         <hr class="my-3"/>
       ` : ''}
 
-<div class="mb-4" style="background-color: ${memberColor}; color: black; padding: 2rem; border-radius: 0.5rem;">
-  <h2>Membership type: ${displayTier}</h2>
-</div>
-
-
-
-
-
-
-
-      <hr class="my-3"/>
+     
 
 
 
@@ -46196,13 +46187,13 @@ const memberColor = getTierColor(levelId)
 settingsContainer.innerHTML = `
 
 <div class="p-4">
-
-  <h4 class="mb-3">Settings</h4>
-
     <div class="mb-4" style="background-color: ${memberColor}; color: black; padding: 2rem; border-radius: 0.5rem;">
 
     <h2>Membership type: ${displayTier}</h2>
 </div>
+  <h4 class="mb-3">Settings</h4>
+
+
 
 
   <hr class="my-2"/>
@@ -46453,6 +46444,13 @@ container.className = "container text-center py-3";
       tier: "pro",
       requiresData: true,
     },
+                {
+      icon: "bi-bag-plus",
+      label: "Feature Request",
+      action: featureRequest,
+      tier: "pro",
+      requiresData: false,
+    },
 
     {
       icon: "bi-speedometer2",
@@ -46475,13 +46473,7 @@ container.className = "container text-center py-3";
       tier: "max",
       requiresData: true,
     },
-            {
-      icon: "bi-bag-plus",
-      label: "Feature Request",
-      action: featureRequest,
-      tier: "pro",
-      requiresData: false,
-    },
+
 
   ];
 
