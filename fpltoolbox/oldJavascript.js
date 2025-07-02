@@ -3729,7 +3729,151 @@ async function showRichList() {
   }, "1000");
 }
 
+// Most Captaincy Points League
+async function showCaptainsLeague() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  sideLeaguesMenu();
+  const loader = new LoadingBar(app);
+  loader.start();
+  await createLeaguePromise;
+  loader.stop();
+  loader.remove();
 
+  // Fetch league data
+  await weeklyPicksForLeague();
+
+  console.log(league);
+  app.innerHTML = "";
+  sideLeaguesMenu();
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  app.appendChild(leagueTable);
+  leagueTable.innerHTML = "";
+
+  // Add a header above the table
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${leagueName} \n Captaincy Points Leaderboard`;
+  tableDescription.style.textAlign = "center";
+  leagueTable.appendChild(tableDescription);
+
+  // Create table
+  const table = document.createElement("table");
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  // Column headers
+  const headers = ["#", "Team Name", "TOT"];
+  headers.forEach((headerText, index) => {
+    const th = document.createElement("th");
+    th.innerText = headerText;
+
+    // Add sorting to "Total Captaincy Points" column
+    if (headerText === "TOT") {
+      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
+      th.style.cursor = "pointer"; // Make it look clickable
+      th.style.textAlign = "right"; // Set text alignment to right
+    }
+
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  // Add rows for each team
+  league.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    // Row number cell
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
+
+    // Team name cell
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br>${team.player_name}`;
+    row.appendChild(teamNameCell);
+
+    // Total captaincy points cell
+    const captaincyPointsCell = document.createElement("td");
+    captaincyPointsCell.innerText = team.total_captaincy_points || 0;
+    captaincyPointsCell.style.textAlign = "right"; // Set text alignment to right
+    row.appendChild(captaincyPointsCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  // Sort the table by Total Captaincy Points in descending order initially
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((rowA, rowB) => {
+      const pointsA = parseFloat(rowA.cells[2].innerText);
+      const pointsB = parseFloat(rowB.cells[2].innerText);
+      return ascending ? pointsA - pointsB : pointsB - pointsA;
+    });
+
+    // Append rows in sorted order
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1; // Update row numbers after sorting
+      tableBody.appendChild(row);
+    });
+
+    // Update the sorting indicator
+    const sortIndicator = document.getElementById("sort-indicator");
+    sortIndicator.innerText = ascending ? "▲" : "▼";
+  };
+
+  // Sort in descending order initially
+  sortTable(false);
+
+  // Add event listener for sorting when clicking the "Total Captaincy Points" header
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
+    sortTable(!isAscending);
+  });
+
+  // Add share button after table
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share League";
+  shareButton.onclick = shareTopTen;
+  leagueTable.appendChild(shareButton);
+
+  // Function to share top 10 results using navigator.share
+  function shareTopTen() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareMessage = `${leagueName}\n Captaincy Points Leaderboard:\n`;
+    rows.forEach((row, index) => {
+      const teamName = row.cells[1].innerText.split("\n")[0];
+      const captaincyPoints = row.cells[2].innerText;
+      shareMessage += `${
+        index + 1
+      }. ${teamName} - Captaincy Points: ${captaincyPoints}\n`;
+    });
+
+    // Add a URL to the bottom of the message
+    const url = "https://fpltoolbox.com/fpl-toolbox-pro";
+    shareMessage += `\nView your own league right here:\n ${url}`;
+
+    // Use navigator.share if available
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareMessage,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
 
 // Captain Goals Scored League
 async function showGoldenBoot() {
@@ -14493,7 +14637,776 @@ function getRandomColor() {
   return colorValues[randomIndex];
 }
 
+//NEW VERSION INCLUDING BOOTSTRAP APP STYLING
+
+document.addEventListener(
+  "DOMContentLoaded",
+  injectUI(),
+);
+
+function injectUI() {
+  const app = document.getElementById("app-screen");
+  app.innerHTML = ""; // Clear previous content
+  app.className = "d-flex flex-column h-100";
+  const mainContainer = document.createElement("div");
+  mainContainer.className = "d-flex flex-column h-100";
+
+  const screenWrapper = document.createElement("div");
+  screenWrapper.id = "screen-wrapper";
+  screenWrapper.className = "flex-grow-1 overflow-auto";
+  createScreens(screenWrapper);
+
+  const nav = createNav();
+
+  mainContainer.appendChild(screenWrapper);
+  mainContainer.appendChild(nav);
+  app.appendChild(mainContainer);
+
+  injectDynamicStyles();
+  setupTabListeners();
+  buildHomeScreen();
+}
+
+function createScreens(wrapper) {
+  const screenIds = ["tools", "settings"];
+  screenIds.forEach((id) => {
+    const screen = document.createElement("div");
+    screen.id = `screen-${id}`;
+    screen.className = `app-screen ${id === "home" ? "" : "d-none"}`;
+    screen.style.overflowY = "auto";
+    screen.style.flexGrow = "1";
+    screen.style.paddingBottom = "80px"; // enough space for nav
+    wrapper.appendChild(screen);
+  });
+}
+
+function createNav() {
+  const nav = document.createElement("div");
+  nav.className = "d-flex justify-content-around border-top bg-light";
+  nav.id = "nav-container";
+
+  const tabs = [
+    { icon: "tools", label: "Tools", target: "tools" },
+    { icon: "globe2", label: "Website", external: "https://fpltoolbox.com" },
+    { icon: "gear", label: "Settings", target: "settings" },
+  ];
+
+  tabs.forEach((tab) => {
+    const div = document.createElement("div");
+    div.className = "nav-tab text-center flex-fill py-2";
+    if (tab.target) div.dataset.target = tab.target;
+    if (tab.external) div.dataset.external = tab.external;
+    if (tab.target === "home") div.classList.add("active");
+
+    div.innerHTML = `<i class="bi bi-${tab.icon}"></i><br><small>${tab.label}</small>`;
+    nav.appendChild(div);
+  });
+
+  return nav;
+}
+
+function setupTabListeners() {
+  const tabs = document.querySelectorAll(".nav-tab");
+  const screens = document.querySelectorAll(".app-screen");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const externalUrl = tab.dataset.external;
+      if (externalUrl) {
+        window.open(externalUrl, "_blank");
+        return;
+      }
+
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      const targetId = `screen-${tab.dataset.target}`;
+      screens.forEach((screen) => screen.classList.add("d-none"));
+      document.getElementById(targetId).classList.remove("d-none");
+    });
+  });
+}
+
+function buildHomeScreen() {
+  const homeScreen = document.getElementById("screen-tools");
+  homeScreen.innerHTML = "";
+
+  const container = document.createElement("div");
+  container.className = "container text-center py-3";
+
+  const row = document.createElement("div");
+  row.className = "row g-3";
+
+  const features = [
+    {
+      icon: "bi-person-badge",
+      label: "My Team",
+      action: handleStatsClick,
+      tier: "free",
+    },
+    {
+      icon: "bi-sliders",
+      label: "Planner",
+      action: handleStatsClick,
+      tier: "max",
+    },
+    {
+      icon: "bi-emoji-smile",
+      label: "GW Memes",
+      action: handleStatsClick,
+      tier: "free",
+    },
+    {
+      icon: "bi-bar-chart",
+      label: "GW Stats",
+      action: handleStatsClick,
+      tier: "free",
+    },
+    {
+      icon: "bi-graph-up-arrow",
+      label: "Season Stats",
+      action: handleStatsClick,
+      tier: "pro",
+    },
+    {
+      icon: "bi-people",
+      label: "Benched Points League",
+      action: handleStatsClick,
+      tier: "pro",
+    },
+    {
+      icon: "bi-cash-coin",
+      label: "Rich List League",
+      action: richListNew,
+      tier: "pro",
+    },
+    {
+      icon: "bi-exclamation-triangle",
+      label: "The Dirty League",
+      action: handleStatsClick,
+      tier: "pro",
+    },
+    {
+      icon: "bi-trophy",
+      label: "Captaincy Points League",
+      action: handleStatsClick,
+      tier: "pro",
+    },
+    {
+      icon: "bi-shield-check",
+      label: "Golden Boot League",
+      action: handleStatsClick,
+      tier: "pro",
+    },
+    {
+      icon: "bi-person-check",
+      label: "Catch A Copycat",
+      action: handleStatsClick,
+      tier: "pro",
+    },
+    {
+      icon: "bi-arrow-repeat",
+      label: "GW Transfer Summaries",
+      action: handleStatsClick,
+      tier: "free",
+    },
+    {
+      icon: "bi-boxes",
+      label: "Chip Usage",
+      action: handleStatsClick,
+      tier: "free",
+    },
+    {
+      icon: "bi-compass",
+      label: "Captain Picks",
+      action: handleStatsClick,
+      tier: "free",
+    },
+    {
+      icon: "bi-binoculars",
+      label: "Rival Comparison",
+      action: handleStatsClick,
+      tier: "free",
+    },
+    {
+      icon: "bi-award",
+      label: "Season Summary",
+      action: handleStatsClick,
+      tier: "free",
+    },
+    {
+      icon: "bi-speedometer2",
+      label: "Max Dashboard",
+      action: handleStatsClick,
+      tier: "max",
+    },
+    {
+      icon: "bi-calculator",
+      label: "Rivals Transfer Calculator",
+      action: handleStatsClick,
+      tier: "pro",
+    },
+  ];
+
+  features.forEach(({ icon, label, action, tier }) => {
+    const col = document.createElement("div");
+    col.className = "col-4 p-2";
+
+    const button = document.createElement("div");
+    button.className =
+      "btn btn-light w-100 feature-icon d-flex flex-column align-items-center justify-content-center text-center position-relative";
+    button.style.height = "120px"; // Ensure equal height
+    button.innerHTML = `
+    <i class="bi ${icon} fs-2 mb-1"></i>
+    <small>${label}</small>
+  `;
+
+    // Tier badge
+    const badge = document.createElement("span");
+    badge.className = "badge position-absolute top-0 end-0 m-1";
+    badge.style.fontSize = "0.6rem";
+    badge.style.padding = "0.25em 0.5em";
+    badge.textContent = tier.toUpperCase();
+
+    switch (tier) {
+      case "free":
+        badge.classList.add("bg-success", "text-light");
+        break;
+      case "pro":
+        badge.classList.add("bg-warning", "text-dark");
+        break;
+      case "max":
+        badge.classList.add("bg-danger", "text-light");
+        break;
+    }
+
+    button.appendChild(badge);
+    button.addEventListener("click", action);
+
+    col.appendChild(button);
+    row.appendChild(col);
+  });
+
+  container.appendChild(row);
+  homeScreen.appendChild(container);
+}
+
+function injectDynamicStyles() {
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  const body = document.body;
+  body.classList.toggle("bg-dark", darkMode);
+  body.classList.toggle("text-light", darkMode);
+
+  const navTabs = document.querySelectorAll(".nav-tab");
+  navTabs.forEach((tab) => {
+    tab.classList.toggle("bg-dark", darkMode);
+    tab.classList.toggle("text-light", darkMode);
+    tab.classList.toggle("border-top", true);
+  });
+
+  const buttons = document.querySelectorAll(".feature-icon");
+  buttons.forEach((btn) => {
+    btn.classList.toggle("btn-dark", darkMode);
+    btn.classList.toggle("btn-light", !darkMode);
+  });
+
+  // Add toggle to settings screen
+  const settings = document.getElementById("screen-settings");
+  settings.innerHTML = "";
+  const toggle = document.createElement("div");
+  toggle.className = "form-check form-switch p-3";
+
+  const input = document.createElement("input");
+  input.className = "form-check-input";
+  input.type = "checkbox";
+  input.id = "darkModeToggle";
+  input.checked = darkMode;
+
+  input.addEventListener("change", () => {
+    localStorage.setItem("darkMode", input.checked);
+    injectDynamicStyles();
+  });
+
+  const label = document.createElement("label");
+  label.className = "form-check-label";
+  label.htmlFor = "darkModeToggle";
+  label.innerText = "Dark Mode";
+
+  toggle.appendChild(input);
+  toggle.appendChild(label);
+  settings.appendChild(toggle);
+}
+
+function userHasAccess(allowedLevels) {
+  const level = Number(theUser?.username?.data?.membership_level?.ID || 0);
+
+  if (Array.isArray(allowedLevels)) {
+    return allowedLevels.includes(level);
+  }
+
+  return level >= allowedLevels;
+}
+
+function handleStatsClick() {
+  if (!userHasAccess([3])) {
+    showModal({
+      title: "Pro Feature",
+      body: "This feature is only available to <strong>Pro members</strong>. <br><br>Upgrade to unlock Copycat mode!",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = "/subscribe";
+      },
+    });
+    return;
+  }
+  console.log("Stats clicked");
+  // Add logic here
+}
+
+function showModal({ title, body, confirmText = null, onConfirm = null }) {
+  const modal = document.getElementById("modal-popup");
+  const titleEl = modal.querySelector(".modal-title");
+  const bodyEl = modal.querySelector(".modal-body-content");
+  const closeBtn = modal.querySelector(".modal-close");
+  const confirmBtn = modal.querySelector(".modal-confirm-btn");
+
+  if (!modal || !titleEl || !bodyEl || !closeBtn || !confirmBtn) {
+    console.error("[showModal] ⚠️ Could not find modal or required elements.");
+    return;
+  }
+
+  // Populate content
+  titleEl.textContent = title;
+  bodyEl.innerHTML = body;
+
+  // Confirm button logic
+  if (confirmText && typeof onConfirm === "function") {
+    confirmBtn.textContent = confirmText;
+    confirmBtn.classList.remove("hidden");
+    confirmBtn.onclick = () => {
+      onConfirm();
+      closeModal();
+    };
+  } else {
+    confirmBtn.classList.add("hidden");
+    confirmBtn.onclick = null;
+  }
+
+  // Close behavior
+  closeBtn.onclick = closeModal;
+  modal.onclick = (e) => {
+    if (e.target === modal) closeModal();
+  };
+  document.addEventListener("keydown", handleEsc);
+
+  // Apply dark/light styling
+  applyModalTheme(modal);
+
+  // Show it
+  modal.classList.add("open");
+
+  function closeModal() {
+    modal.classList.remove("open");
+    document.removeEventListener("keydown", handleEsc);
+  }
+
+  function handleEsc(e) {
+    if (e.key === "Escape") closeModal();
+  }
+}
+
+function applyModalTheme() {
+  const dark = localStorage.getItem("darkMode") === "true";
+  const root = document.documentElement;
+  if (dark) {
+    root.style.setProperty("--modal-bg", "#222");
+    root.style.setProperty("--modal-text", "#eee");
+  } else {
+    root.style.setProperty("--modal-bg", "#fff");
+    root.style.setProperty("--modal-text", "#000");
+  }
+}
+
+async function richListNew() {
+  console.log(theUser)
+  if (!userHasAccess([10, 12])) {
+    showModal({
+      title: "Pro Feature",
+      body: "This feature is only available to <strong>Pro members</strong>. <br><br>Upgrade to unlock!",
+      confirmText: "Upgrade Now",
+      onConfirm: () => {
+        window.location.href = "/subscribe";
+      },
+    });
+    return;
+  }
+
+  const homeScreen = document.getElementById("screen-tools");
+  homeScreen.innerHTML = "";
+  sideLeaguesMenu();
+  const loader = new LoadingBar(homeScreen);
+  loader.start();
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  homeScreen.appendChild(leagueTable);
+  leagueTable.innerHTML = "";
+
+  // Sorting state
+  let isAscending = false; // Default to descending order
+
+  setTimeout(() => {
+    console.log(league);
+
+    // Extract team value from the last object in everyGw array for each entry
+    league.forEach((entry) => {
+      entry.teamValue = entry.everyGw[entry.everyGw.length - 1].value;
+      //entry.everyGw[entry.everyGw.length - 1].bank;
+    });
+
+    // Sort the league by teamValue in descending order by default
+    league.sort((a, b) => b.teamValue - a.teamValue);
+
+    // Add a header above the table
+    const tableHeader = document.createElement("h6");
+    tableHeader.innerText = `${leagueName} \n Rich List League`;
+    tableHeader.style.textAlign = "center";
+    leagueTable.appendChild(tableHeader);
+
+    function renderTable(sortedLeague) {
+      leagueTable.innerHTML = ""; // Clear previous table content
+      leagueTable.appendChild(tableHeader); // Re-append header after clearing content
+
+      let table = document.createElement("table");
+      table.setAttribute("id", "table");
+      let thead = document.createElement("thead");
+      table.appendChild(thead);
+      leagueTable.appendChild(table);
+
+      // Columns
+      let positionHeader = document.createElement("th");
+      positionHeader.innerText = "Pos";
+      positionHeader.style.width = "10px";
+      thead.appendChild(positionHeader);
+
+      createColumnHeader("team", "Team", thead);
+
+      // New column for Team Value with sorting functionality
+      let teamValueHeader = document.createElement("th");
+      teamValueHeader.innerText = "Club Value (£m)";
+      teamValueHeader.style.cursor = "pointer"; // Pointer cursor to indicate clickable header
+      teamValueHeader.style.textAlign = "right"; // Set text alignment to right
+
+      // Add sort indicator to the Team Value header
+      const sortIndicator = document.createElement("span");
+      sortIndicator.innerText = isAscending ? " ▲" : " ▼"; // Initial sort indicator (descending by default)
+      teamValueHeader.appendChild(sortIndicator);
+
+      teamValueHeader.onclick = () => {
+        isAscending = !isAscending;
+
+        // Toggle the sort indicator
+        sortIndicator.innerText = isAscending ? " ▲" : " ▼";
+
+        const sortedLeague = league.sort((a, b) => {
+          return isAscending
+            ? a.teamValue - b.teamValue
+            : b.teamValue - a.teamValue;
+        });
+        renderTable(sortedLeague);
+      };
+      thead.appendChild(teamValueHeader);
+
+      sortedLeague.forEach((element, index) => {
+        let tr = document.createElement("tr");
+        tr.setAttribute("class", "table-row");
+        // if (element.entry === theUser.info.team_id) {
+        //   tr.setAttribute("class", "current-user");
+        // }
+        // Add class based on team value
+        if (element.teamValue > 1000) {
+          tr.classList.add("positive-funds");
+        } else {
+          tr.classList.add("negative-funds");
+        }
+
+        // Position column
+        let positionCell = document.createElement("td");
+        positionCell.innerText = index + 1; // Display position based on sorted order
+        tr.appendChild(positionCell);
+
+        let team = document.createElement("td");
+        let name = document.createElement("div");
+        name.setAttribute("class", "team-name");
+        name.innerText = element.entry_name;
+        let manager = document.createElement("div");
+        manager.setAttribute("class", "manager-name");
+        manager.innerText = element.player_name.slice(0, 40);
+        team.appendChild(name);
+        team.appendChild(manager);
+        tr.appendChild(team);
+
+        // Cell for Team Value
+        let teamValueCell = document.createElement("td");
+        teamValueCell.innerText = element.teamValue / 10;
+        teamValueCell.style.textAlign = "right"; // Set text alignment to right
+        tr.appendChild(teamValueCell);
+
+        document.getElementById("table").appendChild(tr);
+      });
+
+      // Add share button after table
+      const shareButton = document.createElement("button");
+      shareButton.innerText = "Share League";
+      shareButton.onclick = shareTopTen;
+      leagueTable.appendChild(shareButton);
+    }
+
+    // Initial render with the sorted league data
+    renderTable(league);
+
+    // Stop and clean up the loading bar
+    loader.stop();
+    loader.remove();
+
+    // Function to share top 10 results using navigator.share
+    function shareTopTen() {
+      // Get the top 10 entries
+      const topTen = league;
+      let shareMessage = `${leagueName}\n The Team Value League:\n`;
+      topTen.forEach((entry, index) => {
+        shareMessage += `${index + 1}. ${
+          entry.entry_name
+        }\n (${entry.player_name.slice(0, 10)}) - Team Value: £${
+          entry.teamValue / 10
+        }m\n`;
+      });
+
+      // Use navigator.share if available
+      if (navigator.share) {
+        navigator
+          .share({
+            title: "Share League",
+            text:
+              shareMessage +
+              `\n Check your own league here\n https://fpltoolbox.com/fpl-toolbox-pro/`,
+          })
+          .catch((error) => console.log("Error sharing", error));
+      } else {
+        alert("Sharing is not supported in this browser.");
+      }
+    }
+  }, "1000");
+}
 
 
 
+function showMiniLeagueAdminTables() {
+  if (typeof ajaxurl === 'undefined') {
+    var ajaxurl = 'http://fpltoolbox.com/wp-admin/admin-ajax.php';
+}  
+  
+  const container = document.getElementById('screen-tools');
+    if (!container) return;
 
+    container.innerHTML = '';
+console.log(ajaxurl);
+    let tableData = [];
+    let userAdminLeagues = [];
+
+    // Create main app div
+    const appDiv = document.createElement('div');
+    appDiv.id = 'payment-table-app';
+    container.appendChild(appDiv);
+
+    const paymentTablesDiv = document.createElement('div');
+    paymentTablesDiv.id = 'payment-tables';
+    appDiv.appendChild(paymentTablesDiv);
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn btn-primary mt-3';
+    addBtn.id = 'add-new-league';
+    addBtn.textContent = '+ Add New League';
+    appDiv.appendChild(addBtn);
+
+    addBtn.addEventListener('click', () => {
+        const newLeague = { name: `League ${tableData.length + 1}`, entries: [] };
+        tableData.push(newLeague);
+        saveTables();
+        renderLeagues();
+    });
+
+    // Fetch user leagues
+    fetch(ajaxurl + '?action=get_user_payment_tables')
+        .then(res => res.json())
+        .then(data => {
+            tableData = data || [];
+            renderLeagues();
+        });
+
+    // Fetch user's FPL admin leagues
+    fetch(ajaxurl + '?action=get_user_fpl_leagues')
+        .then(res => res.json())
+        .then(response => {
+            if (response.success === false) {
+                console.warn(response.data);
+            } else {
+                userAdminLeagues = response;
+                renderLeagueDropdown();
+            }
+        });
+
+    function renderLeagueDropdown() {
+        const dropdownDiv = document.createElement('div');
+        dropdownDiv.className = 'mb-3';
+
+        const select = document.createElement('select');
+        select.className = 'form-select';
+        select.innerHTML = `<option value="">Select one of your FPL leagues (optional)</option>`;
+
+        userAdminLeagues.forEach(league => {
+            select.innerHTML += `<option value="${league.id}">${league.name} (ID: ${league.id})</option>`;
+        });
+
+        dropdownDiv.appendChild(select);
+        appDiv.prepend(dropdownDiv);
+    }
+
+    function renderLeagues() {
+        paymentTablesDiv.innerHTML = '';
+
+        tableData.forEach((league, leagueIndex) => {
+            const card = document.createElement('div');
+            card.className = "card mb-4";
+
+            const cardBody = document.createElement('div');
+            cardBody.className = "card-body";
+
+            const summary = getSummary(league.entries);
+
+            cardBody.innerHTML = `
+                <h5>League ${leagueIndex + 1}: ${league.name}</h5>
+                <p><strong>Paid:</strong> ${summary.paidCount}/${league.entries.length} &nbsp;&nbsp; <strong>Total Collected:</strong> £${summary.totalPaid}</p>
+
+                <table class="table table-bordered">
+                    <thead><tr><th>Team Name</th><th>Amount Paid</th><th>Paid?</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        ${league.entries.map((team, teamIndex) => `
+                            <tr id="team-${leagueIndex}-${teamIndex}">
+                                <td><span>${team.name}</span><input type="text" class="form-control d-none" value="${team.name}" /></td>
+                                <td><span>£${team.amount}</span><input type="number" class="form-control d-none" value="${team.amount}" /></td>
+                                <td><input type="checkbox" ${team.paid ? 'checked' : ''} onchange="togglePaid(${leagueIndex}, ${teamIndex}, this.checked)" /></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editTeam(${leagueIndex}, ${teamIndex})">Edit</button>
+                                    <button class="btn btn-sm btn-danger" onclick="removeTeam(${leagueIndex}, ${teamIndex})">🗑</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <div class="mb-2 d-flex flex-wrap gap-2">
+                    <button class="btn btn-sm btn-outline-success" onclick="addTeam(${leagueIndex})">+ Add Team</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="exportCSV(${leagueIndex})">Export CSV</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteLeague(${leagueIndex})">Delete League</button>
+                </div>
+            `;
+            card.appendChild(cardBody);
+            paymentTablesDiv.appendChild(card);
+        });
+    }
+
+    function saveTables() {
+        fetch(ajaxurl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=save_user_payment_tables&data=' + encodeURIComponent(JSON.stringify(tableData))
+        });
+    }
+
+    window.editTeam = (leagueIndex, teamIndex) => {
+        const row = document.getElementById(`team-${leagueIndex}-${teamIndex}`);
+        const inputs = row.querySelectorAll('input[type="text"], input[type="number"]');
+        const spans = row.querySelectorAll('span');
+        const actionCell = row.querySelector('td:last-child');
+
+        inputs.forEach(input => input.classList.remove('d-none'));
+        spans.forEach(span => span.style.display = 'none');
+
+        actionCell.innerHTML = `
+            <button class="btn btn-sm btn-success" onclick="saveTeam(${leagueIndex}, ${teamIndex})">Save</button>
+            <button class="btn btn-sm btn-secondary" onclick="cancelEdit()">Cancel</button>
+        `;
+    };
+
+    window.saveTeam = (leagueIndex, teamIndex) => {
+        const row = document.getElementById(`team-${leagueIndex}-${teamIndex}`);
+        const inputs = row.querySelectorAll('input');
+
+        const newName = inputs[0].value;
+        const newAmount = parseFloat(inputs[1].value) || 0;
+        const paid = inputs[2].checked;
+
+        tableData[leagueIndex].entries[teamIndex] = { name: newName, amount: newAmount, paid };
+        saveTables();
+        renderLeagues();
+    };
+
+    window.cancelEdit = () => renderLeagues();
+
+    window.addTeam = (leagueIndex) => {
+        tableData[leagueIndex].entries.push({ name: "New Team", amount: 0, paid: false });
+        saveTables();
+        renderLeagues();
+    };
+
+    window.removeTeam = (leagueIndex, teamIndex) => {
+        if (confirm("Delete this team?")) {
+            tableData[leagueIndex].entries.splice(teamIndex, 1);
+            saveTables();
+            renderLeagues();
+        }
+    };
+
+    window.togglePaid = (leagueIndex, teamIndex, isChecked) => {
+        tableData[leagueIndex].entries[teamIndex].paid = isChecked;
+        saveTables();
+        renderLeagues();
+    };
+
+    window.deleteLeague = (leagueIndex) => {
+        if (confirm("Delete this entire league?")) {
+            tableData.splice(leagueIndex, 1);
+            saveTables();
+            renderLeagues();
+        }
+    };
+
+    window.exportCSV = (leagueIndex) => {
+        const league = tableData[leagueIndex];
+        const rows = [["Team Name", "Amount Paid", "Paid"]];
+        league.entries.forEach(team => {
+            rows.push([team.name, team.amount, team.paid ? "Yes" : "No"]);
+        });
+
+        const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        const link = document.createElement("a");
+        link.setAttribute("href", csvContent);
+        link.setAttribute("download", `${league.name.replace(/\s+/g, "_").toLowerCase()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    function getSummary(entries) {
+        let paidCount = 0, totalPaid = 0;
+        entries.forEach(e => {
+            if (e.paid) {
+                paidCount++;
+                totalPaid += parseFloat(e.amount) || 0;
+            }
+        });
+        return { paidCount, totalPaid };
+    }
+}

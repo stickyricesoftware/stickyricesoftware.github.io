@@ -1,0 +1,1874 @@
+:root {
+  --stickyBackground: #ffffff;
+  --color-cyan-neon: #06EAFF;
+  --color-green-neon: #00FF87;
+  --color-pink-hot: #FC2C80;
+  --color-yellow-bright: #FFE65B;
+  --color-dashboard-blue: #1A73E8
+}
+.loader {
+  width: 100%;
+  height: 20px;
+  -webkit-mask: linear-gradient(90deg, #000 70%, #0000 0) left/20% 100%;
+  background: linear-gradient(#000 0 0) left -25% top 0 /20% 100% no-repeat
+    #05fa87;
+  animation: l7 1s infinite steps(6);
+  margin-left: 0.8rem;
+}
+@keyframes l7 {
+  100% {
+    background-position: right -25% top 0;
+  }
+}
+#app {
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  margin-bottom: 75px;
+}
+
+#share-button {
+  margin: 20px;
+  padding: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+  color: #000;
+  background-color: #05fa87;
+  border: 1px solid #000;
+}
+
+.rank-up {
+  color: #05fa87;
+}
+.rank-down {
+  color: #fc2c80;
+}
+.rank-equal {
+  color: #808080;
+}
+
+.TC,
+.BB,
+.AM,
+.WC,
+.FH {
+  background-color: #01f8b8;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: bold;
+  border-radius: 100%;
+  text-align: center;
+  max-height: 2em;
+  max-width: 2em;
+}
+
+#chip-card {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  padding: 5px;
+  max-width: 600px;
+}
+#chip-card-header > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#all-chips {
+  display: flex;
+  flex-direction: row;
+  padding-top: 5px;
+  max-width: 600px;
+  justify-content: space-evenly;
+}
+#all-chips > div {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: bold;
+  align-items: center;
+  border-radius: 5px;
+  padding: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  min-height: 30px;
+}
+#chip-used-gameweek {
+  background-color: #05eafa;
+  padding: 5px;
+  color: #37003c;
+  border-radius: 5px;
+}
+.used-chip {
+  opacity: 0.4;
+}
+.unused-chip {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.current-user {
+  background: #37003c !important;
+  color: #f8f8f8;
+}
+#inactive-user {
+  background-color: #ff7f7f;
+}
+.team-name {
+  font-weight: bolder;
+}
+.manager-name {
+  font-size: 0.75em;
+}
+table {
+  overflow-x: auto; /* Allow horizontal scrolling if necessary */
+  white-space: normal; /* Allow content to wrap */
+  border: none !important;
+  border-collapse: collapse !important;
+  width: 100%; /* Ensures table scales with parent container */
+  font-size: 0.8em;
+  background-color: #f8f8f8 !important;
+}
+
+th {
+  border: none !important;
+  border-collapse: collapse !important;
+  position: sticky;
+  top: 0;
+  text-align: left;
+  padding: 5px; /* Proper padding */
+  font-weight: bold;
+  color: grey;
+}
+
+th,
+td {
+  border: none !important;
+  border-collapse: collapse !important;
+
+  padding: 5px 15px !important;
+  border-bottom: 1px solid #ddd !important;
+}
+
+tr {
+  border: none !important;
+  border-collapse: collapse !important;
+}
+
+/* Optional: Ensure parent container supports scrolling */
+#league-table {
+  overflow-x: auto; /* Enable horizontal scrolling */
+  width: 100%; /* Match parent container */
+}
+
+#player-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 60% 40%;
+  text-align: left;
+  border-radius: 20px;
+  padding: 20px;
+  padding-left: 0px;
+  padding-bottom: 0px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  width: 300px;
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/09/card-background-compressed.webp");
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+  position: relative;
+}
+.cardLeft {
+  display: flex;
+  flex-direction: column;
+}
+.cardLeft > img {
+  max-width: 200px;
+}
+
+.cardRight {
+  text-align: right;
+}
+.cardRight > p {
+  font-size: 1em;
+  color: #f5f3fc;
+  font-weight: bold;
+  margin-bottom: -15px;
+  text-align: right;
+}
+
+.cardLeft > h6 {
+  font-size: 2em;
+  color: #f5f3fc;
+  font-weight: bolder;
+  padding-left: 20px;
+}
+
+.xP {
+  font-size: 2em;
+  color: #f5f3fc;
+}
+
+@media only screen and (max-width: 800px) {
+  #player-card {
+    width: 100%;
+  }
+}
+
+#pitch,
+#pitch1,
+#pitch2 {
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png");
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  padding-bottom: 20px;
+}
+#pitches {
+  max-width: 100%;
+  display: flex;
+  padding: 0px;
+}
+#pitch1,
+#pitch2 {
+  max-width: 50%;
+  padding: 2px;
+}
+
+#pitch > #my-keeper,
+#my-defenders,
+#my-midfielders,
+#my-strikers,
+#my-bench {
+  justify-content: space-evenly !important;
+  gap: auto;
+}
+
+#my-bench1 {
+  justify-content: space-evenly !important;
+}
+
+@media only screen and (min-width: 800px) {
+  #pitch1 > div {
+    transform: scale(0.9);
+  }
+  #pitch2 > div {
+    transform: scale(0.9);
+  }
+}
+
+#my-keeper,
+#my-defenders,
+#my-midfielders,
+#my-strikers,
+#my-bench,
+#my-keeper2,
+#my-defenders2,
+#my-midfielders2,
+#my-strikers2,
+#my-bench2 {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+}
+#my-bench,
+#my-bench2 {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+.player {
+  min-width: 50px;
+  max-width: 50px;
+  padding-top: 5px;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border-radius: 5px;
+}
+.player-new > img {
+  margin-bottom: -10px;
+}
+.my-player-name,
+.my-captain-name,
+.my-vice-captain-name,
+.my-triple-captain-name {
+  text-align: center;
+  width: 100%;
+  padding: 0px;
+  background: #f5f3fc;
+  color: #37003c;
+  font-size: 0.5em;
+  text-wrap: nowrap;
+  font-weight: bolder;
+  margin-top: -5px;
+  margin-bottom: 0px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.captain-badge,
+.my-vice-captain-badge,
+.my-triple-captain-badge {
+  width: 10px;
+  height: 10px;
+  margin-bottom: -10px;
+  z-index: 20;
+  position: absolute;
+}
+
+.player-search-img {
+  width: 100%;
+}
+.player-search {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.my-player-xp {
+  text-align: center;
+  width: 100%;
+  padding: 0px;
+  background: #37003c;
+  color: #f5f3fc;
+  font-size: 0.5em;
+  font-weight: bolder;
+  margin-top: -5px;
+  margin-bottom: -5px !important;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+#player-search-card-background > .player-search {
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png");
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  padding: 50px;
+  border-radius: 0px;
+  margin: 5px;
+}
+#player-search-card-background > .player-search .my-player-xp {
+  font-size: large;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-weight: bold;
+  margin-bottom: 0px;
+  padding: 5px;
+  max-width: 400px;
+}
+#player-search-card-background > .player-search .my-player-name {
+  font-size: 2rem;
+  margin-bottom: 0px;
+  padding: 5px;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-weight: bold;
+  max-width: 400px;
+}
+#player-search-card-background
+  > .player-search
+  .up-coming-fixtures
+  > .fixtureDiv
+  > .homeawaygame {
+  display: flex;
+  font-size: 1rem;
+}
+#player-search-card-background
+  > .player-search
+  .up-coming-fixtures
+  > .fixtureDiv
+  > .homeaway {
+  font-size: 1rem;
+  margin-top: 10px;
+}
+#player-search-card-background > .player-search .up-coming-fixtures > div {
+  min-width: 50px;
+  min-height: 50px;
+  max-width: 15px;
+  max-height: 15px;
+  border-radius: 3px;
+  font-weight: bolder;
+  font-size: 1.5rem;
+}
+#player-search-card-background {
+  background-color: black;
+  width: 100%;
+}
+
+#player-search-card-background > .player-search > .additional-stats > div {
+  font-size: 1.5rem;
+}
+
+#players-played {
+  font-size: 12px;
+}
+#rank-change {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+#green-arrow,
+#red-arrow {
+  color: white;
+  font-size: 44px;
+  border-radius: 100%;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#green-arrow {
+  background-color: #05fa87;
+}
+#red-arrow {
+  background-color: #fc2c80;
+}
+#first-panel {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+}
+#middle-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  position: absolute; /* Removes the middle panel from the flex layout */
+  left: 50%; /* Pushes the middle panel to the center of the container */
+  transform: translateX(
+    -50%
+  ); /* Adjusts the middle panel to be exactly centered */
+}
+#third-panel {
+  text-align: right;
+}
+#score-panel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+  position: relative;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  border-radius: 15px;
+  padding: 30px;
+}
+#score-panel p {
+  padding: 0px !important;
+  margin: 2px;
+}
+
+#my-score,
+#my-score2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  font-weight: bolder;
+  padding: 10px;
+}
+.comparison-score {
+  background: #37003c;
+  color: #f5f3fc;
+  max-width: 100px;
+
+  border-radius: 5px;
+}
+#actual-points {
+  font-size: 2.5rem;
+  margin-bottom: 0px;
+}
+#expected-points {
+  font-size: 1rem;
+}
+
+#gameweek-identifier {
+  font-size: 1rem;
+}
+.rank-difference {
+  font-size: 16px;
+}
+#comparison-text,
+#comparison-heading {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.captain-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px 20px 0px 20px;
+}
+.captain-row > .pos {
+  display: flex;
+  flex-direction: row;
+}
+.captain-row > .player {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: left;
+  text-align: left;
+}
+.captain-row > .player > div {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.captain-row:nth-child(odd) {
+  background-color: #f0f0f0;
+}
+
+.captains {
+  display: flex;
+  flex-direction: row;
+}
+.captain {
+  max-height: 75px;
+  width: 75px;
+  z-index: 2;
+  margin-top: 25px;
+}
+
+.vice-captain {
+  width: 50px;
+  z-index: 1;
+  max-height: 50px;
+  margin-left: -20px;
+  margin-top: 50px;
+}
+
+.additional-stats {
+  display: none;
+  flex-direction: row;
+  gap: 1px;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  padding-right: 3px;
+  padding-left: 9px;
+  z-index: 21;
+}
+.additional-stats > div {
+  display: flex;
+  flex-direction: row;
+  border-radius: 3px;
+  min-height: 3px;
+  margin-left: -2px;
+  padding: 0px;
+  font-size: 0.7rem;
+}
+
+.breakdown-stats {
+  display: flex;
+  flex-direction: row;
+  margin-left: -4px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.transfer-stats {
+  display: none;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  padding-right: 3px;
+  padding-left: 3px;
+  color: white;
+}
+.transfer-stats > div {
+  border-radius: 3px;
+  min-height: 3px;
+  padding: 0px;
+  font-size: 0.6rem;
+}
+
+.xp-stats {
+  display: none;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  padding-right: 3px;
+  padding-left: 3px;
+  color: black;
+}
+.xp-stats > div {
+  border-radius: 3px;
+  min-height: 3px;
+  padding: 0px;
+  font-size: 0.6rem;
+}
+
+.up-coming-fixtures {
+  display: flex;
+  flex-direction: row;
+  background-color: black;
+  margin-top: 2px;
+  gap: 2px;
+  background: transparent;
+  align-self: center;
+  justify-content: center;
+}
+.fixtureDiv {
+  min-width: 10px;
+  min-height: 10px;
+  border-radius: 3px;
+  display: flex !important;
+  flex-direction: column !important;
+  text-align: center;
+}
+.fixtureDiv > div {
+  font-size: 8px;
+}
+.fixtureDiv > div:first-child {
+  font-size: 8px;
+  margin-bottom: -10px;
+  margin-top: -5px;
+}
+.homeawaygame {
+  display: none;
+}
+.homeaway {
+  display: flex;
+  margin-top: -5px;
+  margin-bottom: -10px;
+  padding-bottom: 5px;
+}
+.season-summary {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+#season-container {
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+}
+
+.player-fixture-img {
+  width: 75px;
+  height: 75px;
+}
+
+.up-coming-season-fixtures {
+  display: flex;
+  flex-direction: row;
+  background-color: black;
+  margin-top: 2px;
+  gap: 2px;
+  background: transparent;
+}
+.up-coming-season-fixtures > div {
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: 3px;
+}
+#season-fixtures:nth-last-child(-n + 4) {
+  background-color: #66ce99;
+}
+#season-fixtures,
+#season-fixtures-non-owned > img {
+  background-color: transparent;
+}
+#gw-headers {
+  display: flex;
+  flex-direction: row;
+  margin-left: 75px;
+  gap: 2px;
+}
+
+#gw-header {
+  display: flex;
+  flex-direction: row;
+  font-size: 8px;
+  padding: 0px !important;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0px;
+  min-width: 30px;
+
+  text-align: center;
+}
+#diff1,
+#diff2,
+#diff3,
+#diff4,
+#diff5 {
+  display: flex;
+  flex-direction: row;
+  font-size: 8px;
+  padding: 0px !important;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0px;
+}
+
+#diff5 {
+  background-color: #80072d;
+  color: white;
+}
+#diff4 {
+  background-color: #ff1751;
+  color: white;
+}
+#diff3 {
+  background-color: #e7e7e7;
+}
+#diff2 {
+  background-color: #01fc7a;
+}
+#diff1 {
+  background-color: #375523;
+  color: white;
+}
+.up-coming-season-fixtures-for-chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  background-color: black;
+  margin-top: 2px;
+  gap: 2px;
+  background: transparent;
+}
+#diff9 {
+  display: flex;
+  flex-direction: row;
+  font-size: 8px;
+  padding: 10px !important;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0px;
+  background-color: #37003c;
+  color: white;
+  border-radius: 5px;
+}
+#diff8 {
+  display: flex;
+  flex-direction: row;
+  font-size: 8px;
+  padding: 10px !important;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0px;
+  background-color: #01fc7a;
+  color: black;
+  border-radius: 5px;
+}
+#diff7 {
+  display: flex;
+  flex-direction: row;
+  font-size: 8px;
+  padding: 10px !important;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0px;
+  background-color: lightgray;
+  color: darkgray;
+  border-radius: 5px;
+}
+
+.strategy-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.strategy {
+  margin-bottom: 10px;
+}
+.strategies {
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+}
+
+.strategy-content > ul {
+  list-style-type: none; /* Remove bullets */
+  padding: 10px; /* Remove padding */
+  margin: 0; /* Remove margins */
+  background-color: #37003c;
+  border-radius: 20px;
+}
+.strategy-content > ul > li {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding: 20px;
+  margin: 10px;
+  background-color: #f8f8f8;
+}
+
+.strategy-content {
+  max-height: 0; /* Hidden by default */
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.strategy-content:not(.collapsed) {
+  max-height: 10000px; /* Adjust to a sufficiently large value */
+}
+
+.strategy-header {
+  cursor: pointer;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  background-color: #05eaff;
+  color: #37023f;
+  border-radius: 10px;
+}
+
+.strategy-header:hover {
+  background-color: #37003c;
+  color: #05eaff;
+}
+
+.chip-strategy {
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+#pitch1 > div {
+  transform: scale(0.7);
+}
+#pitch2 > div {
+  transform: scale(0.7);
+}
+
+#team1name,
+#team2name {
+  padding: 5px;
+  background-color: #37003c;
+  border-radius: 20px;
+  color: white;
+  font-weight: 800;
+}
+
+/* css for modal */
+
+/* Modal Styling */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Black overlay */
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close-button {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+/* Container for the player image and buttons */
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Style for the player image */
+.image-container img {
+  width: 100%; /* Make sure the image is responsive */
+  height: auto;
+}
+
+/* Buttons container that holds all the buttons */
+.buttons-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: space-between;
+}
+
+/* Style for each button */
+.player-modal-button {
+  position: absolute;
+  width: 20px; /* Adjust size */
+  height: 20px;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+  color: white;
+  border: none;
+  border-radius: 15%;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
+  line-height: 0px; /* Center the text */
+}
+
+/* Positioning buttons in the corners */
+.player-modal-button:nth-child(1) {
+  /* Stats button */
+  top: 1px;
+  left: 1px; /* Top-left corner */
+}
+
+.player-modal-button:nth-child(2) {
+  /* Fixtures button */
+  top: 1px;
+  right: 1px; /* Top-right corner */
+}
+
+.player-modal-button:nth-child(3) {
+  /* Form button */
+  bottom: 1px;
+  left: 1px; /* Bottom-left corner */
+}
+
+.player-modal-button:nth-child(4) {
+  /* Details button */
+  bottom: 1px;
+  right: 1px; /* Bottom-right corner */
+}
+
+/* Floating widget styling */
+.floating-widget {
+  position: fixed;
+  bottom: 30%;
+  right: 20px;
+  z-index: 1000;
+}
+.widget-button {
+  background-color: #05fa87;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+  color: #37003c;
+}
+.widget-button:hover {
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+}
+.widget-menu {
+  display: none;
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  font-size: 1.1rem;
+  width: 45vw;
+}
+.widget-menu a {
+  padding: 10px;
+  color: #333;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s;
+}
+.widget-menu a:hover {
+  background-color: #f0f0f0;
+}
+
+#side-leagues-menu{
+  display: flex;
+  flex-direction: row;
+  overflow: scroll;
+  gap: 10px;
+
+  padding: 20px
+}
+#side-leagues-menu > button{
+  min-width: 70%;
+}
+
+.different-players {
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+}
+
+#sign-up-ad {
+  background-color: #37023f;
+  text-align: center;
+  padding: 20px;
+  color: #f8f8f8 !important;
+  margin: 20px;
+  border-radius: 20px;
+  margin-top: 0px;
+}
+#sign-up-ad > a {
+  color: #03f6d1;
+}
+#team-card {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  max-width: 600px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+#team-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+#transfer-team {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  max-width: 600px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+#team-transfers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 20px;
+}
+.transfer-fail {
+  background-color: #f8f8f8;
+}
+.transfer-success {
+  background-color: #f8f8f8;
+}
+#team-card > #bench-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  border-radius: 5px;
+  padding-top: 10px;
+  background-color: #68cd99;
+}
+.bench-card {
+  background-color: #f8f8f8;
+  transform: scale(0.8);
+}
+#bench-div > .player {
+  scale: 1.1;
+}
+
+#watermark {
+  font-size: 0.7rem;
+  text-align: center;
+}
+#dor {
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2025/02/who-should-be-awarded-the-bench-dor-v0-r6sja77eqrmc1-1.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: center;
+}
+span#share-bench-points {
+  font-size: 1.5rem;
+}
+
+.captain-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #f8f8f8;
+}
+#captains-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+#player-transfer {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+#bench-score {
+  display: flex;
+  font-size: 1.2rem;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  padding: 10px;
+}
+#player-in,
+#player-out {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 10px;
+  width: 50%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+}
+
+#transfer-direction-in {
+  border-radius: 100%;
+  width: 25px;
+  height: 25px;
+  background-color: #05fa87;
+}
+#transfer-direction-out {
+  border-radius: 100%;
+  width: 25px;
+  height: 25px;
+  background-color: #fc2c80;
+  transform: rotate(180deg);
+}
+#transfer-img {
+  width: 40px;
+  height: 40px;
+}
+#transfer-team-chip {
+  background-color: #37023f;
+  color: white;
+  margin: 10px;
+  padding: 5px;
+  border-radius: 20px;
+}
+#transfer-summary {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+#net-points {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.hide {
+  display: none;
+}
+
+.positive-funds {
+  background-color: #05fa8750 !important;
+}
+.negative-funds {
+  background-color: #fc2c8050 !important;
+}
+
+.influencer-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-top: -20px;
+}
+#influencer-profile-pic {
+  border-radius: 100%;
+  padding: 10px;
+  max-width: 75px;
+  max-height: 75px;
+}
+#share-influencer-comparison {
+  z-index: 10000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  overflow: auto;
+}
+
+#influencer-comparison-modal {
+  background-color: black;
+  padding: 20px;
+  color: #f8f8f8;
+  border-radius: 5px;
+  width: 90%;
+  max-width: 500px;
+  margin-top: 20px;
+}
+
+#influencer-comparison-message {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.similar-gameweeks {
+  margin-top: 0px;
+  padding-top: 0px;
+}
+.similar-gameweeks > p {
+  margin: 0px;
+  padding: 0px;
+}
+.similar-gameweeks > ul {
+  margin-top: 0px;
+  padding-top: 0px;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.best-match-percentage-bar-container {
+  position: relative; /* Enables absolute positioning of children */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.best-match-bar {
+  background-image: linear-gradient(to right, #05eafa, orange, #fc2c80);
+  height: 30px;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  position: relative; /* Pointer aligns within this container */
+}
+
+.copycat-pointer {
+  position: absolute;
+  top: -20px; /* Adjust this to place the pointer above the bar */
+  transform: translateX(-50%); /* Centers the arrow on the percentage */
+  font-size: 32px; /* Adjust for arrow size */
+  transition: left 1s ease; /* Smooth animation of 1 second */
+}
+#copycat-popup-body > strong > h2 {
+  color: white;
+}
+#copycat-popup-body > h4 {
+  color: white;
+  padding: 0px;
+  margin: 0px;
+}
+
+#copycat-popup-body > p {
+  margin: 0px;
+}
+
+#player-price-change-container {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  #player-price-change-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+#price-change-player-img {
+  max-width: 150px;
+  max-height: 150px;
+}
+
+#watermark-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  padding: 10px;
+}
+#watermark-logo {
+  max-width: 40px;
+  max-height: 40px;
+  border-radius: 100%;
+}
+#watermark-text {
+  color: white;
+  font-size: 0.6rem;
+}
+#meme-loader-container {
+  display: flex; /* Enable Flexbox */
+  flex-wrap: wrap; /* Allows items to wrap */
+  gap: 20px; /* Space between child elements */
+  padding: 20px;
+}
+#meme-loader {
+  min-height: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: grey;
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+}
+#meme-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-content: center;
+  padding: 20px;
+  min-width: 100%;
+}
+.custom-meme {
+  max-width: 500px;
+  background-color: black;
+  font-weight: bold;
+  font-family: "Inter", sans-serif;
+}
+#meme-text {
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: white;
+  padding: none;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  margin-bottom: -10px;
+}
+
+.meme-header {
+  display: flex;
+  flex-direction: row;
+}
+.meme-header,
+.meme-footer {
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+#meme-image-container > div > .player {
+  background-color: #0d9959;
+  padding: 5px 5px 0px 5px;
+  border: 1px solid #ffffff !important;
+}
+
+.meme-footer > div > .player {
+  background-color: #0d9959;
+  padding: 5px 5px 0px 5px;
+  border: 1px solid #ffffff !important;
+}
+
+.skeleton {
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(200, 20%, 80%);
+  }
+  100% {
+    background-color: hsl(200, 20%, 95%);
+  }
+}
+
+.whitespace-fix {
+  white-space: pre-line;
+}
+
+#dragon-meme-footer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-items: center;
+  justify-content: space-around;
+  gap: 10px;
+}
+
+#dragon-meme-footer-text {
+  font-size: 0.7rem;
+}
+
+
+#loader-container {
+  display: flex; /* Enable Flexbox */
+  flex-wrap: wrap; /* Allows items to wrap */
+  gap: 20px; /* Space between child elements */
+  padding: 20px;
+}
+#loader-card {
+  min-height: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: grey;
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+}
+
+
+/* Existing desktop layout */
+#season-view {
+  display: flex;
+  flex-direction: row;
+  background-color: #01ba5c;
+
+  justify-content: center;
+  margin-bottom: 10px;
+}
+#first-half-view,
+#second-half-view {
+  max-width: 600px;
+  padding: 10px;
+}
+
+/* Mobile override */
+@media (max-width: 768px) {
+  #season-view {
+    flex-direction: column;
+  }
+
+  /* Force desktop layout on mobile if this class is applied */
+  body.force-desktop #season-view {
+    flex-direction: row !important;
+    width: 1200px;
+  }
+}
+
+#gameweek-view {
+}
+
+#bench-container {
+  align-items: center;
+  justify-content: center;
+}
+#players-container,
+#bench-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px;
+}
+#players-container > .player {
+  background-color: #0e9e5c;
+  margin: 1px;
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+}
+
+#bench-container > .player {
+  background-color: #0e9e5c;
+  margin: 5px;
+  max-width: 20px;
+  justify-content: center;
+  align-items: center;
+}
+#bench-container > .player > .player-img {
+  justify-content: center;
+  max-width: 25px;
+  align-items: center;
+}
+
+#gw-summary {
+  font-size: 0.8rem;
+  background-color: white;
+  padding: 10px;
+  border-radius: 15px;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+#gw-chip-activated {
+  font-size: 10px;
+  background-color: #05eafa;
+  padding: 5px;
+  color: #37003c;
+  border-radius: 5px;
+  margin: 0px 5px 5px 0px;
+}
+
+#create-player-post-background {
+  background: transparent;
+  /* width: 1080px;
+    height: 1350px; */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  padding: 50px;
+  border-radius: 0px;
+  margin: none;
+}
+#create-player-post > .player-search > .up-coming-fixtures > div {
+  width: 50px;
+  height: 50px;
+  font-size: 3rem !important;
+}
+
+#points-distribution,
+#average-scores {
+  min-height: 200px;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: grey;
+  font-family: "Inter", sans-serif;
+}
+
+#rank-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: left;
+}
+
+#rank-difference-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.rank-percentile {
+  font-size: 0.8rem;
+  color: white;
+  font-weight: bold;
+  padding: 5px;
+  background-color: #37003c;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  margin: auto;
+  margin-left: 0;
+}
+
+#download-season-rank {
+  margin-right: 10px;
+}
+
+#planner-pitch {
+  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png");
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  max-width: 700px;
+  padding-bottom: 20px;
+}
+
+#planner-keeper,
+#planner-defenders,
+#planner-midfielders,
+#planner-strikers,
+#planner-bench {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+  justify-content: space-evenly;
+}
+#planner-bench {
+  background-color: rgba(255, 255, 255, 0.4);
+  width: auto;
+  padding: 20px;
+  border-radius: 2px;
+}
+
+#planner-dashboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#planner-metric {
+  text-align: center;
+  width: 100%;
+  padding: 0px;
+  background: #ebe4eb;
+  color: #000;
+  font-size: 0.7em;
+  font-weight: bolder;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+.planner-player {
+  background-color: #03ba5b;
+
+  padding-top: 5px;
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 2px;
+}
+.status-0 {
+  background-color: #c0020d !important;
+  color: white !important;
+}
+.status-50 {
+  background-color: #ffab1b !important;
+}
+.status-75 {
+  background-color: #ffe65b !important;
+}
+.planner-player > img {
+  width: 4rem;
+  margin-bottom: -10px;
+  align-self: center;
+}
+
+.planner-player-name {
+  text-align: center;
+  width: 100%;
+  padding: 0px;
+  background: #f5f3fc;
+  color: #37003c;
+  font-size: 0.7em;
+  text-wrap: nowrap;
+  font-weight: bolder;
+  margin-top: -5px;
+  margin-bottom: 0px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+.fdr5 {
+  background-color: #80072d !important;
+  color: white !important;
+}
+.fdr4 {
+  background-color: #ff1751 !important;
+  color: white !important;
+}
+.fdr3 {
+  background-color: #e7e7e7 !important;
+  color: #000 !important;
+}
+.fdr2 {
+  background-color: #01fc7a !important;
+  color: #000 !important;
+}
+.fdr1 {
+  background-color: #375523 !important;
+  color: white !important;
+}
+
+.planner-player-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  max-width: 500px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  display: none;
+}
+.planner-player-popup button {
+  margin: 10px 0;
+}
+.subbing {
+  outline: 2px solid white;
+  opacity: 0.5;
+}
+
+#super-table {
+  display: block;
+  align-self: center;
+  max-width: 1140px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+#load-league-button{
+ width: auto;
+}
+#league-drobdown{
+  max-width: 400px;
+}
+
+.custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  max-width: 400px;
+  background-color: #ffffff;
+  color: #333;
+  padding: 10px 40px 10px 15px;
+  font-size: 16px;
+  border: 2px solid #1A73E8;
+  border-radius: 8px;
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  transition: border-color 0.3s ease;
+}
+
+.custom-select:focus {
+  outline: none;
+  border-color: #00FF87;
+}
+
+.custom-select option {
+  background: white;
+  color: #333;
+}
+
+
+
+#dashboard-menu{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+ 
+}
+
+#sidebar-chip-container{
+  grid-template-columns: 1fr 1fr!important;
+}
+
+#season-stats-sidebar, #gameweek-stats-sidebar, #my-team-stats-sidebar {
+background-color: #F1F2F3;
+}
+.chart-js-container{
+
+}
+
+#progress-message{
+  background-color: var(--color-green-neon);
+  color: black;
+  position: absolute;
+  margin-top: 75%;
+  max-width: 75%;
+  align-items: center;
+  padding: 30px;
+  font-family: Inter;
+  font-weight: bold;
+  z-index: 99;
+  
+}
+
+
+
+ /* NEW CSS SHEET BELOW */
+ 
+ html, body, #app-screen {
+  height: 100%;
+  margin: 0;
+  min-height: 100%;
+}
+#nav-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* ensures it sits above other content */
+}
+    .nav-tab.active {
+      font-weight: bold;
+    }
+
+    .form-check{
+
+padding: 20px!important;
+    }
+
+
+#modal-popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999;
+  overflow: auto;
+  align-items: center;
+  justify-content: center;
+}
+
+#modal-popup.open {
+  display: flex;
+}
+
+#modal-popup .modal-content {
+  background: var(--modal-bg, #fff);
+  color: var(--modal-text, #000);
+  padding: 20px;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 500px;
+  margin: auto;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+#modal-popup .modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  background: transparent;
+  border: none;
+}
+
+#modal-popup .modal-title {
+  margin: 0 0 10px 0;
+  font-size: 1.25rem;
+}
+
+#modal-popup .modal-body-content {
+  margin-bottom: 15px;
+}
+
+#modal-popup .modal-confirm-btn {
+  margin-top: 15px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+}
+
+#modal-popup .modal-confirm-btn.hidden {
+  display: none;
+}
+

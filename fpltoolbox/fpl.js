@@ -3,17 +3,17 @@ const BASE_URL =
 //  const BASE_URL =
 //  "http://fantasy.premierleague.com/api/";
 
-import managerDataTest from "./testData/managerDataTest.js";
-import eventStatusTest from "./testData/eventStatusTest.js";
-import bootstrapTest from "./testData/bootsatrapTest.js";
-import superLeagueTest from "./testData/superLeagueTest.js";
-import superLeagueManagerDataTest from "./testData/superLeagueManagerDataTest.js";
-import superLeagueGameweekDataTest from "./testData/superLeagueGameweekDataTest.js";
-import superLeagueDetailedGameweekDataTest from "./testData/superLeagueDetailedGameweekDataTest.js";
-import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
-import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
+// import managerDataTest from "./testData/managerDataTest.js";
+// import eventStatusTest from "./testData/eventStatusTest.js";
+// import bootstrapTest from "./testData/bootsatrapTest.js";
+// import superLeagueTest from "./testData/superLeagueTest.js";
+// import superLeagueManagerDataTest from "./testData/superLeagueManagerDataTest.js";
+// import superLeagueGameweekDataTest from "./testData/superLeagueGameweekDataTest.js";
+// import superLeagueDetailedGameweekDataTest from "./testData/superLeagueDetailedGameweekDataTest.js";
+// import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
+// import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
 
-const preSeason = false
+const preSeason = true
 let testMode = false;
 if (
   window.location.href.includes("http://127.0.0.1:5500/fpltoolbox/") ||
@@ -45721,8 +45721,8 @@ window.FPLToolboxLeagueDataReady = false;
 window.FPLToolboxProLeagueDataReady = false;
 window.FPLToolboxMaxLeagueDataReady = false;
 
-let subscriptionPageUrl = "/subscribe";
-let profilePageUrl = "/profile";
+let subscriptionPageUrl = "/membership-account/membership-levels/";
+let profilePageUrl = "/membership-account/your-profile/";
 let miniLeagueAdminPageUrl = "https://fpltoolbox.com/mini-league-admin-page/"
 
 window.FPLToolboxLeagueData = {
@@ -45828,9 +45828,13 @@ if (theUser.info.team_id) {
 if (theUser.info.league_id != "" || !theUser.info.league_id) {
   //createLeague(theUser.info.league_id);
 } else {
+  let managerName = "Playa"
+  if(managerData.player_first_name){
+  managerName = managerData.player_first_name
+  }
   showModal({
     title: `Reminder`,
-    body: `Hey, ${managerData.player_first_name}! Remember to select a league in your profile page`,
+    body: `Hey, ${ managerName}! <br><br>Remember to input yout team and league ID in your profile when you know it!`,
     confirmText: "Take me there",
     onConfirm: () => {
       window.location.href = profilePageUrl;
@@ -46003,7 +46007,7 @@ function homeScreen() {
 
     <div class="p-4">
 
-      <h2 class="mb-3">Welcome to the all new FPL Toolbox</h2>
+      <div class="mb-3">Welcome to the all new FPL Toolbox</div>
 
       <p class="lead">
         The ultimate companion for your mini league.
@@ -46015,9 +46019,9 @@ function homeScreen() {
 
       <hr class="my-3"/>
 
-      ${!preSeason ? `
+      ${preSeason ? `
         <div class="mb-4">
-          <p class="mb-1"><strong>It's pretty early on so we won't have much data at the moment.</strong> Switch between your mini leagues at any time from the settings.</p>
+          <p class="mb-1"><strong>Stuck on the perfect FPL Team name? Head over to the new FPL Team Name Generator in the tools section.</p>
         </div>
         <hr class="my-3"/>
       ` : ''}
@@ -46030,9 +46034,7 @@ function homeScreen() {
 
       <hr class="my-3"/>
 
-      <div class="text-muted small">
-        FPL Toolbox version <span id="fpltoolbox-version">${FPLToolboxVersion}</span>
-      </div>
+
 
     </div>
   `;
@@ -46046,7 +46048,7 @@ function settingsScreen() {
   // Generate changelog HTML
   let changelogHTML = `
   <div class="mb-4">
-    <h5>Changelog</h5>
+    <p>Changelog</p>
     <ul class="small">
 `;
 
@@ -46065,7 +46067,7 @@ settingsContainer.innerHTML = `
 
 <div class="p-4">
 
-  <h2 class="mb-3">Settings</h2>
+  <div class="mb-3">Settings</div>
 
   <hr class="my-2"/>
 
@@ -46582,6 +46584,19 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
   onStatusUpdate("started");
 
   try {
+    if (preSeason) {
+      console.log("preseason dummy data");
+      localStorage.removeItem("savedLeagueId");
+      console.log("Removed stored league id")
+      onStatusUpdate("fetching test data");
+
+      return {
+        type: dummyLeague.type,
+        leagueName: dummyLeague.leagueName,
+        standings: sliceStandingsForUser(superLeagueTest.standings),
+      };
+    }
+
     if (testMode) {
       console.log("simulating delay");
       await sleep(addDelaySimulationTime);
@@ -46637,6 +46652,15 @@ function handleLeagueCreation(result) {
 }
 
 async function processLeague(standings) {
+  if (preSeason){
+      window.FPLToolboxLeagueDataReady = true;
+  window.FPLToolboxProLeagueDataReady = true;
+  window.FPLToolboxMaxLeagueDataReady = true;
+
+    toolsScreen(); // Re-render for free features
+    return
+  }
+  
   // Free Tier
   if (userHasAccess([1, 10, 12])) {
     await addManagerDetailsToLeague(standings, null);
@@ -46669,6 +46693,15 @@ async function processLeague(standings) {
 
 async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
   try {
+    if (preSeason){
+
+    handleLeagueCreation(dummyLeague);
+    await processLeague(dummyLeague.standings);
+
+    onStatusUpdate("complete", dummyLeague);
+    return
+    }
+    
     const result = await createSelectedLeague(leagueId, onStatusUpdate);
     handleLeagueCreation(result);
     await processLeague(result.standings);
@@ -46689,15 +46722,12 @@ async function renderToolsScreenWithLeague(leagueId) {
 
       showModal({
       title: "Pre Season",
-      body: "Limited access until season begins. <strong><br><br>Feel free to use the team name generator while you wait</strong>. <br><br>Not a paid member? Why not!!",
+      body: "Limited access until season begins. <strong><br><br>Feel free to use the team name generator while you wait or explore some of the features ahead of the new season</strong>. <br><br>Not a paid member? Why not!! <br><br>If you've already subscribed, dont worry, you'll get all the pro features back when the season begins!",
       confirmText: "Upgrade Now",
       onConfirm: () => {
         window.location.href = subscriptionPageUrl;
       },
     });
-    toolsScreen();
-    return;
-
   }
 
 
@@ -48120,6 +48150,16 @@ function generateTeamName() {
 }
 
 async function showMyTeam() {
+  if (preSeason){
+      showModal({
+    title: "Hold your horses",
+    body: "Nothing to see here, come back when FPL is up and running again",
+    confirmText: "OK",
+    onConfirm: () => {}, // No action taken
+  });
+  return
+  }
+  
   const container = document.getElementById("screen-tools");
   container.innerHTML = "";
   const backBtn = createBackButton();
@@ -49587,6 +49627,16 @@ async function showSeasonStats() {
 ///////////////////////////Rival Differences Compare START////////////////
 
 async function showRivalDiff() {
+    if (preSeason){
+      showModal({
+    title: "Hold your horses",
+    body: "Nothing to see here, come back when FPL is up and running again",
+    confirmText: "OK",
+    onConfirm: () => {}, // No action taken
+  });
+  return
+  }
+  
   const app = document.getElementById("screen-tools");
   app.innerHTML = "";
   // Add back button (styled with Bootstrap)
@@ -54947,12 +54997,14 @@ thead.innerHTML = `
 
 async function createSeasonMaxDashboard() {
 
-  
-  let leagueToDisplay = dummyLeague.standings;
-  if (userHasAccess([12])) {
-    leagueToDisplay = window.FPLToolboxLeagueData.standings;
-  }
-  console.log(leagueToDisplay);
+  let leagueToDisplay = await getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague, {accessRoles:[12], showLockedModal: true})
+
+
+  // let leagueToDisplay = dummyLeague.standings;
+  // if (userHasAccess([12])) {
+  //   leagueToDisplay = window.FPLToolboxLeagueData.standings;
+  // }
+console.log(leagueToDisplay);
 
   const app = document.getElementById("screen-tools");
   app.innerHTML = ""; // Clear existing content
@@ -55008,24 +55060,28 @@ async function createSeasonMaxDashboard() {
   container.appendChild(row);
   app.appendChild(container);
 
-  await createSeasonMaxTable(leagueToDisplay, seasonStats);
+  await createSeasonMaxTable(leagueToDisplay.standings, seasonStats);
   const chipsChart = await createChipsUsedChart(leagueToDisplay);
   seasonStats.appendChild(chipsChart);
 
-  const managerOfTheMonth = await findManagersOfTheMonth(leagueToDisplay, bootstrap.phases);
+  const comingSoon = await createComingSoonCard()
+  seasonStats.appendChild(comingSoon);
+  sidebarCol.appendChild(comingSoon);
+
+  const managerOfTheMonth = await findManagersOfTheMonth(leagueToDisplay.standings, bootstrap.phases);
   seasonStats.appendChild(managerOfTheMonth);
 
-  const chipUsageCharts = await createChipUsageCharts(leagueToDisplay);
+  const chipUsageCharts = await createChipUsageCharts(leagueToDisplay.standings);
   seasonStats.appendChild(chipUsageCharts);
 
-    const rankProgression = await createRankProgressionChart(leagueToDisplay);
+    const rankProgression = await createRankProgressionChart(leagueToDisplay.standings);
   seasonStats.appendChild(rankProgression);
 
   
 
   // Most Captaincy Points
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Captaincy Points",
     statKeys: ["total_captaincy_points"],
@@ -55036,7 +55092,7 @@ async function createSeasonMaxDashboard() {
 
   // Fewest Captaincy Points
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Fewest Captaincy Points",
     statKeys: ["total_captaincy_points"],
@@ -55047,7 +55103,7 @@ async function createSeasonMaxDashboard() {
 
   // Most Benched Points
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Benched Points",
     statKeys: ["totalPointsOnBench"],
@@ -55058,7 +55114,7 @@ async function createSeasonMaxDashboard() {
 
   // Fewest Benched Points
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Fewest Benched Points",
     statKeys: ["totalPointsOnBench"],
@@ -55069,7 +55125,7 @@ async function createSeasonMaxDashboard() {
 
   // Most goals scored
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Goals Scored",
     statKeys: ["total_goals_scored"],
@@ -55080,7 +55136,7 @@ async function createSeasonMaxDashboard() {
 
   // Fewest goals scored
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Fewest Goals Scored",
     statKeys: ["total_goals_scored"],
@@ -55091,7 +55147,7 @@ async function createSeasonMaxDashboard() {
 
   // Most goals conceded
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Goals Conceded",
     statKeys: ["total_goals_conceded"],
@@ -55102,7 +55158,7 @@ async function createSeasonMaxDashboard() {
 
   // Fewest goals conceded
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Fewest Goals Conceded",
     statKeys: ["total_goals_conceded"],
@@ -55113,7 +55169,7 @@ async function createSeasonMaxDashboard() {
 
     // Most Transfers
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Transfers",
     statKeys: ["totalTransfers"],
@@ -55124,7 +55180,7 @@ async function createSeasonMaxDashboard() {
 
   // Most minutes played
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Minutes Played",
     statKeys: ["total_minutes"],
@@ -55135,7 +55191,7 @@ async function createSeasonMaxDashboard() {
 
   // Most own goals
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Own Goals",
     statKeys: ["total_own_goals"],
@@ -55146,7 +55202,7 @@ async function createSeasonMaxDashboard() {
 
   // Most penalties missed
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Penalties Missed",
     statKeys: ["total_penalties_missed"],
@@ -55156,7 +55212,7 @@ async function createSeasonMaxDashboard() {
   });
   // Most cards
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Cards",
     statKeys: ["total_yellow_cards", "total_red_cards"],
@@ -55166,7 +55222,7 @@ async function createSeasonMaxDashboard() {
   });
   // Most Saves
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Saves",
     statKeys: ["total_saves"],
@@ -55176,7 +55232,7 @@ async function createSeasonMaxDashboard() {
   });
   // Most Cleansheets
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Cleansheets",
     statKeys: ["total_clean_sheets"],
@@ -55187,7 +55243,7 @@ async function createSeasonMaxDashboard() {
 
   // Most Experienced
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Most Experienced",
     statKeys: ["seasons"],
@@ -55198,7 +55254,7 @@ async function createSeasonMaxDashboard() {
 
   //Best Week
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Best Week",
     statLabels: ["Points"],
@@ -55212,7 +55268,7 @@ async function createSeasonMaxDashboard() {
   });
   //Worst Week
   createTopStatTable({
-    standings: leagueToDisplay,
+    standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
     titleText: "Worst Week",
     statLabels: ["Points"],
@@ -55387,7 +55443,37 @@ async function createSeasonMaxTable(standings, containerDiv) {
 }
 
 
-async function createChipsUsedChart(standings) {
+async function createComingSoonCard() {
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "col-12"; // Full width column
+
+  const card = document.createElement("div");
+  card.className = `card shadow-sm mb-3 ${darkMode ? 'bg-dark text-light' : ''}`;
+
+  const cardBody = document.createElement("div");
+  cardBody.className = "card-body";
+
+  const title = document.createElement("h4");
+  title.className = "card-title mb-2";
+  title.textContent = "More Features Coming Soon!";
+
+  const text = document.createElement("p");
+  text.className = "card-text";
+  text.textContent = "We're working on adding new tools and stats for your FPL Toolbox experience. Stay tuned!";
+
+  cardBody.appendChild(title);
+  cardBody.appendChild(text);
+  card.appendChild(cardBody);
+  wrapper.appendChild(card);
+
+  return wrapper;
+}
+
+
+async function createChipsUsedChart(league) {
+ 
   const wrapper = document.createElement("div");
   wrapper.className = "col-12"; // full-width column
 
@@ -55410,7 +55496,7 @@ async function createChipsUsedChart(standings) {
   wrapper.appendChild(card);
 
   // Now generate the chart
-  const sortedStandings = [...standings].sort(
+  const sortedStandings = [...league.standings].sort(
     (a, b) => a.chips.length - b.chips.length
   );
 
