@@ -46073,6 +46073,10 @@ async function createStoriesDisplayBootstrap() {
   const WORDPRESS_URL = 'https://fpltoolbox.com/wp-json/wp/v2/posts?per_page=8&_embed';
 
 
+   const darkMode = localStorage.getItem("darkMode") === "true";
+
+
+
 // Get the list of viewed story IDs from localStorage
   const viewedStories = JSON.parse(localStorage.getItem('viewedFplStories')) || [];
 
@@ -46126,9 +46130,13 @@ storyWrapper.dataset.postId = post.id; // Store post ID for the click handler
       storyCircle.appendChild(innerCircle);
 
       const storyLabel = document.createElement('div');
-      storyLabel.className = 'small text-muted mt-1';
+  
       storyLabel.innerHTML = post.title.rendered; // Use innerHTML to decode HTML entities
-      storyLabel.style.cssText = 'max-width: 66px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
+      storyLabel.style.cssText = 'max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
+      // Conditionally set text color class based on dark mode for better visibility
+      const textColorClass = darkMode ? 'text-light' : 'text-muted';
+      storyLabel.className = `small ${textColorClass} mt-1`;
+
 
       storyWrapper.appendChild(storyCircle);
       storyWrapper.appendChild(storyLabel);
