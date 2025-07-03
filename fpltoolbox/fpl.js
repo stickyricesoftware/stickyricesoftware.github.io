@@ -3,18 +3,11 @@ const BASE_URL =
 //  const BASE_URL =
 //  "http://fantasy.premierleague.com/api/";
 
-// import managerDataTest from "./testData/managerDataTest.js";
-// import eventStatusTest from "./testData/eventStatusTest.js";
-// import bootstrapTest from "./testData/bootsatrapTest.js";
-// import superLeagueTest from "./testData/superLeagueTest.js";
-// import superLeagueManagerDataTest from "./testData/superLeagueManagerDataTest.js";
-// import superLeagueGameweekDataTest from "./testData/superLeagueGameweekDataTest.js";
-// import superLeagueDetailedGameweekDataTest from "./testData/superLeagueDetailedGameweekDataTest.js";
-// import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
-// import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
+
 
 const preSeason = true
 let testMode = false;
+
 if (
   window.location.href.includes("http://127.0.0.1:5500/fpltoolbox/") ||
   window.location.href.includes(
@@ -28,6 +21,42 @@ if (
   }
 }
 
+let managerDataTest,
+  eventStatusTest,
+  bootstrapTest,
+  superLeagueTest,
+  superLeagueManagerDataTest,
+  superLeagueGameweekDataTest,
+  superLeagueDetailedGameweekDataTest,
+  superLeagueTransfersAddedDataTest,
+  superLeagueAddWeeklyPicksTest;
+
+if (testMode) {
+  // Use Promise.all to load modules in parallel for efficiency
+  const modules = await Promise.all([
+    import("./testData/managerDataTest.js"),
+    import("./testData/eventStatusTest.js"),
+    import("./testData/bootsatrapTest.js"),
+    import("./testData/superLeagueTest.js"),
+    import("./testData/superLeagueManagerDataTest.js"),
+    import("./testData/superLeagueGameweekDataTest.js"),
+    import("./testData/superLeagueDetailedGameweekDataTest.js"),
+    import("./testData/superLeagueTransfersAddedDataTest.js"),
+    import("./testData/superLeagueAddWeeklyPicksTest.js"),
+  ]);
+
+  [
+    managerDataTest,
+    eventStatusTest,
+    bootstrapTest,
+    superLeagueTest,
+    superLeagueManagerDataTest,
+    superLeagueGameweekDataTest,
+    superLeagueDetailedGameweekDataTest,
+    superLeagueTransfersAddedDataTest,
+    superLeagueAddWeeklyPicksTest,
+  ] = modules.map((m) => m.default);
+}
 
 
 const changelogData = [
@@ -46005,13 +46034,12 @@ async function homeScreen() {
   }
 
 
+  
 
 
 
 const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
 const tierName = getTierName(levelId);
-const displayTier = tierName.charAt(0).toUpperCase() + tierName.slice(1);
-const memberColor = getTierColor(levelId)
 
 
   homeContainer.innerHTML = `
@@ -46061,6 +46089,8 @@ async function createStoriesDisplayBootstrap() {
   const storiesContainer = document.createElement('div');
   storiesContainer.className = 'd-flex gap-3 p-3 border-bottom overflow-x-auto';
 
+  
+  
   const WORDPRESS_URL = 'https://fpltoolbox.com/wp-json/wp/v2/posts?per_page=8&_embed';
 
 
@@ -46070,6 +46100,8 @@ async function createStoriesDisplayBootstrap() {
 
 // Get the list of viewed story IDs from localStorage
   const viewedStories = JSON.parse(localStorage.getItem('viewedFplStories')) || [];
+
+
 
   try {
     const response = await fetch(WORDPRESS_URL);
@@ -46089,7 +46121,7 @@ async function createStoriesDisplayBootstrap() {
       storyWrapper.target = '_blank'; // Open in a new tab
       storyWrapper.className = 'd-flex flex-column align-items-center text-decoration-none';
       storyWrapper.style.cursor = 'pointer';
-storyWrapper.dataset.postId = post.id; // Store post ID for the click handler
+      storyWrapper.dataset.postId = post.id; // Store post ID for the click handler
 
       const storyCircle = document.createElement('div');
       storyCircle.className = 'rounded-circle p-1';
@@ -46455,6 +46487,13 @@ container.className = "container text-center py-3";
       action: featureRequest,
       tier: "pro",
       requiresData: false,
+    },
+        {
+      icon: "bi-person-fill-dash",
+      label: "Last Man Standing",
+      action:showLastManStandingEliminations,
+      tier: "max",
+      requiresData: true,
     },
 
     {
@@ -49792,6 +49831,161 @@ async function showSeasonStats() {
     console.error("Error building table:", error);
   }
 }
+async function showLastManStandingEliminations() {
+  const leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  if (leagueToDisplay.standings.length >= 50) {
+    const warning = document.createElement("div");
+    warning.className = `alert ${darkMode ? "alert-dark text-light" : "alert-danger"}`;
+    warning.innerText = "This feature is only available for leagues with fewer than 50 teams.";
+    container.appendChild(warning);
+    return;
+  }
+
+  // Header
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const title = document.createElement("h5");
+  title.className = `text-center mb-3 ${darkMode ? "text-light" : ""}`;
+  title.innerText = `${leagueToDisplay.leagueName} – Last Man Standing`;
+  container.appendChild(title);
+
+  const survivors = [...leagueToDisplay.standings];
+  const eliminations = [];
+
+  const totalTeams = survivors.length;
+  const firstElimGw = 39 - totalTeams; // Ensures last team is eliminated in GW38
+
+  for (let gw = firstElimGw; gw <= 38; gw++) {
+    let lowestScorer = null;
+
+    for (const player of survivors) {
+      const gwData = player.everyGw.find(e => e.gameweek === gw);
+      if (!gwData) continue;
+
+      if (
+        !lowestScorer ||
+        gwData.points < lowestScorer.gwData.points ||
+        (gwData.points === lowestScorer.gwData.points &&
+         gwData.overall_rank > lowestScorer.gwData.overall_rank)
+      ) {
+        lowestScorer = { player, gwData };
+      }
+    }
+
+    if (lowestScorer) {
+      eliminations.push({ ...lowestScorer, gameweek: gw });
+      const index = survivors.findIndex(p => p.entry === lowestScorer.player.entry);
+      if (index !== -1) survivors.splice(index, 1);
+    }
+  }
+
+  // === Eliminated Teams List ===
+  const elimHeader = document.createElement("h6");
+  elimHeader.innerText = "Eliminated Teams";
+  elimHeader.className = `mt-4 mb-2 ${darkMode ? "text-light" : ""}`;
+  container.appendChild(elimHeader);
+
+  const elimList = document.createElement("ul");
+  elimList.className = `list-group mb-4 ${darkMode ? "bg-dark" : ""}`;
+
+  eliminations.forEach((elim, i) => {
+    const li = document.createElement("li");
+    li.className = `list-group-item d-flex justify-content-between align-items-center ${darkMode ? "bg-dark text-light border-secondary" : ""}`;
+    li.style.animation = `fadeIn 0.4s ease ${i * 0.1}s forwards`;
+    li.style.opacity = 0;
+
+    li.innerHTML = `
+      <span><strong>${elim.player.entry_name}</strong><br><small>${elim.player.player_name}</small></span>
+      <span>GW${elim.gameweek}: ${elim.gwData.points} pts</span>
+    `;
+
+    elimList.appendChild(li);
+  });
+
+  container.appendChild(elimList);
+
+  // === Final Winner Table ===
+  if (survivors.length === 1) {
+    // 🎉 Confetti
+    if (typeof confetti === "function") {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    const finalHeader = document.createElement("h6");
+    finalHeader.innerText = "🏆 Winner – Last Team Standing";
+    finalHeader.className = `mt-4 mb-2 ${darkMode ? "text-light" : ""}`;
+    container.appendChild(finalHeader);
+
+    const tableWrapper = document.createElement("div");
+    tableWrapper.className = "table-responsive";
+    tableWrapper.id = "winner-section";
+
+    const table = document.createElement("table");
+    table.className = `table table-bordered table-striped table-hover ${darkMode ? "table-dark" : "table-light"}`;
+
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    ["Team", "Manager", "Total Points", "Avg GW Score"].forEach((text) => {
+      const th = document.createElement("th");
+      th.innerText = text;
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    const winner = survivors[0];
+
+    const totalPoints = winner.everyGw.reduce((acc, gw) => acc + gw.points, 0);
+    const avgPoints = (totalPoints / winner.everyGw.length).toFixed(1);
+
+    const tr = document.createElement("tr");
+    tr.className = "table-success";
+
+    tr.innerHTML = `
+      <td><strong>🏆 ${winner.entry_name}</strong></td>
+      <td>${winner.player_name}</td>
+      <td class="text-center">${totalPoints}</td>
+      <td class="text-center">${avgPoints}</td>
+    `;
+
+    tbody.appendChild(tr);
+    table.appendChild(tbody);
+    tableWrapper.appendChild(table);
+    container.appendChild(tableWrapper);
+
+    // 📸 Share Button
+    const shareBtn = document.createElement("button");
+    shareBtn.className = "btn btn-outline-success mt-3";
+    shareBtn.innerText = "📸 Share Winner";
+    shareBtn.onclick = () => {
+      const target = document.getElementById("winner-section");
+      html2canvas(target).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "fpl_last_man_standing_winner.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    };
+
+    container.appendChild(shareBtn);
+  }
+}
+
+
 
 ///////////////////////////Rival Differences Compare START////////////////
 

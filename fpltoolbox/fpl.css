@@ -921,3 +921,13 @@ margin-left: 20px;
 #copycat-popup-body > p {
   margin: 0px;
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+[class^="fade-in"] {
+  opacity: 0;
+  animation: fadeIn 0.4s ease-out forwards;
+}
