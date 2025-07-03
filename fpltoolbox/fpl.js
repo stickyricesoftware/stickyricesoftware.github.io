@@ -4,7 +4,15 @@ const BASE_URL =
 //  "http://fantasy.premierleague.com/api/";
 
 
-
+import managerDataTest from "./testData/managerDataTest.js";
+import eventStatusTest from "./testData/eventStatusTest.js";
+import bootstrapTest from "./testData/bootsatrapTest.js";
+import superLeagueTest from "./testData/superLeagueTest.js";
+import superLeagueManagerDataTest from "./testData/superLeagueManagerDataTest.js";
+import superLeagueGameweekDataTest from "./testData/superLeagueGameweekDataTest.js";
+import superLeagueDetailedGameweekDataTest from "./testData/superLeagueDetailedGameweekDataTest.js";
+import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
+import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
 const preSeason = true
 let testMode = false;
 
@@ -20,44 +28,6 @@ if (
     testMode = false;
   }
 }
-
-let managerDataTest,
-  eventStatusTest,
-  bootstrapTest,
-  superLeagueTest,
-  superLeagueManagerDataTest,
-  superLeagueGameweekDataTest,
-  superLeagueDetailedGameweekDataTest,
-  superLeagueTransfersAddedDataTest,
-  superLeagueAddWeeklyPicksTest;
-
-if (testMode) {
-  // Use Promise.all to load modules in parallel for efficiency
-  const modules = await Promise.all([
-    import("./testData/managerDataTest.js"),
-    import("./testData/eventStatusTest.js"),
-    import("./testData/bootsatrapTest.js"),
-    import("./testData/superLeagueTest.js"),
-    import("./testData/superLeagueManagerDataTest.js"),
-    import("./testData/superLeagueGameweekDataTest.js"),
-    import("./testData/superLeagueDetailedGameweekDataTest.js"),
-    import("./testData/superLeagueTransfersAddedDataTest.js"),
-    import("./testData/superLeagueAddWeeklyPicksTest.js"),
-  ]);
-
-  [
-    managerDataTest,
-    eventStatusTest,
-    bootstrapTest,
-    superLeagueTest,
-    superLeagueManagerDataTest,
-    superLeagueGameweekDataTest,
-    superLeagueDetailedGameweekDataTest,
-    superLeagueTransfersAddedDataTest,
-    superLeagueAddWeeklyPicksTest,
-  ] = modules.map((m) => m.default);
-}
-
 
 const changelogData = [
   { version: "4.3.0", description: "Blog articles"},
