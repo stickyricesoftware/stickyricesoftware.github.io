@@ -4,15 +4,15 @@ const BASE_URL =
 //  "http://fantasy.premierleague.com/api/";
 
 
-import managerDataTest from "./testData/managerDataTest.js";
-import eventStatusTest from "./testData/eventStatusTest.js";
-import bootstrapTest from "./testData/bootsatrapTest.js";
-import superLeagueTest from "./testData/superLeagueTest.js";
-import superLeagueManagerDataTest from "./testData/superLeagueManagerDataTest.js";
-import superLeagueGameweekDataTest from "./testData/superLeagueGameweekDataTest.js";
-import superLeagueDetailedGameweekDataTest from "./testData/superLeagueDetailedGameweekDataTest.js";
-import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
-import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
+// import managerDataTest from "./testData/managerDataTest.js";
+// import eventStatusTest from "./testData/eventStatusTest.js";
+// import bootstrapTest from "./testData/bootsatrapTest.js";
+// import superLeagueTest from "./testData/superLeagueTest.js";
+// import superLeagueManagerDataTest from "./testData/superLeagueManagerDataTest.js";
+// import superLeagueGameweekDataTest from "./testData/superLeagueGameweekDataTest.js";
+// import superLeagueDetailedGameweekDataTest from "./testData/superLeagueDetailedGameweekDataTest.js";
+// import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
+// import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
 
 const preSeason = true
 let testMode = false;
@@ -31,6 +31,7 @@ if (
 }
 
 const changelogData = [
+   { version: "4.3.2", description: "Team Name Generator Fixes"},
   { version: "4.3.0", description: "Blog articles"},
   { version: "4.2.0", description: "Manager of the Month"},
   { version: "4.1.0", description: "Team of the week"},
@@ -45716,6 +45717,22 @@ const dummyLeague = {
 };
 
 
+async function changeLeague(id) {
+  //navigator.clipboard.writeText(id);
+  document.getElementById("league_id").value = id;
+  setTimeout(() => {
+    document
+      .getElementsByClassName("pmpro_btn-submit-update-profile")[0]
+      .click();
+  }, "500");
+
+  alert("League ID changed to: " + id);
+  if (leagueLength > 49) {
+    alert(
+      "Just so you know, I can only work with the top 50 teams in this leaugue at the moment - i'll let you know when/if that changes"
+    );
+  }
+}
 // Set to true to use test data
 let addDelaySimulationTime = 100;
 window.FPLToolboxLeagueDataReady = false;
@@ -45829,13 +45846,13 @@ if (theUser.info.team_id) {
 if (theUser.info.league_id != "" || !theUser.info.league_id) {
   //createLeague(theUser.info.league_id);
 } else {
-  let managerName = "Bro"
+  let managerName = ""
   if(managerData.player_first_name){
   managerName = managerData.player_first_name
   }
   showModal({
     title: `Reminder`,
-    body: `Hey, ${ managerName}! <br><br>Remember to input yout team and league ID in your profile when you know it!`,
+    body: `Hey, ${ managerName} <br><br>Remember to input yout team and league ID in your profile when you know it!`,
     confirmText: "Take me there now",
     onConfirm: () => {
       window.location.href = profilePageUrl;
@@ -46370,7 +46387,7 @@ container.className = "container text-center py-3";
        {
       icon: "bi-arrow-repeat",
       label: "GW Transfer Summaries",
-      action: handleStatsClick,
+      action: showTransferSummaries,
       tier: "free",
       requiresData: true,
     },
@@ -47581,16 +47598,16 @@ function generateTeamName() {
     { name: "Come Digne With Me", tags: ["aston-villa"] },
     { name: "Out on Bailey", tags: ["aston-villa"] },
     { name: "Put a Dendonck on it", tags: ["aston-villa"] },
-    { name: "Tea for the Tielemans", tags: ["aston-villa"] },
+    { name: "Tea for the Tielemans", tags: ["aston-villa", "Food & Drink"] },
     {
       name: "Bangers and Rashford",
-      tags: ["classic", "aston-villa", "manchester-united"],
+      tags: ["classic", "aston-villa", "manchester-united", "Food & Drink"],
     },
     { name: "Aston Village People", tags: ["aston-villa", "music"] },
     { name: "Rubber Digne Rapids", tags: ["aston-villa"] },
     { name: "Matty Cash Hoes", tags: ["aston-villa", "music"] },
     { name: "MattyCashInTheAttic", tags: ["aston-villa", "music"] },
-    { name: "McGinn and Tonic", tags: ["aston-villa"] },
+    { name: "McGinn and Tonic", tags: ["aston-villa", "Food & Drink"] },
     { name: "Comme Ci Konsa", tags: ["aston-villa"] },
 
     // Brentford
@@ -47598,8 +47615,8 @@ function generateTeamName() {
     { name: "Mee, Myself and I", tags: ["brentford"] },
     { name: "Dasilva Lining", tags: ["brentford"] },
     { name: "Thomas The Frank Engine", tags: ["brentford", "TV & Film"] },
-    { name: "Kinder Mbeumo", tags: ["brentford"] },
-    { name: "Mbeumo No.5", tags: ["classic", "brentford", "music"] },
+    { name: "Kinder Mbeumo", tags: ["manchester-united", "Food & Drink"] },
+    { name: "Mbeumo No.5", tags: ["classic", "manchester-united", "music"] },
     { name: "Wissa Khalifa", tags: ["classic", "brentford", "TV & Film"] },
 
     // Bournemouth
@@ -47623,8 +47640,8 @@ function generateTeamName() {
     { name: "I'm Sorry Nic Jackson", tags: ["chelsea", "music"] },
     { name: "Stuck in the Mudryk", tags: ["chelsea"] },
     { name: "Under My Cucurella", tags: ["chelsea", "music"] },
-    { name: "Reece's Set Pieces", tags: ["chelsea"] },
-    { name: "Palmer Violets", tags: ["chelsea"] },
+    { name: "Reece's Set Pieces", tags: ["chelsea", "Food & Drink"] },
+    { name: "Palmer Violets", tags: ["chelsea", "Food & Drink"] },
     { name: "Chilwell Soon", tags: ["chelsea"] },
     { name: "Petr Cech Yourself", tags: ["classic", "chelsea"] },
     { name: "Mudryk To Life", tags: ["classic", "chelsea"] },
@@ -47669,7 +47686,7 @@ function generateTeamName() {
     { name: "Hungry like the Woolf", tags: ["ipswich-town"] },
     { name: "Morsy Code", tags: ["ipswich-town"] },
     { name: "Starsky and Hutchinson", tags: ["ipswich-town"] },
-    { name: "Burgess and Fries", tags: ["ipswich-town"] },
+    { name: "Burgess and Fries", tags: ["ipswich-town", "Food & Drink"] },
     { name: "Leif Blower", tags: ["ipswich-town"] },
     { name: "Hawk Tuanzebe", tags: ["ipswich-town"] },
 
@@ -47677,10 +47694,10 @@ function generateTeamName() {
     { name: "Hey, Wout's Wrong With You", tags: ["leicester-city"] },
     { name: "Yes Ndidi", tags: ["leicester-city"] },
     { name: "That's Soumare", tags: ["leicester-city"] },
-    { name: "Champagne Coopernova", tags: ["leicester-city"] },
+    { name: "Champagne Coopernova", tags: ["leicester-city", "Food & Drink"] },
     { name: "House of Vards", tags: ["leicester-city", "classic"] },
     { name: "Vardy Boys FC", tags: ["leicester-city", "classic"] },
-    { name: "Egg On Your Faes", tags: ["classic", "leicester-city"] },
+    { name: "Egg On Your Faes", tags: ["classic", "leicester-city", "Food & Drink"] },
 
     // Liverpool
     { name: "Alisson Wonderland", tags: ["liverpool"] },
@@ -47704,6 +47721,7 @@ function generateTeamName() {
 
     // Manchester City
     { name: "Haalandaise Sauce", tags: ["manchester-city"] },
+    { name: "Beef Cherki", tags: ["manchester-city", "Food & Drink"] },
     { name: "Ake Breaky Heart", tags: ["manchester-city"] },
     { name: "Gvardiols of the Galaxy", tags: ["manchester-city", "TV & Film"] },
     { name: "Silva Surfer", tags: ["manchester-city"] },
@@ -47711,8 +47729,8 @@ function generateTeamName() {
     { name: "Cameroon Diaz", tags: ["manchester-city"] },
     { name: "Luke Kyle Walker", tags: ["classic", "manchester-city"] },
     { name: "Judy Haaland", tags: ["manchester-city"] },
-    { name: "Haaland Oates", tags: ["manchester-city"] },
-    { name: "Haalandaise Sauce", tags: ["manchester-city"] },
+    { name: "Haaland Oates", tags: ["manchester-city", "Food & Drink"] },
+    { name: "Haalandaise Sauce", tags: ["manchester-city", "Food & Drink"] },
     {
       name: "Diaz Nother Day",
       tags: ["manchester-city", "classic", "TV & Film"],
@@ -47735,8 +47753,8 @@ function generateTeamName() {
     },
     { name: "Earth Wind & Maguire", tags: ["manchester-united", "music"] },
     { name: "The Shaw Thing", tags: ["manchester-united"] },
-    { name: "Cheesy Garnachos", tags: ["classic", "manchester-united"] },
-    { name: "Garnacho Chips", tags: ["classic", "manchester-united"] },
+    { name: "Cheesy Garnachos", tags: ["classic", "manchester-united", "Food & Drink"] },
+    { name: "Garnacho Chips", tags: ["classic", "manchester-united", "Food & Drink"] },
     { name: "Afternoon De Ligt", tags: ["manchester-united"] },
     { name: "It'sOffToZirkzeeGo", tags: ["manchester-united"] },
 
@@ -47758,7 +47776,7 @@ function generateTeamName() {
     { name: "Boly and Clyde", tags: ["nottingham-forest"] },
     { name: "Matz Sels Sea Shells", tags: ["nottingham-forest"] },
     { name: "Finding Neco", tags: ["nottingham-forest", "TV & Film"] },
-    { name: "MacAwoniyi Cheese", tags: ["nottingham-forest"] },
+    { name: "MacAwoniyi Cheese", tags: ["nottingham-forest", "Food & Drink"] },
     {
       name: "What the Elanga?",
       tags: ["nottingham-forest", "manchester-united"],
@@ -47772,7 +47790,7 @@ function generateTeamName() {
     { name: "Escape from Alcaraz", tags: ["southampton"] },
     { name: "Aribo Tangfastics", tags: ["southampton"] },
     { name: "Onuachu (Bless you)", tags: ["southampton"] },
-    { name: "Heinz Bella-Kotchap", tags: ["southampton"] },
+    { name: "Heinz Bella-Kotchap", tags: ["southampton", "Food & Drink"] },
     { name: "Lallanas in Pyjamas", tags: ["southampton"] },
 
     // Spurs
@@ -47804,18 +47822,18 @@ function generateTeamName() {
     { name: "Purple Rayan", tags: ["wolves", "music"] },
     { name: "Pedro Lima Bean", tags: ["wolves"] },
     { name: "Mama, Just Kilman", tags: ["wolves", "music"] },
-    { name: "Cunha Get Any Worse?", tags: ["wolves", "manchester-united"] },
+    { name: "Cunha Get Any Worse?", tags: ["manchester-united", "manchester-united"] },
     { name: "Podence Dence Revolution", tags: ["wolves"] },
     { name: "Ruthless Toothless Wolves", tags: ["wolves"] },
-    { name: "Ait Nouri Geller", tags: ["wolves"] },
+    { name: "Ait Nouri Geller", tags: ["manchester-city"] },
 
     // Classics
 
     { name: "Absolutely Fabregas", tags: ["arsenal", "classic", "TV & Film"] },
-    { name: "Baines on Toast", tags: ["everton", "classic"] },
+    { name: "Baines on Toast", tags: ["everton", "classic", "Food & Drink"] },
     {
       name: "Crouch Potato",
-      tags: ["classic", "spurs", "southampton", "liverpool"],
+      tags: ["classic", "spurs", "southampton", "liverpool", "Food & Drink"],
     },
     { name: "Ruud Health", tags: ["classic", "chelsea"] },
     {
@@ -47871,7 +47889,7 @@ function generateTeamName() {
       tags: ["classic", "manchester-united", "music"],
     },
     { name: "Tinchy Sneijder", tags: ["classic", "music"] },
-    { name: "Who Ate All Depays?", tags: ["classic", "manchester-united"] },
+    { name: "Who Ate All Depays?", tags: ["classic", "manchester-united", "Food & Drink"] },
 
     { name: "Bellerin Than Out", tags: ["classic"] },
     { name: "Better Call Saúl", tags: ["classic", "chelsea"] },
@@ -48095,7 +48113,7 @@ function generateTeamName() {
     { name: "Mbappe Feet", tags: ["worldwide"] },
     { name: "Orban Legend", tags: ["worldwide"] },
     { name: "PassionOfTheCruyff", tags: ["worldwide"] },
-    { name: "Pedri Dish", tags: ["worldwide"] },
+    { name: "Pedri Dish", tags: ["worldwide", "Food & Drink"] },
     { name: "Pique Blinders", tags: ["worldwide"] },
     { name: "PutJohansUp4DeCruyff", tags: ["worldwide"] },
     { name: "Savic Garden", tags: ["worldwide", "music"] },
@@ -48128,6 +48146,13 @@ function generateTeamName() {
     { name: "Vladimir Luton", tags: ["worldwide"] },
     { name: "Khedira Pin Drop", tags: ["worldwide", "classic"] },
     { name: "Surreal Madrid", tags: ["worldwide", "classic"] },
+    //New 2025
+    { name: "Cunha Dig It? Saka!", tags: ["manchester-united", "wolves", "music"] },
+    { name: "Cheeky Taka!", tags: ["worldwide"] },
+    { name: "Scots Tots", tags: ["worldwide"] },
+        { name: "Hasta La Cunha", tags: ["manchester-united", "wolves", "TV & Film"] },
+    { name: "RuttedWokeNonsense", tags: ["classic"] },
+
   ];
   const darkMode = localStorage.getItem("darkMode") === "true";
 
@@ -48149,14 +48174,14 @@ function generateTeamName() {
   
     <div class="mb-4">
     <h5>Step 2:</h5>
-        <p class="fs-6">Press the button until you find a name that suits your style.</p>
+        <p class="fs-6">Generate team name until you find a name that suits your managerial style.</p>
     <button id="generateBtn" class="btn btn-primary mb-2">Generate Team Name</button>
 
   </div>
 
   <div class="mb-4">
     <h5>Step 3:</h5>
-    <p id="teamNameDisplay" class="fs-4">Click the button to get a name</p>
+    <p id="teamNameDisplay" class="fs-4"> </p>
     <p class="fs-6">Tap copy if you like what you see!</p>
     <button id="copyBtn" class="btn btn-outline-secondary" style="display:none;">📋 Copy</button>
   </div>
@@ -48268,10 +48293,30 @@ function generateTeamName() {
       //Optional: reset count so they see it again every 5
       generationCount = 0;
     }
+
+
+
+    const timestamp = new Date().toISOString();
+    const notifcation = `
+    👤 User: ${theUser.info.nickname}
+    ✉️ Email: ${theUser.username.data.user_email}    
+    🕒 Time: ${timestamp}
+    🖥️ Team Name Generated: ${selectedName}`;
+    fetch('https://ntfy.sunny.bz/team-name-generator', {
+      method: 'POST',
+      body: notifcation
+  });
+
+
+
   });
 
   // Copy to clipboard logic
   copyBtn.addEventListener("click", () => {
+    
+    
+    
+    
     const textToCopy = display.textContent;
     navigator.clipboard.writeText(textToCopy).then(() => {
       copyBtn.textContent = "✅ Copied!";
@@ -48332,7 +48377,7 @@ async function showMyTeam() {
   if (preSeason){
       showModal({
     title: "Hold your horses",
-    body: "Nothing to see here, come back when FPL is up and running again",
+    body: "Nothing to see here, come back once GW1 has started",
     confirmText: "OK",
     onConfirm: () => {}, // No action taken
   });
@@ -49964,7 +50009,7 @@ async function showRivalDiff() {
     if (preSeason){
       showModal({
     title: "Hold your horses",
-    body: "Nothing to see here, come back when FPL is up and running again",
+    body: "Nothing to see here, come back once GW1 has started",
     confirmText: "OK",
     onConfirm: () => {}, // No action taken
   });
@@ -51861,6 +51906,20 @@ async function getPlayerWeeklyScore(playerId, gameweek) {
     return null;
   }
 }
+
+
+async function showTransferSummaries() {
+  if (userHasAccess([1, 10, 12])) {
+    showModal({
+      title: "Coming Soon",
+      body: "Improved transfer summaries coming soon!",
+      confirmText: "Ok",
+      onConfirm: () => {}, // No action taken
+    });
+    return;
+  }
+}
+
 
 async function showMemes() {
   if (!userHasAccess([1, 10, 12])) {
@@ -55442,7 +55501,7 @@ async function createGWMaxDashboard(){
   if (preSeason){
       showModal({
     title: "Hold your horses",
-    body: "Nothing to see here, come back when FPL is up and running again",
+    body: "Nothing to see here, come back once GW1 has started",
     confirmText: "OK",
     onConfirm: () => {}, // No action taken
   });
