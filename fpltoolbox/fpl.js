@@ -3,7 +3,6 @@ const BASE_URL =
 //  const BASE_URL =
 //  "http://fantasy.premierleague.com/api/";
 
-
 // import managerDataTest from "./testData/managerDataTest.js";
 // import eventStatusTest from "./testData/eventStatusTest.js";
 // import bootstrapTest from "./testData/bootsatrapTest.js";
@@ -14,7 +13,7 @@ const BASE_URL =
 // import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
 // import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
 
-const preSeason = true
+const preSeason = true;
 let testMode = false;
 
 if (
@@ -31,13 +30,12 @@ if (
 }
 
 const changelogData = [
-   { version: "4.3.2", description: "Team Name Generator Fixes"},
-  { version: "4.3.0", description: "Blog articles"},
-  { version: "4.2.0", description: "Manager of the Month"},
-  { version: "4.1.0", description: "Team of the week"},
-   { version: "4.0.0", description: "New interface"},
+  { version: "4.3.2", description: "Team Name Generator Fixes" },
+  { version: "4.3.0", description: "Blog articles" },
+  { version: "4.2.0", description: "Manager of the Month" },
+  { version: "4.1.0", description: "Team of the week" },
+  { version: "4.0.0", description: "New interface" },
   { version: "3.9.0", description: "Max dashboard" },
-
 ];
 const FPLToolboxVersion = changelogData[0].version;
 
@@ -45716,7 +45714,6 @@ const dummyLeague = {
   ],
 };
 
-
 async function changeLeague(id) {
   //navigator.clipboard.writeText(id);
   document.getElementById("league_id").value = id;
@@ -45741,7 +45738,7 @@ window.FPLToolboxMaxLeagueDataReady = false;
 
 let subscriptionPageUrl = "/membership-account/membership-levels/";
 let profilePageUrl = "/membership-account/your-profile/";
-let miniLeagueAdminPageUrl = "https://fpltoolbox.com/mini-league-admin-page/"
+let miniLeagueAdminPageUrl = "https://fpltoolbox.com/mini-league-admin-page/";
 
 window.FPLToolboxLeagueData = {
   leagueName: null,
@@ -45846,13 +45843,13 @@ if (theUser.info.team_id) {
 if (theUser.info.league_id != "" || !theUser.info.league_id) {
   //createLeague(theUser.info.league_id);
 } else {
-  let managerName = ""
-  if(managerData.player_first_name){
-  managerName = managerData.player_first_name
+  let managerName = "";
+  if (managerData.player_first_name) {
+    managerName = managerData.player_first_name;
   }
   showModal({
     title: `Reminder`,
-    body: `Hey, ${ managerName} <br><br>Remember to input yout team and league ID in your profile when you know it!`,
+    body: `Hey, ${managerName} <br><br>Remember to input yout team and league ID in your profile when you know it!`,
     confirmText: "Take me there now",
     onConfirm: () => {
       window.location.href = profilePageUrl;
@@ -45921,7 +45918,7 @@ function injectUI() {
   mainContainer.appendChild(screenWrapper);
   mainContainer.appendChild(nav);
   app.appendChild(mainContainer);
-  homeScreen()
+  homeScreen();
   injectDynamicStyles();
   setupTabListeners();
 }
@@ -45950,7 +45947,7 @@ document.getElementById("nav-container").addEventListener("click", (e) => {
 });
 
 function createScreens(wrapper) {
-  const screenIds = ["home","tools", "settings"];
+  const screenIds = ["home", "tools", "settings"];
   screenIds.forEach((id) => {
     const screen = document.createElement("div");
     screen.id = `screen-${id}`;
@@ -45968,7 +45965,7 @@ function createNav() {
   nav.id = "nav-container";
 
   const tabs = [
-        { icon: "house", label: "Home", target: "home" },
+    { icon: "house", label: "Home", target: "home" },
     { icon: "tools", label: "Tools", target: "tools" },
     { icon: "globe2", label: "Website", external: "https://fpltoolbox.com" },
     { icon: "gear", label: "Settings", target: "settings" },
@@ -46021,14 +46018,8 @@ async function homeScreen() {
     homeContainer.classList.add("bg-dark", "text-light");
   }
 
-
-  
-
-
-
-const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
-const tierName = getTierName(levelId);
-
+  const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
+  const tierName = getTierName(levelId);
 
   homeContainer.innerHTML = `
 
@@ -46046,12 +46037,16 @@ const tierName = getTierName(levelId);
 
       <hr class="my-3"/>
 
-      ${preSeason ? `
+      ${
+        preSeason
+          ? `
         <div class="mb-4">
           <p class="mb-1"><strong>Stuck on the perfect FPL Team name? Head over to the new FPL Team Name Generator in the tools section.</p>
         </div>
         <hr class="my-3"/>
-      ` : ''}
+      `
+          : ""
+      }
 
      
 
@@ -46060,9 +46055,8 @@ const tierName = getTierName(levelId);
     </div>
   `;
 
-
- const storiesBar = await createStoriesDisplayBootstrap();
- homeContainer.prepend(storiesBar)
+  const storiesBar = await createStoriesDisplayBootstrap();
+  homeContainer.prepend(storiesBar);
 
   injectDynamicStyles(); // Apply any additional dynamic styling
 }
@@ -46074,22 +46068,17 @@ const tierName = getTierName(levelId);
  */
 async function createStoriesDisplayBootstrap() {
   // The main container for the stories bar
-  const storiesContainer = document.createElement('div');
-  storiesContainer.className = 'd-flex gap-3 p-3 border-bottom overflow-x-auto';
+  const storiesContainer = document.createElement("div");
+  storiesContainer.className = "d-flex gap-3 p-3 border-bottom overflow-x-auto";
 
-  
-  
-  const WORDPRESS_URL = 'https://fpltoolbox.com/wp-json/wp/v2/posts?per_page=8&_embed';
+  const WORDPRESS_URL =
+    "https://fpltoolbox.com/wp-json/wp/v2/posts?per_page=8&_embed";
 
+  const darkMode = localStorage.getItem("darkMode") === "true";
 
-   const darkMode = localStorage.getItem("darkMode") === "true";
-
-
-
-// Get the list of viewed story IDs from localStorage
-  const viewedStories = JSON.parse(localStorage.getItem('viewedFplStories')) || [];
-
-
+  // Get the list of viewed story IDs from localStorage
+  const viewedStories =
+    JSON.parse(localStorage.getItem("viewedFplStories")) || [];
 
   try {
     const response = await fetch(WORDPRESS_URL);
@@ -46099,85 +46088,92 @@ async function createStoriesDisplayBootstrap() {
     const posts = await response.json();
 
     if (posts.length === 0) {
-      storiesContainer.innerHTML = '<p class="text-muted m-0">No recent blog posts found.</p>';
+      storiesContainer.innerHTML =
+        '<p class="text-muted m-0">No recent blog posts found.</p>';
       return storiesContainer;
     }
 
-    posts.forEach(post => {
-      const storyWrapper = document.createElement('a');
+    posts.forEach((post) => {
+      const storyWrapper = document.createElement("a");
       storyWrapper.href = post.link;
-      storyWrapper.target = '_blank'; // Open in a new tab
-      storyWrapper.className = 'd-flex flex-column align-items-center text-decoration-none';
-      storyWrapper.style.cursor = 'pointer';
+      storyWrapper.target = "_blank"; // Open in a new tab
+      storyWrapper.className =
+        "d-flex flex-column align-items-center text-decoration-none";
+      storyWrapper.style.cursor = "pointer";
       storyWrapper.dataset.postId = post.id; // Store post ID for the click handler
 
-      const storyCircle = document.createElement('div');
-      storyCircle.className = 'rounded-circle p-1';
-      storyCircle.style.width = '90px';
-      storyCircle.style.height = '90px';
-      storyCircle.style.flexShrink = '0';
+      const storyCircle = document.createElement("div");
+      storyCircle.className = "rounded-circle p-1";
+      storyCircle.style.width = "90px";
+      storyCircle.style.height = "90px";
+      storyCircle.style.flexShrink = "0";
 
- // Check if the story has been viewed and apply the appropriate style
+      // Check if the story has been viewed and apply the appropriate style
       const isViewed = viewedStories.includes(post.id);
       if (isViewed) {
-        storyCircle.style.background = '#dbdbdb'; // A simple gray for viewed stories
+        storyCircle.style.background = "#dbdbdb"; // A simple gray for viewed stories
       } else {
-        storyCircle.style.background = 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%)';
+        storyCircle.style.background =
+          "radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%)";
       }
 
+      const innerCircle = document.createElement("div");
+      innerCircle.className =
+        "w-100 h-100 rounded-circle border border-2 border-white";
 
-      const innerCircle = document.createElement('div');
-      innerCircle.className = 'w-100 h-100 rounded-circle border border-2 border-white';
-      
-      const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+      const featuredImage =
+        post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
       if (featuredImage) {
         innerCircle.style.backgroundImage = `url(${featuredImage})`;
-        innerCircle.style.backgroundSize = 'cover';
-        innerCircle.style.backgroundPosition = 'center';
+        innerCircle.style.backgroundSize = "cover";
+        innerCircle.style.backgroundPosition = "center";
       } else {
-        innerCircle.classList.add('bg-light'); // Fallback color
+        innerCircle.classList.add("bg-light"); // Fallback color
       }
 
       storyCircle.appendChild(innerCircle);
 
-      const storyLabel = document.createElement('div');
-  
-      storyLabel.innerHTML = post.title.rendered; // Use innerHTML to decode HTML entities
-      storyLabel.style.cssText = 'max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
-      // Conditionally set text color class based on dark mode for better visibility
-      const textColorClass = darkMode ? 'text-light' : 'text-muted';
-      storyLabel.className = `small ${textColorClass} mt-1`;
+      const storyLabel = document.createElement("div");
 
+      storyLabel.innerHTML = post.title.rendered; // Use innerHTML to decode HTML entities
+      storyLabel.style.cssText =
+        "max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
+      // Conditionally set text color class based on dark mode for better visibility
+      const textColorClass = darkMode ? "text-light" : "text-muted";
+      storyLabel.className = `small ${textColorClass} mt-1`;
 
       storyWrapper.appendChild(storyCircle);
       storyWrapper.appendChild(storyLabel);
 
-// Add click listener to mark the story as viewed
-      storyWrapper.addEventListener('click', () => {
+      // Add click listener to mark the story as viewed
+      storyWrapper.addEventListener("click", () => {
         const postId = parseInt(storyWrapper.dataset.postId, 10);
-        
+
         // Update UI immediately
-        storyCircle.style.background = '#dbdbdb';
+        storyCircle.style.background = "#dbdbdb";
 
         // Update localStorage
-        let currentViewed = JSON.parse(localStorage.getItem('viewedFplStories')) || [];
+        let currentViewed =
+          JSON.parse(localStorage.getItem("viewedFplStories")) || [];
         if (!currentViewed.includes(postId)) {
           currentViewed.push(postId);
-          localStorage.setItem('viewedFplStories', JSON.stringify(currentViewed));
+          localStorage.setItem(
+            "viewedFplStories",
+            JSON.stringify(currentViewed)
+          );
         }
       });
 
       storiesContainer.appendChild(storyWrapper);
     });
   } catch (error) {
-    console.error('Error fetching WordPress posts for stories:', error);
-    storiesContainer.innerHTML = '<p class="text-danger m-0">Could not load stories.</p>';
+    console.error("Error fetching WordPress posts for stories:", error);
+    storiesContainer.innerHTML =
+      '<p class="text-danger m-0">Could not load stories.</p>';
   }
 
   return storiesContainer;
 }
-
-
 
 function settingsScreen() {
   const settingsContainer = document.getElementById("screen-settings");
@@ -46198,13 +46194,13 @@ function settingsScreen() {
     </ul>
   </div>
 `;
-const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
-const tierName = getTierName(levelId);
-const displayTier = tierName.charAt(0).toUpperCase() + tierName.slice(1);
-const memberColor = getTierColor(levelId)
+  const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
+  const tierName = getTierName(levelId);
+  const displayTier = tierName.charAt(0).toUpperCase() + tierName.slice(1);
+  const memberColor = getTierColor(levelId);
 
-    // Clear container and add Bootstrap padding
-settingsContainer.innerHTML = `
+  // Clear container and add Bootstrap padding
+  settingsContainer.innerHTML = `
 
 <div class="p-4">
     <div class="mb-4" style="background-color: ${memberColor}; color: black; padding: 2rem; border-radius: 0.5rem;">
@@ -46227,7 +46223,9 @@ settingsContainer.innerHTML = `
 
   <hr class="my-2"/>
 
-  ${!preSeason ? `
+  ${
+    !preSeason
+      ? `
     <!-- League Selector -->
     <div class="mb-4">
       <label for="leagueSelector" class="form-label">Switch Mini League</label>
@@ -46235,7 +46233,9 @@ settingsContainer.innerHTML = `
     </div>
 
     <hr class="my-2"/>
-  ` : ''}
+  `
+      : ""
+  }
 
 
 
@@ -46248,7 +46248,9 @@ settingsContainer.innerHTML = `
       <p>Features will be available when the season begins</p>  
     <p>Your Toolbox Account</p>
     <p>Manage your profile, check your subscription status, or update your details anytime.</p>
-    <a href="${profilePageUrl}" target="_blank" class="btn ${darkMode ? 'btn-primary' : 'btn-outline-primary'}">View My Profile</a>
+    <a href="${profilePageUrl}" target="_blank" class="btn ${
+    darkMode ? "btn-primary" : "btn-outline-primary"
+  }">View My Profile</a>
   </div>
 <hr class="my-2"/>
 
@@ -46262,7 +46264,9 @@ settingsContainer.innerHTML = `
   
 
     
-    <a href="https://fpltoolbox.com/wp-login.php?action=logout" target="_blank" class="btn ${darkMode ? 'btn-primary' : 'btn-outline-primary'}">Logout</a>
+    <a href="https://fpltoolbox.com/wp-login.php?action=logout" target="_blank" class="btn ${
+      darkMode ? "btn-primary" : "btn-outline-primary"
+    }">Logout</a>
   </div>
 
   <hr class="my-2"/>
@@ -46272,7 +46276,6 @@ settingsContainer.innerHTML = `
 
 
 `;
-
 
   // Dark mode toggle logic
   const darkModeToggle = document.getElementById("darkModeToggle");
@@ -46334,10 +46337,10 @@ settingsContainer.innerHTML = `
 function toolsScreen() {
   const toolsScreen = document.getElementById("screen-tools");
   toolsScreen.innerHTML = "";
-  toolsScreen.style.marginBottom = "50px"
-const container = document.createElement("div");
-container.className = "container text-center py-3";
-  
+  toolsScreen.style.marginBottom = "50px";
+  const container = document.createElement("div");
+  container.className = "container text-center py-3";
+
   const row = document.createElement("div");
   row.className = "row g-3";
 
@@ -46384,14 +46387,14 @@ container.className = "container text-center py-3";
       tier: "free",
       requiresData: true,
     },
-       {
+    {
       icon: "bi-arrow-repeat",
       label: "GW Transfer Summaries",
       action: showTransferSummaries,
       tier: "free",
       requiresData: true,
     },
-        {
+    {
       icon: "bi-emoji-smile",
       label: "GW Memes",
       action: showMemes,
@@ -46469,17 +46472,17 @@ container.className = "container text-center py-3";
       tier: "pro",
       requiresData: true,
     },
-                {
+    {
       icon: "bi-bag-plus",
       label: "Feature Request",
       action: featureRequest,
       tier: "pro",
       requiresData: false,
     },
-        {
+    {
       icon: "bi-person-fill-dash",
       label: "Last Man Standing",
-      action:showLastManStandingEliminations,
+      action: showLastManStandingEliminations,
       tier: "max",
       requiresData: true,
     },
@@ -46505,8 +46508,6 @@ container.className = "container text-center py-3";
       tier: "max",
       requiresData: true,
     },
-
-
   ];
 
   features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
@@ -46564,15 +46565,15 @@ container.className = "container text-center py-3";
     switch (tier) {
       case "free":
         badge.classList.add("text-dark");
-        badge.style.backgroundColor = "#05FA87"
+        badge.style.backgroundColor = "#05FA87";
         break;
       case "pro":
         badge.classList.add("text-dark");
-        badge.style.backgroundColor = "#0BE5FF"
+        badge.style.backgroundColor = "#0BE5FF";
         break;
       case "max":
-        badge.classList.add( "text-dark");
-        badge.style.backgroundColor = "#FFE65B"
+        badge.classList.add("text-dark");
+        badge.style.backgroundColor = "#FFE65B";
         break;
     }
 
@@ -46589,7 +46590,6 @@ container.className = "container text-center py-3";
     .map((f, i) => ({ ...f, index: i }))
     .filter((f) => f.requiresData);
 }
-
 
 function injectDynamicStyles() {
   const darkMode = localStorage.getItem("darkMode") === "true";
@@ -46619,8 +46619,6 @@ function injectDynamicStyles() {
   });
 }
 
-
-
 // Map level IDs to tier names
 function getTierName(levelId) {
   switch (levelId) {
@@ -46647,8 +46645,6 @@ function getTierColor(levelId) {
       return "#05FA87";
   }
 }
-
-
 
 function userHasAccess(allowedLevels) {
   const level = Number(theUser?.username?.data?.membership_level?.ID || 0);
@@ -46783,7 +46779,7 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
     if (preSeason) {
       console.log("preseason dummy data");
       localStorage.removeItem("savedLeagueId");
-      console.log("Removed stored league id")
+      console.log("Removed stored league id");
       onStatusUpdate("fetching test data");
 
       return {
@@ -46818,7 +46814,7 @@ async function createSelectedLeague(leagueID, onStatusUpdate = () => {}) {
         `${BASE_URL}leagues-classic/${leagueID}/standings?page_standings=${i}`
       );
       const data = await res.json();
-      console.error(data)
+      console.error(data);
       if (i === 1) leagueName = data.league.name;
       standings.push(...(data.standings?.results ?? []));
 
@@ -46848,15 +46844,15 @@ function handleLeagueCreation(result) {
 }
 
 async function processLeague(standings) {
-  if (preSeason){
-      window.FPLToolboxLeagueDataReady = true;
-  window.FPLToolboxProLeagueDataReady = true;
-  window.FPLToolboxMaxLeagueDataReady = true;
+  if (preSeason) {
+    window.FPLToolboxLeagueDataReady = true;
+    window.FPLToolboxProLeagueDataReady = true;
+    window.FPLToolboxMaxLeagueDataReady = true;
 
     toolsScreen(); // Re-render for free features
-    return
+    return;
   }
-  
+
   // Free Tier
   if (userHasAccess([1, 10, 12])) {
     await addManagerDetailsToLeague(standings, null);
@@ -46889,15 +46885,14 @@ async function processLeague(standings) {
 
 async function fetchAndProcessLeague(leagueId, onStatusUpdate = () => {}) {
   try {
-    if (preSeason){
+    if (preSeason) {
+      handleLeagueCreation(dummyLeague);
+      await processLeague(dummyLeague.standings);
 
-    handleLeagueCreation(dummyLeague);
-    await processLeague(dummyLeague.standings);
-
-    onStatusUpdate("complete", dummyLeague);
-    return
+      onStatusUpdate("complete", dummyLeague);
+      return;
     }
-    
+
     const result = await createSelectedLeague(leagueId, onStatusUpdate);
     handleLeagueCreation(result);
     await processLeague(result.standings);
@@ -46913,10 +46908,9 @@ async function renderToolsScreenWithLeague(leagueId) {
   // Step 0: Use leagueId from localStorage if available
   const savedLeagueId = localStorage.getItem("savedLeagueId");
   console.log("Saved league ID", savedLeagueId);
-  
-  if (preSeason){
 
-      showModal({
+  if (preSeason) {
+    showModal({
       title: "Pre Season",
       body: "Limited access until season begins. <strong><br><br>Feel free to use the team name generator while you wait or explore some of the features ahead of the new season</strong>. <br><br>Not a paid member? Why not!! <br><br>If you've already subscribed for a paid account, dont worry, you'll get all your paid features back when the season begins!",
       confirmText: "Upgrade Now",
@@ -46925,7 +46919,6 @@ async function renderToolsScreenWithLeague(leagueId) {
       },
     });
   }
-
 
   if (!leagueId && savedLeagueId) {
     leagueId = savedLeagueId;
@@ -46958,8 +46951,6 @@ async function renderToolsScreenWithLeague(leagueId) {
     }
   });
 }
-
-
 
 async function addManagerDetailsToLeague(standings, div) {
   const startTime = Date.now(); // Start the timer
@@ -47697,7 +47688,10 @@ function generateTeamName() {
     { name: "Champagne Coopernova", tags: ["leicester-city", "Food & Drink"] },
     { name: "House of Vards", tags: ["leicester-city", "classic"] },
     { name: "Vardy Boys FC", tags: ["leicester-city", "classic"] },
-    { name: "Egg On Your Faes", tags: ["classic", "leicester-city", "Food & Drink"] },
+    {
+      name: "Egg On Your Faes",
+      tags: ["classic", "leicester-city", "Food & Drink"],
+    },
 
     // Liverpool
     { name: "Alisson Wonderland", tags: ["liverpool"] },
@@ -47753,8 +47747,14 @@ function generateTeamName() {
     },
     { name: "Earth Wind & Maguire", tags: ["manchester-united", "music"] },
     { name: "The Shaw Thing", tags: ["manchester-united"] },
-    { name: "Cheesy Garnachos", tags: ["classic", "manchester-united", "Food & Drink"] },
-    { name: "Garnacho Chips", tags: ["classic", "manchester-united", "Food & Drink"] },
+    {
+      name: "Cheesy Garnachos",
+      tags: ["classic", "manchester-united", "Food & Drink"],
+    },
+    {
+      name: "Garnacho Chips",
+      tags: ["classic", "manchester-united", "Food & Drink"],
+    },
     { name: "Afternoon De Ligt", tags: ["manchester-united"] },
     { name: "It'sOffToZirkzeeGo", tags: ["manchester-united"] },
 
@@ -47822,7 +47822,10 @@ function generateTeamName() {
     { name: "Purple Rayan", tags: ["wolves", "music"] },
     { name: "Pedro Lima Bean", tags: ["wolves"] },
     { name: "Mama, Just Kilman", tags: ["wolves", "music"] },
-    { name: "Cunha Get Any Worse?", tags: ["manchester-united", "manchester-united"] },
+    {
+      name: "Cunha Get Any Worse?",
+      tags: ["manchester-united", "manchester-united"],
+    },
     { name: "Podence Dence Revolution", tags: ["wolves"] },
     { name: "Ruthless Toothless Wolves", tags: ["wolves"] },
     { name: "Ait Nouri Geller", tags: ["manchester-city"] },
@@ -47889,7 +47892,10 @@ function generateTeamName() {
       tags: ["classic", "manchester-united", "music"],
     },
     { name: "Tinchy Sneijder", tags: ["classic", "music"] },
-    { name: "Who Ate All Depays?", tags: ["classic", "manchester-united", "Food & Drink"] },
+    {
+      name: "Who Ate All Depays?",
+      tags: ["classic", "manchester-united", "Food & Drink"],
+    },
 
     { name: "Bellerin Than Out", tags: ["classic"] },
     { name: "Better Call Saúl", tags: ["classic", "chelsea"] },
@@ -48147,12 +48153,17 @@ function generateTeamName() {
     { name: "Khedira Pin Drop", tags: ["worldwide", "classic"] },
     { name: "Surreal Madrid", tags: ["worldwide", "classic"] },
     //New 2025
-    { name: "Cunha Dig It? Saka!", tags: ["manchester-united", "wolves", "music"] },
+    {
+      name: "Cunha Dig It? Saka!",
+      tags: ["manchester-united", "wolves", "music"],
+    },
     { name: "Cheeky Taka!", tags: ["worldwide"] },
     { name: "Scots Tots", tags: ["worldwide"] },
-        { name: "Hasta La Cunha", tags: ["manchester-united", "wolves", "TV & Film"] },
+    {
+      name: "Hasta La Cunha",
+      tags: ["manchester-united", "wolves", "TV & Film"],
+    },
     { name: "RuttedWokeNonsense", tags: ["classic"] },
-
   ];
   const darkMode = localStorage.getItem("darkMode") === "true";
 
@@ -48294,29 +48305,20 @@ function generateTeamName() {
       generationCount = 0;
     }
 
-
-
     const timestamp = new Date().toISOString();
     const notifcation = `
     👤 User: ${theUser.info.nickname}
     ✉️ Email: ${theUser.username.data.user_email}    
     🕒 Time: ${timestamp}
     🖥️ Team Name Generated: ${selectedName}`;
-    fetch('https://ntfy.sunny.bz/team-name-generator', {
-      method: 'POST',
-      body: notifcation
-  });
-
-
-
+    fetch("https://ntfy.sunny.bz/team-name-generator", {
+      method: "POST",
+      body: notifcation,
+    });
   });
 
   // Copy to clipboard logic
   copyBtn.addEventListener("click", () => {
-    
-    
-    
-    
     const textToCopy = display.textContent;
     navigator.clipboard.writeText(textToCopy).then(() => {
       copyBtn.textContent = "✅ Copied!";
@@ -48374,16 +48376,16 @@ function generateTeamName() {
 }
 
 async function showMyTeam() {
-  if (preSeason){
-      showModal({
-    title: "Hold your horses",
-    body: "Nothing to see here, come back once GW1 has started",
-    confirmText: "OK",
-    onConfirm: () => {}, // No action taken
-  });
-  return
+  if (preSeason) {
+    showModal({
+      title: "Hold your horses",
+      body: "Nothing to see here, come back once GW1 has started",
+      confirmText: "OK",
+      onConfirm: () => {}, // No action taken
+    });
+    return;
   }
-  
+
   const container = document.getElementById("screen-tools");
   container.innerHTML = "";
   const backBtn = createBackButton();
@@ -49856,8 +49858,11 @@ async function showLastManStandingEliminations() {
 
   if (leagueToDisplay.standings.length >= 50) {
     const warning = document.createElement("div");
-    warning.className = `alert ${darkMode ? "alert-dark text-light" : "alert-danger"}`;
-    warning.innerText = "This feature is only available for leagues with fewer than 50 teams.";
+    warning.className = `alert ${
+      darkMode ? "alert-dark text-light" : "alert-danger"
+    }`;
+    warning.innerText =
+      "This feature is only available for leagues with fewer than 50 teams.";
     container.appendChild(warning);
     return;
   }
@@ -49882,14 +49887,14 @@ async function showLastManStandingEliminations() {
     let lowestScorer = null;
 
     for (const player of survivors) {
-      const gwData = player.everyGw.find(e => e.gameweek === gw);
+      const gwData = player.everyGw.find((e) => e.gameweek === gw);
       if (!gwData) continue;
 
       if (
         !lowestScorer ||
         gwData.points < lowestScorer.gwData.points ||
         (gwData.points === lowestScorer.gwData.points &&
-         gwData.overall_rank > lowestScorer.gwData.overall_rank)
+          gwData.overall_rank > lowestScorer.gwData.overall_rank)
       ) {
         lowestScorer = { player, gwData };
       }
@@ -49897,7 +49902,9 @@ async function showLastManStandingEliminations() {
 
     if (lowestScorer) {
       eliminations.push({ ...lowestScorer, gameweek: gw });
-      const index = survivors.findIndex(p => p.entry === lowestScorer.player.entry);
+      const index = survivors.findIndex(
+        (p) => p.entry === lowestScorer.player.entry
+      );
       if (index !== -1) survivors.splice(index, 1);
     }
   }
@@ -49913,7 +49920,9 @@ async function showLastManStandingEliminations() {
 
   eliminations.forEach((elim, i) => {
     const li = document.createElement("li");
-    li.className = `list-group-item d-flex justify-content-between align-items-center ${darkMode ? "bg-dark text-light border-secondary" : ""}`;
+    li.className = `list-group-item d-flex justify-content-between align-items-center ${
+      darkMode ? "bg-dark text-light border-secondary" : ""
+    }`;
     li.style.animation = `fadeIn 0.4s ease ${i * 0.1}s forwards`;
     li.style.opacity = 0;
 
@@ -49934,7 +49943,7 @@ async function showLastManStandingEliminations() {
       confetti({
         particleCount: 150,
         spread: 70,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
       });
     }
 
@@ -49948,7 +49957,9 @@ async function showLastManStandingEliminations() {
     tableWrapper.id = "winner-section";
 
     const table = document.createElement("table");
-    table.className = `table table-bordered table-striped table-hover ${darkMode ? "table-dark" : "table-light"}`;
+    table.className = `table table-bordered table-striped table-hover ${
+      darkMode ? "table-dark" : "table-light"
+    }`;
 
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
@@ -49989,7 +50000,7 @@ async function showLastManStandingEliminations() {
     shareBtn.innerText = "📸 Share Winner";
     shareBtn.onclick = () => {
       const target = document.getElementById("winner-section");
-      html2canvas(target).then(canvas => {
+      html2canvas(target).then((canvas) => {
         const link = document.createElement("a");
         link.download = "fpl_last_man_standing_winner.png";
         link.href = canvas.toDataURL("image/png");
@@ -50001,21 +50012,19 @@ async function showLastManStandingEliminations() {
   }
 }
 
-
-
 ///////////////////////////Rival Differences Compare START////////////////
 
 async function showRivalDiff() {
-    if (preSeason){
-      showModal({
-    title: "Hold your horses",
-    body: "Nothing to see here, come back once GW1 has started",
-    confirmText: "OK",
-    onConfirm: () => {}, // No action taken
-  });
-  return
+  if (preSeason) {
+    showModal({
+      title: "Hold your horses",
+      body: "Nothing to see here, come back once GW1 has started",
+      confirmText: "OK",
+      onConfirm: () => {}, // No action taken
+    });
+    return;
   }
-  
+
   const app = document.getElementById("screen-tools");
   app.innerHTML = "";
   // Add back button (styled with Bootstrap)
@@ -50486,8 +50495,6 @@ function getLeagueToDisplay(realLeague, dummyLeague, options = {}) {
 
   return dummyLeague;
 }
-
-
 
 async function showCaptaincyPointsLeague() {
   let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
@@ -51907,7 +51914,6 @@ async function getPlayerWeeklyScore(playerId, gameweek) {
   }
 }
 
-
 async function showTransferSummaries() {
   if (userHasAccess([1, 10, 12])) {
     showModal({
@@ -51919,7 +51925,6 @@ async function showTransferSummaries() {
     return;
   }
 }
-
 
 async function showMemes() {
   if (!userHasAccess([1, 10, 12])) {
@@ -54705,9 +54710,8 @@ function extractTeamIds(arrayOfTeams) {
 }
 
 async function showCopycatFinder() {
-      if (preSeason){
-
-      showModal({
+  if (preSeason) {
+    showModal({
       title: "Pre Season",
       body: "Limited access until season begins. <strong><br><br>Feel free to use the team name generator while you wait or explore some of the features ahead of the new season</strong>. <br><br>Not a paid member? Why not!! <br><br>If you've already subscribed for a paid account, dont worry, you'll get all your paid features back when the season begins!",
       confirmText: "Upgrade Now",
@@ -54715,7 +54719,7 @@ async function showCopycatFinder() {
         window.location.href = subscriptionPageUrl;
       },
     });
-    return
+    return;
   }
   if (currentGw < 38) {
     showModal({
@@ -55338,7 +55342,8 @@ function createTopStatTable({
   // Card wrapper
   const wrapper = document.createElement("div");
   wrapper.classList.add("card", "shadow-sm", "mb-3");
-  if (darkMode) wrapper.classList.add("bg-dark", "text-white", "border-secondary");
+  if (darkMode)
+    wrapper.classList.add("bg-dark", "text-white", "border-secondary");
 
   const cardBody = document.createElement("div");
   cardBody.classList.add("card-body");
@@ -55356,7 +55361,9 @@ function createTopStatTable({
   tableWrapper.classList.add("table-responsive");
 
   const table = document.createElement("table");
-  table.className = `table table-striped table-hover table-sm mb-0 ${darkMode ? "table-dark" : ""}`;
+  table.className = `table table-striped table-hover table-sm mb-0 ${
+    darkMode ? "table-dark" : ""
+  }`;
 
   const thead = document.createElement("thead");
   const headerCells = statLabels
@@ -55438,50 +55445,55 @@ function createTopStatTable({
 
   // --- Share as Image ---
   const shareImageBtn = document.createElement("button");
-  shareImageBtn.className = `btn btn-sm ${darkMode ? "btn-outline-light" : "btn-outline-secondary"}`;
+  shareImageBtn.className = `btn btn-sm ${
+    darkMode ? "btn-outline-light" : "btn-outline-secondary"
+  }`;
   shareImageBtn.textContent = "Share to chat 📷";
 
-shareImageBtn.addEventListener("click", () => {
-  html2canvas(contentWrapper, { backgroundColor: null }).then((originalCanvas) => {
-    const padding = 50; // pixels padding around the image
-    const watermarkText = "www.fpltoolbox.com";
+  shareImageBtn.addEventListener("click", () => {
+    html2canvas(contentWrapper, { backgroundColor: null }).then(
+      (originalCanvas) => {
+        const padding = 50; // pixels padding around the image
+        const watermarkText = "www.fpltoolbox.com";
 
-    // Create a larger canvas with padding
-    const canvas = document.createElement("canvas");
-    canvas.width = originalCanvas.width + padding * 2;
-    canvas.height = originalCanvas.height + padding * 2;
+        // Create a larger canvas with padding
+        const canvas = document.createElement("canvas");
+        canvas.width = originalCanvas.width + padding * 2;
+        canvas.height = originalCanvas.height + padding * 2;
 
-    const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");
 
-    // Fill background for light/dark mode (optional, or leave transparent)
-    ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Fill background for light/dark mode (optional, or leave transparent)
+        ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw the original content into the new padded canvas
-    ctx.drawImage(originalCanvas, padding, padding);
+        // Draw the original content into the new padded canvas
+        ctx.drawImage(originalCanvas, padding, padding);
 
-    // Watermark styling
-    ctx.font = "bold 18px Arial";
-    ctx.fillStyle = darkMode ? "rgba(255, 255, 255, 0.8)" : "rgba(0, 0, 0, 0.7)";
-ctx.textAlign = "right";
-ctx.textBaseline = "top";
+        // Watermark styling
+        ctx.font = "bold 18px Arial";
+        ctx.fillStyle = darkMode
+          ? "rgba(255, 255, 255, 0.8)"
+          : "rgba(0, 0, 0, 0.7)";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "top";
 
-    // Draw watermark with small padding from bottom-right corner
+        // Draw watermark with small padding from bottom-right corner
 
-ctx.fillText(watermarkText, canvas.width - 10, 10);
+        ctx.fillText(watermarkText, canvas.width - 10, 10);
 
-    // Export the padded, watermarked image
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${titleText.replace(/\s+/g, "_")}.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
+        // Export the padded, watermarked image
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${titleText.replace(/\s+/g, "_")}.png`;
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      }
+    );
   });
-});
-
 
   // Append both buttons
   //buttonGroup.appendChild(shareTextBtn);
@@ -55493,38 +55505,34 @@ ctx.fillText(watermarkText, canvas.width - 10, 10);
   containerDiv.appendChild(wrapper);
 }
 
-
-
-
-
-async function createGWMaxDashboard(){
-  if (preSeason){
-      showModal({
-    title: "Hold your horses",
-    body: "Nothing to see here, come back once GW1 has started",
-    confirmText: "OK",
-    onConfirm: () => {}, // No action taken
-  });
-  return
+async function createGWMaxDashboard() {
+  if (preSeason) {
+    showModal({
+      title: "Hold your horses",
+      body: "Nothing to see here, come back once GW1 has started",
+      confirmText: "OK",
+      onConfirm: () => {}, // No action taken
+    });
+    return;
   }
 }
 
-
-
 async function createSeasonMaxDashboard() {
-
-  let leagueToDisplay = await getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague, {accessRoles:[12], showLockedModal: true})
-
+  let leagueToDisplay = await getLeagueToDisplay(
+    FPLToolboxLeagueData,
+    dummyLeague,
+    { accessRoles: [12], showLockedModal: true }
+  );
 
   // let leagueToDisplay = dummyLeague.standings;
   // if (userHasAccess([12])) {
   //   leagueToDisplay = window.FPLToolboxLeagueData.standings;
   // }
-console.log(leagueToDisplay);
+  console.log(leagueToDisplay);
 
   const app = document.getElementById("screen-tools");
   app.innerHTML = ""; // Clear existing content
-    // Back button
+  // Back button
   const backBtn = createBackButton();
   backBtn.classList.add("btn", "btn-secondary", "mb-3");
   app.appendChild(backBtn);
@@ -55540,7 +55548,6 @@ console.log(leagueToDisplay);
   const seasonStats = document.createElement("div");
   seasonStats.id = "season-stats";
   seasonStats.className = "row g-3"; // Bootstrap grid spacing
-
 
   // Example stat cards
   // for (let i = 1; i <= 6; i++) {
@@ -55580,20 +55587,25 @@ console.log(leagueToDisplay);
   const chipsChart = await createChipsUsedChart(leagueToDisplay);
   seasonStats.appendChild(chipsChart);
 
-  const comingSoon = await createComingSoonCard()
+  const comingSoon = await createComingSoonCard();
   seasonStats.appendChild(comingSoon);
   sidebarCol.appendChild(comingSoon);
 
-  const managerOfTheMonth = await findManagersOfTheMonth(leagueToDisplay.standings, bootstrap.phases);
+  const managerOfTheMonth = await findManagersOfTheMonth(
+    leagueToDisplay.standings,
+    bootstrap.phases
+  );
   seasonStats.appendChild(managerOfTheMonth);
 
-  const chipUsageCharts = await createChipUsageCharts(leagueToDisplay.standings);
+  const chipUsageCharts = await createChipUsageCharts(
+    leagueToDisplay.standings
+  );
   seasonStats.appendChild(chipUsageCharts);
 
-    const rankProgression = await createRankProgressionChart(leagueToDisplay.standings);
+  const rankProgression = await createRankProgressionChart(
+    leagueToDisplay.standings
+  );
   seasonStats.appendChild(rankProgression);
-
-  
 
   // Most Captaincy Points
   createTopStatTable({
@@ -55683,7 +55695,7 @@ console.log(leagueToDisplay);
     sortOrder: "asc", // you'll need to add this option below
   });
 
-    // Most Transfers
+  // Most Transfers
   createTopStatTable({
     standings: leagueToDisplay.standings,
     containerDiv: sidebarCol,
@@ -55799,8 +55811,6 @@ console.log(leagueToDisplay);
 }
 
 async function createSeasonMaxTable(standings, containerDiv) {
-
-  
   const table = document.createElement("table");
   table.id = "league-table";
   table.style.width = "100%";
@@ -55826,14 +55836,14 @@ async function createSeasonMaxTable(standings, containerDiv) {
       label: "Favourite Team",
       value: async (team) => {
         const name = await getTeamName(team.managerDetails.favourite_team);
-       
-        return (name == null || name === 'undefined') ? "" : name;
+
+        return name == null || name === "undefined" ? "" : name;
       },
     },
     { label: "Total Points", key: "managerDetails.summary_overall_points" },
     {
       label: "Chips Used",
-      value: async (team) => await team.chips?.length || 0,
+      value: async (team) => (await team.chips?.length) || 0,
     },
 
     { label: "Minus Points", key: "totalMinusPoints" },
@@ -55878,10 +55888,14 @@ async function createSeasonMaxTable(standings, containerDiv) {
         const sortKey = header.key || header.label;
         const dir = sortDirection[sortKey];
 
-        const sortableStandings = await Promise.all(standings.map(async (team) => {
-          const val = header.value ? await header.value(team) : getValue(team, header.key);
-          return { team, sortVal: val };
-        }));
+        const sortableStandings = await Promise.all(
+          standings.map(async (team) => {
+            const val = header.value
+              ? await header.value(team)
+              : getValue(team, header.key);
+            return { team, sortVal: val };
+          })
+        );
 
         sortableStandings.sort((a, b) => {
           const valA = a.sortVal;
@@ -55896,7 +55910,7 @@ async function createSeasonMaxTable(standings, containerDiv) {
           }
         });
 
-        standings = sortableStandings.map(item => item.team);
+        standings = sortableStandings.map((item) => item.team);
 
         sortDirection[sortKey] = dir === "asc" ? "desc" : "asc";
         await renderTableBody();
@@ -55949,15 +55963,14 @@ async function createSeasonMaxTable(standings, containerDiv) {
   scrollWrapper.style.width = "100%";
   scrollWrapper.appendChild(table);
 
-    // Title
+  // Title
   const title = document.createElement("h4");
   title.textContent = "Season Stats";
-  console.log(title, containerDiv)
+  console.log(title, containerDiv);
   containerDiv.appendChild(title);
 
   containerDiv.appendChild(scrollWrapper);
 }
-
 
 async function createComingSoonCard() {
   const darkMode = localStorage.getItem("darkMode") === "true";
@@ -55966,7 +55979,9 @@ async function createComingSoonCard() {
   wrapper.className = "col-12"; // Full width column
 
   const card = document.createElement("div");
-  card.className = `card shadow-sm mb-3 ${darkMode ? 'bg-dark text-light' : ''}`;
+  card.className = `card shadow-sm mb-3 ${
+    darkMode ? "bg-dark text-light" : ""
+  }`;
 
   const cardBody = document.createElement("div");
   cardBody.className = "card-body";
@@ -55977,7 +55992,8 @@ async function createComingSoonCard() {
 
   const text = document.createElement("p");
   text.className = "card-text";
-  text.textContent = "We're working on adding new tools and stats for your FPL Toolbox experience. Stay tuned!";
+  text.textContent =
+    "We're working on adding new tools and stats for your FPL Toolbox experience. Stay tuned!";
 
   cardBody.appendChild(title);
   cardBody.appendChild(text);
@@ -55987,9 +56003,7 @@ async function createComingSoonCard() {
   return wrapper;
 }
 
-
 async function createChipsUsedChart(league) {
- 
   const wrapper = document.createElement("div");
   wrapper.className = "col-12"; // full-width column
 
@@ -56072,9 +56086,6 @@ async function createChipsUsedChart(league) {
   return wrapper;
 }
 
-
-
-
 async function findManagersOfTheMonth(standings, phases, currentGw) {
   const darkMode = localStorage.getItem("darkMode") === "true";
 
@@ -56104,7 +56115,9 @@ async function findManagersOfTheMonth(standings, phases, currentGw) {
     col.className = "col-md-4";
 
     const card = document.createElement("div");
-    card.className = `card h-100 ${darkMode ? "bg-dark text-white border-secondary" : ""}`;
+    card.className = `card h-100 ${
+      darkMode ? "bg-dark text-white border-secondary" : ""
+    }`;
 
     const cardBody = document.createElement("div");
     cardBody.className = "card-body text-center";
@@ -56153,68 +56166,78 @@ async function findManagersOfTheMonth(standings, phases, currentGw) {
 
     // ===== Per-month Share Button =====
     const shareBtn = document.createElement("button");
-    shareBtn.className = `btn btn-sm ${darkMode ? "btn-outline-light" : "btn-outline-secondary"} mt-2`;
+    shareBtn.className = `btn btn-sm ${
+      darkMode ? "btn-outline-light" : "btn-outline-secondary"
+    } mt-2`;
     shareBtn.textContent = "Share This 📷";
 
-shareBtn.addEventListener("click", () => {
-  // Clone the card so we can edit it without changing the original
-  const clone = card.cloneNode(true);
+    shareBtn.addEventListener("click", () => {
+      // Clone the card so we can edit it without changing the original
+      const clone = card.cloneNode(true);
 
-  // Remove the share button from the clone
-  const cloneShareBtn = clone.querySelector("button");
-  if (cloneShareBtn) cloneShareBtn.remove();
+      // Remove the share button from the clone
+      const cloneShareBtn = clone.querySelector("button");
+      if (cloneShareBtn) cloneShareBtn.remove();
 
-  // Create and prepend the "Manager of the Month" heading
-  const heading = document.createElement("h4");
-  heading.textContent = "Manager of the Month";
-  heading.style.marginBottom = "1rem";
-  heading.style.textAlign = "center";
-  clone.querySelector(".card-body").insertBefore(heading, clone.querySelector(".card-title"));
+      // Create and prepend the "Manager of the Month" heading
+      const heading = document.createElement("h4");
+      heading.textContent = "Manager of the Month";
+      heading.style.marginBottom = "1rem";
+      heading.style.textAlign = "center";
+      clone
+        .querySelector(".card-body")
+        .insertBefore(heading, clone.querySelector(".card-title"));
 
-  // Temporarily add the clone to the DOM (offscreen) for html2canvas to render it
-  clone.style.position = "fixed";
-  clone.style.top = "-10000px";
-  clone.style.left = "-10000px";
-  clone.style.width = card.offsetWidth + "px"; // match width to avoid weird scaling
-  document.body.appendChild(clone);
+      // Temporarily add the clone to the DOM (offscreen) for html2canvas to render it
+      clone.style.position = "fixed";
+      clone.style.top = "-10000px";
+      clone.style.left = "-10000px";
+      clone.style.width = card.offsetWidth + "px"; // match width to avoid weird scaling
+      document.body.appendChild(clone);
 
-  html2canvas(clone, { backgroundColor: null }).then((originalCanvas) => {
-    const padding = 50;
+      html2canvas(clone, { backgroundColor: null }).then((originalCanvas) => {
+        const padding = 50;
 
-    const canvas = document.createElement("canvas");
-    canvas.width = originalCanvas.width + padding * 2;
-    canvas.height = originalCanvas.height + padding * 2;
+        const canvas = document.createElement("canvas");
+        canvas.width = originalCanvas.width + padding * 2;
+        canvas.height = originalCanvas.height + padding * 2;
 
-    const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");
 
-    // Fill background
-    ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Fill background
+        ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw original card with padding
-    ctx.drawImage(originalCanvas, padding, padding);
+        // Draw original card with padding
+        ctx.drawImage(originalCanvas, padding, padding);
 
-    // Watermark
-    ctx.font = "bold 14px Arial";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.textAlign = "right";
-    ctx.textBaseline = "top";
-    ctx.fillText("www.fpltoolbox.com", canvas.width - 10, canvas.height - 10);
+        // Watermark
+        ctx.font = "bold 14px Arial";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "top";
+        ctx.fillText(
+          "www.fpltoolbox.com",
+          canvas.width - 10,
+          canvas.height - 10
+        );
 
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${phase.name.replace(/\s+/g, "_")}_ManagerOfTheMonth.png`;
-      a.click();
-      URL.revokeObjectURL(url);
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${phase.name.replace(
+            /\s+/g,
+            "_"
+          )}_ManagerOfTheMonth.png`;
+          a.click();
+          URL.revokeObjectURL(url);
 
-      // Clean up the clone from the DOM after capturing
-      clone.remove();
+          // Clean up the clone from the DOM after capturing
+          clone.remove();
+        });
+      });
     });
-  });
-});
-
 
     cardBody.appendChild(shareBtn);
     card.appendChild(cardBody);
@@ -56228,7 +56251,9 @@ shareBtn.addEventListener("click", () => {
   col.className = "col-md-4";
 
   const fullCard = document.createElement("div");
-  fullCard.className = `card h-100 ${darkMode ? "bg-dark text-white border-secondary" : ""}`;
+  fullCard.className = `card h-100 ${
+    darkMode ? "bg-dark text-white border-secondary" : ""
+  }`;
 
   const fullCardBody = document.createElement("div");
   fullCardBody.className = "card-body text-center";
@@ -56239,39 +56264,47 @@ shareBtn.addEventListener("click", () => {
   fullCardBody.appendChild(fullCardTitle);
 
   const fullShareBtn = document.createElement("button");
-  fullShareBtn.className = `btn btn-sm ${darkMode ? "btn-outline-light" : "btn-outline-secondary"} mt-2`;
+  fullShareBtn.className = `btn btn-sm ${
+    darkMode ? "btn-outline-light" : "btn-outline-secondary"
+  } mt-2`;
   fullShareBtn.textContent = "Share Full Calendar 📷";
 
   fullShareBtn.addEventListener("click", () => {
-    html2canvas(contentWrapper, { backgroundColor: null }).then((originalCanvas) => {
-      const padding = 20;
+    html2canvas(contentWrapper, { backgroundColor: null }).then(
+      (originalCanvas) => {
+        const padding = 20;
 
-      const canvas = document.createElement("canvas");
-      canvas.width = originalCanvas.width + padding * 2;
-      canvas.height = originalCanvas.height + padding * 2;
+        const canvas = document.createElement("canvas");
+        canvas.width = originalCanvas.width + padding * 2;
+        canvas.height = originalCanvas.height + padding * 2;
 
-      const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");
 
-      ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = darkMode ? "#212529" : "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.drawImage(originalCanvas, padding, padding);
+        ctx.drawImage(originalCanvas, padding, padding);
 
-      ctx.font = "bold 16px Arial";
-      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-      ctx.textAlign = "right";
-      ctx.textBaseline = "bottom";
-      ctx.fillText("www.fpltoolbox.com", canvas.width - 10, canvas.height - 10);
+        ctx.font = "bold 16px Arial";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(
+          "www.fpltoolbox.com",
+          canvas.width - 10,
+          canvas.height - 10
+        );
 
-      canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "ManagerOfTheMonth_Calendar.png";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-    });
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "ManagerOfTheMonth_Calendar.png";
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      }
+    );
   });
 
   fullCardBody.appendChild(fullShareBtn);
@@ -56282,11 +56315,16 @@ shareBtn.addEventListener("click", () => {
   return holdingContainer;
 }
 
-
-
 async function createChipUsageCharts(standings) {
-    const darkMode = localStorage.getItem("darkMode") === "true";
-  const chipTypes = ["wildcard1", "wildcard2", "freehit", "manager", "bboost", "3xc"];
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  const chipTypes = [
+    "wildcard1",
+    "wildcard2",
+    "freehit",
+    "manager",
+    "bboost",
+    "3xc",
+  ];
   const chipLabels = {
     wildcard1: "Wildcard 1",
     wildcard2: "Wildcard 2",
@@ -56338,7 +56376,7 @@ async function createChipUsageCharts(standings) {
 
   // Step 3: Color selector based on your darkMode variable
   const chartColors = darkMode
-    ? ["#0d6efd", "#6c757d"]  // Blue + Gray for dark mode
+    ? ["#0d6efd", "#6c757d"] // Blue + Gray for dark mode
     : ["#0d6efd", "#e9ecef"]; // Blue + Light gray for light mode
 
   // Step 4: Create each chip card
@@ -56357,7 +56395,12 @@ async function createChipUsageCharts(standings) {
     );
 
     const cardBody = document.createElement("div");
-    cardBody.classList.add("card-body", "d-flex", "flex-column", "align-items-center");
+    cardBody.classList.add(
+      "card-body",
+      "d-flex",
+      "flex-column",
+      "align-items-center"
+    );
 
     const canvas = document.createElement("canvas");
     canvas.width = 100;
@@ -56404,11 +56447,11 @@ async function createChipUsageCharts(standings) {
 async function createRankProgressionChart(standings) {
   if (!standings || standings.length === 0) return null;
 
- const darkMode = localStorage.getItem("darkMode") === "true";
+  const darkMode = localStorage.getItem("darkMode") === "true";
 
   // Bootstrap color palette for line colors
   const bootstrapColors = darkMode
-    ? ["#0d6efd", "#6610f2", "#198754", "#fd7e14", "#dc3545", "#adb5bd"]  // Dark mode: bold colors
+    ? ["#0d6efd", "#6610f2", "#198754", "#fd7e14", "#dc3545", "#adb5bd"] // Dark mode: bold colors
     : ["#0d6efd", "#6f42c1", "#28a745", "#ffc107", "#dc3545", "#6c757d"]; // Light mode: standard Bootstrap theme colors
 
   let colorIndex = 0;
@@ -56484,22 +56527,19 @@ async function createRankProgressionChart(standings) {
   return chartContainer;
 }
 
-
-
-
-function miniLeagueAdmin(){
-      if (!userHasAccess([12])) {
-      showModal({
-        title: "Paid Feature",
-        body: "This feature is only available to <strong>Max members</strong>.<br><br>If you're a mini league organiser/commissioner, upgrade to import your mini leagues and keep track on who's paid and who hasn't!",
-        confirmText: "Take me there",
-        onConfirm: () => {
-          window.location.href = subscriptionPageUrl;
-        },
-      });
-      return;
-    }
-    window.location.href = miniLeagueAdminPageUrl
+function miniLeagueAdmin() {
+  if (!userHasAccess([12])) {
+    showModal({
+      title: "Paid Feature",
+      body: "This feature is only available to <strong>Max members</strong>.<br><br>If you're a mini league organiser/commissioner, upgrade to import your mini leagues and keep track on who's paid and who hasn't!",
+      confirmText: "Take me there",
+      onConfirm: () => {
+        window.location.href = subscriptionPageUrl;
+      },
+    });
+    return;
+  }
+  window.location.href = miniLeagueAdminPageUrl;
 }
 
 async function createLeagueDashboardOLD() {
@@ -57447,14 +57487,7 @@ async function createLeagueDashboardOLD() {
     });
   }
   createYearsActiveChart(standings, seasonStats);
-
-
 }
-
-
-
-
-
 
 //HELPERS
 // Convert FPL chip name to user-friendly chip names
