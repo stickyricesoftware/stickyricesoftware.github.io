@@ -4,7 +4,21 @@ const BASE_URL =
 "https://api.cors.lol/?url=http://fantasy.premierleague.com/api/";
 const leagueID = 635219;
 
+
+async function startLoader(){
+   const screenDiv = document.getElementById("screen");
+   const loader = document.createElement("div")
+   loader.id = "loader"
+   loader.innerHTML = `<div class="loader">LOADING</div>`
+   screenDiv.append(loader)  
+}
+async function endLoader(){
+  document.getElementById(`loader`).remove()
+}
+
+
 async function runOnLoad(leagueID) {
+  startLoader()
   const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
   const bootstrapData = await bootstrapCall.json();
   const leagueCall = await fetch(`${BASE_URL}leagues-classic/${leagueID}/standings/`);
@@ -83,6 +97,7 @@ function displayLeagueTableWithToggle(teamsToKeep = []) {
 
   // Render the initial view showing all teams
   renderTable(leagueData.standings.results, false);
+  endLoader()
 }
 
 // IDs of the teams you want to KEEP when toggled ie: Paid entries only
