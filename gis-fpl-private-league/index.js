@@ -9,7 +9,7 @@ async function startLoader(){
    const screenDiv = document.getElementById("screen");
    const loader = document.createElement("div")
    loader.id = "loader"
-   loader.innerHTML = `<div class="loader">LOADING</div>`
+   loader.innerHTML = `<div class="loader"><h2>Loading...</h2></div>`
    screenDiv.append(loader)  
 }
 async function endLoader(){
