@@ -1,6 +1,7 @@
 const BASE_URL =
-  "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
+ // "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
 //"http://fantasy.premierleague.com/api/";
+"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/";
 const leagueID = 635219;
 
 async function runOnLoad(leagueID) {
@@ -9,7 +10,7 @@ async function runOnLoad(leagueID) {
   const leagueCall = await fetch(`${BASE_URL}leagues-classic/${leagueID}/standings/`);
   const leagueData = await leagueCall.json();
   
-  
+  console.log(BASE_URL)
   console.log(bootstrapData)  
   
   console.log(leagueData)
@@ -90,4 +91,5 @@ const teamsToKeep = ["23745637", "59392628", "40237933", "43139140", "40248422",
 // Call the function to display the initial table
 displayLeagueTableWithToggle(teamsToKeep);
 }
+
 runOnLoad(leagueID);
