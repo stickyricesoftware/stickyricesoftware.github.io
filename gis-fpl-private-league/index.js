@@ -1,7 +1,7 @@
 const BASE_URL =
-  "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
+  //"https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
 //"http://fantasy.premierleague.com/api/";
-//"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/";
+"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/";
 
 const leagueID = 635219;
 
