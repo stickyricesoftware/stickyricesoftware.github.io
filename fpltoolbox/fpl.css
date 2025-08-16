@@ -706,6 +706,42 @@ margin-left: 20px;
   font-size: 0.6rem;
 }
 
+#diff1,
+#diff2,
+#diff3,
+#diff4,
+#diff5 {
+  display: flex;
+  flex-direction: row;
+  font-size: 8px;
+  padding: 0px !important;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0px;
+}
+
+#diff5 {
+  background-color: #80072d;
+  color: white;
+}
+#diff4 {
+  background-color: #ff1751;
+  color: white;
+}
+#diff3 {
+  background-color: #e7e7e7;
+}
+#diff2 {
+  background-color: #01fc7a;
+}
+#diff1 {
+  background-color: #375523;
+  color: white;
+}
+
+
+
 .up-coming-fixtures {
   display: flex;
   flex-direction: row;

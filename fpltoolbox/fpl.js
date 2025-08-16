@@ -13,7 +13,7 @@ const BASE_URL =
 // import superLeagueTransfersAddedDataTest from "./testData/superLeagueTransfersAddedDataTest.js";
 // import superLeagueAddWeeklyPicksTest from "./testData/superLeagueAddWeeklyPicksTest.js";
 
-const preSeason = true;
+const preSeason = false;
 let testMode = false;
 
 if (
@@ -30,6 +30,8 @@ if (
 }
 
 const changelogData = [
+  { version: "4.3.4", description: "Kit updates" },
+  { version: "4.3.3", description: "Pre-season bugs fixes" },
   { version: "4.3.2", description: "Team Name Generator Fixes" },
   { version: "4.3.0", description: "Blog articles" },
   { version: "4.2.0", description: "Manager of the Month" },
@@ -46344,14 +46346,7 @@ function toolsScreen() {
   const row = document.createElement("div");
   row.className = "row g-3";
 
-  const features = [
-    {
-      icon: "bi-person-badge",
-      label: "Team Name Generator",
-      action: generateTeamName,
-      tier: "free",
-      requiresData: false,
-    },
+  let features = [
     {
       icon: "bi-person-badge",
       label: "My Team",
@@ -46400,6 +46395,13 @@ function toolsScreen() {
       action: showMemes,
       tier: "free",
       requiresData: true,
+    },
+        {
+      icon: "bi-person-badge",
+      label: "Team Name Generator",
+      action: generateTeamName,
+      tier: "free",
+      requiresData: false,
     },
     {
       icon: "bi-people",
@@ -46509,6 +46511,9 @@ function toolsScreen() {
       requiresData: true,
     },
   ];
+  if (theUser.username.data.ID == 1) {
+    console.log("User: ID1")
+  }
 
   features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
     const featureId = `feature-btn-${i}`;
@@ -48786,13 +48791,13 @@ async function updateScoreCard(data) {
 
     const img = document.createElement("img");
     img.setAttribute("class", "player-img");
-    console.log(await getPlayerPhoto(elementId));
 
-    const photo = await getPlayerPhoto(elementId);
-    img.src = `https://resources.premierleague.com/premierleague/photos/players/250x250/p${photo.slice(
-      0,
-      -3
-    )}png`;
+
+  const photo = await getPlayerTeamCode(elementId);
+  img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}.webp`;
+  if (type == 1) {
+    img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}_1.webp`;
+  }
 
     const name = document.createElement("div");
     name.className = "my-player-name";
@@ -48819,15 +48824,18 @@ async function updateScoreCard(data) {
 
   const formattedOverallRank = overallRank.toLocaleString();
   const formattedGwRank = gwRank ? gwRank.toLocaleString() : "";
+  let rankArrow =""
 
+  let rankDifference = "-";
+  let rankDifferenceDisplay = ""
   // Fetch previous gameweek data
+  if (currentGw > 1){
   const previousData = await fetchPreviousGwTeamData();
   const previousRank = previousData.entry_history.overall_rank;
   console.log(previousRank);
 
-  // Determine rank change and difference
-  const isRankImproved = previousRank > overallRank;
-  const rankArrow = isRankImproved
+    const isRankImproved = previousRank > overallRank;
+  let rankArrow = isRankImproved
     ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
     : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
 
@@ -48838,6 +48846,30 @@ async function updateScoreCard(data) {
     };">
       ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
     </div>`;
+  }
+  if (currentGw = 1) {
+
+ 
+  const previousRank = 0
+  console.log(previousRank);
+
+    const isRankImproved = 0;
+  let rankArrow = isRankImproved
+    ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
+    : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
+
+  let rankDifference = "-";
+  let rankDifferenceDisplay = `
+    <div class="rank-difference" style="color:${
+      isRankImproved ? "#05FA87" : "#FC2C80"
+    };">
+      ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
+    </div>`;
+
+  }
+
+  // Determine rank change and difference
+
 
   function calculatePercentileRank(userRank, totalTeams) {
     if (totalTeams <= 0 || userRank <= 0) {
@@ -49170,17 +49202,18 @@ async function fetchAndRenderFixturesForAllSeason(data) {
   for (let i = 0; i < data.picks.length && i < 16; i++) {
     const pick = data.picks[i];
     const fixtures = await fetchPlayerFixturesForSeason(pick.element);
+     const type = await getPlayerType(pick.element); // if async
     const playerDiv = document.createElement("div");
     playerDiv.setAttribute("id", "season-fixtures");
     playerDiv.style.display = "flex";
     const player = document.createElement("img");
     player.setAttribute("class", "player-fixture-img");
 
-    const photo = await getPlayerPhoto(pick.element);
-    player.src = `https://resources.premierleague.com/premierleague/photos/players/250x250/p${photo.slice(
-      0,
-      -3
-    )}png`;
+  const photo = await getPlayerTeamCode(pick.element);
+  player.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}.webp`;
+  if (type == 1) {
+    player.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}_1.webp`;
+  }
 
     // const photo = await getPlayerPhoto(data.picks[i].element)
     // photo.slice(0, -3);
@@ -49384,9 +49417,9 @@ async function createPlayerCardNew(
   const img = document.createElement("img");
   img.setAttribute("class", "player-img");
   const photo = await getPlayerTeamCode(elementId);
-  img.src = `https://fpltoolbox.com/wp-content/uploads/2025/04/shirt_${photo}.webp`;
+  img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}.webp`;
   if (type == 1) {
-    img.src = `https://fpltoolbox.com/wp-content/uploads/2025/04/shirt_${photo}_1.webp`;
+    img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}_1.webp`;
   }
 
   //console.log(elementId, score, isCaptain, isViceCaptain, isTriple)
@@ -57669,3 +57702,4 @@ function removeSpinner() {
   const spinner = document.getElementById("fpl-spinner");
   if (spinner) spinner.remove();
 }
+
