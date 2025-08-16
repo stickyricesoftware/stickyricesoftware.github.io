@@ -6,7 +6,7 @@ background: #08EDFF;
 background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1) 100%);
 }
 
-.league-table-container {
+.card {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
@@ -59,7 +59,7 @@ button:hover {
     color: #333;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 14px;
+    font-size: 10px;
     letter-spacing: 0.5px;
 }
 
@@ -69,4 +69,18 @@ button:hover {
 
 .league-table tr:hover {
     background-color: #e8f4f8;
+}
+
+.is-paid:nth-child(1), .key:nth-child(1) {
+  background-color: #08EDFF!important;
+  
+}
+
+.is-paid:nth-child(2), .key:nth-child(2) {
+  background-color: #7A3CFF!important;
+  color: #f9f9f9;
+}
+.is-paid:nth-child(3), .key:nth-child(3) {
+  background-color: #B066FF!important;
+  color: #f9f9f9;
 }
