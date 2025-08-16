@@ -19,17 +19,17 @@ async function endLoader(){
 
 async function runOnLoad(leagueID) {
   startLoader()
+  
+  try {
   const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
   const bootstrapData = await bootstrapCall.json();
   const leagueCall = await fetch(`${BASE_URL}leagues-classic/${leagueID}/standings/`);
   const leagueData = await leagueCall.json();
-  
-  console.log(BASE_URL)
+    console.log(BASE_URL)
   console.log(bootstrapData)  
   
   console.log(leagueData)
-
-/**
+  /**
  * Appends a league table to a div with the id "screen",
  * with a toggle to hide specific teams and re-rank the table.
  * @param {string[]} teamsToKeep An array of team IDs to be shown by the toggle.
@@ -99,6 +99,19 @@ function displayLeagueTableWithToggle(teamsToKeep = []) {
   renderTable(leagueData.standings.results, false);
   endLoader()
 }
+
+
+} catch (error) {
+    console.error("ERROR")
+    const screenDiv = document.getElementById("screen");
+    screenDiv.innerHTML = `<h2>Failed to load</h2>`;
+     endLoader()
+  }
+
+  
+
+
+
 
 // IDs of the teams you want to KEEP when toggled ie: Paid entries only
 const teamsToKeep = ["23745637", "59392628", "40237933", "43139140", "40248422", "36653856", "43138959", "43631917", "52421611", "55865016", "56328339", "56543395", "57275835", "70271347", "73314948", ];
