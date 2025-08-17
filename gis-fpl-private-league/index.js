@@ -16,10 +16,12 @@ async function startLoader() {
 async function endLoader() {
   document.getElementById(`loader`).remove();
 }
-
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 async function runOnLoad(leagueID) {
   startLoader();
-
+ await sleep(1000); // pause for 1000 ms (1 second)
   try {
     const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
     const bootstrapData = await bootstrapCall.json();
