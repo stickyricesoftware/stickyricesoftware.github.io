@@ -30,7 +30,8 @@ button {
     padding: 12px;
     border: none;
     border-radius: 6px;
-    background-color: #3498db;
+    background: #08EDFF;
+background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1) 100%);
     color: white;
     font-size: 16px;
     font-weight: bold;
@@ -51,7 +52,7 @@ button:hover {
 .league-table th,
 .league-table td {
     border: 1px solid #ddd;
-    padding: 2px;
+    padding: 5px;
     text-align: left;
     transition: background-color 0.3s ease;
 }

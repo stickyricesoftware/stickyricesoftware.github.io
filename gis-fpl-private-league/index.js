@@ -127,8 +127,8 @@ async function runOnLoad(leagueID) {
         <tr>
           <th></th>
           <th>Team</th>
-          <th>GW Total</th>
-          <th>Total Points</th>
+          <th>GW<br> Total</th>
+          <th>Total<br> Points</th>
         </tr>
       </thead>
  <tbody>
