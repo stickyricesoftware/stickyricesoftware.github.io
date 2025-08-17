@@ -217,7 +217,7 @@ function appendCupCompetition(screenDiv) {
 
 
         <div>
-          <h3>The cup competitionis scheduled to start in GW34</h3>
+          <h3>The cup competition is scheduled to start in GW34</h3>
           <span><strong></strong></span>
         </div>
  <hr>
