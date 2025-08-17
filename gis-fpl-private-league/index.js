@@ -19,7 +19,6 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 async function runOnLoad(leagueID) {
-  alert("updated")
   startLoader();
   //await sleep(1000); // pause for 1000 ms (1 second)
   try {
