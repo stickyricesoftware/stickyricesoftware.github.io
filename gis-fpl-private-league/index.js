@@ -171,17 +171,53 @@ function appendManagerOfTheMonth(screenDiv) {
 
         <div>
           <h3>The MOTM competition is scheduled to start in GW4</h3>
+          <div id="motm-grid-placeholder"></div> </div>
           <span><strong></strong></span>
+          <hr>
         </div>
- <hr>
+ 
 
 
       
     </div>
   `;
   screenDiv.appendChild(motm);
+
+
+
   setupCollapsibleCard(motm); // Use the reusable function
+
+        // Find the grid placeholder inside the MOTM card
+    const gridPlaceholder = motm.querySelector('#motm-grid-placeholder');
+
+    // Append the grid to the placeholder
+    if (gridPlaceholder) {
+        appendMonthlyGrid(gridPlaceholder);
+    }
 }
+
+function appendMonthlyGrid(parentElement) {
+  const gridContainer = document.createElement('div');
+  gridContainer.className = 'motm-grid';
+
+  const months = [
+    'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan', 'Feb', 'Mar', 'Apr'
+  ];
+
+  months.forEach(month => {
+    const gridItem = document.createElement('div');
+    gridItem.className = 'grid-item';
+    gridItem.innerHTML = `
+      <p class="month-name">${month}</p>
+      <p class="winner-name">TBC</p>
+    `;
+    gridContainer.appendChild(gridItem);
+  });
+
+  parentElement.appendChild(gridContainer);
+}
+
 
 // A function to create and append the Manager of the Month section.
 function appendCupCompetition(screenDiv) {

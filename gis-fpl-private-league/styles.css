@@ -239,3 +239,29 @@ background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1
   color: #333;
   font-weight: bold;
 }
+
+.motm-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns, equal width */
+  gap: 10px; /* Space between grid items */
+  padding: 10px 0;
+}
+
+.grid-item {
+  text-align: center;
+  padding: 10px 5px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.grid-item .month-name {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.grid-item .winner-name {
+  font-size: 0.9em;
+  color: #666;
+}
