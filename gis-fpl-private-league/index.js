@@ -170,7 +170,6 @@ function appendManagerOfTheMonth(screenDiv) {
     <div class="collapsible-content">
 
         <div>
-          <h3>The MOTM competition is scheduled to start in GW4</h3>
           <div id="motm-grid-placeholder"></div> </div>
           <span><strong></strong></span>
           <hr>
