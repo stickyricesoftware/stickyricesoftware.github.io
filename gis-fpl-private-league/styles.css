@@ -51,7 +51,7 @@ button:hover {
 .league-table th,
 .league-table td {
     border: 1px solid #ddd;
-    padding: 12px;
+    padding: 2px;
     text-align: left;
     transition: background-color 0.3s ease;
 }
