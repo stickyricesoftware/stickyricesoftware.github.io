@@ -142,24 +142,15 @@ function appendManagerOfTheMonth(screenDiv) {
     <h2 class="toggle-title">Manager of the Month <span class="toggle-icon">▼</span></h2>
     <div class="collapsible-content">
 
-        <h3>Total Pot</h3>
-        <span>RM100 Buy-in = <strong>RM1700</strong></span>
 
         <div>
           <h3>Monthly Prizes</h3>
           <span>Pot = <strong>RM400</strong></span>
           <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
         </div>
- 
+ <hr>
 
-        <h3>End of Season</h3>
-        <span>Pot = <strong>RM1300</strong></span>
-        <div class="is-paid">
-          <div class="key" style="padding:20px">1st Place: RM600</div>
-          <div class="key" style="padding:20px">2nd Place: RM300</div>
-          <div class="key" style="padding:20px">3rd Place: RM100</div>
-          <div class="key" style="padding:20px">Cup Winner: RM300</div>
-        </div>
+
       
     </div>
   `;
@@ -175,24 +166,14 @@ function appendCupCompetition(screenDiv) {
     <h2 class="toggle-title">Cup Competition <span class="toggle-icon">▼</span></h2>
     <div class="collapsible-content">
 
-        <h3>Total Pot</h3>
-        <span>RM100 Buy-in = <strong>RM1700</strong></span>
 
         <div>
           <h3>Monthly Prizes</h3>
           <span>Pot = <strong>RM400</strong></span>
-          <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
         </div>
- 
+ <hr>
 
-        <h3>End of Season</h3>
-        <span>Pot = <strong>RM1300</strong></span>
-        <div class="is-paid">
-          <div class="key" style="padding:20px">1st Place: RM600</div>
-          <div class="key" style="padding:20px">2nd Place: RM300</div>
-          <div class="key" style="padding:20px">3rd Place: RM100</div>
-          <div class="key" style="padding:20px">Cup Winner: RM300</div>
-        </div>
+
       
     </div>
   `;
@@ -207,17 +188,19 @@ function appendPayoutStructure(screenDiv) {
   payoutStructureCard.innerHTML = `
     <h2 class="toggle-title">Payout Structure <span class="toggle-icon">▼</span></h2>
     <div class="collapsible-content">
-
+        <div>
         <h3>Total Pot</h3>
         <span>RM100 Buy-in = <strong>RM1700</strong></span>
-
+        </div>
+<hr>
         <div>
           <h3>Monthly Prizes</h3>
           <span>Pot = <strong>RM400</strong></span>
-          <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
+          <p>8 x RM50 prizes for complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
         </div>
- 
+<hr>
 
+<div>
         <h3>End of Season</h3>
         <span>Pot = <strong>RM1300</strong></span>
         <div class="is-paid">
@@ -226,7 +209,8 @@ function appendPayoutStructure(screenDiv) {
           <div class="key" style="padding:20px">3rd Place: RM100</div>
           <div class="key" style="padding:20px">Cup Winner: RM300</div>
         </div>
-      
+      </div>
+      <hr>
     </div>
   `;
   screenDiv.appendChild(payoutStructureCard);
