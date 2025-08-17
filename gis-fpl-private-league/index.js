@@ -117,14 +117,14 @@ function createLeagueTable(teams, isHiddenView) {
 
           return `
             <tr class="${rowClass}">
-              <td>${team.rank}</td>
+              <td style="padding-left:10px">${team.rank}</td>
               <td>
                 <strong>${team.entry_name}</strong><br>
                 <span class="player-name">${team.player_name}</span>
               </td>
               <td>${team.event_total}</td>
               <td>${pointsGap > 0 ? pointsGap : '-'}</td>
-              <td style="text-align:right">${team.total}</td>
+              <td style="text-align:right; padding-right:10px">${team.total}</td>
              
             </tr>
           `;
