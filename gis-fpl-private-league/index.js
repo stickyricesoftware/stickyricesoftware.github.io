@@ -303,7 +303,7 @@ async function runOnLoad(leagueID) {
       const teamsToDisplay = isHiddenView ? filteredTeams : allTeams;
 
       const tableContainer = document.createElement("div");
-      tableContainer.className = "card";
+      tableContainer.className = "table-card";
       tableContainer.innerHTML = `<h2>GIS - FPL</h2>`;
 
       const toggleSwitch = createToggleSwitch(isHiddenView, renderTable);
