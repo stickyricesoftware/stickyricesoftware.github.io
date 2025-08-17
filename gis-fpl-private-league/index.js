@@ -133,27 +133,27 @@ function createLeagueTable(teams, isHiddenView) {
   return table;
 }
 
+
+
 // A function to create the toggle switch element.
 function createToggleSwitch(isHiddenView, renderTable) {
   const switchContainer = document.createElement('div');
   switchContainer.className = 'toggle-switch-container';
 
   switchContainer.innerHTML = `
+    <span class="toggle-text-label full-league">Full League</span>
     <input type="checkbox" id="league-toggle" class="toggle-switch-checkbox" ${isHiddenView ? 'checked' : ''}>
     <label for="league-toggle" class="toggle-switch-label">
       <span class="toggle-switch-inner"></span>
       <span class="toggle-switch-switch"></span>
     </label>
-    <span class="toggle-text">${isHiddenView ? 'Paid League' : 'Full League'}</span>
+    <span class="toggle-text-label paid-league">Paid League</span>
   `;
 
   // Attach the event listener to the checkbox
   const checkbox = switchContainer.querySelector('.toggle-switch-checkbox');
   checkbox.addEventListener('change', () => {
     renderTable(checkbox.checked);
-    // Update the text next to the toggle
-    const toggleText = switchContainer.querySelector('.toggle-text');
-    toggleText.textContent = checkbox.checked ? 'Paid League' : 'Full League';
   });
 
   return switchContainer;
