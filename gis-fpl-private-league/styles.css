@@ -82,12 +82,16 @@ button:hover {
 }
 
 .is-paid:nth-child(2), .key:nth-child(2) {
-  background-color: #7A3CFF!important;
+  background-color: #B066FF !important;
   color: #f9f9f9;
 }
 .is-paid:nth-child(3), .key:nth-child(3) {
-  background-color: #B066FF!important;
+  background-color: #7A3CFF!important;
   color: #f9f9f9;
+}
+.key:nth-child(4) {
+  background-color: rgb(236, 236, 50)!important;
+
 }
 
 .loader {

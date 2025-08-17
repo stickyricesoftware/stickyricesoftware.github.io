@@ -22,6 +22,7 @@ async function runOnLoad(leagueID) {
   startLoader();
   //await sleep(1000); // pause for 1000 ms (1 second)
   try {
+    console.log("Starting...")
     const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
 
 
@@ -98,21 +99,21 @@ async function runOnLoad(leagueID) {
             payoutStructure.innerHTML = `
   <h2>Payout Structure</h2>
   <div><h3>Monthly Prizes</h3>
-<p>Paid out at the end of the season</p>
+<p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can win this upto 2 times per season</p>
   </div>
   
-  <ul>
-    <li style="padding:20px">RM50 × 8 months = <strong>RM400</strong></li>
-  </ul>
+
+    <div style="padding:20px">RM50 × 8 months = <strong>RM400</strong></div>
+ 
   <h3>End of Season</h3>
-  <ul>
-    <li class="key" style="padding:20px">1st Place: RM600</li>
-    <li class="key"style="padding:20px" >2nd Place: RM300</li>
-    <li class="key" style="padding:20px">3rd Place: RM100</li>
-    <li>Cup Winner: RM300</li>
-  </ul>
+            <div class="is-paid">
+    <div class="key" style="padding:20px">1st Place: RM600</div>
+    <div class="key"style="padding:20px" >2nd Place: RM300</div>
+    <div class="key" style="padding:20px">3rd Place: RM100</div>
+    <div class="key"style="padding:20px" >Cup Winner: RM300</div>
+</div>
   <h3>Total Pot</h3>
-  <p><strong>RM1,700</strong>(RM100 Buy-in)</p>
+  <p><strong>RM1,700</strong> (RM100 Buy-in)</p>
 `;
 
             screenDiv.appendChild(payoutStructure);
