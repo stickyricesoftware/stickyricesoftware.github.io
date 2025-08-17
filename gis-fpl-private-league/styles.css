@@ -4,9 +4,6 @@ body {
 background: #08EDFF;
 background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1) 100%);
 }
-#screen{
-
-}
 .card {
     max-width: 800px;
     margin: 20px auto;
@@ -18,7 +15,7 @@ background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1
 .table-card {
     max-width: 800px;
     margin: 20px auto;
-    padding: 20px 5px 20px 5px;
+    padding: 20px 0px 20px 0px;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -27,7 +24,7 @@ h2 {
     color: #2c3e50;
     text-align: center;
     margin-bottom: 20px;
-    font-size: 24px;
+    font-size: 1.2rem;
 }
 
 button {
