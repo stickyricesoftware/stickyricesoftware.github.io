@@ -314,6 +314,7 @@ background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1
 .player-name-option {
   padding: 10px;
   background-color: #f0f0f0;
+  color: #37003C;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1em;
