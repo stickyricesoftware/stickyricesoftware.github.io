@@ -1,8 +1,7 @@
-const BASE_URL = 
-  "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/"
-  //"http://fantasy.premierleague.com/api/"
-  //"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/"
-
+const BASE_URL =
+  "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
+//"http://fantasy.premierleague.com/api/"
+//"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/"
 
 const leagueID = 635219;
 
@@ -17,11 +16,11 @@ async function endLoader() {
   document.getElementById(`loader`).remove();
 }
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 async function runOnLoad(leagueID) {
   startLoader();
- await sleep(1000); // pause for 1000 ms (1 second)
+  //await sleep(1000); // pause for 1000 ms (1 second)
   try {
     const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
     const bootstrapData = await bootstrapCall.json();
@@ -47,7 +46,7 @@ async function runOnLoad(leagueID) {
 
       // Filter for teams to KEEP and re-rank them
       const filteredAndReRankedTeams = leagueData.standings.results
-        .filter((team) => teamsToKeep.includes(String(team.id))) // CHANGED LOGIC
+        .filter((team) => teamsToKeep.includes(String(team.entry))) // CHANGED LOGIC
         .map((team, index, arr) => {
           let currentRank =
             index === 0 || team.total < arr[index - 1].total
@@ -63,7 +62,7 @@ async function runOnLoad(leagueID) {
 
         const tableContainer = document.createElement("div");
         tableContainer.className = "card";
-        tableContainer.innerHTML = `<h2>GIS -FPL</h2>`;
+        tableContainer.innerHTML = `<h2>GIS - FPL</h2>`;
 
         // Create the toggle button
         const toggleButton = document.createElement("button");
@@ -81,6 +80,31 @@ async function runOnLoad(leagueID) {
 
           // Your separate function call goes here, conditioned on the new state
           if (!isHiddenView) {
+            const motm = document.createElement("div");
+            motm.className = "card";
+
+            motm.innerHTML = `
+  <h2>Manager of the month</h2>
+  <div><h3>Monthly Prizes</h3>
+<p>Paid out at the end of the season</p>
+  </div>
+  
+  <ul>
+    <li style="padding:20px">RM50 × 8 months = <strong>RM400</strong></li>
+  </ul>
+  <h3>End of Season</h3>
+  <ul>
+    <li class="key" style="padding:20px">1st Place: RM600</li>
+    <li class="key"style="padding:20px" >2nd Place: RM300</li>
+    <li class="key" style="padding:20px">3rd Place: RM100</li>
+    <li>Cup Winner: RM300</li>
+  </ul>
+  <h3>Total Pot</h3>
+  <p><strong>RM1,700</strong>(RM100 Buy-in)</p>
+`;
+
+            screenDiv.appendChild(motm);
+
             const payoutStructure = document.createElement("div");
             payoutStructure.className = "card";
 
@@ -91,17 +115,17 @@ async function runOnLoad(leagueID) {
   </div>
   
   <ul>
-    <li>RM50 × 8 months = <strong>RM400</strong></li>
+    <li style="padding:20px">RM50 × 8 months = <strong>RM400</strong></li>
   </ul>
   <h3>End of Season</h3>
   <ul>
-    <li class="key">1st Place: RM600</li>
-    <li class="key">2nd Place: RM300</li>
-    <li class="key">3rd Place: RM100</li>
+    <li class="key" style="padding:20px">1st Place: RM600</li>
+    <li class="key"style="padding:20px" >2nd Place: RM300</li>
+    <li class="key" style="padding:20px">3rd Place: RM100</li>
     <li>Cup Winner: RM300</li>
   </ul>
   <h3>Total Pot</h3>
-  <p><strong>RM1,700</strong></p>
+  <p><strong>RM1,700</strong>(RM100 Buy-in)</p>
 `;
 
             screenDiv.appendChild(payoutStructure);
@@ -116,7 +140,7 @@ async function runOnLoad(leagueID) {
         <tr>
           <th></th>
           <th>Team</th>
-          <th>Event Total</th>
+          <th>GW Total</th>
           <th>Total Points</th>
         </tr>
       </thead>
@@ -157,23 +181,23 @@ async function runOnLoad(leagueID) {
 
   // IDs of the teams you want to KEEP when toggled ie: Paid entries only
   const teamsToKeep = [
-    "23745637",
-    "59392628",
-    "40237933",
-    "43139140",
-    "40248422",
-    "36653856",
-    "43138959",
-    "43631917",
-    "52421611",
-    "55865016",
-    "56328339",
-    "56543395",
-    "57275835",
-    "70271347",
-    "73314948",
-    "5270716",
+    "2471830",
+    "7011671",
     "9670559",
+    "4439378",
+    "5270716",
+    "829035",
+    "121633",
+    "1077605",
+    "252362",
+    "137606",
+    "6525541",
+    "4359674",
+    "7332950",
+    "5496376",
+    "5145044",
+    "1216178",
+    "6565912",
   ];
 
   // Call the function to display the initial table
@@ -181,5 +205,3 @@ async function runOnLoad(leagueID) {
 }
 
 runOnLoad(leagueID);
-
-

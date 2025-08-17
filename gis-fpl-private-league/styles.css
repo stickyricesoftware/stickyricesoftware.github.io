@@ -6,9 +6,7 @@ background: #08EDFF;
 background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1) 100%);
 }
 #screen{
-    display: flex;
-    flex-direction: column;;
-    align-items: center;
+
 }
 .card {
     max-width: 800px;
@@ -90,14 +88,17 @@ button:hover {
 }
 
 .loader {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 6rem;
-    margin-top: 3rem;
-    margin-bottom: 3rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 6rem;
   }
   .loader:before,
   .loader:after {
