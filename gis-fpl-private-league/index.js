@@ -5,6 +5,9 @@ const BASE_URL = "https://api.codetabs.com/v1/proxy?quest=http://fantasy.premier
 
 const leagueID = 635219;
 
+
+
+
 async function startLoader() {
   const screenDiv = document.getElementById("screen");
   const loader = document.createElement("div");
@@ -18,156 +21,139 @@ async function endLoader() {
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-async function runOnLoad(leagueID) {
-  startLoader();
-  //await sleep(1000); // pause for 1000 ms (1 second)
-  try {
-    console.log("Starting...")
-    const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
 
+
+async function fetchData(leagueID) {
+ 
+  try {
+    const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
+    const leagueCall = await fetch(
+      `${BASE_URL}leagues-classic/${leagueID}/standings/`
+    );
 
     const bootstrapData = await bootstrapCall.json();
-    const leagueCall = await fetch(`${BASE_URL}leagues-classic/${leagueID}/standings/`
-    );
     const leagueData = await leagueCall.json();
-    console.log(BASE_URL);
-    console.log(bootstrapData);
 
-    console.log(leagueData);
-    /**
-     * Appends a league table to a div with the id "screen",
-     * with a toggle to hide specific teams and re-rank the table.
-     * @param {string[]} teamsToKeep An array of team IDs to be shown by the toggle.
-     */
-    function displayLeagueTableWithToggle(teamsToKeep = []) {
-      const screenDiv = document.getElementById("screen");
-      if (!screenDiv) {
-        console.error('Element with id "screen" not found.');
-        return;
-      }
+    console.log("Bootstrap Data:", bootstrapData);
+    console.log("League Data:", leagueData);
 
-      // Filter for teams to KEEP and re-rank them
-      const filteredAndReRankedTeams = leagueData.standings.results
-        .filter((team) => teamsToKeep.includes(String(team.entry))) // CHANGED LOGIC
-        .map((team, index, arr) => {
-          let currentRank =
-            index === 0 || team.total < arr[index - 1].total
-              ? index + 1
-              : arr[index - 1].rank;
-          return { ...team, rank: currentRank };
-        });
-
-      // Function to create and render the table
-      const renderTable = (teams, isHiddenView) => {
-        // Clear the current table before rendering a new one
-        screenDiv.innerHTML = "";
-
-        const tableContainer = document.createElement("div");
-        tableContainer.className = "card";
-        tableContainer.innerHTML = `<h2>GIS - FPL</h2>`;
-
-        // Create the toggle button
-        const toggleButton = document.createElement("button");
-        toggleButton.textContent = isHiddenView
-          ? "Show Full League"
-          : "Show Paid League";
-        toggleButton.onclick = () => {
-          // This line renders the table
-          renderTable(
-            isHiddenView
-              ? leagueData.standings.results
-              : filteredAndReRankedTeams,
-            !isHiddenView
-          );
-
-          // Your separate function call goes here, conditioned on the new state
-          if (!isHiddenView) {
-            const motm = document.createElement("div");
-            motm.className = "card";
-
-            motm.innerHTML = `
-  <h2>Manager of the Month</h2>
-  <div><h3>Monthly Prizes</h3>
-
-`;
-
-            screenDiv.appendChild(motm);
-
-            const payoutStructure = document.createElement("div");
-            payoutStructure.className = "card";
-
-            payoutStructure.innerHTML = `
-  <h2>Payout Structure</h2>
-  <div><h3>Monthly Prizes</h3>
-<p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can win this upto 2 times per season</p>
-  </div>
-  
-
-    <div style="padding:20px">RM50 × 8 months = <strong>RM400</strong></div>
- 
-  <h3>End of Season</h3>
-            <div class="is-paid">
-    <div class="key" style="padding:20px">1st Place: RM600</div>
-    <div class="key"style="padding:20px" >2nd Place: RM300</div>
-    <div class="key" style="padding:20px">3rd Place: RM100</div>
-    <div class="key"style="padding:20px" >Cup Winner: RM300</div>
-</div>
-  <h3>Total Pot</h3>
-  <p><strong>RM1,700</strong> (RM100 Buy-in)</p>
-`;
-
-            screenDiv.appendChild(payoutStructure);
-          }
-        };
-        tableContainer.appendChild(toggleButton);
-
-        const table = document.createElement("table");
-        table.className = "league-table";
-        table.innerHTML = `
-      <thead>
-        <tr>
-          <th></th>
-          <th>Team</th>
-          <th>GW<br> Total</th>
-          <th>Total<br> Points</th>
-        </tr>
-      </thead>
- <tbody>
- ${teams
-   .map((team, index) => {
-     // Determine if the 'is-paid' class should be added
-     const isPaid = isHiddenView && index < 3;
-     const rowClass = isPaid ? "is-paid" : "";
-
-     return `
- <tr class="${rowClass}">
- <td>${team.rank}</td>
- <td><strong>${team.entry_name}</strong><br> <span class="player-name">${team.player_name}</span></td>
-<td>${team.event_total}</td>
- <td>${team.total}</td>
- </tr>
- `;
-   })
-   .join("")}
- </tbody>
-    `;
-
-        tableContainer.appendChild(table);
-        screenDiv.appendChild(tableContainer);
-      };
-
-      // Render the initial view showing all teams
-      renderTable(leagueData.standings.results, false);
-      endLoader();
-    }
+    return { bootstrapData, leagueData };
   } catch (error) {
-    console.error("ERROR");
-    const screenDiv = document.getElementById("screen");
-    screenDiv.innerHTML = `<h2>Failed to load</h2>`;
+    console.error("Failed to fetch data:", error);
+    throw new Error("Failed to load league data.");
+  }
+}
+
+// A function to filter and re-rank the teams.
+function getFilteredAndReRankedTeams(allTeams, teamsToKeep) {
+  const filteredTeams = allTeams.filter((team) =>
+    teamsToKeep.includes(String(team.entry))
+  );
+
+  return filteredTeams.map((team, index, arr) => {
+    let currentRank =
+      index === 0 || team.total < arr[index - 1].total
+        ? index + 1
+        : arr[index - 1].rank;
+    return { ...team, rank: currentRank };
+  });
+}
+
+// A function to create the main league table HTML element.
+function createLeagueTable(teams, isHiddenView) {
+  const table = document.createElement("table");
+  table.className = "league-table";
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th></th>
+        <th>Team</th>
+        <th>GW<br> Total</th>
+        <th>Total<br> Points</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${teams
+        .map((team, index) => {
+          const isPaid = isHiddenView && index < 3;
+          const rowClass = isPaid ? "is-paid" : "";
+          return `
+            <tr class="${rowClass}">
+              <td>${team.rank}</td>
+              <td>
+                <strong>${team.entry_name}</strong><br>
+                <span class="player-name">${team.player_name}</span>
+              </td>
+              <td>${team.event_total}</td>
+              <td>${team.total}</td>
+            </tr>
+          `;
+        })
+        .join("")}
+    </tbody>
+  `;
+  return table;
+}
+
+// A function to create and append the toggle button.
+function createToggleButton(isHiddenView, renderTable) {
+  const toggleButton = document.createElement("button");
+  toggleButton.textContent = isHiddenView
+    ? "Show Full League"
+    : "Show Paid League";
+  toggleButton.onclick = () => renderTable(!isHiddenView);
+  return toggleButton;
+}
+
+// A function to append additional content for the paid league view.
+function appendPaidLeagueContent(screenDiv) {
+  const motm = document.createElement("div");
+  motm.className = "card";
+  motm.innerHTML = `
+    <h2>Manager of the Month</h2>
+    <div><h3>Monthly Prizes</h3></div>
+  `;
+  screenDiv.appendChild(motm);
+
+  const payoutStructure = document.createElement("div");
+  payoutStructure.className = "card";
+  payoutStructure.innerHTML = `
+    <h2>Payout Structure</h2>
+    <div class="card">
+    <h3>Total Pot</h3>
+    <span>RM100 Buy-in = <strong>RM1700</strong></span>
+    </div>
+<div class="card">
+    <div><h3>Monthly Prizes</h3>
+    <span>Pot = <strong>RM400</strong></span>
+      <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
+    </div>
+</div>
+<div class="card">
+    <h3>End of Season</h3>
+    <span>Pot = <strong>RM1300</strong></span>
+
+    <div class="is-paid">
+      <div class="key" style="padding:20px">1st Place: RM600</div>
+      <div class="key" style="padding:20px">2nd Place: RM300</div>
+      <div class="key" style="padding:20px">3rd Place: RM100</div>
+      <div class="key" style="padding:20px">Cup Winner: RM300</div>
+    </div>
+</div>
+  `;
+  screenDiv.appendChild(payoutStructure);
+}
+
+// The main function that orchestrates the entire process.
+async function runOnLoad(leagueID) {
+  startLoader();
+  const screenDiv = document.getElementById("screen");
+  if (!screenDiv) {
+    console.error('Element with id "screen" not found.');
     endLoader();
+    return;
   }
 
-  // IDs of the teams you want to KEEP when toggled ie: Paid entries only
   const teamsToKeep = [
     "2471830",
     "7011671",
@@ -188,8 +174,41 @@ async function runOnLoad(leagueID) {
     "6565912",
   ];
 
-  // Call the function to display the initial table
-  displayLeagueTableWithToggle(teamsToKeep);
+  try {
+    const { leagueData } = await fetchData(leagueID);
+
+    const allTeams = leagueData.standings.results;
+    const filteredTeams = getFilteredAndReRankedTeams(allTeams, teamsToKeep);
+
+    // This function will be called by the toggle button and the initial load.
+    const renderTable = (isHiddenView) => {
+      screenDiv.innerHTML = "";
+      const teamsToDisplay = isHiddenView ? filteredTeams : allTeams;
+
+      const tableContainer = document.createElement("div");
+      tableContainer.className = "card";
+      tableContainer.innerHTML = `<h2>GIS - FPL</h2>`;
+
+      const toggleButton = createToggleButton(isHiddenView, renderTable);
+      const table = createLeagueTable(teamsToDisplay, isHiddenView);
+
+      tableContainer.appendChild(toggleButton);
+      tableContainer.appendChild(table);
+      screenDiv.appendChild(tableContainer);
+
+      if (isHiddenView) {
+        appendPaidLeagueContent(screenDiv);
+      }
+    };
+
+    // Render the initial view.
+    renderTable(false);
+  } catch (error) {
+    screenDiv.innerHTML = `<h2>Failed to load</h2>`;
+    console.error("An error occurred during rendering:", error);
+  } finally {
+    endLoader();
+  }
 }
 
 runOnLoad(leagueID);
