@@ -43,7 +43,9 @@ background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1
 button:hover {
     background-color: #2980b9;
 }
-
+.player-name{
+    font-size: 12px;
+}
 .league-table {
     width: 100%;
     border-collapse: collapse;

@@ -141,7 +141,7 @@ async function runOnLoad(leagueID) {
      return `
  <tr class="${rowClass}">
  <td>${team.rank}</td>
- <td><strong>${team.player_name}</strong><br> ${team.entry_name}</td>
+ <td><strong>${team.entry_name}</strong><br> <span class="player-name">${team.player_name}</span></td>
 <td>${team.event_total}</td>
  <td>${team.total}</td>
  </tr>
