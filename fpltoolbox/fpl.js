@@ -46491,7 +46491,7 @@ function toolsScreen() {
 
     {
       icon: "bi-speedometer2",
-      label: "GW Max Dashboard",
+      label: "GW Max Dashboard  <br> Coming Soon",
       action: createGWMaxDashboard,
       tier: "max",
       requiresData: true,
@@ -48380,6 +48380,20 @@ function generateTeamName() {
   }
 }
 
+
+
+if (userHasAccess([10, 12])) {
+  const timestamp = new Date().toISOString();
+    const notifcation = `
+    👤 User: ${theUser.info.nickname}
+    ✉️ Email: ${theUser.username.data.user_email}    
+    🕒 Time: ${timestamp}
+    👍 Pro and Max User Logging in`;
+    fetch("https://ntfy.sunny.bz/fpltoolbox", {
+      method: "POST",
+      body: notifcation,
+    });
+}
 async function showMyTeam() {
   if (preSeason) {
     showModal({
@@ -48390,7 +48404,14 @@ async function showMyTeam() {
     });
     return;
   }
+  //
 
+
+
+
+
+
+  //
   const container = document.getElementById("screen-tools");
   container.innerHTML = "";
   const backBtn = createBackButton();
@@ -57703,3 +57724,21 @@ function removeSpinner() {
   if (spinner) spinner.remove();
 }
 
+  function trackEvent(eventName, params = {}) {
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, params);
+      console.log(`GA4 event sent: ${eventName}`, params); // Debug log
+    } else {
+      console.warn('gtag is not defined. Make sure GA4 is installed.');
+    }
+  }
+    // Example usage
+  function trackButtonClick() {
+    console.log("tracked event")
+    trackEvent('button_click', {
+      button_location: 'TEST',
+      button_text: 'TEST TEXT',
+      value: 99
+    });
+  }
+  trackButtonClick()

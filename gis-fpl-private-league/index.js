@@ -1,12 +1,10 @@
-const BASE_URL = "https://api.codetabs.com/v1/proxy?quest=http://fantasy.premierleague.com/api/"
-  //"https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
+const BASE_URL =
+  "https://api.codetabs.com/v1/proxy?quest=http://fantasy.premierleague.com/api/";
+//"https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
 //"http://fantasy.premierleague.com/api/"
 //"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/"
 
 const leagueID = 635219;
-
-
-
 
 async function startLoader() {
   const screenDiv = document.getElementById("screen");
@@ -23,16 +21,12 @@ function sleep(ms) {
 }
 
 async function fetchBootstrapData() {
- 
   try {
     const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
 
-
     const bootstrapData = await bootstrapCall.json();
-    
 
     console.log("Bootstrap Data:", bootstrapData);
-
 
     return { bootstrapData };
   } catch (error) {
@@ -43,7 +37,6 @@ async function fetchBootstrapData() {
 const bootstrap = fetchBootstrapData();
 
 async function fetchLeagueData(leagueID) {
- 
   try {
     const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
     const leagueCall = await fetch(
@@ -78,13 +71,13 @@ function getFilteredAndReRankedTeams(allTeams, teamsToKeep) {
   });
 }
 function applyStaggeredRowAnimation(tableElement, delayStep = 0.1) {
-  const rows = tableElement.querySelectorAll('tr');
+  const rows = tableElement.querySelectorAll("tr");
   rows.forEach((row, index) => {
     // Calculate the delay based on the row's index
     const delay = (index * delayStep).toFixed(1); // .toFixed(1) for cleaner output
 
     // Apply the animation delay as a CSS custom property
-    row.style.setProperty('--animation-delay', `${delay}s`);
+    row.style.setProperty("--animation-delay", `${delay}s`);
   });
 }
 // A function to create the main league table HTML element.
@@ -123,8 +116,10 @@ function createLeagueTable(teams, isHiddenView) {
                 <span class="player-name">${team.player_name}</span>
               </td>
               <td>${team.event_total}</td>
-              <td>${pointsGap > 0 ? pointsGap : '-'}</td>
-              <td style="text-align:right; padding-right:10px">${team.total}</td>
+              <td>${pointsGap > 0 ? pointsGap : "-"}</td>
+              <td style="text-align:right; padding-right:10px">${
+                team.total
+              }</td>
              
             </tr>
           `;
@@ -135,16 +130,16 @@ function createLeagueTable(teams, isHiddenView) {
   return table;
 }
 
-
-
 // A function to create the toggle switch element.
 function createToggleSwitch(isHiddenView, renderTable) {
-  const switchContainer = document.createElement('div');
-  switchContainer.className = 'toggle-switch-container';
+  const switchContainer = document.createElement("div");
+  switchContainer.className = "toggle-switch-container";
 
   switchContainer.innerHTML = `
     <span class="toggle-text-label full-league">Full League</span>
-    <input type="checkbox" id="league-toggle" class="toggle-switch-checkbox" ${isHiddenView ? 'checked' : ''}>
+    <input type="checkbox" id="league-toggle" class="toggle-switch-checkbox" ${
+      isHiddenView ? "checked" : ""
+    }>
     <label for="league-toggle" class="toggle-switch-label">
       <span class="toggle-switch-inner"></span>
       <span class="toggle-switch-switch"></span>
@@ -153,8 +148,8 @@ function createToggleSwitch(isHiddenView, renderTable) {
   `;
 
   // Attach the event listener to the checkbox
-  const checkbox = switchContainer.querySelector('.toggle-switch-checkbox');
-  checkbox.addEventListener('change', () => {
+  const checkbox = switchContainer.querySelector(".toggle-switch-checkbox");
+  checkbox.addEventListener("change", () => {
     renderTable(checkbox.checked);
   });
 
@@ -164,7 +159,7 @@ function createToggleSwitch(isHiddenView, renderTable) {
 // A function to create and append the Manager of the Month section.
 function appendManagerOfTheMonth(screenDiv) {
   const motm = document.createElement("div");
-  motm.className = "card toggle-card"
+  motm.className = "card toggle-card";
   motm.innerHTML = `
     <h2 class="toggle-title">FPL Manager of the Month <span class="toggle-icon">▼</span></h2>
     <div class="collapsible-content">
@@ -182,31 +177,26 @@ function appendManagerOfTheMonth(screenDiv) {
   `;
   screenDiv.appendChild(motm);
 
-
-
   setupCollapsibleCard(motm); // Use the reusable function
 
-        // Find the grid placeholder inside the MOTM card
-    const gridPlaceholder = motm.querySelector('#motm-grid-placeholder');
+  // Find the grid placeholder inside the MOTM card
+  const gridPlaceholder = motm.querySelector("#motm-grid-placeholder");
 
-    // Append the grid to the placeholder
-    if (gridPlaceholder) {
-        appendMonthlyGrid(gridPlaceholder);
-    }
+  // Append the grid to the placeholder
+  if (gridPlaceholder) {
+    appendMonthlyGrid(gridPlaceholder);
+  }
 }
 
 function appendMonthlyGrid(parentElement) {
-  const gridContainer = document.createElement('div');
-  gridContainer.className = 'motm-grid';
+  const gridContainer = document.createElement("div");
+  gridContainer.className = "motm-grid";
 
-  const months = [
-    'Sep', 'Oct', 'Nov', 'Dec',
-    'Jan', 'Feb', 'Mar', 'Apr'
-  ];
+  const months = ["Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"];
 
-  months.forEach(month => {
-    const gridItem = document.createElement('div');
-    gridItem.className = 'grid-item';
+  months.forEach((month) => {
+    const gridItem = document.createElement("div");
+    gridItem.className = "grid-item";
     gridItem.innerHTML = `
       <p class="month-name">${month}</p>
       <p class="winner-name">TBC</p>
@@ -217,11 +207,10 @@ function appendMonthlyGrid(parentElement) {
   parentElement.appendChild(gridContainer);
 }
 
-
 // A function to create and append the Manager of the Month section.
 function appendCupCompetition(screenDiv) {
   const cupComp = document.createElement("div");
-  cupComp.className = "card toggle-card"
+  cupComp.className = "card toggle-card";
   cupComp.innerHTML = `
     <h2 class="toggle-title">FPL Cup <span class="toggle-icon">▼</span></h2>
     <div class="collapsible-content">
@@ -274,15 +263,16 @@ function appendPayoutStructure(screenDiv) {
     </div>
   `;
   screenDiv.appendChild(payoutStructureCard);
-setupCollapsibleCard(payoutStructureCard); // Use the reusable function
-
+  setupCollapsibleCard(payoutStructureCard); // Use the reusable function
 }
 function setupCollapsibleCard(cardElement) {
   const toggleTitle = cardElement.querySelector(".toggle-title");
   const content = cardElement.querySelector(".collapsible-content");
 
   if (!toggleTitle || !content) {
-    console.error("Collapsible card elements not found within the provided card.");
+    console.error(
+      "Collapsible card elements not found within the provided card."
+    );
     return;
   }
 
@@ -299,6 +289,7 @@ function setupCollapsibleCard(cardElement) {
 // The main function that orchestrates the entire process.
 async function runOnLoad(leagueID) {
   startLoader();
+
   const screenDiv = document.getElementById("screen");
   if (!screenDiv) {
     console.error('Element with id "screen" not found.');
@@ -332,6 +323,41 @@ async function runOnLoad(leagueID) {
     const allTeams = leagueData.standings.results;
     const filteredTeams = getFilteredAndReRankedTeams(allTeams, teamsToKeep);
 
+    const playerNameKey = "fpl_player_name";
+    const storedName = getPlayerName(playerNameKey);
+    // Your predefined list of names
+    const allPlayerNames = [];
+
+    for (let i = 0; i < leagueData.standings.results.length; i++) {
+      console.log(leagueData.standings.results[i].player_name);
+      let playerName = leagueData.standings.results[i].player_name;
+      allPlayerNames.push(playerName);
+    }
+
+    if (!storedName) {
+      showPlayerNamePopup(allPlayerNames, playerNameKey);
+    } else {
+      const date = new Date();
+
+      const formattedDateTime = new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false, // Use 24-hour format
+      }).format(date);
+
+      const notifcation = `    
+    🖥️ ${storedName} Checked in at:
+    🕒 ${formattedDateTime}`;
+      fetch("https://ntfy.sunny.bz/gis-fpl", {
+        method: "POST",
+        body: notifcation,
+      });
+    }
+
     // This function will be called by the toggle button and the initial load.
     const renderTable = (isHiddenView) => {
       screenDiv.innerHTML = "";
@@ -347,12 +373,12 @@ async function runOnLoad(leagueID) {
       tableContainer.appendChild(toggleSwitch);
       tableContainer.appendChild(table);
       screenDiv.appendChild(tableContainer);
-        // Now, apply the staggered animation
-  applyStaggeredRowAnimation(table);
+      // Now, apply the staggered animation
+      applyStaggeredRowAnimation(table);
 
       if (isHiddenView) {
-        appendManagerOfTheMonth(screenDiv)
-        appendCupCompetition(screenDiv)
+        appendManagerOfTheMonth(screenDiv);
+        appendCupCompetition(screenDiv);
         appendPayoutStructure(screenDiv);
       }
     };
@@ -368,3 +394,37 @@ async function runOnLoad(leagueID) {
 }
 
 runOnLoad(leagueID);
+
+function getPlayerName(storageKey) {
+  return localStorage.getItem(storageKey);
+}
+function showPlayerNamePopup(playerNames, storageKey) {
+  const popupContainer = document.createElement("div");
+  popupContainer.id = "player-popup-overlay";
+
+  // Create the list of names as buttons
+  const namesListHtml = playerNames
+    .map((name) => `<button class="player-name-option">${name}</button>`)
+    .join("");
+
+  popupContainer.innerHTML = `
+    <div id="player-popup">
+      <h2>Who are you?</h2>
+      <p>Please select your name from the list.</p>
+      <div id="player-names-list">${namesListHtml}</div>
+    </div>
+  `;
+
+  document.body.appendChild(popupContainer);
+
+  const namesList = document.getElementById("player-names-list");
+
+  namesList.addEventListener("click", (event) => {
+    // Check if the clicked element is a button
+    if (event.target.tagName === "BUTTON") {
+      const selectedName = event.target.textContent;
+      localStorage.setItem(storageKey, selectedName);
+      popupContainer.remove(); // Remove the popup after selection
+    }
+  });
+}
