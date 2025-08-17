@@ -78,7 +78,7 @@ button:hover {
 
 .is-paid:nth-child(1), .key:nth-child(1) {
   background-color: #08EDFF!important;
-  
+  color: #000000;
 }
 
 .is-paid:nth-child(2), .key:nth-child(2) {
@@ -91,7 +91,19 @@ button:hover {
 }
 .key:nth-child(4) {
   background-color: rgb(236, 236, 50)!important;
+  color: #000000;
 
+}
+
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.collapsible-content.show {
+  max-height: 1000px; /* A value larger than the content height */
 }
 
 .loader {

@@ -22,8 +22,25 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function fetchBootstrapData() {
+ 
+  try {
+    const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
 
-async function fetchData(leagueID) {
+
+    const bootstrapData = await bootstrapCall.json();
+    
+
+    console.log("Bootstrap Data:", bootstrapData);
+
+
+    return { bootstrapData };
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+    throw new Error("Failed to load league data.");
+  }
+}
+async function fetchLeagueData(leagueID) {
  
   try {
     const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
@@ -31,13 +48,13 @@ async function fetchData(leagueID) {
       `${BASE_URL}leagues-classic/${leagueID}/standings/`
     );
 
-    const bootstrapData = await bootstrapCall.json();
+    //const bootstrapData = await bootstrapCall.json();
     const leagueData = await leagueCall.json();
 
-    console.log("Bootstrap Data:", bootstrapData);
+    //console.log("Bootstrap Data:", bootstrapData);
     console.log("League Data:", leagueData);
 
-    return { bootstrapData, leagueData };
+    return { leagueData };
   } catch (error) {
     console.error("Failed to fetch data:", error);
     throw new Error("Failed to load league data.");
@@ -63,13 +80,19 @@ function getFilteredAndReRankedTeams(allTeams, teamsToKeep) {
 function createLeagueTable(teams, isHiddenView) {
   const table = document.createElement("table");
   table.className = "league-table";
+
+  // Calculate the total points of the top team
+  const topTeamTotalPoints = teams.length > 0 ? teams[0].total : 0;
+
   table.innerHTML = `
     <thead>
       <tr>
         <th></th>
         <th>Team</th>
         <th>GW<br> Total</th>
+        <th>Points<br> Gap</th>
         <th>Total<br> Points</th>
+
       </tr>
     </thead>
     <tbody>
@@ -77,6 +100,10 @@ function createLeagueTable(teams, isHiddenView) {
         .map((team, index) => {
           const isPaid = isHiddenView && index < 3;
           const rowClass = isPaid ? "is-paid" : "";
+
+          // Calculate the points gap
+          const pointsGap = topTeamTotalPoints - team.total;
+
           return `
             <tr class="${rowClass}">
               <td>${team.rank}</td>
@@ -85,7 +112,9 @@ function createLeagueTable(teams, isHiddenView) {
                 <span class="player-name">${team.player_name}</span>
               </td>
               <td>${team.event_total}</td>
+              <td>${pointsGap > 0 ? pointsGap : '-'}</td>
               <td>${team.total}</td>
+             
             </tr>
           `;
         })
@@ -105,45 +134,124 @@ function createToggleButton(isHiddenView, renderTable) {
   return toggleButton;
 }
 
-// A function to append additional content for the paid league view.
-function appendPaidLeagueContent(screenDiv) {
+// A function to create and append the Manager of the Month section.
+function appendManagerOfTheMonth(screenDiv) {
   const motm = document.createElement("div");
-  motm.className = "card";
+  motm.className = "card toggle-card"
   motm.innerHTML = `
-    <h2>Manager of the Month</h2>
-    <div><h3>Monthly Prizes</h3></div>
+    <h2 class="toggle-title">Manager of the Month <span class="toggle-icon">▼</span></h2>
+    <div class="collapsible-content">
+
+        <h3>Total Pot</h3>
+        <span>RM100 Buy-in = <strong>RM1700</strong></span>
+
+        <div>
+          <h3>Monthly Prizes</h3>
+          <span>Pot = <strong>RM400</strong></span>
+          <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
+        </div>
+ 
+
+        <h3>End of Season</h3>
+        <span>Pot = <strong>RM1300</strong></span>
+        <div class="is-paid">
+          <div class="key" style="padding:20px">1st Place: RM600</div>
+          <div class="key" style="padding:20px">2nd Place: RM300</div>
+          <div class="key" style="padding:20px">3rd Place: RM100</div>
+          <div class="key" style="padding:20px">Cup Winner: RM300</div>
+        </div>
+      
+    </div>
   `;
   screenDiv.appendChild(motm);
-
-  const payoutStructure = document.createElement("div");
-  payoutStructure.className = "card";
-  payoutStructure.innerHTML = `
-    <h2>Payout Structure</h2>
-    <div class="card">
-    <h3>Total Pot</h3>
-    <span>RM100 Buy-in = <strong>RM1700</strong></span>
-    </div>
-<div class="card">
-    <div><h3>Monthly Prizes</h3>
-    <span>Pot = <strong>RM400</strong></span>
-      <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
-    </div>
-</div>
-<div class="card">
-    <h3>End of Season</h3>
-    <span>Pot = <strong>RM1300</strong></span>
-
-    <div class="is-paid">
-      <div class="key" style="padding:20px">1st Place: RM600</div>
-      <div class="key" style="padding:20px">2nd Place: RM300</div>
-      <div class="key" style="padding:20px">3rd Place: RM100</div>
-      <div class="key" style="padding:20px">Cup Winner: RM300</div>
-    </div>
-</div>
-  `;
-  screenDiv.appendChild(payoutStructure);
+  setupCollapsibleCard(motm); // Use the reusable function
 }
 
+// A function to create and append the Manager of the Month section.
+function appendCupCompetition(screenDiv) {
+  const cupComp = document.createElement("div");
+  cupComp.className = "card toggle-card"
+  cupComp.innerHTML = `
+    <h2 class="toggle-title">Cup Competition <span class="toggle-icon">▼</span></h2>
+    <div class="collapsible-content">
+
+        <h3>Total Pot</h3>
+        <span>RM100 Buy-in = <strong>RM1700</strong></span>
+
+        <div>
+          <h3>Monthly Prizes</h3>
+          <span>Pot = <strong>RM400</strong></span>
+          <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
+        </div>
+ 
+
+        <h3>End of Season</h3>
+        <span>Pot = <strong>RM1300</strong></span>
+        <div class="is-paid">
+          <div class="key" style="padding:20px">1st Place: RM600</div>
+          <div class="key" style="padding:20px">2nd Place: RM300</div>
+          <div class="key" style="padding:20px">3rd Place: RM100</div>
+          <div class="key" style="padding:20px">Cup Winner: RM300</div>
+        </div>
+      
+    </div>
+  `;
+  screenDiv.appendChild(cupComp);
+  setupCollapsibleCard(cupComp); // Use the reusable function
+}
+
+// A function to create and append the Payout Structure section with a toggle.
+function appendPayoutStructure(screenDiv) {
+  const payoutStructureCard = document.createElement("div");
+  payoutStructureCard.className = "card toggle-card"; // Added a new class for styling the toggle
+  payoutStructureCard.innerHTML = `
+    <h2 class="toggle-title">Payout Structure <span class="toggle-icon">▼</span></h2>
+    <div class="collapsible-content">
+
+        <h3>Total Pot</h3>
+        <span>RM100 Buy-in = <strong>RM1700</strong></span>
+
+        <div>
+          <h3>Monthly Prizes</h3>
+          <span>Pot = <strong>RM400</strong></span>
+          <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
+        </div>
+ 
+
+        <h3>End of Season</h3>
+        <span>Pot = <strong>RM1300</strong></span>
+        <div class="is-paid">
+          <div class="key" style="padding:20px">1st Place: RM600</div>
+          <div class="key" style="padding:20px">2nd Place: RM300</div>
+          <div class="key" style="padding:20px">3rd Place: RM100</div>
+          <div class="key" style="padding:20px">Cup Winner: RM300</div>
+        </div>
+      
+    </div>
+  `;
+  screenDiv.appendChild(payoutStructureCard);
+setupCollapsibleCard(payoutStructureCard); // Use the reusable function
+
+}
+function setupCollapsibleCard(cardElement) {
+  const toggleTitle = cardElement.querySelector(".toggle-title");
+  const content = cardElement.querySelector(".collapsible-content");
+
+  if (!toggleTitle || !content) {
+    console.error("Collapsible card elements not found within the provided card.");
+    return;
+  }
+
+  toggleTitle.addEventListener("click", () => {
+    content.classList.toggle("show");
+    const icon = toggleTitle.querySelector(".toggle-icon");
+    if (content.classList.contains("show")) {
+      icon.textContent = "▲";
+    } else {
+      icon.textContent = "▼";
+    }
+  });
+}
 // The main function that orchestrates the entire process.
 async function runOnLoad(leagueID) {
   startLoader();
@@ -175,7 +283,7 @@ async function runOnLoad(leagueID) {
   ];
 
   try {
-    const { leagueData } = await fetchData(leagueID);
+    const { leagueData } = await fetchLeagueData(leagueID);
 
     const allTeams = leagueData.standings.results;
     const filteredTeams = getFilteredAndReRankedTeams(allTeams, teamsToKeep);
@@ -197,7 +305,9 @@ async function runOnLoad(leagueID) {
       screenDiv.appendChild(tableContainer);
 
       if (isHiddenView) {
-        appendPaidLeagueContent(screenDiv);
+        appendManagerOfTheMonth(screenDiv)
+        appendCupCompetition(screenDiv)
+        appendPayoutStructure(screenDiv);
       }
     };
 
