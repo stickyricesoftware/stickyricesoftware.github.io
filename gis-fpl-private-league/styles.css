@@ -53,7 +53,7 @@ button:hover {
 
 .league-table th,
 .league-table td {
-    border: 1px solid #ddd;
+    
     padding: 5px;
     text-align: left;
     transition: background-color 0.3s ease;
@@ -75,6 +75,23 @@ button:hover {
 .league-table tr:hover {
     background-color: #e8f4f8;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animated-table tr {
+  animation: fadeIn 0.6s ease-in-out forwards var(--animation-delay, 0s);
+  opacity: 0;
+}
+
 
 .is-paid:nth-child(1), .key:nth-child(1) {
   background-color: #08EDFF!important;

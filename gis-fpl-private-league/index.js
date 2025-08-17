@@ -75,11 +75,20 @@ function getFilteredAndReRankedTeams(allTeams, teamsToKeep) {
     return { ...team, rank: currentRank };
   });
 }
+function applyStaggeredRowAnimation(tableElement, delayStep = 0.1) {
+  const rows = tableElement.querySelectorAll('tr');
+  rows.forEach((row, index) => {
+    // Calculate the delay based on the row's index
+    const delay = (index * delayStep).toFixed(1); // .toFixed(1) for cleaner output
 
+    // Apply the animation delay as a CSS custom property
+    row.style.setProperty('--animation-delay', `${delay}s`);
+  });
+}
 // A function to create the main league table HTML element.
 function createLeagueTable(teams, isHiddenView) {
   const table = document.createElement("table");
-  table.className = "league-table";
+  table.className = "league-table animated-table";
 
   // Calculate the total points of the top team
   const topTeamTotalPoints = teams.length > 0 ? teams[0].total : 0;
@@ -123,16 +132,6 @@ function createLeagueTable(teams, isHiddenView) {
   `;
   return table;
 }
-
-// // A function to create and append the toggle button.
-// function createToggleButton(isHiddenView, renderTable) {
-//   const toggleButton = document.createElement("button");
-//   toggleButton.textContent = isHiddenView
-//     ? "Show Full League"
-//     : "Show Paid League";
-//   toggleButton.onclick = () => renderTable(!isHiddenView);
-//   return toggleButton;
-// }
 
 // A function to create the toggle switch element.
 function createToggleSwitch(isHiddenView, renderTable) {
@@ -313,6 +312,8 @@ async function runOnLoad(leagueID) {
       tableContainer.appendChild(toggleSwitch);
       tableContainer.appendChild(table);
       screenDiv.appendChild(tableContainer);
+        // Now, apply the staggered animation
+  applyStaggeredRowAnimation(table);
 
       if (isHiddenView) {
         appendManagerOfTheMonth(screenDiv)
