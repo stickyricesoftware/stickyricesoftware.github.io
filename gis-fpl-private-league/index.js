@@ -164,14 +164,12 @@ function appendManagerOfTheMonth(screenDiv) {
   const motm = document.createElement("div");
   motm.className = "card toggle-card"
   motm.innerHTML = `
-    <h2 class="toggle-title">Manager of the Month <span class="toggle-icon">▼</span></h2>
+    <h2 class="toggle-title">FPL Manager of the Month <span class="toggle-icon">▼</span></h2>
     <div class="collapsible-content">
 
-
         <div>
-          <h3>Monthly Prizes</h3>
-          <span>Pot = <strong>RM400</strong></span>
-          <p>Complete months only - September, October, November, December, January, February, March, and April. Paid out at the end of the season. Managers can only win this up to 2 times per season</p>
+          <h3>The MOTM competition is scheduled to start in GW34</h3>
+          <span><strong></strong></span>
         </div>
  <hr>
 
@@ -188,13 +186,13 @@ function appendCupCompetition(screenDiv) {
   const cupComp = document.createElement("div");
   cupComp.className = "card toggle-card"
   cupComp.innerHTML = `
-    <h2 class="toggle-title">Cup Competition <span class="toggle-icon">▼</span></h2>
+    <h2 class="toggle-title">FPL Cup <span class="toggle-icon">▼</span></h2>
     <div class="collapsible-content">
 
 
         <div>
-          <h3>Monthly Prizes</h3>
-          <span>Pot = <strong>RM400</strong></span>
+          <h3>The cup competitionis scheduled to start in GW34</h3>
+          <span><strong></strong></span>
         </div>
  <hr>
 
@@ -304,7 +302,7 @@ async function runOnLoad(leagueID) {
 
       const tableContainer = document.createElement("div");
       tableContainer.className = "table-card";
-      tableContainer.innerHTML = `<h2>GIS - FPL</h2>`;
+      tableContainer.innerHTML = `<h2>GIS - FPL Mini League</h2>`;
 
       const toggleSwitch = createToggleSwitch(isHiddenView, renderTable);
       const table = createLeagueTable(teamsToDisplay, isHiddenView);
