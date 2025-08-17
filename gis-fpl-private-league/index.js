@@ -124,14 +124,40 @@ function createLeagueTable(teams, isHiddenView) {
   return table;
 }
 
-// A function to create and append the toggle button.
-function createToggleButton(isHiddenView, renderTable) {
-  const toggleButton = document.createElement("button");
-  toggleButton.textContent = isHiddenView
-    ? "Show Full League"
-    : "Show Paid League";
-  toggleButton.onclick = () => renderTable(!isHiddenView);
-  return toggleButton;
+// // A function to create and append the toggle button.
+// function createToggleButton(isHiddenView, renderTable) {
+//   const toggleButton = document.createElement("button");
+//   toggleButton.textContent = isHiddenView
+//     ? "Show Full League"
+//     : "Show Paid League";
+//   toggleButton.onclick = () => renderTable(!isHiddenView);
+//   return toggleButton;
+// }
+
+// A function to create the toggle switch element.
+function createToggleSwitch(isHiddenView, renderTable) {
+  const switchContainer = document.createElement('div');
+  switchContainer.className = 'toggle-switch-container';
+
+  switchContainer.innerHTML = `
+    <input type="checkbox" id="league-toggle" class="toggle-switch-checkbox" ${isHiddenView ? 'checked' : ''}>
+    <label for="league-toggle" class="toggle-switch-label">
+      <span class="toggle-switch-inner"></span>
+      <span class="toggle-switch-switch"></span>
+    </label>
+    <span class="toggle-text">${isHiddenView ? 'Paid League' : 'Full League'}</span>
+  `;
+
+  // Attach the event listener to the checkbox
+  const checkbox = switchContainer.querySelector('.toggle-switch-checkbox');
+  checkbox.addEventListener('change', () => {
+    renderTable(checkbox.checked);
+    // Update the text next to the toggle
+    const toggleText = switchContainer.querySelector('.toggle-text');
+    toggleText.textContent = checkbox.checked ? 'Paid League' : 'Full League';
+  });
+
+  return switchContainer;
 }
 
 // A function to create and append the Manager of the Month section.
@@ -281,10 +307,10 @@ async function runOnLoad(leagueID) {
       tableContainer.className = "card";
       tableContainer.innerHTML = `<h2>GIS - FPL</h2>`;
 
-      const toggleButton = createToggleButton(isHiddenView, renderTable);
+      const toggleSwitch = createToggleSwitch(isHiddenView, renderTable);
       const table = createLeagueTable(teamsToDisplay, isHiddenView);
 
-      tableContainer.appendChild(toggleButton);
+      tableContainer.appendChild(toggleSwitch);
       tableContainer.appendChild(table);
       screenDiv.appendChild(tableContainer);
 
