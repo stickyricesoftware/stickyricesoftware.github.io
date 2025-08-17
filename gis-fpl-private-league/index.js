@@ -1,7 +1,8 @@
-const BASE_URL =
-  //"https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
-//"http://fantasy.premierleague.com/api/";
-"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/";
+const BASE_URL = 
+  "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/"
+  //"http://fantasy.premierleague.com/api/"
+  //"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/"
+
 
 const leagueID = 635219;
 
@@ -9,7 +10,7 @@ async function startLoader() {
   const screenDiv = document.getElementById("screen");
   const loader = document.createElement("div");
   loader.id = "loader";
-  loader.innerHTML = `<div class="loader"><h2>Loading...</h2></div>`;
+  loader.innerHTML = `<div class="loader"></div>`;
   screenDiv.append(loader);
 }
 async function endLoader() {
@@ -178,3 +179,5 @@ async function runOnLoad(leagueID) {
 }
 
 runOnLoad(leagueID);
+
+
