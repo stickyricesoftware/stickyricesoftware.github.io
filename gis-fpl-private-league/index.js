@@ -1,5 +1,5 @@
-const BASE_URL =
-  "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
+const BASE_URL = "https://api.codetabs.com/v1/proxy?quest=http://fantasy.premierleague.com/api/"
+  //"https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
 //"http://fantasy.premierleague.com/api/"
 //"https://api.cors.lol/?url=http://fantasy.premierleague.com/api/"
 
@@ -23,23 +23,11 @@ async function runOnLoad(leagueID) {
   startLoader();
   //await sleep(1000); // pause for 1000 ms (1 second)
   try {
-    const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/", {
-      method: "GET", // Or 'POST', 'PUT', etc.
-      headers: {
-        "Content-Type": "application/json",
-        // The 'Origin' header is automatically added by the browser for cross-origin requests.
-      },
-    });
+    const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
+
+
     const bootstrapData = await bootstrapCall.json();
-    const leagueCall = await fetch(
-      `${BASE_URL}leagues-classic/${leagueID}/standings/`,
-      {
-        method: "GET", // Or 'POST', 'PUT', etc.
-        headers: {
-          "Content-Type": "application/json",
-          // The 'Origin' header is automatically added by the browser for cross-origin requests.
-        },
-      }
+    const leagueCall = await fetch(`${BASE_URL}leagues-classic/${leagueID}/standings/`
     );
     const leagueData = await leagueCall.json();
     console.log(BASE_URL);
