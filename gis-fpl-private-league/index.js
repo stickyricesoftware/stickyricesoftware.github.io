@@ -22,10 +22,23 @@ async function runOnLoad(leagueID) {
   startLoader();
   //await sleep(1000); // pause for 1000 ms (1 second)
   try {
-    const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
+    const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/", {
+      method: "GET", // Or 'POST', 'PUT', etc.
+      headers: {
+        "Content-Type": "application/json",
+        // The 'Origin' header is automatically added by the browser for cross-origin requests.
+      },
+    });
     const bootstrapData = await bootstrapCall.json();
     const leagueCall = await fetch(
-      `${BASE_URL}leagues-classic/${leagueID}/standings/`
+      `${BASE_URL}leagues-classic/${leagueID}/standings/`,
+      {
+        method: "GET", // Or 'POST', 'PUT', etc.
+        headers: {
+          "Content-Type": "application/json",
+          // The 'Origin' header is automatically added by the browser for cross-origin requests.
+        },
+      }
     );
     const leagueData = await leagueCall.json();
     console.log(BASE_URL);
