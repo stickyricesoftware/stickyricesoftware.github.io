@@ -40,6 +40,8 @@ async function fetchBootstrapData() {
     throw new Error("Failed to load league data.");
   }
 }
+const bootstrap = fetchBootstrapData();
+
 async function fetchLeagueData(leagueID) {
  
   try {
@@ -100,7 +102,7 @@ function createLeagueTable(teams, isHiddenView) {
         <th>Team</th>
         <th>GW<br> Total</th>
         <th>Points<br> Gap</th>
-        <th>Total<br> Points</th>
+        <th style="text-align:right">Total<br> Points</th>
 
       </tr>
     </thead>
@@ -122,7 +124,7 @@ function createLeagueTable(teams, isHiddenView) {
               </td>
               <td>${team.event_total}</td>
               <td>${pointsGap > 0 ? pointsGap : '-'}</td>
-              <td>${team.total}</td>
+              <td style="text-align:right">${team.total}</td>
              
             </tr>
           `;
@@ -168,7 +170,7 @@ function appendManagerOfTheMonth(screenDiv) {
     <div class="collapsible-content">
 
         <div>
-          <h3>The MOTM competition is scheduled to start in GW34</h3>
+          <h3>The MOTM competition is scheduled to start in GW4</h3>
           <span><strong></strong></span>
         </div>
  <hr>
