@@ -46318,10 +46318,10 @@ function settingsScreen() {
 
   // On league change
   leagueSelector.addEventListener("change", (e) => {
-    if (!userHasAccess([12])) {
+    if (!userHasAccess([10, 12])) {
       showModal({
         title: "Paid Feature",
-        body: "This feature is only available to <strong>Max members</strong>.<br><br>Head over to your profile page to switch leagues manually",
+        body: "This feature is only available to <strong>Pro and Max members</strong>.<br><br>Head over to your profile page to switch leagues manually",
         confirmText: "Take me there",
         onConfirm: () => {
           window.location.href = profilePageUrl;
@@ -52022,7 +52022,7 @@ async function showMemes() {
   if (
     currentGw !== 34 && // Ignore this whole check if we're in Gameweek 34
     !ignoredUrls.includes(currentUrl) && // Check if the full URL is not in the ignore list
-    eventStatus.status[eventStatus.status.length - 1].bonus_added === false
+    eventStatus.status[eventStatus.status.length - 1].bonus_added === true
   ) {
     const memeLoader = document.createElement("div");
     memeLoader.id = "meme-loader";
@@ -52076,7 +52076,79 @@ async function showMemes() {
     "https://fpltoolbox.com/wp-content/uploads/2025/02/sean-dyche-football.gif",
     "https://fpltoolbox.com/wp-content/uploads/2025/02/r7vfc0oych5e1.jpeg",
   ];
+  async function findBenchDor() {
+  const teamsWithHighBenchPoints = [];
 
+  for (const team of FPLToolboxLeagueData.standings) {
+    // Filter bench players (positions 12–15)
+    const benchPlayers = team.currentWeek[0].picks.filter(
+      player => player.position > 11 && player.position < 16
+    );
+
+    // Fetch all bench points in parallel
+    const benchPointsArray = await Promise.all(
+      benchPlayers.map(player => getPlayerScore(player.element))
+    );
+
+    const totalBenchPoints = benchPointsArray.reduce((sum, bp) => sum + bp, 0);
+
+    
+
+    if (totalBenchPoints > 1) {
+      teamsWithHighBenchPoints.push({ team, totalBenchPoints });
+    }
+  }
+
+  if (teamsWithHighBenchPoints.length > 0) {
+    // Get the team with the highest bench points
+    const topTeam = teamsWithHighBenchPoints.sort(
+      (a, b) => b.totalBenchPoints - a.totalBenchPoints
+    )[0];
+
+    const message1 = `POV: ${topTeam.team.player_name.substring(
+      0,
+      topTeam.team.player_name.indexOf(" ")
+    )} after leaving ${topTeam.totalBenchPoints} points on the bench this week`;
+
+    const img =
+      "https://fpltoolbox.com/wp-content/uploads/2025/02/who-should-be-awarded-the-bench-dor-v0-r6sja77eqrmc1-1.jpg";
+
+
+    console.log("BENCH D'OR", topTeam)
+    const benchDorPlayers = topTeam.team.currentWeek[0].picks.filter(
+      player => player.position > 11 && player.position < 16
+    );
+    console.log(benchDorPlayers)
+
+    let bench = document.createElement('div')
+    bench.style.display = "flex"
+    bench.style.flexDirection = "row"
+    bench.style.gap = "5px"
+    for (let i = 0; i < benchDorPlayers.length; i++) {
+      
+      let bplayerScore = await getPlayerScore(benchDorPlayers[i].element)
+
+
+      let bplayer = await createPlayerCardNew(
+        benchDorPlayers[i].element,
+        bplayerScore,
+        null,
+        null,
+        1
+      );
+
+      bench.append(bplayer)
+    }
+
+    
+      
+
+    const meme = createMeme4Corners(message1, null, null, null, null, bench, img);
+    memeContainer.append(meme);
+  } else {
+    console.log("No bench fail found.");
+  }
+}
   function findCaptaincyFailDrake() {
     for (const team of FPLToolboxLeagueData.standings) {
       let captain = null;
@@ -52524,14 +52596,14 @@ async function showMemes() {
 
     console.log(lowestTeam);
 
-    const message1 = `POV: Realising that you've got to listen to another year of "We got ____ before GTA 6... "`;
-    const message2 = `and ${lowestTeam.player_name.substring(
+    const message1 = `POV: That one bro picking their FPL team for the gameweek "`;
+    const message2 = `Spoiler alert: It's ${lowestTeam.player_name.substring(
       0,
       lowestTeam.player_name.indexOf(" ")
-    )} being shit at FPL`;
+    )}`;
 
     const img =
-      "https://fpltoolbox.com/wp-content/uploads/2025/05/disgusted.webp";
+      "https://fpltoolbox.com/wp-content/uploads/2025/08/raf360x360075tfafafa_ca443f4786.jpg";
 
     const meme = createMeme4Corners(
       message1,
@@ -52682,8 +52754,14 @@ async function showMemes() {
         img
       );
       memeContainer.append(meme);
+    } else {
+      console.log("No bench fail found.");
     }
   }
+
+
+
+
 
   function findLowBench() {
     const teamsWithHighBenchPoints = []; // Array to store teams with bench points > 10
@@ -52756,7 +52834,7 @@ async function showMemes() {
       const randomTeam = getRandomTeam(teamsWithHighBenchPoints);
 
       const message1 = document.createElement("div");
-      message1.innerText = `Seeing your players score `;
+      message1.innerText = `Seeing your players pick up points `;
       message1.style.color = "black";
 
       const message2 = document.createElement("div");
@@ -53064,8 +53142,8 @@ async function showMemes() {
           playerStatsCache.set(player.element, playerStats);
         }
 
-        console.log(player);
-        console.log(playerStats);
+        //console.log(player);
+        //console.log(playerStats);
         if (playerStats[0].penalties_missed > 0) {
           teamsWith59Minutes.push(team);
           team.fiftyNineMinutePlayer = player.element;
@@ -54447,6 +54525,7 @@ async function showMemes() {
       findHigestTransferMaker,
       findHighBench,
       find100Plus,
+      findBenchDor,
       gwSpecificMeme,
       findMissedPen,
       findBelowAverage,
