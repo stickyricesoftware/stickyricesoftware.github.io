@@ -70,6 +70,7 @@ function getFilteredAndReRankedTeams(allTeams, teamsToKeep) {
     return { ...team, rank: currentRank };
   });
 }
+
 function applyStaggeredRowAnimation(tableElement, delayStep = 0.1) {
   const rows = tableElement.querySelectorAll("tr");
   rows.forEach((row, index) => {
@@ -108,9 +109,21 @@ function createLeagueTable(teams, isHiddenView) {
           // Calculate the points gap
           const pointsGap = topTeamTotalPoints - team.total;
 
+          // Determine the rank display: medal emojis for top 3, nothing for others
+          let rankDisplay = '';
+          if (index === 0) {
+            rankDisplay = '🥇';
+          } else if (index === 1) {
+            rankDisplay = '🥈';
+          } else if (index === 2) {
+            rankDisplay = '🥉';
+          } else {
+            rankDisplay = index + 1;
+          }
+
           return `
             <tr class="${rowClass}">
-              <td style="padding-left:10px">${team.rank}</td>
+              <td style="padding-left:10px">${rankDisplay}</td>
               <td>
                 <strong>${team.entry_name}</strong><br>
                 <span class="player-name">${team.player_name}</span>
@@ -239,7 +252,7 @@ function appendPayoutStructure(screenDiv) {
     <div class="collapsible-content">
         <div>
         <h3>Total Pot</h3>
-        <span>RM100 Buy-in = <strong>RM1700</strong></span>
+        <span>RM100 Buy-in = <strong>RM1800</strong></span>
         </div>
 <hr>
         <div>
@@ -251,9 +264,9 @@ function appendPayoutStructure(screenDiv) {
 
 <div>
         <h3>End of Season</h3>
-        <span>Pot = <strong>RM1300</strong></span>
+        <span>Pot = <strong>RM1400</strong></span>
         <div class="is-paid">
-          <div class="key" style="padding:20px">1st Place: RM600</div>
+          <div class="key" style="padding:20px">1st Place: RM700</div>
           <div class="key" style="padding:20px">2nd Place: RM300</div>
           <div class="key" style="padding:20px">3rd Place: RM100</div>
           <div class="key" style="padding:20px">Cup Winner: RM300</div>
