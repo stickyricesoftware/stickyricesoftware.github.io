@@ -38,7 +38,7 @@ const bootstrap = fetchBootstrapData();
 
 async function fetchLeagueData(leagueID) {
   try {
-    const bootstrapCall = await fetch(BASE_URL + "bootstrap-static/");
+    
     const leagueCall = await fetch(
       `${BASE_URL}leagues-classic/${leagueID}/standings/`
     );
@@ -296,7 +296,8 @@ async function runOnLoad(leagueID) {
     endLoader();
     return;
   }
-
+  // Andy Nind 
+  // 4225067 Tom Schofield
   const teamsToKeep = [
     "2471830",
     "7011671",
@@ -315,6 +316,7 @@ async function runOnLoad(leagueID) {
     "5145044",
     "1216178",
     "6565912",
+    "4630220",
   ];
 
   try {
