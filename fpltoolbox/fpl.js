@@ -45859,46 +45859,79 @@ if (theUser.info.league_id != "" || !theUser.info.league_id) {
   });
 }
 
+// async function getBootstrap() {
+//   try {
+//     if (testMode) {
+//       bootstrap = bootstrapTest;
+
+//       console.log(
+//         "%c TEST MODE - NO API CALL MADE - Bootstrap Data",
+//         "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+//         bootstrap
+//       );
+
+//       // Set current and next game week
+//       bootstrap.events.forEach((event) => {
+//         if (event.is_current) currentGw = event.id;
+//         if (event.is_next) nextGw = event.id;
+//       });
+
+//       return bootstrap;
+//     }
+
+//     const res = await fetch(BASE_URL + "bootstrap-static/");
+//     const data = await res.json();
+//     bootstrap = data;
+//     console.log(
+//       "%c API CALL MADE - Bootstrap Data",
+//       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
+//       bootstrap
+//     );
+//     // Set current and next game week
+//     bootstrap.events.forEach((event) => {
+//       if (event.is_current) currentGw = event.id;
+//       if (event.is_next) nextGw = event.id;
+//     });
+//     // Sort players by `transfers_in` in descending order
+//     bootstrap.elements.sort((a, b) => b.transfers_in - a.transfers_in);
+
+//     // Get the top 5 most transferred-in players
+//     // top5TransferredIn = bootstrap.elements.slice(0, 10);
+//   } catch (error) {
+//     console.error("Something went wrong... ", error);
+//   }
+// }
 async function getBootstrap() {
   try {
     if (testMode) {
       bootstrap = bootstrapTest;
-
-      console.log(
-        "%c TEST MODE - NO API CALL MADE - Bootstrap Data",
-        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green; ",
+      console.log("%c TEST MODE - NO API CALL MADE - Bootstrap Data", 
+        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green;", 
         bootstrap
       );
-
-      // Set current and next game week
-      bootstrap.events.forEach((event) => {
-        if (event.is_current) currentGw = event.id;
-        if (event.is_next) nextGw = event.id;
-      });
-
-      return bootstrap;
+    } else {
+      const res = await fetch(BASE_URL + "bootstrap-static/");
+      const data = await res.json();
+      bootstrap = data;
+      console.log("%c API CALL MADE - Bootstrap Data", 
+        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red;", 
+        bootstrap
+      );
     }
 
-    const res = await fetch(BASE_URL + "bootstrap-static/");
-    const data = await res.json();
-    bootstrap = data;
-    console.log(
-      "%c API CALL MADE - Bootstrap Data",
-      "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
-      bootstrap
-    );
     // Set current and next game week
     bootstrap.events.forEach((event) => {
       if (event.is_current) currentGw = event.id;
       if (event.is_next) nextGw = event.id;
     });
-    // Sort players by `transfers_in` in descending order
+
+    // Sort players by `transfers_in`
     bootstrap.elements.sort((a, b) => b.transfers_in - a.transfers_in);
 
-    // Get the top 5 most transferred-in players
-    // top5TransferredIn = bootstrap.elements.slice(0, 10);
+    return bootstrap; // ✅ Always return
   } catch (error) {
     console.error("Something went wrong... ", error);
+    return null; // Optional: ensures the caller gets something
   }
 }
 getBootstrap();
@@ -46023,6 +46056,31 @@ async function homeScreen() {
   const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
   const tierName = getTierName(levelId);
 
+
+  const homeScreenBootstrap = await getBootstrap();
+  console.log(homeScreenBootstrap);
+  
+// Find the current event
+const currentEvent = homeScreenBootstrap.events.find(event => event.is_current);
+
+let chipDiv = '';
+
+if (currentEvent) {
+  // Map each chip play to HTML and join them
+  const chipsHTML = currentEvent.chip_plays.map(chip => {
+    return `     <div class="card shadow-sm text-center">
+       <div class="card-body">
+         <h6 class="card-title">${ convertChipName(chip.chip_name)} </h6>
+         <p class="card-text">${chip.num_played} </p>
+       </div>
+     </div>`;  
+    
+  }).join(''); // join into a single string
+
+  // Wrap in a div
+  chipDiv = `<div class="chip-container">${chipsHTML}</div>`;
+}
+  
   homeContainer.innerHTML = `
 
     <div class="p-4">
@@ -46037,6 +46095,27 @@ async function homeScreen() {
         Keep everyone active, engaged, and involved all season long with stats, banter, and tools that shine a light on every triumph and disaster.
       </p>
 
+      <hr class="my-3"/>
+      
+<div class="mb-1">
+            <p class="lead">
+        Current Stats
+      </p>
+
+     
+    
+     <div class="card shadow-sm text-center">
+       <div class="card-body">
+         <h6 class="card-title">Total players </h6>
+         <p class="card-text">${homeScreenBootstrap.total_players} </p>
+       </div>
+     </div>
+     
+     
+      
+     ${chipDiv} 
+   
+</div>
       <hr class="my-3"/>
 
       ${
@@ -46438,7 +46517,13 @@ function toolsScreen() {
     //   tier: "pro",
     //   requiresData: true,
     // },
-
+    {
+      icon: "bi-house-lock",
+      label: "Defcon League <br> Coming Soon",
+      action: comingSoon,
+      tier: "pro",
+      requiresData: true,
+    },
     {
       icon: "bi-calculator",
       label: "Rivals Transfer Calculator",
@@ -47377,6 +47462,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
     team.total_captaincy_points = 0;
     team.allCaptains = [];
     team.total_saves = 0;
+    team.total_defensive_contribution = 0;
 
     const apiRequests = new Map();
 
@@ -47422,7 +47508,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
           );
 
           if (matchingHistories.length === 0) continue;
-
+         //console.error(playerData)
           // Aggregate stats across all matching histories
           const combined = matchingHistories.reduce(
             (acc, curr) => {
@@ -47437,6 +47523,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
               acc.penalties_missed += curr.penalties_missed;
               acc.total_points += curr.total_points;
               acc.saves += curr.saves;
+              acc.defensive_contribution += curr.defensive_contribution;
 
               // Count home/away games
               if (curr.was_home) {
@@ -47459,6 +47546,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
               penalties_missed: 0,
               total_points: 0,
               saves: 0,
+              defensive_contribution: 0,
               home_games: 0,
               away_games: 0,
             }
@@ -47475,6 +47563,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
           team.total_own_goals += combined.own_goals;
           team.total_penalties_missed += combined.penalties_missed;
           team.total_saves += combined.saves;
+          team.total_defensive_contribution += combined.defensive_contribution;
           team.total_home_games += combined.home_games;
           team.total_away_games += combined.away_games;
 
@@ -47549,22 +47638,17 @@ async function testFunction() {
   console.log(window.FPLToolboxLeagueData);
 }
 
-async function testFunction2() {
-  if (!userHasAccess([12])) {
+async function comingSoon() {
     showModal({
       title: "Pro Feature",
-      body: "This feature is only available to <strong>Pro members</strong>. <br><br>Upgrade to unlock!",
+      body: "Coming sooon to <strong>Pro members</strong>. <br><br>Upgrade to unlock!",
       confirmText: "Upgrade Now",
       onConfirm: () => {
         window.location.href = subscriptionPageUrl;
       },
     });
     return;
-  }
 
-  if (window.FPLToolboxLeagueData?.standings?.length) {
-    console.log(window.FPLToolboxLeagueData);
-  }
 }
 
 function generateTeamName() {
