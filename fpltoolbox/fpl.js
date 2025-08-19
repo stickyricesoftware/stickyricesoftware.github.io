@@ -30,6 +30,8 @@ if (
 }
 
 const changelogData = [
+   { version: "4.4", description: "Homescreen stats" },
+   { version: "4.3.5", description: "Bench D'or meme" },
   { version: "4.3.4", description: "Kit updates" },
   { version: "4.3.3", description: "Pre-season bugs fixes" },
   { version: "4.3.2", description: "Team Name Generator Fixes" },
