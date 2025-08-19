@@ -1,34 +1,28 @@
 <?php
 /**
  * Plugin Name: Export Students CSV
- * Description: Export all users with the "student" role to CSV, including LearnDash group memberships (one column per group).
- * Version: 1.2
- * Author: Your Name
+ * Description: Exports all users with role "student" into a clean CSV file.
  */
 
 add_action('admin_menu', function () {
-    add_management_page(
-        'Export Students',
-        'Export Students',
-        'manage_options',
-        'export-students',
-        'export_students_page'
-    );
+    add_menu_page('Export Students CSV', 'Export Students', 'manage_options', 'export-students', 'export_students_csv_page');
 });
 
-function export_students_page() {
+function export_students_csv_page() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
     if (isset($_POST['export_students_csv'])) {
         export_students_csv();
     }
-    ?>
-    <div class="wrap">
-        <h1>Export Students</h1>
-        <form method="post">
-            <p>This will export all users with the <strong>student</strong> role.</p>
-            <input type="submit" name="export_students_csv" class="button button-primary" value="Download CSV">
-        </form>
-    </div>
-    <?php
+
+    echo '<div class="wrap">';
+    echo '<h1>Export Students</h1>';
+    echo '<form method="post">';
+    submit_button('Export CSV', 'primary', 'export_students_csv');
+    echo '</form>';
+    echo '</div>';
 }
 
 function export_students_csv() {
@@ -36,69 +30,56 @@ function export_students_csv() {
         return;
     }
 
-    $args = [
-        'role'    => 'student',
-        'orderby' => 'user_email',
-        'order'   => 'ASC',
-        'number'  => -1
-    ];
-
-    $users = get_users($args);
-
-    // --- Step 1: Collect all unique LearnDash groups ---
-    $all_groups = [];
-
-    foreach ($users as $user) {
-        $all_meta = get_user_meta($user->ID);
-
-        foreach ($all_meta as $meta_key => $meta_value) {
-            if (strpos($meta_key, 'learndash_group_users_') === 0) {
-                $group_id = str_replace('learndash_group_users_', '', $meta_key);
-                $group_name = get_the_title($group_id);
-                if ($group_name) {
-                    $all_groups[$group_id] = $group_name;
-                }
-            }
-        }
-    }
-
-    // Sort groups by name for readability
-    asort($all_groups);
-
-    // --- Step 2: Build CSV header ---
-    $header = ['Email', 'First Name', 'Last Name', 'Year Group'];
-    foreach ($all_groups as $group_id => $group_name) {
-        $header[] = "Group: {$group_name} (ID {$group_id})";
-    }
-
-    // Send headers
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=students.csv');
+    // CSV headers
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment; filename="students_export.csv"');
+    header('Pragma: no-cache');
+    header('Expires: 0');
 
     $output = fopen('php://output', 'w');
-    fputcsv($output, $header);
 
-    // --- Step 3: Write student rows ---
-    foreach ($users as $user) {
-        $first_name = get_user_meta($user->ID, 'first_name', true);
-        $last_name  = get_user_meta($user->ID, 'last_name', true);
-        $year_group = get_user_meta($user->ID, 'student_year_group', true);
+    // Column headings
+    fputcsv($output, ['Email', 'First Name', 'Last Name', 'Year Group', 'Group ID', 'Group Name']);
 
-        $row = [
-            $user->user_email,
-            $first_name,
-            $last_name,
-            $year_group
-        ];
+    // Process users in batches
+    $paged     = 1;
+    $per_page  = 500; // adjust batch size depending on server limits
 
-        // Check group membership
-        foreach ($all_groups as $group_id => $group_name) {
-            $meta_key = 'learndash_group_users_' . $group_id;
-            $in_group = get_user_meta($user->ID, $meta_key, true);
-            $row[] = $in_group ? 'Yes' : '';
+    while (true) {
+        $users = get_users([
+            'role'    => 'student', // adjust role if different
+            'number'  => $per_page,
+            'paged'   => $paged,
+            'fields'  => 'all_with_meta',
+        ]);
+
+        if (empty($users)) {
+            break; // no more users
         }
 
-        fputcsv($output, $row);
+        foreach ($users as $user) {
+            $email   = $user->user_email;
+            $fname   = get_user_meta($user->ID, 'first_name', true);
+            $lname   = get_user_meta($user->ID, 'last_name', true);
+            $year    = get_user_meta($user->ID, 'student_year_group', true);
+
+            // Find LearnDash group key
+            $group_id = '';
+            $group_name = '';
+            foreach ($user->meta as $key => $val) {
+                if (strpos($key, 'learndash_group_users_') === 0) {
+                    $group_id = str_replace('learndash_group_users_', '', $key);
+                    $group_name = get_the_title(intval($group_id));
+                    break;
+                }
+            }
+
+            fputcsv($output, [$email, $fname, $lname, $year, $group_id, $group_name]);
+        }
+
+        $paged++;
+        // Clear memory between batches
+        wp_cache_flush();
     }
 
     fclose($output);

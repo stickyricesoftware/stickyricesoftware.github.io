@@ -252,7 +252,7 @@ function appendPayoutStructure(screenDiv) {
     <div class="collapsible-content">
         <div>
         <h3>Total Pot</h3>
-        <span>RM100 Buy-in = <strong>RM1800</strong></span>
+        <span>RM100 Buy-in = <strong>RM1900</strong></span>
         </div>
 <hr>
         <div>
@@ -264,11 +264,11 @@ function appendPayoutStructure(screenDiv) {
 
 <div>
         <h3>End of Season</h3>
-        <span>Pot = <strong>RM1400</strong></span>
+        <span>Pot = <strong>RM1500</strong></span>
         <div class="is-paid">
-          <div class="key" style="padding:20px">1st Place: RM700</div>
+          <div class="key" style="padding:20px">1st Place: RM750</div>
           <div class="key" style="padding:20px">2nd Place: RM300</div>
-          <div class="key" style="padding:20px">3rd Place: RM100</div>
+          <div class="key" style="padding:20px">3rd Place: RM150</div>
           <div class="key" style="padding:20px">Cup Winner: RM300</div>
         </div>
       </div>
@@ -309,8 +309,7 @@ async function runOnLoad(leagueID) {
     endLoader();
     return;
   }
-  // Andy Nind 
-  // 4225067 Tom Schofield
+
   const teamsToKeep = [
     "2471830",
     "7011671",
@@ -330,6 +329,7 @@ async function runOnLoad(leagueID) {
     "1216178",
     "6565912",
     "4630220",
+    "4225067",
   ];
 
   try {

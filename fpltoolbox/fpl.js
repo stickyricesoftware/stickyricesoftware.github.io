@@ -30,8 +30,8 @@ if (
 }
 
 const changelogData = [
-   { version: "4.4", description: "Homescreen stats" },
-   { version: "4.3.5", description: "Bench D'or meme" },
+  { version: "4.4", description: "Homescreen stats" },
+  { version: "4.3.5", description: "Bench D'or meme" },
   { version: "4.3.4", description: "Kit updates" },
   { version: "4.3.3", description: "Pre-season bugs fixes" },
   { version: "4.3.2", description: "Team Name Generator Fixes" },
@@ -45907,16 +45907,18 @@ async function getBootstrap() {
   try {
     if (testMode) {
       bootstrap = bootstrapTest;
-      console.log("%c TEST MODE - NO API CALL MADE - Bootstrap Data", 
-        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green;", 
+      console.log(
+        "%c TEST MODE - NO API CALL MADE - Bootstrap Data",
+        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: green;",
         bootstrap
       );
     } else {
       const res = await fetch(BASE_URL + "bootstrap-static/");
       const data = await res.json();
       bootstrap = data;
-      console.log("%c API CALL MADE - Bootstrap Data", 
-        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red;", 
+      console.log(
+        "%c API CALL MADE - Bootstrap Data",
+        "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red;",
         bootstrap
       );
     }
@@ -46058,37 +46060,54 @@ async function homeScreen() {
   const levelId = Number(theUser?.username?.data?.membership_level?.ID || 0);
   const tierName = getTierName(levelId);
 
-
   const homeScreenBootstrap = await getBootstrap();
   console.log(homeScreenBootstrap);
-  
-// Find the current event
-const currentEvent = homeScreenBootstrap.events.find(event => event.is_current);
 
-let chipDiv = '';
+  // Find the current event
+  const currentEvent = homeScreenBootstrap.events.find(
+    (event) => event.is_current
+  );
 
-if (currentEvent) {
-  // Map each chip play to HTML and join them
-  const chipsHTML = currentEvent.chip_plays.map(chip => {
-    return `     <div class="card shadow-sm text-center">
-       <div class="card-body">
-         <h6 class="card-title">${ convertChipName(chip.chip_name)} </h6>
-         <p class="card-text">${chip.num_played} </p>
-       </div>
-     </div>`;  
-    
-  }).join(''); // join into a single string
+  let chipDiv = "";
 
-  // Wrap in a div
-  chipDiv = `<div class="chip-container">${chipsHTML}</div>`;
-}
-  
+  if (currentEvent) {
+const cardClasses = darkMode
+  ? "card shadow-sm text-center h-100 text-bg-dark"
+  : "card shadow-sm text-center h-100";
+
+chipDiv = `
+  <div class="chip-container row g-3 mt-3">
+    ${currentEvent.chip_plays
+      .map((chip) => {
+        return `
+          <div class="col-6 col-md-4">
+            <div class="${cardClasses}">
+              <div class="card-body p-3">
+                <h6 class="card-title mb-2">${convertChipName(chip.chip_name)}</h6>
+                <p class="card-text fs-5 fw-bold">${chip.num_played}</p>
+              </div>
+            </div>
+          </div>`;
+      })
+      .join("")}
+  </div>`;
+  }
+
+
+
+  const totalPlayersCard = `
+  <div class="card shadow-sm text-center ${darkMode ? "text-bg-dark" : ""}">
+    <div class="card-body">
+      <h6 class="card-title mb-2">Total players</h6>
+      <p class="card-text">${homeScreenBootstrap.total_players}</p>
+    </div>
+  </div>
+`;
   homeContainer.innerHTML = `
 
     <div class="p-4">
 
-      <h2 class="mb-3">Welcome to the all new FPL Toolbox</h2>
- <hr class="my-3"/>
+
       <p class="lead">
         The ultimate companion for your mini league.
       </p>
@@ -46101,20 +46120,17 @@ if (currentEvent) {
       
 <div class="mb-1">
             <p class="lead">
-        Current Stats
+        Current Stats:
       </p>
 
      
     
-     <div class="card shadow-sm text-center">
-       <div class="card-body">
-         <h6 class="card-title">Total players </h6>
-         <p class="card-text">${homeScreenBootstrap.total_players} </p>
-       </div>
-     </div>
+${totalPlayersCard} 
      
      
-      
+                  <p class="lead">
+       Activated Chips:
+      </p>
      ${chipDiv} 
    
 </div>
@@ -46477,7 +46493,7 @@ function toolsScreen() {
       tier: "free",
       requiresData: true,
     },
-        {
+    {
       icon: "bi-person-badge",
       label: "Team Name Generator",
       action: generateTeamName,
@@ -46599,7 +46615,7 @@ function toolsScreen() {
     },
   ];
   if (theUser.username.data.ID == 1) {
-    console.log("User: ID1")
+    console.log("User: ID1");
   }
 
   features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
@@ -47510,7 +47526,7 @@ async function weeklyPicksForSuperLeague(standings, div) {
           );
 
           if (matchingHistories.length === 0) continue;
-         //console.error(playerData)
+          //console.error(playerData)
           // Aggregate stats across all matching histories
           const combined = matchingHistories.reduce(
             (acc, curr) => {
@@ -47641,16 +47657,15 @@ async function testFunction() {
 }
 
 async function comingSoon() {
-    showModal({
-      title: "Pro Feature",
-      body: "Coming sooon to <strong>Pro members</strong>. <br><br>Upgrade to unlock!",
-      confirmText: "Upgrade Now",
-      onConfirm: () => {
-        window.location.href = subscriptionPageUrl;
-      },
-    });
-    return;
-
+  showModal({
+    title: "Pro Feature",
+    body: "Coming sooon to <strong>Pro members</strong>. <br><br>Upgrade to unlock!",
+    confirmText: "Upgrade Now",
+    onConfirm: () => {
+      window.location.href = subscriptionPageUrl;
+    },
+  });
+  return;
 }
 
 function generateTeamName() {
@@ -48466,19 +48481,17 @@ function generateTeamName() {
   }
 }
 
-
-
 if (userHasAccess([10, 12])) {
   const timestamp = new Date().toISOString();
-    const notifcation = `
+  const notifcation = `
     👤 User: ${theUser.info.nickname}
     ✉️ Email: ${theUser.username.data.user_email}    
     🕒 Time: ${timestamp}
     👍 Pro and Max User Logging in`;
-    fetch("https://ntfy.sunny.bz/fpltoolbox", {
-      method: "POST",
-      body: notifcation,
-    });
+  fetch("https://ntfy.sunny.bz/fpltoolbox", {
+    method: "POST",
+    body: notifcation,
+  });
 }
 async function showMyTeam() {
   if (preSeason) {
@@ -48491,11 +48504,6 @@ async function showMyTeam() {
     return;
   }
   //
-
-
-
-
-
 
   //
   const container = document.getElementById("screen-tools");
@@ -48899,12 +48907,11 @@ async function updateScoreCard(data) {
     const img = document.createElement("img");
     img.setAttribute("class", "player-img");
 
-
-  const photo = await getPlayerTeamCode(elementId);
-  img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}.webp`;
-  if (type == 1) {
-    img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}_1.webp`;
-  }
+    const photo = await getPlayerTeamCode(elementId);
+    img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}.webp`;
+    if (type == 1) {
+      img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}_1.webp`;
+    }
 
     const name = document.createElement("div");
     name.className = "my-player-name";
@@ -48931,52 +48938,48 @@ async function updateScoreCard(data) {
 
   const formattedOverallRank = overallRank.toLocaleString();
   const formattedGwRank = gwRank ? gwRank.toLocaleString() : "";
-  let rankArrow =""
+  let rankArrow = "";
 
   let rankDifference = "-";
-  let rankDifferenceDisplay = ""
+  let rankDifferenceDisplay = "";
   // Fetch previous gameweek data
-  if (currentGw > 1){
-  const previousData = await fetchPreviousGwTeamData();
-  const previousRank = previousData.entry_history.overall_rank;
-  console.log(previousRank);
+  if (currentGw > 1) {
+    const previousData = await fetchPreviousGwTeamData();
+    const previousRank = previousData.entry_history.overall_rank;
+    console.log(previousRank);
 
     const isRankImproved = previousRank > overallRank;
-  let rankArrow = isRankImproved
-    ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
-    : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
+    let rankArrow = isRankImproved
+      ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
+      : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
 
-  const rankDifference = previousRank - overallRank;
-  const rankDifferenceDisplay = `
+    const rankDifference = previousRank - overallRank;
+    const rankDifferenceDisplay = `
     <div class="rank-difference" style="color:${
       isRankImproved ? "#05FA87" : "#FC2C80"
     };">
       ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
     </div>`;
   }
-  if (currentGw = 1) {
-
- 
-  const previousRank = 0
-  console.log(previousRank);
+  if ((currentGw = 1)) {
+    const previousRank = 0;
+    console.log(previousRank);
 
     const isRankImproved = 0;
-  let rankArrow = isRankImproved
-    ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
-    : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
+    let rankArrow = isRankImproved
+      ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
+      : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
 
-  let rankDifference = "-";
-  let rankDifferenceDisplay = `
+    let rankDifference = "-";
+    let rankDifferenceDisplay = `
     <div class="rank-difference" style="color:${
       isRankImproved ? "#05FA87" : "#FC2C80"
     };">
       ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
     </div>`;
-
   }
 
   // Determine rank change and difference
-
 
   function calculatePercentileRank(userRank, totalTeams) {
     if (totalTeams <= 0 || userRank <= 0) {
@@ -49309,18 +49312,18 @@ async function fetchAndRenderFixturesForAllSeason(data) {
   for (let i = 0; i < data.picks.length && i < 16; i++) {
     const pick = data.picks[i];
     const fixtures = await fetchPlayerFixturesForSeason(pick.element);
-     const type = await getPlayerType(pick.element); // if async
+    const type = await getPlayerType(pick.element); // if async
     const playerDiv = document.createElement("div");
     playerDiv.setAttribute("id", "season-fixtures");
     playerDiv.style.display = "flex";
     const player = document.createElement("img");
     player.setAttribute("class", "player-fixture-img");
 
-  const photo = await getPlayerTeamCode(pick.element);
-  player.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}.webp`;
-  if (type == 1) {
-    player.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}_1.webp`;
-  }
+    const photo = await getPlayerTeamCode(pick.element);
+    player.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}.webp`;
+    if (type == 1) {
+      player.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}_1.webp`;
+    }
 
     // const photo = await getPlayerPhoto(data.picks[i].element)
     // photo.slice(0, -3);
@@ -52163,78 +52166,83 @@ async function showMemes() {
     "https://fpltoolbox.com/wp-content/uploads/2025/02/r7vfc0oych5e1.jpeg",
   ];
   async function findBenchDor() {
-  const teamsWithHighBenchPoints = [];
+    const teamsWithHighBenchPoints = [];
 
-  for (const team of FPLToolboxLeagueData.standings) {
-    // Filter bench players (positions 12–15)
-    const benchPlayers = team.currentWeek[0].picks.filter(
-      player => player.position > 11 && player.position < 16
-    );
-
-    // Fetch all bench points in parallel
-    const benchPointsArray = await Promise.all(
-      benchPlayers.map(player => getPlayerScore(player.element))
-    );
-
-    const totalBenchPoints = benchPointsArray.reduce((sum, bp) => sum + bp, 0);
-
-    
-
-    if (totalBenchPoints > 1) {
-      teamsWithHighBenchPoints.push({ team, totalBenchPoints });
-    }
-  }
-
-  if (teamsWithHighBenchPoints.length > 0) {
-    // Get the team with the highest bench points
-    const topTeam = teamsWithHighBenchPoints.sort(
-      (a, b) => b.totalBenchPoints - a.totalBenchPoints
-    )[0];
-
-    const message1 = `POV: ${topTeam.team.player_name.substring(
-      0,
-      topTeam.team.player_name.indexOf(" ")
-    )} after leaving ${topTeam.totalBenchPoints} points on the bench this week`;
-
-    const img =
-      "https://fpltoolbox.com/wp-content/uploads/2025/02/who-should-be-awarded-the-bench-dor-v0-r6sja77eqrmc1-1.jpg";
-
-
-    console.log("BENCH D'OR", topTeam)
-    const benchDorPlayers = topTeam.team.currentWeek[0].picks.filter(
-      player => player.position > 11 && player.position < 16
-    );
-    console.log(benchDorPlayers)
-
-    let bench = document.createElement('div')
-    bench.style.display = "flex"
-    bench.style.flexDirection = "row"
-    bench.style.gap = "5px"
-    for (let i = 0; i < benchDorPlayers.length; i++) {
-      
-      let bplayerScore = await getPlayerScore(benchDorPlayers[i].element)
-
-
-      let bplayer = await createPlayerCardNew(
-        benchDorPlayers[i].element,
-        bplayerScore,
-        null,
-        null,
-        1
+    for (const team of FPLToolboxLeagueData.standings) {
+      // Filter bench players (positions 12–15)
+      const benchPlayers = team.currentWeek[0].picks.filter(
+        (player) => player.position > 11 && player.position < 16
       );
 
-      bench.append(bplayer)
+      // Fetch all bench points in parallel
+      const benchPointsArray = await Promise.all(
+        benchPlayers.map((player) => getPlayerScore(player.element))
+      );
+
+      const totalBenchPoints = benchPointsArray.reduce(
+        (sum, bp) => sum + bp,
+        0
+      );
+
+      if (totalBenchPoints > 1) {
+        teamsWithHighBenchPoints.push({ team, totalBenchPoints });
+      }
     }
 
-    
-      
+    if (teamsWithHighBenchPoints.length > 0) {
+      // Get the team with the highest bench points
+      const topTeam = teamsWithHighBenchPoints.sort(
+        (a, b) => b.totalBenchPoints - a.totalBenchPoints
+      )[0];
 
-    const meme = createMeme4Corners(message1, null, null, null, null, bench, img);
-    memeContainer.append(meme);
-  } else {
-    console.log("No bench fail found.");
+      const message1 = `POV: ${topTeam.team.player_name.substring(
+        0,
+        topTeam.team.player_name.indexOf(" ")
+      )} after leaving ${
+        topTeam.totalBenchPoints
+      } points on the bench this week`;
+
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/who-should-be-awarded-the-bench-dor-v0-r6sja77eqrmc1-1.jpg";
+
+      console.log("BENCH D'OR", topTeam);
+      const benchDorPlayers = topTeam.team.currentWeek[0].picks.filter(
+        (player) => player.position > 11 && player.position < 16
+      );
+      console.log(benchDorPlayers);
+
+      let bench = document.createElement("div");
+      bench.style.display = "flex";
+      bench.style.flexDirection = "row";
+      bench.style.gap = "5px";
+      for (let i = 0; i < benchDorPlayers.length; i++) {
+        let bplayerScore = await getPlayerScore(benchDorPlayers[i].element);
+
+        let bplayer = await createPlayerCardNew(
+          benchDorPlayers[i].element,
+          bplayerScore,
+          null,
+          null,
+          1
+        );
+
+        bench.append(bplayer);
+      }
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        bench,
+        img
+      );
+      memeContainer.append(meme);
+    } else {
+      console.log("No bench fail found.");
+    }
   }
-}
   function findCaptaincyFailDrake() {
     for (const team of FPLToolboxLeagueData.standings) {
       let captain = null;
@@ -52844,10 +52852,6 @@ async function showMemes() {
       console.log("No bench fail found.");
     }
   }
-
-
-
-
 
   function findLowBench() {
     const teamsWithHighBenchPoints = []; // Array to store teams with bench points > 10
@@ -57889,21 +57893,21 @@ function removeSpinner() {
   if (spinner) spinner.remove();
 }
 
-  function trackEvent(eventName, params = {}) {
-    if (typeof gtag === 'function') {
-      gtag('event', eventName, params);
-      console.log(`GA4 event sent: ${eventName}`, params); // Debug log
-    } else {
-      console.warn('gtag is not defined. Make sure GA4 is installed.');
-    }
+function trackEvent(eventName, params = {}) {
+  if (typeof gtag === "function") {
+    gtag("event", eventName, params);
+    console.log(`GA4 event sent: ${eventName}`, params); // Debug log
+  } else {
+    console.warn("gtag is not defined. Make sure GA4 is installed.");
   }
-    // Example usage
-  function trackButtonClick() {
-    console.log("tracked event")
-    trackEvent('button_click', {
-      button_location: 'TEST',
-      button_text: 'TEST TEXT',
-      value: 99
-    });
-  }
-  trackButtonClick()
+}
+// Example usage
+function trackButtonClick() {
+  console.log("tracked event");
+  trackEvent("button_click", {
+    button_location: "TEST",
+    button_text: "TEST TEXT",
+    value: 99,
+  });
+}
+trackButtonClick();
