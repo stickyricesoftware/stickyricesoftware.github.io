@@ -34,11 +34,14 @@ async function fetchBootstrapData() {
     throw new Error("Failed to load league data.");
   }
 }
-const bootstrap = fetchBootstrapData();
+let bootstrapData
+(async () => {
+  bootstrapData = await fetchBootstrapData();
+  console.log("Bootstrap:", bootstrapData);
+})();
 
 async function fetchLeagueData(leagueID) {
   try {
-    
     const leagueCall = await fetch(
       `${BASE_URL}leagues-classic/${leagueID}/standings/`
     );
@@ -109,21 +112,21 @@ function createLeagueTable(teams, isHiddenView) {
           // Calculate the points gap
           const fromTop = topTeamTotalPoints - team.total;
 
-              // Calculate the points gap to the team above
-    let pointsGap = "-";
-    if (index > 0) {
-      const prevTeam = teams[index - 1];
-      pointsGap = prevTeam.total - team.total;
-    }
+          // Calculate the points gap to the team above
+          let pointsGap = "-";
+          if (index > 0) {
+            const prevTeam = teams[index - 1];
+            pointsGap = prevTeam.total - team.total;
+          }
 
           // Determine the rank display: medal emojis for top 3, nothing for others
-          let rankDisplay = '';
+          let rankDisplay = "";
           if (index === 0) {
-            rankDisplay = '🥇';
+            rankDisplay = "🥇";
           } else if (index === 1) {
-            rankDisplay = '🥈';
+            rankDisplay = "🥈";
           } else if (index === 2) {
-            rankDisplay = '🥉';
+            rankDisplay = "🥉";
           } else {
             rankDisplay = index + 1;
           }
@@ -136,7 +139,9 @@ function createLeagueTable(teams, isHiddenView) {
                 <span class="player-name">${team.player_name}</span>
               </td>
               <td>${team.event_total}</td>
-              <td><strong>${pointsGap > 0 ? pointsGap : "-"}</strong> (${fromTop})</td>
+              <td><strong>${
+                pointsGap > 0 ? pointsGap : "-"
+              }</strong> (${fromTop})</td>
               <td style="text-align:right; padding-right:10px">${
                 team.total
               }</td>
@@ -176,37 +181,236 @@ function createToggleSwitch(isHiddenView, renderTable) {
   return switchContainer;
 }
 
+
 // A function to create and append the Manager of the Month section.
-function appendManagerOfTheMonth(screenDiv) {
-  const motm = document.createElement("div");
-  motm.className = "card toggle-card";
-  motm.innerHTML = `
-    <h2 class="toggle-title">FPL Manager of the Month <span class="toggle-icon">▼</span></h2>
-    <div class="collapsible-content">
+async function appendManagerOfTheMonth(screenDiv, filteredTeams) {
+  const phases = bootstrapData.bootstrapData.phases;
+//     const phases = [
 
-        <div>
-          <div id="motm-grid-placeholder"></div> </div>
-          <span><strong></strong></span>
-          <hr>
-        </div>
- 
+//     {
+//         "highest_score": 211,
+//         "id": 2,
+//         "name": "August",
+//         "start_event": 1,
+//         "stop_event": 2
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 3,
+//         "name": "September",
+//         "start_event": 1,
+//         "stop_event": 2
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 4,
+//         "name": "October",
+//         "start_event": 1,
+//         "stop_event": 2
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 5,
+//         "name": "November",
+//         "start_event": 1,
+//         "stop_event": 2
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 6,
+//         "name": "December",
+//         "start_event": 1,
+//         "stop_event": 2
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 7,
+//         "name": "January",
+//         "start_event": 1,
+//         "stop_event": 2
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 8,
+//         "name": "February",
+//         "start_event": 1,
+//         "stop_event": 2
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 9,
+//         "name": "March",
+//         "start_event": 29,
+//         "stop_event": 31
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 10,
+//         "name": "April",
+//         "start_event": 32,
+//         "stop_event": 34
+//     },
+//     {
+//         "highest_score": null,
+//         "id": 11,
+//         "name": "May",
+//         "start_event": 35,
+//         "stop_event": 38
+//     }
+// ]
+  
+  
+  const events = bootstrapData.bootstrapData.events;
 
+  // Find the current GW
+  const currentEvent = events.find(e => e.is_current);
+  const currentGw = currentEvent ? currentEvent.id : 0;
 
-      
-    </div>
-  `;
-  screenDiv.appendChild(motm);
+  //const excludedMonths = [];
+const excludedMonths = [ "August","May"];
 
-  setupCollapsibleCard(motm); // Use the reusable function
+  // Filter valid phases
+  const validPhases = phases.filter(
+    p => !excludedMonths.includes(p.name) && p.start_event <= currentGw
+  );
 
-  // Find the grid placeholder inside the MOTM card
-  const gridPlaceholder = motm.querySelector("#motm-grid-placeholder");
+  // Track number of wins per team
+const winCounts = {};
 
-  // Append the grid to the placeholder
-  if (gridPlaceholder) {
-    appendMonthlyGrid(gridPlaceholder);
+// Calculate winners/runner-ups
+const phaseResults = validPhases.map(phase => {
+  const scores = filteredTeams.map(team => {
+    const phasePoints = team.everyGw
+      .filter(gw => gw.gameweek >= phase.start_event && gw.gameweek <= phase.stop_event)
+      .reduce((sum, gw) => sum + gw.points, 0);
+
+    return {
+      entry_name: team.entry_name,
+      player_name: team.player_name,
+      total_points: phasePoints,
+    };
+  });
+
+  // Sort by descending points
+  scores.sort((a, b) => b.total_points - a.total_points);
+
+  // --- Find winner (respecting win cap) ---
+  let winners = [];
+  const usedScores = new Set();
+
+  for (const scoreObj of scores) {
+    if (usedScores.has(scoreObj.total_points)) continue;
+
+    // teams tied at this score
+    const tiedTeams = scores.filter(s => s.total_points === scoreObj.total_points);
+
+    // filter eligible
+    const eligible = tiedTeams.filter(t => {
+      if (!winCounts[t.entry_name]) winCounts[t.entry_name] = 0;
+      return winCounts[t.entry_name] < 2;
+    });
+
+    if (eligible.length > 0) {
+      eligible.forEach(t => {
+        winCounts[t.entry_name]++;
+      });
+      winners = eligible;
+      break;
+    }
+
+    usedScores.add(scoreObj.total_points);
   }
+
+  // --- Find runner-up (next highest eligible after winners) ---
+  let runnerUp = [];
+  if (winners.length > 0) {
+    const winnerScore = winners[0].total_points;
+    const nextScores = scores.filter(s => s.total_points < winnerScore);
+
+    for (const scoreObj of nextScores) {
+      if (usedScores.has(scoreObj.total_points)) continue;
+
+      const tiedTeams = nextScores.filter(s => s.total_points === scoreObj.total_points);
+
+      const eligible = tiedTeams.filter(t => {
+        if (!winCounts[t.entry_name]) winCounts[t.entry_name] = 0;
+        return winCounts[t.entry_name] < 2;
+      });
+
+      if (eligible.length > 0) {
+        runnerUp = eligible;
+        break;
+      }
+
+      usedScores.add(scoreObj.total_points);
+    }
+  }
+
+  return { phase: phase.name, winners, runnerUp };
+});
+
+// --- Create card ---
+const motm = document.createElement("div");
+motm.className = "card toggle-card";
+motm.innerHTML = `
+  <h2 class="toggle-title">
+    FPL Manager of the Month <span class="toggle-icon">▼</span>
+  </h2>
+  <div class="collapsible-content">
+    <div id="motm-grid-placeholder" class="container-fluid"></div>
+  </div>
+`;
+screenDiv.appendChild(motm);
+setupCollapsibleCard(motm);
+
+const gridPlaceholder = motm.querySelector("#motm-grid-placeholder");
+
+// Build rows of 2 cols each
+for (let i = 0; i < phaseResults.length; i += 2) {
+  const row = document.createElement("div");
+  row.className = "row";
+
+  phaseResults.slice(i, i + 2).forEach(result => {
+    const col = document.createElement("div");
+    col.className = "col-6 mb-4";
+
+    const winnersHTML = result.winners.length
+      ? result.winners
+          .map(
+            w =>
+              `<strong>${w.entry_name}</strong> <span class="player-name">(${w.player_name})</span> - ${w.total_points} pts`
+          )
+          .join("<br>")
+      : `<em>No eligible winner</em>`; // only if literally all capped out
+
+    const runnerUpHTML = result.runnerUp.length
+      ? `<div class="text-muted" style="font-size:0.9em; margin-top:4px;">
+           ${result.runnerUp.length > 1 ? "Runners-up" : "Runner-up"}: 
+           ${result.runnerUp
+             .map(r => `${r.entry_name} (${r.player_name}) - ${r.total_points} pts`)
+             .join(", ")}
+         </div>`
+      : "";
+
+    col.innerHTML = `
+      <div class="motm-phase card shadow-sm p-3 h-100 text-center">
+        <div style="font-size:2rem;">⭐</div>
+        <h5 class="mb-2">${result.phase}</h5>
+        <div>${winnersHTML}</div>
+        ${runnerUpHTML}
+      </div>
+    `;
+
+    row.appendChild(col);
+  });
+
+  gridPlaceholder.appendChild(row);
 }
+
+}
+
+
+
 
 function appendMonthlyGrid(parentElement) {
   const gridContainer = document.createElement("div");
@@ -350,8 +554,10 @@ async function runOnLoad(leagueID) {
     // Your predefined list of names
     const allPlayerNames = [];
 
+
+    //Create player select popup
     for (let i = 0; i < leagueData.standings.results.length; i++) {
-      console.log(leagueData.standings.results[i].player_name);
+      
       let playerName = leagueData.standings.results[i].player_name;
       allPlayerNames.push(playerName);
     }
@@ -360,7 +566,6 @@ async function runOnLoad(leagueID) {
       showPlayerNamePopup(allPlayerNames, playerNameKey);
     } else {
       const date = new Date();
-
       const formattedDateTime = new Intl.DateTimeFormat("en-GB", {
         day: "2-digit",
         month: "long",
@@ -370,7 +575,6 @@ async function runOnLoad(leagueID) {
         second: "2-digit",
         hour12: false, // Use 24-hour format
       }).format(date);
-
       const notifcation = `    
     🖥️ ${storedName} Checked in at:
     🕒 ${formattedDateTime}`;
@@ -379,6 +583,80 @@ async function runOnLoad(leagueID) {
         body: notifcation,
       });
     }
+
+async function addGameweeksToLeague(standings) {
+  const startTime = Date.now(); // Start the timer
+
+  const gwFetches = standings.map(async (team) => {
+    try {
+      const response = await fetch(`${BASE_URL}entry/${team.entry}/history/`);
+      const teamData = await response.json();
+      //console.log(teamData)
+      // Add all gameweeks data to a new array
+      team.everyGw = teamData.current.map((week) => ({
+        percentile_rank: week.percentile_rank,
+        bank: week.bank,
+        gameweek: week.event,
+        points: week.points,
+        rank: week.rank,
+        overall_rank: week.overall_rank,
+        value: week.value,
+        transfers: week.event_transfers,
+        transfers_cost: week.event_transfers_cost,
+        bench_points: week.points_on_bench,
+      }));
+
+      // Helper function to calculate a total for a specific field
+      // const calculateTotal = (field) =>
+      //   teamData.current.reduce((sum, week) => sum + week[field], 0);
+
+      // Calculate totals
+      // team.totalTransfers = calculateTotal("event_transfers");
+      // team.totalMinusPoints = calculateTotal("event_transfers_cost");
+      // team.totalPointsOnBench = calculateTotal("points_on_bench");
+
+      // Add chips data (limited to 6 chips)
+      //console.log(teamData)
+      team.chips = teamData.chips.slice(0, 8).map((chip) => ({
+        name: chip.name,
+        time: chip.time,
+        gw: chip.event,
+      }));
+
+      // team.past = teamData.past;
+
+      // Other team data
+      // team.seasons = teamData.past.length;
+      // team.seasons_managed = teamData.past[0]?.season_name || "NEW";
+      // team.previousRank =
+      //   teamData.current[teamData.current.length - 2]?.overall_rank || "";
+      // Add a small delay between requests (e.g., 500ms)
+      await sleep(500);
+      //div.innerText = `Adding general gameweek stats for ${team.entry_name}`;
+      console.log("delay here");
+    } catch (error) {
+      console.error(`Error fetching data for team ${team.entry}: `, error);
+    }
+  });
+
+  await Promise.all(gwFetches);
+  const endTime = Date.now(); // End the timer
+  console.log(
+    `All weeks data for all teams added in ${
+      (endTime - startTime) / 1000
+    } seconds.`
+  );
+  console.log(
+    "%c Gameweek Details Added",
+    "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 2.2em; line-height: 1.4em; color: white; background-color: red; ",
+    standings
+  );
+
+  return standings;
+}
+await addGameweeksToLeague(filteredTeams)
+
+
 
     // This function will be called by the toggle button and the initial load.
     const renderTable = (isHiddenView) => {
@@ -399,9 +677,29 @@ async function runOnLoad(leagueID) {
       applyStaggeredRowAnimation(table);
 
       if (isHiddenView) {
-        appendManagerOfTheMonth(screenDiv);
+        appendManagerOfTheMonth(screenDiv, filteredTeams);
         appendCupCompetition(screenDiv);
         appendPayoutStructure(screenDiv);
+
+        if (storedName) {
+          const date = new Date();
+          const formattedDateTime = new Intl.DateTimeFormat("en-GB", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false, // Use 24-hour format
+          }).format(date);
+          const notifcation = `    
+    🖥️ ${storedName} Checked paid league:
+    🕒 ${formattedDateTime}`;
+          fetch("https://ntfy.sunny.bz/gis-fpl", {
+            method: "POST",
+            body: notifcation,
+          });
+        }
       }
     };
 
@@ -450,3 +748,4 @@ function showPlayerNamePopup(playerNames, storageKey) {
     }
   });
 }
+
