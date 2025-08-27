@@ -95,7 +95,7 @@ function createLeagueTable(teams, isHiddenView) {
         <th></th>
         <th>Team</th>
         <th>GW<br> Total</th>
-        <th>Points<br> Gap</th>
+        <th>Points Gap<br>(From Top)</th>
         <th style="text-align:right">Total<br> Points</th>
 
       </tr>
@@ -107,7 +107,14 @@ function createLeagueTable(teams, isHiddenView) {
           const rowClass = isPaid ? "is-paid" : "";
 
           // Calculate the points gap
-          const pointsGap = topTeamTotalPoints - team.total;
+          const fromTop = topTeamTotalPoints - team.total;
+
+              // Calculate the points gap to the team above
+    let pointsGap = "-";
+    if (index > 0) {
+      const prevTeam = teams[index - 1];
+      pointsGap = prevTeam.total - team.total;
+    }
 
           // Determine the rank display: medal emojis for top 3, nothing for others
           let rankDisplay = '';
@@ -129,7 +136,7 @@ function createLeagueTable(teams, isHiddenView) {
                 <span class="player-name">${team.player_name}</span>
               </td>
               <td>${team.event_total}</td>
-              <td>${pointsGap > 0 ? pointsGap : "-"}</td>
+              <td><strong>${pointsGap > 0 ? pointsGap : "-"}</strong> (${fromTop})</td>
               <td style="text-align:right; padding-right:10px">${
                 team.total
               }</td>
@@ -266,10 +273,10 @@ function appendPayoutStructure(screenDiv) {
         <h3>End of Season</h3>
         <span>Pot = <strong>RM1500</strong></span>
         <div class="is-paid">
-          <div class="key" style="padding:20px">1st Place: RM750</div>
-          <div class="key" style="padding:20px">2nd Place: RM300</div>
-          <div class="key" style="padding:20px">3rd Place: RM150</div>
-          <div class="key" style="padding:20px">Cup Winner: RM300</div>
+          <div class="key" style="padding:20px">🥇 1st Place: RM750</div>
+          <div class="key" style="padding:20px">🥈 2nd Place: RM300</div>
+          <div class="key" style="padding:20px">🥉 3rd Place: RM150</div>
+          <div class="key" style="padding:20px">🏆 Cup Winner: RM300</div>
         </div>
       </div>
       <hr>

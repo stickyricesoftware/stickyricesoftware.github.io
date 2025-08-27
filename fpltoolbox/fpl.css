@@ -168,6 +168,11 @@ margin-left: 20px;
   padding: 20px;
   min-width: 100%;
 }
+
+#meme-image-container > div > .player{
+    min-width: 70px;
+    max-width: 70px;
+}
 .custom-meme {
   max-width: 500px;
   background-color: black;
@@ -191,7 +196,7 @@ margin-left: 20px;
 .meme-header,
 .meme-footer {
   display: flex;
-  flex-direction: row;
+  flex-direction: row!important;
   padding: 20px;
   color: white;
   font-family: "Inter", sans-serif;
@@ -210,7 +215,19 @@ margin-left: 20px;
   padding: 5px 5px 0px 5px;
   border: 1px solid #ffffff !important;
 }
+#dragon-meme-footer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-items: center;
+  justify-content: space-around;
+  gap: 10px;
+}
 
+#dragon-meme-footer-text {
+  font-size: 0.7rem;
+}
 .skeleton {
   animation: skeleton-loading 1s linear infinite alternate;
 }
@@ -223,7 +240,10 @@ margin-left: 20px;
     background-color: hsl(200, 20%, 95%);
   }
 }
-
+#meme-refresh-button{
+ margin: 0 auto;
+    display: block;
+}
 
 
 #player-card {
@@ -522,43 +542,7 @@ margin-left: 20px;
 #red-arrow {
   background-color: #fc2c80;
 }
-#first-panel {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  align-self: flex-end;
-}
-#middle-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto;
-  position: absolute; /* Removes the middle panel from the flex layout */
-  left: 50%; /* Pushes the middle panel to the center of the container */
-  transform: translateX(
-    -50%
-  ); /* Adjusts the middle panel to be exactly centered */
-}
-#third-panel {
-  text-align: right;
-}
-#score-panel {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 10px;
-  position: relative;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-  border-radius: 15px;
-  padding: 30px;
-}
-#score-panel p {
-  padding: 0px !important;
-  margin: 2px;
-}
+
 
 #my-score,
 #my-score2 {

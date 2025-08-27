@@ -30,7 +30,8 @@ if (
 }
 
 const changelogData = [
-  { version: "4.4", description: "Homescreen stats" },
+  { version: "4.4.1", description: "Defcon Leaderboard" },
+  { version: "4.4.0", description: "Homescreen stats" },
   { version: "4.3.5", description: "Bench D'or meme" },
   { version: "4.3.4", description: "Kit updates" },
   { version: "4.3.3", description: "Pre-season bugs fixes" },
@@ -46071,11 +46072,11 @@ async function homeScreen() {
   let chipDiv = "";
 
   if (currentEvent) {
-const cardClasses = darkMode
-  ? "card shadow-sm text-center h-100 text-bg-dark"
-  : "card shadow-sm text-center h-100";
+    const cardClasses = darkMode
+      ? "card shadow-sm text-center h-100 text-bg-dark"
+      : "card shadow-sm text-center h-100";
 
-chipDiv = `
+    chipDiv = `
   <div class="chip-container row g-3 mt-3">
     ${currentEvent.chip_plays
       .map((chip) => {
@@ -46083,7 +46084,9 @@ chipDiv = `
           <div class="col-6 col-md-4">
             <div class="${cardClasses}">
               <div class="card-body p-3">
-                <h6 class="card-title mb-2">${convertChipName(chip.chip_name)}</h6>
+                <h6 class="card-title mb-2">${convertChipName(
+                  chip.chip_name
+                )}</h6>
                 <p class="card-text fs-5 fw-bold">${chip.num_played}</p>
               </div>
             </div>
@@ -46092,8 +46095,6 @@ chipDiv = `
       .join("")}
   </div>`;
   }
-
-
 
   const totalPlayersCard = `
   <div class="card shadow-sm text-center ${darkMode ? "text-bg-dark" : ""}">
@@ -46537,8 +46538,8 @@ function toolsScreen() {
     // },
     {
       icon: "bi-house-lock",
-      label: "Defcon League <br> Coming Soon",
-      action: comingSoon,
+      label: "Defcon League",
+      action: showDefconLeague,
       tier: "pro",
       requiresData: true,
     },
@@ -48519,16 +48520,16 @@ async function showMyTeam() {
   container.append(myScore, pitch);
 
   const data = await fetchGwTeamData();
+  console.log(data);
   await renderTeam(data);
   await fetchAndRenderUpcomingFixtures(data);
   //calculatePlayersPlayed(data);
-  document.getElementById("expected-points").innerHTML = "";
 
   if (userHasAccess([10, 12])) {
     await fetchAndRenderAdditionalStats(data);
     await fetchAndRenderTransferStats(data);
     await fetchAndRenderXpStats(data);
-
+    document.getElementById("expected-points").innerHTML = "";
     //await fetchAndRenderFixturesForNonOwned(data);
   }
   await fetchAndRenderFixturesForAllSeason(data);
@@ -48868,10 +48869,12 @@ async function updateScoreCard(data) {
   let liveScore = 0; // Use 'let' so the value can be updated
   let highestScore = 0; // Variable to track the highest raw score
   let highestScoringPlayer = null; // Variable to track the player with the highest raw score
-  console.log(data);
+
   for (let i = 0; i < 11; i++) {
     const player = data.picks[i]; // Get the player data
+
     const playerRawScore = await getPlayerScore(player.element); // Raw score without multiplier
+
     const playerScore = playerRawScore * player.multiplier; // Calculate the player's total score
     liveScore += playerScore; // Increment liveScore by the player's score
 
@@ -48890,51 +48893,10 @@ async function updateScoreCard(data) {
   //       highestScoringPlayer.element
   //     )} with ${highestScore} raw points`
   //   );
-  // }
+  // }{
 
-  const playerOfTheWeek = await createPlayerOfTheWeekCard(
-    highestScoringPlayer.element
-  );
 
-  playerOfTheWeek.classList.add("player-of-the-week");
 
-  async function createPlayerOfTheWeekCard(elementId) {
-    const card = document.createElement("div");
-    card.classList.add("player");
-    const type = await getPlayerType(elementId);
-    card.classList.add("type" + type);
-
-    const img = document.createElement("img");
-    img.setAttribute("class", "player-img");
-
-    const photo = await getPlayerTeamCode(elementId);
-    img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}.webp`;
-    if (type == 1) {
-      img.src = `https://fpltoolbox.com/wp-content/uploads/2025/08/shirt_${photo}_1.webp`;
-    }
-
-    const name = document.createElement("div");
-    name.className = "my-player-name";
-    name.textContent = await getPlayerWebName(elementId);
-    name.textContent.slice(0, 10);
-    const scoreText = document.createElement("div");
-    scoreText.className = "my-player-xp";
-    scoreText.textContent = await getPlayerScore(elementId);
-
-    // Create a new image element
-    const star = document.createElement("div");
-    star.innerHTML = "⭐";
-    star.style.textAlign = "left";
-    star.style.width = "30px";
-    star.style.marginBottom = "-5px";
-    star.style.zIndex = "20";
-    star.margin = "0";
-    //star.style.transform = "rotate(10deg)"; // Rotate the image slightly
-
-    card.append(star, img, name, scoreText);
-
-    return card;
-  }
 
   const formattedOverallRank = overallRank.toLocaleString();
   const formattedGwRank = gwRank ? gwRank.toLocaleString() : "";
@@ -48961,23 +48923,23 @@ async function updateScoreCard(data) {
       ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
     </div>`;
   }
-  if ((currentGw = 1)) {
-    const previousRank = 0;
-    console.log(previousRank);
+  // if ((currentGw = 1)) {
+  //   const previousRank = 0;
+  //   console.log(previousRank);
 
-    const isRankImproved = 0;
-    let rankArrow = isRankImproved
-      ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
-      : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
+  //   const isRankImproved = 0;
+  //   let rankArrow = isRankImproved
+  //     ? `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/green-arrow.png" style="max-width:30px">`
+  //     : `<img src="https://fpltoolbox.com/wp-content/uploads/2024/12/red-arrow.png" style="rotate:180deg; max-width:30px">`;
 
-    let rankDifference = "-";
-    let rankDifferenceDisplay = `
-    <div class="rank-difference" style="color:${
-      isRankImproved ? "#05FA87" : "#FC2C80"
-    };">
-      ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
-    </div>`;
-  }
+  //   let rankDifference = "-";
+  //   let rankDifferenceDisplay = `
+  //   <div class="rank-difference" style="color:${
+  //     isRankImproved ? "#05FA87" : "#FC2C80"
+  //   };">
+  //     ${isRankImproved ? "+" : ""}${rankDifference.toLocaleString()}
+  //   </div>`;
+  // }
 
   // Determine rank change and difference
 
@@ -48992,39 +48954,87 @@ async function updateScoreCard(data) {
   }
 
   // Update the scorecard
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+
+  // Build classes dynamically
+  const cardTheme = darkMode
+    ? "bg-dark text-light border-secondary"
+    : "bg-light text-dark";
+  const containerTheme = darkMode ? "bg-dark" : "bg-light";
+
   myScore.innerHTML = `
-  <div id="score-panel">
- 
- 
-      <div id="first-panel">
-      <div class="rank-percentile">Top: ${calculatePercentileRank(
-        overallRank,
-        bootstrap.total_players
-      )}%</div>
-      <div id="rank-container"><div id="rank-change">${rankArrow}</div><div id="rank-difference-text" style="font-size:1.2rem">${rankDifferenceDisplay}</div></div>
-      <div style="font-size:0.7rem">OR: ${formattedOverallRank}</div>
-          <div style="font-size:0.7rem">Total: ${totalPoints}pts</div>
-           
-        
-       
+  <div id="score-panel" class="container my-3 ${containerTheme}">
+    <div class="row g-2 g-md-3">
+
+      <!-- First Panel -->
+      <div id="first-panel" class="col-4">
+        <div class="card shadow-sm text-center h-100 ${cardTheme}">
+          <div class="card-body p-2 p-md-3">
+            <h6 class="fs-7 mb-1">Top</h6>
+            <p class="fs-6 fw-bold text-success mb-2">
+              ${calculatePercentileRank(overallRank, bootstrap.total_players)}%
+            </p>
+
+            <div id="rank-container" class="d-flex justify-content-center align-items-center mb-1">
+              <span id="rank-change" class="me-1">${rankArrow}</span>
+              <span id="rank-difference-text" class="fs-7 fw-semibold">${rankDifferenceDisplay}</span>
+            </div>
+
+            <p class="fs-7 mb-0">OR: ${formattedOverallRank}</p>
+            <p class="fs-7 mb-0">Total: ${totalPoints} pts</p>
+          </div>
+        </div>
       </div>
 
-      <div id="middle-panel">
-        <div id="team-name">${loggedInTeamName}</div>
-        <div id="gameweek-identifier">GW ${currentGw}:</div>
-        <div id="actual-points">${points}</div>
-        <div id="players-played"></div>
-        <div id="expected-points">...calculating</div>
+      <!-- Middle Panel -->
+      <div id="middle-panel" class="col-4">
+        <div class="card shadow-sm text-center h-100 ${cardTheme}">
+          <div class="card-body p-2 p-md-3">
+            <h6 id="team-name" class="fw-bold fs-6 mb-1">${loggedInTeamName}</h6>
+            <p id="gameweek-identifier" class="fs-7 mb-1">GW ${
+              data.entry_history.event
+            }</p>
+            <p id="actual-points" class="fw-bold text-primary fs-3 mb-2">${points}</p>
+            
+            <div id="players-played" class="fs-7 text-muted"></div>
+            <div id="expected-points" class="fs-7 text-muted"></div>
+          </div>
+        </div>
       </div>
 
-      <div id="third-panel">
-        
-        ${playerOfTheWeek.outerHTML}
+      <!-- Third Panel -->
+      <div id="third-panel" class="col-4">
+        <div class="card shadow-sm h-100 ${cardTheme}">
+          <div class="card-body text-center p-2 p-md-3">
+                        <h6 id="team-name" class="fw-bold fs-6 mb-1">Avg Score</h6>
+            <p id="gameweek-identifier" class="fs-7 mb-1">${
+              bootstrap.events[currentGw-1].average_entry_score
+
+            }</p>
+            
+                                    <h6 id="team-name" class="fw-bold fs-6 mb-1">Top Score</h6>
+            <p id="gameweek-identifier" class="fs-7 mb-1">${
+              bootstrap.events[currentGw-1].highest_score
+
+
+            }</p>
+          </div>
+        </div>
       </div>
+
+      <!-- Points Summary -->
+      <div class="col-12">
+        <div class="card shadow-sm mt-2 mt-md-3 ${cardTheme}">
+          <div class="card-body p-2 p-md-3">
+            <div id="points-summary"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div id="points-summary"></div>`;
-
-  //<div id:"live-score">Live: ${liveScore}</div>
+  </div>
+`;
 }
 // Fetch and render upcoming fixtures for each player
 async function fetchAndRenderUpcomingFixtures(data) {
@@ -49221,7 +49231,7 @@ async function createXpStats(fixtures) {
   expectedPointsArray.push(parseInt(playerEP));
 
   const stat1Div = document.createElement("div");
-  console.log(playerEP);
+
   stat1Div.innerHTML = playerEP;
 
   // Append each div to the statsDiv only if it has content
@@ -49237,7 +49247,7 @@ async function fetchAndRenderXpStats(data) {
   for (let i = 0; i < data.picks.length && i < 11; i++) {
     const pick = data.picks[i];
     const fixtures = await fetchPlayerCurrentStats(pick.element);
-    console.log(fixtures);
+
     const playerDiv = document.getElementById(pick.element);
     const xpStatsDiv = await createXpStats(fixtures);
     playerDiv.prepend(xpStatsDiv);
@@ -50763,7 +50773,7 @@ async function showCaptaincyPointsLeague() {
       }. ${teamName} - Captaincy Points: ${captaincyPoints}\n`;
     });
 
-    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/app`;
 
     if (navigator.share) {
       navigator
@@ -50904,7 +50914,7 @@ async function showBenchedPointsLeague() {
       }. ${teamName} - Benched Points: ${benchedPoints}\n`;
     });
 
-    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/app`;
 
     if (navigator.share) {
       navigator
@@ -51034,7 +51044,7 @@ async function showCardsLeague() {
       shareText += `${i + 1}. ${name} - Cards: ${total}\n`;
     });
 
-    shareText += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+    shareText += `\nView your own league right here:\n https://fpltoolbox.com/app`;
 
     if (navigator.share) {
       navigator
@@ -51162,7 +51172,7 @@ async function showGoldenbootLeague() {
       shareMessage += `${index + 1}. ${teamName} - Goals: ${goals}\n`;
     });
 
-    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/app`;
 
     if (navigator.share) {
       navigator
@@ -51176,7 +51186,134 @@ async function showGoldenbootLeague() {
     }
   }
 }
+async function showDefconLeague() {
+  let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
 
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const leagueTable = document.createElement("div");
+  leagueTable.setAttribute("id", "league-table");
+  container.appendChild(leagueTable);
+
+  const tableDescription = document.createElement("h6");
+  tableDescription.innerText = `${leagueToDisplay.leagueName} \n Defensive Contribution Leaderboard`;
+  tableDescription.classList.add("text-center", "mb-3");
+  leagueTable.appendChild(tableDescription);
+
+  const table = document.createElement("table");
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered"
+  );
+
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(darkMode ? "table-dark" : "table-light");
+
+  const tableHeader = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+
+  const headers = ["#", "Team Name", "TOT"];
+  headers.forEach((headerText) => {
+    const th = document.createElement("th");
+    if (headerText === "TOT") {
+      th.innerHTML = `TOT <span id="sort-indicator">▼</span>`;
+      th.classList.add("text-end");
+      th.style.cursor = "pointer";
+    } else {
+      th.innerText = headerText;
+    }
+    tableHeaderRow.appendChild(th);
+  });
+
+  tableHeader.appendChild(tableHeaderRow);
+  table.appendChild(tableHeader);
+
+  const tableBody = document.createElement("tbody");
+
+  leagueToDisplay.standings.forEach((team, index) => {
+    const row = document.createElement("tr");
+
+    const rowNumberCell = document.createElement("td");
+    rowNumberCell.innerText = index + 1;
+    row.appendChild(rowNumberCell);
+
+    const teamNameCell = document.createElement("td");
+    teamNameCell.innerHTML = `<strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    row.appendChild(teamNameCell);
+
+    const goalsCell = document.createElement("td");
+    goalsCell.innerText = team.total_defensive_contribution || 0;
+    goalsCell.classList.add("text-end");
+    row.appendChild(goalsCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
+  leagueTable.appendChild(table);
+
+  const sortTable = (ascending = false) => {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.sort((rowA, rowB) => {
+      const goalsA = parseFloat(rowA.cells[2].innerText);
+      const goalsB = parseFloat(rowB.cells[2].innerText);
+      return ascending ? goalsA - goalsB : goalsB - goalsA;
+    });
+
+    rows.forEach((row, index) => {
+      row.cells[0].innerText = index + 1;
+      tableBody.appendChild(row);
+    });
+
+    const sortIndicator = document.getElementById("sort-indicator");
+    sortIndicator.innerText = ascending ? "▲" : "▼";
+  };
+
+  sortTable(false);
+
+  tableHeaderRow.children[2].addEventListener("click", () => {
+    const isAscending = tableHeaderRow.children[2].dataset.sorted === "asc";
+    tableHeaderRow.children[2].dataset.sorted = isAscending ? "desc" : "asc";
+    sortTable(!isAscending);
+  });
+
+  const shareButton = document.createElement("button");
+  shareButton.innerText = "Share League";
+  shareButton.classList.add("btn", "btn-primary", "mt-3", "share-button");
+  shareButton.onclick = shareLeague;
+  leagueTable.appendChild(shareButton);
+
+  function shareLeague() {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    let shareMessage = `${leagueToDisplay.leagueName}\nDefCon Leaderboard:\n`;
+
+    rows.forEach((row, index) => {
+      const teamName = row.cells[1].innerText.split("\n")[0];
+      const goals = row.cells[2].innerText;
+      shareMessage += `${index + 1}. ${teamName} - Goals: ${goals}\n`;
+    });
+
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/app`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Share League",
+          text: shareMessage,
+        })
+        .catch((error) => console.log("Error sharing", error));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  }
+}
 async function showPensMissedLeague() {
   let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
 
@@ -51291,7 +51428,7 @@ async function showPensMissedLeague() {
       shareMessage += `${index + 1}. ${teamName} - Goals: ${goals}\n`;
     });
 
-    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/fpl-toolbox-pro`;
+    shareMessage += `\nView your own league right here:\n https://fpltoolbox.com/app`;
 
     if (navigator.share) {
       navigator
@@ -51556,7 +51693,7 @@ async function showTransferCalculator() {
           title: "Share League",
           text:
             shareMessage +
-            `\nCheck your own league here:\nhttps://fpltoolbox.com/fpl-toolbox-pro/`,
+            `\nCheck your own league here:\nhttps://fpltoolbox.com/app/`,
         })
         .catch((error) => console.log("Error sharing", error));
     } else {
@@ -51684,7 +51821,7 @@ async function showTeamValueLeague() {
       shareMessage += `${index + 1}. ${teamName} - £${value}m\n`;
     });
 
-    shareMessage += `\nView your own league here:\nhttps://fpltoolbox.com/fpl-toolbox-pro`;
+    shareMessage += `\nView your own league here:\nhttps://fpltoolbox.com/app`;
 
     if (navigator.share) {
       navigator
@@ -52070,16 +52207,6 @@ async function showTransferSummaries() {
 }
 
 async function showMemes() {
-  if (!userHasAccess([1, 10, 12])) {
-    showModal({
-      title: "Coming Soon",
-      body: "Come back in a few weeks - we don't have enough info to yet to give you anything useful!",
-      confirmText: "Ok",
-      onConfirm: () => {}, // No action taken
-    });
-    return;
-  }
-
   const container = document.getElementById("screen-tools");
   container.innerHTML = "";
 
@@ -52102,16 +52229,15 @@ async function showMemes() {
   // List of URLs where you want to ignore the condition
   const ignoredUrls = [
     "https://fpltoolbox.com/tools-for-fpl-content/", // Example full URL
-    "http://127.0.0.1:5500/index.html",
+    "http://127.0.0.1:5500/fpltoolbox/index.html",
   ];
 
   const currentUrl = window.location.href; // Get the full URL
   const eventStatus = await getEventStatus();
-  console.log(eventStatus);
+
   if (
-    currentGw !== 34 && // Ignore this whole check if we're in Gameweek 34
     !ignoredUrls.includes(currentUrl) && // Check if the full URL is not in the ignore list
-    eventStatus.status[eventStatus.status.length - 1].bonus_added === true
+    eventStatus.status[eventStatus.status.length - 1].bonus_added === false
   ) {
     const memeLoader = document.createElement("div");
     memeLoader.id = "meme-loader";
@@ -52159,12 +52285,15 @@ async function showMemes() {
     "https://fpltoolbox.com/wp-content/uploads/2025/02/crying-crying-meme.gif",
     "https://fpltoolbox.com/wp-content/uploads/2025/02/caught-out.webp",
     "https://fpltoolbox.com/wp-content/uploads/2025/02/giphy.gif",
+    "https://fpltoolbox.com/wp-content/uploads/2025/08/running-out.jpg",
+    "https://fpltoolbox.com/wp-content/uploads/2025/08/in-danger.jpeg",
   ];
 
   const utterWokeMemes = [
     "https://fpltoolbox.com/wp-content/uploads/2025/02/sean-dyche-football.gif",
     "https://fpltoolbox.com/wp-content/uploads/2025/02/r7vfc0oych5e1.jpeg",
   ];
+  //Meme Funcitons
   async function findBenchDor() {
     const teamsWithHighBenchPoints = [];
 
@@ -52243,131 +52372,40 @@ async function showMemes() {
       console.log("No bench fail found.");
     }
   }
-  function findCaptaincyFailDrake() {
-    for (const team of FPLToolboxLeagueData.standings) {
-      let captain = null;
-      let vice = null;
 
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.is_captain) captain = player;
-        if (player.is_vice_captain) vice = player;
-      });
+  function findHighestandLowest() {
+    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
+      return team.event_total < lowest.event_total ? team : lowest;
+    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
+    const highestTeam = FPLToolboxLeagueData.standings.reduce(
+      (highest, team) => {
+        return team.event_total > highest.event_total ? team : highest;
+      },
+      FPLToolboxLeagueData.standings[0]
+    ); // Start with the first team
 
-      if (captain && vice) {
-        if (getPlayerScore(vice.element) > getPlayerScore(captain.element)) {
-          const message = `Bro making gameweek ${currentGw} captaincy decisions`;
-
-          const capCard = createPlayerCardNew(
-            captain.element,
-            getPlayerScore(captain.element),
-            true,
-            null,
-            null
-          );
-          const viceCard = createPlayerCardNew(
-            vice.element,
-            getPlayerScore(vice.element),
-            null,
-            true,
-            null
-          );
-
-          if (capCard instanceof HTMLElement) {
-            capCard.style.marginLeft = "-70%";
-            viceCard.style.marginLeft = "-70%";
-            capCard.style.transform = "scale(1.2)";
-            viceCard.style.transform = "scale(1.2)";
-          } else {
-            console.warn("message2 is not a DOM element:", capCard);
-          }
-          const footer = `Spoiler alert, It's ${team.player_name.substring(
-            0,
-            team.player_name.indexOf(" ")
-          )}`;
-          // Image URL for meme
-          const img =
-            "https://fpltoolbox.com/wp-content/uploads/2025/02/30b1gx-1.jpg";
-
-          const meme = createMeme4Corners(
-            message,
-            " ",
-            viceCard,
-            capCard,
-            " ",
-            footer,
-            img
-          );
-
-          memeContainer.append(meme);
-
-          return; // Stop searching after finding the first qualifying team
-        }
-      }
-    }
-    console.log("No team found with a captaincy fail.");
-  }
-  function findCaptaincyFailDoggo() {
-    for (const team of FPLToolboxLeagueData.standings) {
-      let captain = null;
-      let vice = null;
-
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.is_captain) captain = player;
-        if (player.is_vice_captain) vice = player;
-      });
-
-      if (captain && vice) {
-        if (getPlayerScore(vice.element) > getPlayerScore(captain.element)) {
-          const message = `${team.player_name.substring(
-            0,
-            team.player_name.indexOf(" ")
-          )}'s vice captain vs actual captain`;
-
-          const capCard = createPlayerCardNew(
-            captain.element,
-            getPlayerScore(captain.element),
-            true,
-            null,
-            null
-          );
-          const viceCard = createPlayerCardNew(
-            vice.element,
-            getPlayerScore(vice.element),
-            null,
-            true,
-            null
-          );
-
-          if (capCard instanceof HTMLElement) {
-            // capCard.style.marginLeft = "-70%";
-            // viceCard.style.marginLeft = "-70%";
-            capCard.style.transform = "scale(1.2)";
-            viceCard.style.transform = "scale(1.2)";
-          } else {
-            console.warn("message2 is not a DOM element:", capCard);
-          }
-          const footer = `www.fpltoolbox.com`;
-          // Image URL for meme
-          const img =
-            "https://fpltoolbox.com/wp-content/uploads/2025/02/430zkq.webp";
-
-          const meme = createMeme4Corners(
-            message,
-            null,
-            capCard,
-            null,
-            viceCard,
-            footer,
-            img
-          );
-
-          memeContainer.append(meme);
-
-          return; // Stop searching after finding the first qualifying team
-        }
-      }
-    }
-    console.log("No team found with a captaincy fail.");
+    console.log(lowestTeam);
+    console.log(highestTeam);
+    const team1 = `${lowestTeam.player_name.substring(
+      0,
+      lowestTeam.player_name.indexOf(" ")
+    )}`;
+    const team2 = `${highestTeam.player_name.substring(
+      0,
+      highestTeam.player_name.indexOf(" ")
+    )}`;
+    const img =
+      "https://fpltoolbox.com/wp-content/uploads/2025/02/Batman-Slapping-Robin.jpg";
+    const meme = createMeme4Corners(
+      null,
+      `GW${currentGw} locked in!`,
+      `Nah mate, \n not this week!`,
+      `${team2}`,
+      `${team1}`,
+      null,
+      img
+    );
+    memeContainer.append(meme);
   }
 
   function findKeeperFail() {
@@ -52437,40 +52475,735 @@ async function showMemes() {
     console.log("No team found with a keeper bench fail.");
   }
 
-  function findHighestandLowest() {
+  function findLowestScorer() {
     const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
       return team.event_total < lowest.event_total ? team : lowest;
     }, FPLToolboxLeagueData.standings[0]); // Start with the first team
-    const highestTeam = FPLToolboxLeagueData.standings.reduce(
-      (highest, team) => {
-        return team.event_total > highest.event_total ? team : highest;
-      },
-      FPLToolboxLeagueData.standings[0]
-    ); // Start with the first team
 
     console.log(lowestTeam);
-    console.log(highestTeam);
-    const team1 = `${lowestTeam.player_name.substring(
+
+    const message1 = `I bet he's thinking about other women`;
+    const message2 = `${lowestTeam.player_name.substring(
+      0,
+      lowestTeam.player_name.indexOf(" ")
+    )}: How have I only got ${lowestTeam.event_total} FPL points this week`;
+
+    const img = "https://fpltoolbox.com/wp-content/uploads/2025/02/1tl71a.jpg";
+
+    const meme = createMeme4Corners(
+      message1,
+      null,
+      null,
+      null,
+      null,
+      message2,
+      img
+    );
+    memeContainer.append(meme);
+  }
+  function findLowestScorer1() {
+    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
+      return team.event_total < lowest.event_total ? team : lowest;
+    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
+
+    console.log(lowestTeam);
+
+    const message1 = `POV: That one bro picking their FPL team for the gameweek "`;
+    const message2 = `Spoiler alert: It's ${lowestTeam.player_name.substring(
       0,
       lowestTeam.player_name.indexOf(" ")
     )}`;
-    const team2 = `${highestTeam.player_name.substring(
-      0,
-      highestTeam.player_name.indexOf(" ")
-    )}`;
+
     const img =
-      "https://fpltoolbox.com/wp-content/uploads/2025/02/Batman-Slapping-Robin.jpg";
+      "https://fpltoolbox.com/wp-content/uploads/2025/08/raf360x360075tfafafa_ca443f4786.jpg";
+
     const meme = createMeme4Corners(
+      message1,
       null,
-      `GW${currentGw} locked in!`,
-      `Nah mate, \n not this week!`,
-      `${team2}`,
-      `${team1}`,
+      null,
+      null,
+      null,
+      message2,
+      img
+    );
+    memeContainer.append(meme);
+  }
+  function findLowestScorerAlternative() {
+    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
+      return team.event_total < lowest.event_total ? team : lowest;
+    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
+
+    console.log(lowestTeam);
+
+    const message1 = `POV: ${lowestTeam.player_name.substring(
+      0,
+      lowestTeam.player_name.indexOf(" ")
+    )} waiting for some FPL points this week`;
+
+    const img = "https://fpltoolbox.com/wp-content/uploads/2025/02/1c1uej.jpg";
+
+    const meme = createMeme4Corners(
+      message1,
+      null,
+      null,
+      null,
+      null,
       null,
       img
     );
     memeContainer.append(meme);
   }
+
+  async function findRedCards() {
+    const teamsWithRedCards = [];
+    const playerStatsCache = new Map(); // Cache for storing player stats
+
+    // Create and append the loading indicator
+    const memeLoader = document.createElement("div");
+    memeLoader.id = "meme-loader";
+    memeLoader.innerText =
+      "There might be a juicy meme loading here, just gotta do some more digging...";
+    memeLoader.className = "skeleton";
+    memeContainer.append(memeLoader);
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
+
+      for (const player of team.currentWeek[0].picks) {
+        let playerStats;
+
+        // Check if player's stats are already cached
+        if (playerStatsCache.has(player.element)) {
+          playerStats = playerStatsCache.get(player.element);
+        } else {
+          // Fetch and store in cache
+          playerStats = await fetchPlayerCurrentStats(player.element);
+          playerStatsCache.set(player.element, playerStats);
+        }
+
+        if (playerStats[0].red_cards > 0) {
+          console.log(playerStats);
+          teamsWithRedCards.push(team);
+          team.redCardPlayer = player.element;
+          break; // Stop checking this team's players and move to the next team
+        }
+      }
+    }
+
+    if (teamsWithRedCards.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithRedCards);
+      console.log(randomTeam);
+
+      const message1 = `When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )} gets a player sent off:`;
+
+      const img =
+        utterWokeMemes[Math.floor(Math.random() * utterWokeMemes.length)];
+
+      const message2 = createPlayerCardNew(
+        randomTeam.redCardPlayer,
+        getPlayerScore(randomTeam.redCardPlayer),
+        null,
+        null,
+        null
+      );
+      if (message2 instanceof HTMLElement) {
+        message2.style.marginRight = "1.5rem";
+        message2.style.transform = "scale(1.5)";
+      } else {
+        console.warn("message2 is not a DOM element:", message2);
+      }
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        message2,
+        null,
+        null,
+        null,
+        img
+      );
+
+      // ✅ Replace the loader with the actual meme
+      memeLoader.replaceWith(meme);
+    } else {
+      memeLoader.remove();
+    }
+  }
+  async function findCaptaincyResults() {
+    console.log("finding captains");
+    const successfulCaptains = [];
+    const failedCaptains = [];
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      let captain = null;
+
+      // Find the captain
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.is_captain) captain = player;
+      });
+
+      if (captain) {
+        const captainScore = await getPlayerScore(captain.element);
+
+        if (captainScore > 4) {
+          successfulCaptains.push({ team, captain, score: captainScore });
+        } else {
+          failedCaptains.push({ team, captain, score: captainScore });
+        }
+      }
+    }
+    let result = [];
+    // Check if there is at least one failed captain
+    if (failedCaptains.length > 0) {
+      // Pick a random failed captain
+      const randomFailedCaptain =
+        failedCaptains[Math.floor(Math.random() * failedCaptains.length)];
+      result.push(randomFailedCaptain);
+    }
+
+    // Check how many successful captains exist
+    if (successfulCaptains.length >= 2) {
+      const count = successfulCaptains.length >= 3 ? 3 : 2;
+
+      // Shuffle the array and pick the required number of successful captains
+      const shuffledSuccessful = successfulCaptains.sort(
+        () => 0.5 - Math.random()
+      );
+      result.push(...shuffledSuccessful.slice(0, count));
+    }
+    console.log(result);
+
+    if (result.length > 2) {
+      const message = `There's always one...`;
+
+      const captainCards = document.createElement("div");
+      captainCards.id = "dragon-meme-footer";
+
+      async function addCaptainToFooter(teamNumber) {
+        const cap = document.createElement("div");
+        const capCard = await createPlayerCardNew(
+          result[teamNumber].captain.element,
+          result[teamNumber].score,
+          true,
+          null,
+          null
+        );
+
+        const capCardText = document.createElement("div");
+        capCardText.id = "dragon-meme-footer-text";
+        capCardText.innerText = `${result[
+          teamNumber
+        ].team.player_name.substring(
+          0,
+          result[teamNumber].team.player_name.indexOf(" ")
+        )}`;
+
+        cap.appendChild(capCard);
+        cap.appendChild(capCardText);
+
+        captainCards.appendChild(cap);
+      }
+
+      addCaptainToFooter(1);
+      addCaptainToFooter(2);
+
+      let img = "https://fpltoolbox.com/wp-content/uploads/2025/02/9e2.jpg";
+
+      if (result.length === 4) {
+        addCaptainToFooter(3);
+        img = "https://fpltoolbox.com/wp-content/uploads/2025/02/4p4zc2.jpg";
+      }
+
+      addCaptainToFooter(0);
+      // if (capCard1 instanceof HTMLElement) {
+      //   capCard1.style.marginLeft = "-70%";
+      //   capCard1.style.transform = "scale(1.2)";
+      // } else {
+      //   console.warn("capCard is not a DOM element:", capCard1);
+      // }
+
+      const meme = createMeme4Corners(
+        message,
+        null,
+        null,
+        null,
+        null,
+        captainCards,
+        img
+      );
+
+      memeContainer.append(meme);
+    } else {
+      console.log("Captain Dragons Meme unavailable");
+    }
+
+    console.log("Successful Captains:", successfulCaptains);
+    console.log("Failed Captains:", failedCaptains);
+  }
+  async function findCaptaincyFailDrake() {
+    for (const team of FPLToolboxLeagueData.standings) {
+      let captain = null;
+      let vice = null;
+
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.is_captain) captain = player;
+        if (player.is_vice_captain) vice = player;
+      });
+
+      const capScore = await getPlayerScore(captain.element);
+      const viceScore = await getPlayerScore(vice.element);
+      if (captain && vice) {
+        if (viceScore > capScore) {
+          const message = `Bro making gameweek ${currentGw} captaincy decisions`;
+
+          const capCard = await createPlayerCardNew(
+            captain.element,
+            capScore,
+            true,
+            null,
+            null
+          );
+          const viceCard = await createPlayerCardNew(
+            vice.element,
+            viceScore,
+            null,
+            true,
+            null
+          );
+
+          if (capCard instanceof HTMLElement) {
+            capCard.style.marginLeft = "-70%";
+            viceCard.style.marginLeft = "-70%";
+            capCard.style.transform = "scale(1.2)";
+            viceCard.style.transform = "scale(1.2)";
+          } else {
+            console.warn("message2 is not a DOM element:", capCard);
+          }
+          const footer = `Spoiler alert, It's ${team.player_name.substring(
+            0,
+            team.player_name.indexOf(" ")
+          )}`;
+          // Image URL for meme
+          const img =
+            "https://fpltoolbox.com/wp-content/uploads/2025/02/30b1gx-1.jpg";
+
+          const meme = createMeme4Corners(
+            message,
+            " ",
+            viceCard,
+            capCard,
+            " ",
+            footer,
+            img
+          );
+
+          memeContainer.append(meme);
+
+          return; // Stop searching after finding the first qualifying team
+        }
+      }
+    }
+    console.log("No team found with a captaincy fail.");
+  }
+
+  async function findCaptaincyFailDoggo() {
+    for (const team of FPLToolboxLeagueData.standings) {
+      let captain = null;
+      let vice = null;
+
+      team.currentWeek[0].picks.forEach((player) => {
+        if (player.is_captain) captain = player;
+        if (player.is_vice_captain) vice = player;
+      });
+
+      const capScore = await getPlayerScore(captain.element);
+      const viceScore = await getPlayerScore(vice.element);
+      if (captain && vice) {
+        if (viceScore > capScore) {
+          const message = `${team.player_name.substring(
+            0,
+            team.player_name.indexOf(" ")
+          )}'s vice captain vs actual captain`;
+
+          const capCard = await createPlayerCardNew(
+            captain.element,
+            capScore,
+            true,
+            null,
+            null
+          );
+          const viceCard = await createPlayerCardNew(
+            vice.element,
+            viceScore,
+            null,
+            true,
+            null
+          );
+
+          if (capCard instanceof HTMLElement) {
+            // capCard.style.marginLeft = "-70%";
+            // viceCard.style.marginLeft = "-70%";
+            capCard.style.transform = "scale(1.2)";
+            viceCard.style.transform = "scale(1.2)";
+          } else {
+            console.warn("message2 is not a DOM element:", capCard);
+          }
+          const footer = `www.fpltoolbox.com`;
+          // Image URL for meme
+          const img =
+            "https://fpltoolbox.com/wp-content/uploads/2025/02/430zkq.webp";
+
+          const meme = createMeme4Corners(
+            message,
+            null,
+            capCard,
+            null,
+            viceCard,
+            footer,
+            img
+          );
+
+          memeContainer.append(meme);
+
+          return; // Stop searching after finding the first qualifying team
+        }
+      }
+    }
+    console.log("No team found with a captaincy fail.");
+  }
+  async function findPlayersWithOnePoint() {
+    console.log("Failed row");
+
+    const teamsWithPlayersOnOnePoint = [];
+
+    // Loop through teams
+    for (const team of FPLToolboxLeagueData.standings) {
+      for (const player of team.currentWeek[0].picks) {
+        const score = await getPlayerScore(player.element);
+
+        if (score === 1) {
+          teamsWithPlayersOnOnePoint.push(team);
+          break; // no need to keep checking this team once a 1-pointer is found
+        }
+      }
+    }
+
+    console.log("Teams with players on 1 point:", teamsWithPlayersOnOnePoint);
+
+    if (teamsWithPlayersOnOnePoint.length > 0) {
+      // Pick a random unlucky team
+      const randomTeam = getRandomTeam(teamsWithPlayersOnOnePoint);
+
+      const message1 = `POV: When ${
+        randomTeam.player_name.split(" ")[0]
+      } opens the FPL app`;
+
+      const images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/03/fine-this-is-fine.png",
+      ];
+
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      // Row of 1-pointers
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+
+      for (const player of randomTeam.currentWeek[0].picks) {
+        const score = await getPlayerScore(player.element);
+
+        if (score === 1) {
+          let card = await createPlayerCardNew(
+            player.element,
+            score,
+            null,
+            null,
+            null
+          );
+
+          // Ensure card is a DOM node
+          if (!(card instanceof HTMLElement)) {
+            card = htmlToElement(card);
+          }
+
+          defenderRow.appendChild(card);
+        }
+      }
+
+      let meme = createMeme4Corners(
+        message1,
+        null,
+        null,
+        null,
+        null,
+        defenderRow,
+        img
+      );
+
+      // Ensure meme is DOM node
+      if (!(meme instanceof HTMLElement)) {
+        meme = htmlToElement(meme);
+      }
+
+      memeContainer.appendChild(meme);
+    }
+  }
+  async function findDefendersOnSixPoints() {
+    console.log("Failed row");
+
+    const teamsWithDefendersOnSixPoints = [];
+
+    // Loop through teams
+    for (const team of FPLToolboxLeagueData.standings) {
+      for (const player of team.currentWeek[0].picks) {
+        console.log();
+        const score = await getPlayerScore(player.element);
+        const type = await getPlayerType(player.element);
+
+        if (score === 6 && type === 2) {
+          teamsWithDefendersOnSixPoints.push(team);
+          break; // no need to keep checking this team once a 1-pointer is found
+        }
+      }
+    }
+
+    console.log(
+      "Teams with players on 1 point:",
+      teamsWithDefendersOnSixPoints
+    );
+
+    if (teamsWithDefendersOnSixPoints.length > 0) {
+      // Pick a random unlucky team
+      const randomTeam = getRandomTeam(teamsWithDefendersOnSixPoints);
+
+      const message1 = `${
+        randomTeam.player_name.split(" ")[0]
+      }: It aint much, but it's honest work`;
+
+      const images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/08/it-aint-much.avif",
+      ];
+
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      // Row of 1-pointers
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+
+      // Collect all players with 6 points
+      const sixPointers = [];
+
+      for (const player of randomTeam.currentWeek[0].picks) {
+        const score = await getPlayerScore(player.element);
+        if (score === 6) {
+          sixPointers.push(player);
+        }
+      }
+
+      if (sixPointers.length > 0) {
+        const chosen =
+          sixPointers[Math.floor(Math.random() * sixPointers.length)];
+        let card = await createPlayerCardNew(
+          chosen.element,
+          6,
+          null,
+          null,
+          null
+        );
+
+        if (!(card instanceof HTMLElement)) {
+          card = htmlToElement(card);
+        }
+
+        defenderRow.appendChild(card);
+      }
+
+      let meme = createMeme4Corners(
+        message1,
+        null,
+        defenderRow,
+        null,
+        null,
+        null,
+        img
+      );
+
+      // Ensure meme is DOM node
+      if (!(meme instanceof HTMLElement)) {
+        meme = htmlToElement(meme);
+      }
+
+      memeContainer.appendChild(meme);
+    }
+  }
+
+  function memesAddedEveryGW() {
+    const message1 = `New memes added every gw to show the highs and lows of your mini-league's FPL season`;
+    const img =
+      "https://fpltoolbox.com/wp-content/uploads/2025/08/jose-celebration.png";
+
+    const meme = createMeme4Corners(
+      message1,
+      null,
+      null,
+      null,
+      null,
+      "www.fpltoolbox.com",
+      img
+    );
+    memeContainer.append(meme);
+  }
+
+  async function findFailedTransfer() {
+    console.log("finding failed transfer");
+
+    const teamsWithFailedTranfers = [];
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      if (team.transfers) {
+        for (const xfr of team.transfers[0]) {
+          const outScore = await getPlayerScore(xfr.element_out);
+          const inScore = await getPlayerScore(xfr.element_in);
+
+          if (xfr.event === currentGw && outScore > inScore) {
+            teamsWithFailedTranfers.push(team);
+            break; // no need to keep checking once we know this team failed
+          }
+        }
+      }
+    }
+
+    console.log(teamsWithFailedTranfers);
+
+    if (teamsWithFailedTranfers.length > 0) {
+      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
+      console.log(randomTeam);
+
+      let xfrTracker = [];
+      for (const xfr of randomTeam.transfers[0]) {
+        const outScore = await getPlayerScore(xfr.element_out);
+        const inScore = await getPlayerScore(xfr.element_in);
+
+        if (xfr.event === currentGw && outScore > inScore) {
+          xfrTracker.push({ ...xfr, outScore, inScore });
+        }
+      }
+
+      console.log(xfrTracker);
+
+      async function findBiggestScoreDifference(xfrTracker) {
+        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
+          return null;
+        }
+
+        let biggestDiffXfr = null;
+        let maxDifference = -Infinity;
+
+        for (const xfr of xfrTracker) {
+          const difference = Math.abs(xfr.inScore - xfr.outScore);
+
+          if (difference > maxDifference) {
+            maxDifference = difference;
+            biggestDiffXfr = xfr;
+          }
+        }
+
+        return biggestDiffXfr;
+      }
+
+      const biggestXfr = await findBiggestScoreDifference(xfrTracker);
+      console.log(biggestXfr);
+
+      if (biggestXfr) {
+        const xfrIN = await createPlayerCardNew(
+          biggestXfr.element_in,
+          biggestXfr.inScore,
+          null,
+          null,
+          null
+        );
+
+        const xfrOUT = await createPlayerCardNew(
+          biggestXfr.element_out,
+          biggestXfr.outScore,
+          null,
+          null,
+          null
+        );
+
+        const message1 = `POV: ${randomTeam.player_name.substring(
+          0,
+          randomTeam.player_name.indexOf(" ")
+        )} making gameweek transfers`;
+
+        const images = [
+          "https://fpltoolbox.com/wp-content/uploads/2025/02/download-3.png",
+        ];
+        const img = images[Math.floor(Math.random() * images.length)];
+
+        const meme = createMeme4Corners(
+          message1,
+          null,
+          xfrOUT,
+          null,
+          xfrIN,
+          null,
+          img
+        );
+
+        memeContainer.append(meme);
+        console.log("meme appeneded");
+      }
+    }
+
+    if (teamsWithFailedTranfers.length == 0) {
+      let topScorer = bootstrap.events[currentGw - 1].top_element_info;
+
+      const xfrIN = await createPlayerCardNew(
+        topScorer.id,
+        topScorer.score,
+        null,
+        null,
+        null
+      );
+
+      const xfrOUT = await createPlayerCardNew(
+        topScorer.id,
+        topScorer.score,
+        null,
+        null,
+        null
+      );
+
+      const message1 = `POV: Upgrade to see your mate making gameweek transfers here`;
+
+      const images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/02/download-3.png",
+      ];
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        xfrOUT,
+        null,
+        xfrIN,
+        null,
+        img
+      );
+
+      memeContainer.append(meme);
+      console.log("meme appeneded");
+    }
+  }
+
+  ///// Above tested working
 
   function findWorstRun() {
     const worstRankRun = FPLToolboxLeagueData.standings.find((team) => {
@@ -52567,7 +53300,7 @@ async function showMemes() {
     }
   }
 
-  function findStrikerFail() {
+  async function findStrikerFail() {
     for (const team of FPLToolboxLeagueData.standings) {
       let striker = null;
       let benchedStriker = null;
@@ -52585,8 +53318,8 @@ async function showMemes() {
 
       if (striker && benchedStriker) {
         if (
-          getPlayerScore(benchedStriker.element) >
-          getPlayerScore(striker.element)
+          (await getPlayerScore(benchedStriker.element)) >
+          (await getPlayerScore(striker.element))
         ) {
           const message1 = `Imagine starting ${getPlayerWebName(
             striker.element
@@ -52649,92 +53382,12 @@ async function showMemes() {
             img
           );
           memeContainer.append(meme);
+          console.log("Striker on bench fail found.");
           return; // Stop searching after finding the first qualifying team
         }
       }
     }
     console.log("No team found with a striker bench fail.");
-  }
-
-  function findLowestScorer() {
-    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
-      return team.event_total < lowest.event_total ? team : lowest;
-    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
-
-    console.log(lowestTeam);
-
-    const message1 = `I bet he's thinking about other women`;
-    const message2 = `${lowestTeam.player_name.substring(
-      0,
-      lowestTeam.player_name.indexOf(" ")
-    )}: How have I only got ${lowestTeam.event_total} FPL points this week`;
-
-    const img = "https://fpltoolbox.com/wp-content/uploads/2025/02/1tl71a.jpg";
-
-    const meme = createMeme4Corners(
-      message1,
-      null,
-      null,
-      null,
-      null,
-      message2,
-      img
-    );
-    memeContainer.append(meme);
-  }
-
-  function findLowestScorer1() {
-    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
-      return team.event_total < lowest.event_total ? team : lowest;
-    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
-
-    console.log(lowestTeam);
-
-    const message1 = `POV: That one bro picking their FPL team for the gameweek "`;
-    const message2 = `Spoiler alert: It's ${lowestTeam.player_name.substring(
-      0,
-      lowestTeam.player_name.indexOf(" ")
-    )}`;
-
-    const img =
-      "https://fpltoolbox.com/wp-content/uploads/2025/08/raf360x360075tfafafa_ca443f4786.jpg";
-
-    const meme = createMeme4Corners(
-      message1,
-      null,
-      null,
-      null,
-      null,
-      message2,
-      img
-    );
-    memeContainer.append(meme);
-  }
-
-  function findLowestScorerAlternative() {
-    const lowestTeam = FPLToolboxLeagueData.standings.reduce((lowest, team) => {
-      return team.event_total < lowest.event_total ? team : lowest;
-    }, FPLToolboxLeagueData.standings[0]); // Start with the first team
-
-    console.log(lowestTeam);
-
-    const message1 = `POV: ${lowestTeam.player_name.substring(
-      0,
-      lowestTeam.player_name.indexOf(" ")
-    )} waiting for some FPL points this week`;
-
-    const img = "https://fpltoolbox.com/wp-content/uploads/2025/02/1c1uej.jpg";
-
-    const meme = createMeme4Corners(
-      message1,
-      null,
-      null,
-      null,
-      null,
-      null,
-      img
-    );
-    memeContainer.append(meme);
   }
 
   function findBelowAverage() {
@@ -52946,85 +53599,6 @@ async function showMemes() {
         img
       );
       memeContainer.append(meme);
-    }
-  }
-
-  async function findRedCards() {
-    const teamsWithRedCards = [];
-    const playerStatsCache = new Map(); // Cache for storing player stats
-
-    // Create and append the loading indicator
-    const memeLoader = document.createElement("div");
-    memeLoader.id = "meme-loader";
-    memeLoader.innerText =
-      "There might be a juicy meme loading here, just gotta do some more digging...";
-    memeLoader.className = "skeleton";
-    memeContainer.append(memeLoader);
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
-
-      for (const player of team.currentWeek[0].picks) {
-        let playerStats;
-
-        // Check if player's stats are already cached
-        if (playerStatsCache.has(player.element)) {
-          playerStats = playerStatsCache.get(player.element);
-        } else {
-          // Fetch and store in cache
-          playerStats = await fetchPlayerCurrentStats(player.element);
-          playerStatsCache.set(player.element, playerStats);
-        }
-
-        if (playerStats[0].red_cards > 0) {
-          console.log(playerStats);
-          teamsWithRedCards.push(team);
-          team.redCardPlayer = player.element;
-          break; // Stop checking this team's players and move to the next team
-        }
-      }
-    }
-
-    if (teamsWithRedCards.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithRedCards);
-      console.log(randomTeam);
-
-      const message1 = `When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} gets a player sent off:`;
-
-      const img =
-        utterWokeMemes[Math.floor(Math.random() * utterWokeMemes.length)];
-
-      const message2 = createPlayerCardNew(
-        randomTeam.redCardPlayer,
-        getPlayerScore(randomTeam.redCardPlayer),
-        null,
-        null,
-        null
-      );
-      if (message2 instanceof HTMLElement) {
-        message2.style.marginRight = "1.5rem";
-        message2.style.transform = "scale(1.5)";
-      } else {
-        console.warn("message2 is not a DOM element:", message2);
-      }
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        message2,
-        null,
-        null,
-        null,
-        img
-      );
-
-      // ✅ Replace the loader with the actual meme
-      memeLoader.replaceWith(meme);
-    } else {
-      memeLoader.remove();
     }
   }
 
@@ -53384,107 +53958,6 @@ async function showMemes() {
     }
   }
 
-  function findFailedTransfer() {
-    const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
-    //   {
-    //     "element_in": 336,
-    //     "element_in_cost": 63,
-    //     "element_out": 398,
-    //     "element_out_cost": 74,
-    //     "entry": 18620,
-    //     "event": 24,
-    //     "time": "2025-02-01T01:02:49.163163Z"
-    // }
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          teamsWithFailedTranfers.push(team);
-        }
-      });
-    }
-    console.log(teamsWithFailedTranfers);
-
-    if (teamsWithFailedTranfers.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithFailedTranfers);
-      console.log(randomTeam);
-
-      let xfrTracker = [];
-      randomTeam.transfers[0].forEach((xfr) => {
-        if (
-          xfr.event === currentGw &&
-          getPlayerScore(xfr.element_out) > getPlayerScore(xfr.element_in)
-        ) {
-          xfrTracker.push(xfr);
-        }
-      });
-
-      console.log(xfrTracker);
-      function findBiggestScoreDifference(xfrTracker) {
-        if (!Array.isArray(xfrTracker) || xfrTracker.length === 0) {
-          return null; // Return null if xfrTracker is empty or not an array
-        }
-
-        let biggestDiffXfr = null;
-        let maxDifference = -Infinity;
-
-        for (const xfr of xfrTracker) {
-          const inScore = getPlayerScore(xfr.element_in);
-          const outScore = getPlayerScore(xfr.element_out);
-          const difference = Math.abs(inScore - outScore); // Absolute difference
-
-          if (difference > maxDifference) {
-            maxDifference = difference;
-            biggestDiffXfr = xfr;
-          }
-        }
-
-        return biggestDiffXfr;
-      }
-
-      // Example Usage
-      const biggestXfr = findBiggestScoreDifference(xfrTracker);
-      console.log(biggestXfr);
-
-      const xfrIN = createPlayerCardNew(
-        biggestXfr.element_in,
-        getPlayerScore(biggestXfr.element_in),
-        null,
-        null,
-        null
-      );
-      const xfrOUT = createPlayerCardNew(
-        biggestXfr.element_out,
-        getPlayerScore(biggestXfr.element_out),
-        null,
-        null,
-        null
-      );
-
-      const message1 = `POV: The grass is always greener if you're ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} making gameweek transfers`;
-
-      images = [
-        "https://fpltoolbox.com/wp-content/uploads/2025/02/download-3.png",
-      ];
-      const img = images[Math.floor(Math.random() * images.length)];
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        xfrOUT,
-        null,
-        xfrIN,
-        null,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
   function findFailedTransferSecond() {
     const teamsWithFailedTranfers = []; // Array to store teams with bench points > 10
     //   {
@@ -54241,65 +54714,7 @@ async function showMemes() {
       memeContainer.append(meme);
     }
   }
-  function findPlayersWithOnePoint() {
-    console.log("Failed row");
-    const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
 
-    for (const team of FPLToolboxLeagueData.standings) {
-      team.currentWeek[0].picks.forEach((player) => {
-        if (getPlayerScore(player.element) === 1) {
-          teamsWithAllDefendersScoring.push(team);
-          return;
-        }
-      });
-    }
-
-    console.log(teamsWithAllDefendersScoring); // Check the stored teams
-
-    if (teamsWithAllDefendersScoring.length > 0) {
-      const randomTeam = getRandomTeam(teamsWithAllDefendersScoring);
-      console.log(randomTeam);
-      const message1 = `POV: When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )} opens the FPL app`;
-
-      images = [
-        "https://fpltoolbox.com/wp-content/uploads/2025/03/fine-this-is-fine.png",
-
-        ,
-      ];
-      const img = images[Math.floor(Math.random() * images.length)];
-
-      const defenderRow = document.createElement("div");
-      defenderRow.style.display = "flex";
-      defenderRow.style.gap = "5px";
-      defenderRow.style.flexDirection = "row";
-      randomTeam.currentWeek[0].picks.forEach((player) => {
-        if (getPlayerScore(player.element) === 1) {
-          const card = createPlayerCardNew(
-            player.element,
-            getPlayerScore(player.element),
-            null,
-            null,
-            null
-          );
-          defenderRow.appendChild(card);
-        }
-      });
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        null,
-        null,
-        null,
-        defenderRow,
-        img
-      );
-      memeContainer.append(meme);
-    }
-  }
   function findPlayersWithOnePointSecond() {
     console.log("Failed row");
     const teamsWithAllDefendersScoring = []; // Array to store teams with bench points > 10
@@ -54429,115 +54844,11 @@ async function showMemes() {
     }
   }
 
-  function findCaptaincyResults() {
-    console.log("finding captains");
-    const successfulCaptains = [];
-    const failedCaptains = [];
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      let captain = null;
-
-      // Find the captain
-      team.currentWeek[0].picks.forEach((player) => {
-        if (player.is_captain) captain = player;
-      });
-
-      if (captain) {
-        const captainScore = getPlayerScore(captain.element);
-
-        if (captainScore > 4) {
-          successfulCaptains.push({ team, captain, score: captainScore });
-        } else {
-          failedCaptains.push({ team, captain, score: captainScore });
-        }
-      }
-    }
-    let result = [];
-    // Check if there is at least one failed captain
-    if (failedCaptains.length > 0) {
-      // Pick a random failed captain
-      const randomFailedCaptain =
-        failedCaptains[Math.floor(Math.random() * failedCaptains.length)];
-      result.push(randomFailedCaptain);
-    }
-
-    // Check how many successful captains exist
-    if (successfulCaptains.length >= 2) {
-      const count = successfulCaptains.length >= 3 ? 3 : 2;
-
-      // Shuffle the array and pick the required number of successful captains
-      const shuffledSuccessful = successfulCaptains.sort(
-        () => 0.5 - Math.random()
-      );
-      result.push(...shuffledSuccessful.slice(0, count));
-    }
-    console.log(result);
-
-    if (result.length > 2) {
-      const message = `There's always one...`;
-
-      const captainCards = document.createElement("div");
-      captainCards.id = "dragon-meme-footer";
-
-      function addCaptainToFooter(teamNumber) {
-        const cap = document.createElement("div");
-        const capCard = createPlayerCardNew(
-          result[teamNumber].captain.element,
-          result[teamNumber].score,
-          true,
-          null,
-          null
-        );
-        const capCardText = document.createElement("div");
-        capCardText.id = "dragon-meme-footer-text";
-        capCardText.innerText = `${result[
-          teamNumber
-        ].team.player_name.substring(
-          0,
-          result[teamNumber].team.player_name.indexOf(" ")
-        )}`;
-
-        cap.appendChild(capCard);
-        cap.appendChild(capCardText);
-
-        captainCards.appendChild(cap);
-      }
-
-      addCaptainToFooter(1);
-      addCaptainToFooter(2);
-
-      let img = "https://fpltoolbox.com/wp-content/uploads/2025/02/9e2.jpg";
-
-      if (result.length === 4) {
-        addCaptainToFooter(3);
-        img = "https://fpltoolbox.com/wp-content/uploads/2025/02/4p4zc2.jpg";
-      }
-
-      addCaptainToFooter(0);
-      // if (capCard1 instanceof HTMLElement) {
-      //   capCard1.style.marginLeft = "-70%";
-      //   capCard1.style.transform = "scale(1.2)";
-      // } else {
-      //   console.warn("capCard is not a DOM element:", capCard1);
-      // }
-
-      const meme = createMeme4Corners(
-        message,
-        null,
-        null,
-        null,
-        null,
-        captainCards,
-        img
-      );
-
-      memeContainer.append(meme);
-    } else {
-      console.log("Captain Dragons Meme unavailable");
-    }
-
-    console.log("Successful Captains:", successfulCaptains);
-    console.log("Failed Captains:", failedCaptains);
+  // Helper: convert string → DOM element
+  function htmlToElement(html) {
+    const template = document.createElement("template");
+    template.innerHTML = html.trim();
+    return template.content.firstChild;
   }
 
   function gwSpecificMeme() {
@@ -54611,42 +54922,53 @@ async function showMemes() {
 
   function runAllRandomly() {
     const functionsList = [
-      findFailedScorer,
-      findHigestTransferMaker,
-      findHighBench,
-      find100Plus,
       findBenchDor,
-      gwSpecificMeme,
-      findMissedPen,
-      findBelowAverage,
-      findLowestScorer,
-      findLowestScorer1,
-      findStrikerFail,
-      findFailedTransferSixth,
-      findChillGuy,
-      findLowBench,
-      findBestMiniLeagueRun,
-      findWorstRun,
       findHighestandLowest,
       findKeeperFail,
+      findLowestScorer,
+      findLowestScorer1,
+      findLowestScorerAlternative,
+      findRedCards,
+      findCaptaincyResults,
       findCaptaincyFailDrake,
       findCaptaincyFailDoggo,
-      findFailedTransfer,
-      findRedCards,
-      find59Minutes,
-      //findSolidDefence,
-      findPlayersWithOnePoint,
-      findTwoYellows,
-      findLowestScorerAlternative,
-      findCaptaincyResults,
-      findFailedTransferSecond,
-      findPlayerSuccess,
-      //findSolidStrikeForce,
-      findSuccesfulTransfer,
-      findFailedTransferThird,
-      findFailedTransferFourth,
-      findFailedTransferFifth,
       findPlayersWithOnePointSecond,
+      findDefendersOnSixPoints,
+      findFailedTransfer,
+      //above tested
+
+      // findFailedScorer,
+      // findHigestTransferMaker,
+      // findHighBench,
+      // find100Plus,
+
+      // gwSpecificMeme,
+      // findMissedPen,
+      // findBelowAverage,
+
+      // findStrikerFail,
+      // findFailedTransferSixth,
+      // findChillGuy,
+      // findLowBench,
+      // findBestMiniLeagueRun,
+      // findWorstRun,
+
+      // findCaptaincyFailDoggo,
+
+      // find59Minutes,
+
+      //findSolidDefence,
+      // findPlayersWithOnePoint,
+      // findTwoYellows,
+
+      // findFailedTransferSecond,
+      // findPlayerSuccess,
+      //findSolidStrikeForce,
+      // findSuccesfulTransfer,
+      // findFailedTransferThird,
+      // findFailedTransferFourth,
+      // findFailedTransferFifth,
+
       findFailedhBench,
     ];
 
@@ -54675,7 +54997,7 @@ async function showMemes() {
   }
 
   function subscribeToProMeme() {
-    const message1 = `POV: You just subscribed to FPL Toolbox Pro and got instant access to even more personalised FPL memes`;
+    const message1 = `Upgrade to get more memes about more teams in your mini-leagues!`;
     const img =
       surprisedMemes[Math.floor(Math.random() * surprisedMemes.length)];
 
@@ -54697,6 +55019,7 @@ async function showMemes() {
   ) {
     // Call the function to execute all in random order
     runAllRandomly();
+    memesAddedEveryGW();
     endOfMemes();
     addCaptainBadge();
   } else if (
@@ -54705,16 +55028,17 @@ async function showMemes() {
   ) {
     runAllRandomly(); //Turn off after testing
     subscribeToProMeme();
+    memesAddedEveryGW();
     endOfMemes();
     addCaptainBadge();
-  } else {
-    ontainer.append("You need to be a pro member to access this feature");
   }
   const refreshButton = document.createElement("button");
+  refreshButton.id = "meme-refresh-button";
   refreshButton.innerHTML = "Refresh Memes";
   refreshButton.addEventListener("click", showMemes);
-  memeContainer.prepend(refreshButton);
+
   container.appendChild(memeContainer);
+  container.append(refreshButton);
   addCaptainBadge();
 }
 
@@ -54797,7 +55121,7 @@ function createMeme4Corners(
     watermarkText.id = "watermark-text";
 
     watermarkContainer.appendChild(watermarkLogo);
-    watermarkContainer.appendChild(watermarkText);
+    //watermarkContainer.appendChild(watermarkText);
 
     // Create a header wrapper for text
     const headerContent = document.createElement("div");
@@ -57897,6 +58221,8 @@ function trackEvent(eventName, params = {}) {
   if (typeof gtag === "function") {
     gtag("event", eventName, params);
     console.log(`GA4 event sent: ${eventName}`, params); // Debug log
+
+    console.error(gtag);
   } else {
     console.warn("gtag is not defined. Make sure GA4 is installed.");
   }
@@ -57908,6 +58234,7 @@ function trackButtonClick() {
     button_location: "TEST",
     button_text: "TEST TEXT",
     value: 99,
+    send_to: "G-3XLGXFHQSS",
   });
 }
 trackButtonClick();

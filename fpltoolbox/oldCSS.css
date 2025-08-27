@@ -1402,19 +1402,7 @@ span#share-bench-points {
   white-space: pre-line;
 }
 
-#dragon-meme-footer {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-items: center;
-  justify-content: space-around;
-  gap: 10px;
-}
 
-#dragon-meme-footer-text {
-  font-size: 0.7rem;
-}
 
 
 #loader-container {
