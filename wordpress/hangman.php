@@ -10,14 +10,10 @@ function wp_hangman_game() {
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'game_database';
-
-    // Format today's date as stored in DB (dd-mm-YYYY)
     $today = date('d-m-Y');
-
     $current_time = time();
     $midnight = strtotime('tomorrow');
 
-    // Fetch today's hangman word
     $row = $wpdb->get_row(
         $wpdb->prepare(
             "SELECT answer FROM $table_name WHERE game_name = %s AND game_date = %s",
@@ -32,12 +28,10 @@ function wp_hangman_game() {
 
     $word = strtoupper(trim($row->answer));
 
-    // Start session if needed
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }
 
-    // Initialize session for today's game
     if (!isset($_SESSION['hangman']) || $_SESSION['hangman']['date'] != $today) {
         $_SESSION['hangman'] = [
             'date' => $today,
@@ -50,10 +44,8 @@ function wp_hangman_game() {
 
     $game = &$_SESSION['hangman'];
 
-    // Handle user guess only if input is allowed
     if (!$game['locked'] && isset($_POST['letter'])) {
         $letter = strtoupper(substr($_POST['letter'], 0, 1));
-
         if (!in_array($letter, $game['guessed'])) {
             $game['guessed'][] = $letter;
             if (strpos($game['word'], $letter) === false) {
@@ -62,10 +54,8 @@ function wp_hangman_game() {
         }
     }
 
-    // Prepare the display word
     $display_word = '';
     $won = true;
-
     for ($i = 0; $i < strlen($game['word']); $i++) {
         $char = $game['word'][$i];
         if (in_array($char, $game['guessed'])) {
@@ -76,16 +66,13 @@ function wp_hangman_game() {
         }
     }
 
-    // Check game over
     $lost = $game['attempts'] <= 0;
 
-    // Lock the game if it's finished
     if (!$game['locked'] && ($won || $lost)) {
         $game['locked'] = true;
         setcookie('hangman_played', $today, $midnight, COOKIEPATH, COOKIE_DOMAIN);
     }
 
-    // Determine message
     $message = '';
     if ($game['locked']) {
         if ($won) {
@@ -97,35 +84,145 @@ function wp_hangman_game() {
         }
     }
 
-    // Time left until next word
     $hours_left = floor(($midnight - $current_time) / 3600);
     $minutes_left = floor((($midnight - $current_time) % 3600) / 60);
     $time_left_msg = "⏳ Come back in {$hours_left}h {$minutes_left}m for the next word.";
 
-    // Determine if user can guess
     $can_guess = !$game['locked'] && !(isset($_COOKIE['hangman_played']) && $_COOKIE['hangman_played'] == $today);
 
-    // Output HTML
     ob_start();
     ?>
-    <div style="font-family: monospace; padding: 20px; border: 1px solid #ccc; width: 350px;">
+    <style>
+        .hangman-container {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 12px;
+            background: #f9f9f9;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .hangman-container h2 {
+            margin-bottom: 15px;
+        }
+        .hangman-container .word {
+            font-size: 22px;
+            letter-spacing: 5px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .hangman-container .attempts {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .hangman-container form input[type="text"] {
+            width: 50px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .hangman-container form button {
+            padding: 6px 12px;
+            margin-left: 5px;
+            background: #0073aa;
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .hangman-container form button:hover {
+            background: #005f8d;
+        }
+
+        /* Popup modal */
+.hangman-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+    font-size: 24px;
+    transform: translateY(100%); /* hidden by default */
+    transition: transform 0.5s ease-in-out;
+    z-index: 9999;
+}
+
+.hangman-popup.active {
+    transform: translateY(0); /* slides fully into view */
+}
+
+.hangman-popup .popup-content {
+    position: relative;
+    max-width: 500px;
+    padding: 20px;
+    background: #222;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.popup-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.popup-close:hover {
+    color: #ff5555;
+}
+
+
+    </style>
+
+    <div class="hangman-container">
         <h2>Hangman Game</h2>
-        <p>Word: <?php echo $display_word; ?></p>
-        <p>Attempts left: <?php echo $game['attempts']; ?></p>
-        <p>Guessed Letters: <?php echo implode(', ', $game['guessed']); ?></p>
+        <div class="word"><?php echo $display_word; ?></div>
+        <div class="attempts">Attempts left: <?php echo $game['attempts']; ?></div>
+        <p>Guessed Letters: <?php echo $game['guessed'] ? implode(', ', $game['guessed']) : 'None yet'; ?></p>
 
         <?php if ($can_guess): ?>
             <form method="post">
-                <input type="text" name="letter" maxlength="1" required style="width: 50px;">
+                <input type="text" name="letter" maxlength="1" required>
                 <button type="submit">Guess</button>
             </form>
         <?php else: ?>
-            <?php if ($message): ?>
-                <p><strong><?php echo $message; ?></strong></p>
-            <?php endif; ?>
             <p><?php echo $time_left_msg; ?></p>
         <?php endif; ?>
     </div>
+
+    <?php if ($message): ?>
+    <div id="hangmanPopup" class="hangman-popup">
+        <div class="popup-content">
+            <span class="popup-close" id="hangmanPopupClose">&times;</span>
+            <p><?php echo $message; ?></p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const popup = document.getElementById("hangmanPopup");
+            const closeBtn = document.getElementById("hangmanPopupClose");
+
+            // Show popup
+            setTimeout(() => {
+                popup.classList.add("active");
+            }, 300);
+
+            // Close popup on X click
+            closeBtn.addEventListener("click", () => {
+                popup.classList.remove("active");
+            });
+        });
+    </script>
+<?php endif; ?>
     <?php
     return ob_get_clean();
 }
