@@ -38,7 +38,9 @@ function wp_hangman_game() {
             'word' => $word,
             'guessed' => [],
             'attempts' => 6,
-            'locked' => false
+            'locked' => false,
+            'start_time' => time(), // Start timer
+            'end_time'   => null
         ];
     }
 
@@ -70,17 +72,60 @@ function wp_hangman_game() {
 
     if (!$game['locked'] && ($won || $lost)) {
         $game['locked'] = true;
+        $game['end_time'] = time();
         setcookie('hangman_played', $today, $midnight, COOKIEPATH, COOKIE_DOMAIN);
+
+        // ✅ Save game record to user meta if logged in
+        if (is_user_logged_in()) {
+            $user_id = get_current_user_id();
+            $played_games = get_user_meta($user_id, 'hangman_games', true);
+
+            if (!is_array($played_games)) {
+                $played_games = [];
+            }
+
+            $played_games[] = [
+                'game_name' => 'Hangman',
+                'date'      => $today,
+                'word'      => $game['word'],
+                'won'       => $won,
+                'duration'  => $game['end_time'] - $game['start_time']
+            ];
+
+            update_user_meta($user_id, 'hangman_games', $played_games);
+			
+			// ✅ Handle streak logic
+            $current_streak = (int) get_user_meta($user_id, 'hangman_streak', true);
+            if ($won) {
+                $current_streak++;
+            } else {
+                $current_streak = 0;
+            }
+            update_user_meta($user_id, 'hangman_streak', $current_streak);
+        }
     }
 
     $message = '';
     if ($game['locked']) {
+        // Work out elapsed time
+        $elapsed = '';
+        if (!empty($game['end_time']) && !empty($game['start_time'])) {
+            $duration = $game['end_time'] - $game['start_time'];
+            $minutes = floor($duration / 60);
+            $seconds = $duration % 60;
+            $elapsed = " You completed this in {$minutes}m {$seconds}s.";
+        }
+
         if ($won) {
-            $message = "🎉 You did it! The word was {$game['word']}.";
+            $message = "🎉 You did it! The word was {$game['word']}." . $elapsed;
+			if (is_user_logged_in()) {
+            $streak = (int) get_user_meta(get_current_user_id(), 'hangman_streak', true);
+            $message .= '<br>🔥 Current Streak: ' . $streak;
+        }
         } elseif ($lost) {
-            $message = "😢 Better luck next time! The word was {$game['word']}.";
+            $message = "😢 Better luck next time! The word was {$game['word']}." . $elapsed;
         } elseif (isset($_COOKIE['hangman_played']) && $_COOKIE['hangman_played'] == $today) {
-            $message = "⏳ You already played today! The word was: {$game['word']}.";
+            $message = "⏳ You already played today! The word was: {$game['word']}." . $elapsed;
         }
     }
 
@@ -116,71 +161,79 @@ function wp_hangman_game() {
             margin: 10px 0;
             font-weight: bold;
         }
-        .hangman-container form input[type="text"] {
-            width: 50px;
-            text-align: center;
-            font-size: 18px;
-        }
-        .hangman-container form button {
-            padding: 6px 12px;
-            margin-left: 5px;
-            background: #0073aa;
-            border: none;
-            color: #fff;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+.hangman-container form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap; /* allows wrapping on small screens */
+}
+
+.hangman-container form input[type="text"] {
+    flex: 0 0 60px; /* fixed width input */
+    text-align: center;
+    font-size: 20px;
+    padding: 5px;
+}
+
+.hangman-container form button {
+    flex: 1; /* button fills remaining space */
+    min-width: 100px;
+    font-size: 16px;
+    padding: 8px;
+    background: blue;
+}
+
         .hangman-container form button:hover {
-            background: #005f8d;
+            background: red;
+			
         }
 
         /* Popup modal */
-.hangman-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.85);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 30px;
-    font-size: 24px;
-    transform: translateY(100%); /* hidden by default */
-    transition: transform 0.5s ease-in-out;
-    z-index: 9999;
-}
+        .hangman-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            font-size: 24px;
+            transform: translateY(100%);
+            transition: transform 0.5s ease-in-out;
+            z-index: 9999;
+        }
 
-.hangman-popup.active {
-    transform: translateY(0); /* slides fully into view */
-}
+        .hangman-popup.active {
+            transform: translateY(0);
+        }
 
-.hangman-popup .popup-content {
-    position: relative;
-    max-width: 500px;
-    padding: 20px;
-    background: #222;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-}
+        .hangman-popup .popup-content {
+            position: relative;
+            max-width: 500px;
+            padding: 20px;
+            background: #222;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
 
-.popup-close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
-    cursor: pointer;
-    color: #fff;
-}
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #fff;
+        }
 
-.popup-close:hover {
-    color: #ff5555;
-}
-
-
+        .popup-close:hover {
+            color: #ff5555;
+        }
     </style>
 
     <div class="hangman-container">
@@ -191,7 +244,15 @@ function wp_hangman_game() {
 
         <?php if ($can_guess): ?>
             <form method="post">
-                <input type="text" name="letter" maxlength="1" required>
+               <input 
+    type="text" 
+    name="letter" 
+    maxlength="1" 
+    inputmode="text" 
+    pattern="[A-Za-z]" 
+    required
+    style="text-transform: uppercase; text-align: center; width: 40px; font-size: 20px;"
+>
                 <button type="submit">Guess</button>
             </form>
         <?php else: ?>
@@ -222,7 +283,7 @@ function wp_hangman_game() {
             });
         });
     </script>
-<?php endif; ?>
+    <?php endif; ?>
     <?php
     return ob_get_clean();
 }
