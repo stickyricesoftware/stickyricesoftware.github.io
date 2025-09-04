@@ -5,14 +5,15 @@ import {
   TextInput,
   ActivityIndicator,
   Pressable,
-  StyleSheet,
+  Modal,
+  FlatList,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@react-navigation/native";
-import { styles } from "../styles"; // Import your new style sheet
+
 import { TeamContext } from "../contexts/TeamContext";
-import ErrorModal from "../components/ErrorModal";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { Picker } from "@react-native-picker/picker";
+import ErrorModal from "../components/ErrorModal";
 
 export default function SettingsScreen() {
   const {
@@ -21,20 +22,22 @@ export default function SettingsScreen() {
     setTeamID,
     resetTeamID,
     selectedLeague,
-    setSelectedLeague, // 👈 from context
+    setSelectedLeague,
     error,
     loading,
   } = useContext(TeamContext);
+
   const [inputValue, setInputValue] = useState(teamID ? String(teamID) : "");
-  const [isFocused, setIsFocused] = useState(false); // To handle input focus style
+  const [isFocused, setIsFocused] = useState(false);
 
-  const { theme, effectiveTheme, changeTheme } = useContext(ThemeContext);
-  const { colors } = useTheme(); // Access the colors from the active theme
+  const { theme, changeTheme } = useContext(ThemeContext);
+  const { colors } = useTheme();
 
-  // modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalTitle, setModalTitle] = useState("");
+
+  const [leagueModalVisible, setLeagueModalVisible] = useState(false);
 
   const showModal = (message, title = "Notice") => {
     setModalMessage(message);
@@ -42,16 +45,14 @@ export default function SettingsScreen() {
     setModalVisible(true);
   };
 
-  const saveTeamID = async () => {
+  const saveTeamIDHandler = async () => {
     const id = parseInt(inputValue, 10);
-
     if (isNaN(id)) {
       showModal("Please enter a valid number", "Error");
       return;
     }
 
     const success = await setTeamID(id);
-
     if (success) {
       showModal(`Team ID set to ${id}`, "Success");
     } else {
@@ -65,168 +66,139 @@ export default function SettingsScreen() {
     showModal("Team ID has been cleared", "Reset");
   };
 
+  const selectLeague = async (league) => {
+    if (!league) {
+      setSelectedLeague(null);
+      await AsyncStorage.removeItem("@leagueID");
+    } else {
+      setSelectedLeague(league);
+      await AsyncStorage.setItem("@leagueID", league.id.toString());
+    }
+    setLeagueModalVisible(false);
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[localStyles.label, { color: colors.onBackground }]}>
+    <View className="flex-1 p-4 bg-white dark:bg-black">
+      {/* Team ID */}
+      <Text className="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">
         Enter Team ID:
       </Text>
       <TextInput
-        style={[styles.input, isFocused && styles.inputFocused]}
+        className={`border rounded-lg p-3 text-base ${
+          isFocused ? "border-blue-500" : "border-gray-300"
+        } text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-800`}
         value={inputValue}
         onChangeText={setInputValue}
         keyboardType="numeric"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        placeholderTextColor={colors.onSurfaceVariant} // Use a theme color for placeholder
+        placeholder="Team ID"
+        placeholderTextColor={colors.onSurfaceVariant}
       />
 
+      {/* Loading / Buttons */}
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color={colors.primary}
-          style={{ marginVertical: 10 }}
-        />
+        <View className="flex-row justify-center my-4">
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
       ) : (
-        <>
-          {/* Primary Button */}
-          <Pressable onPress={saveTeamID} style={styles.button}>
-            <Text style={styles.buttonText}>Save Team ID</Text>
+        <View className="flex-row space-x-4 mt-4">
+          <Pressable
+            onPress={saveTeamIDHandler}
+            className="bg-blue-600 rounded-lg px-4 py-2 flex-1"
+          >
+            <Text className="text-white text-center font-medium">Save Team ID</Text>
           </Pressable>
-
-          {/* Secondary Button */}
-          <Pressable onPress={handleReset} style={styles.buttonSecondary}>
-            <Text style={styles.buttonSecondaryText}>Reset Team ID</Text>
+          <Pressable
+            onPress={handleReset}
+            className="bg-gray-300 dark:bg-gray-700 rounded-lg px-4 py-2 flex-1"
+          >
+            <Text className="text-gray-800 dark:text-gray-200 text-center font-medium">
+              Reset Team ID
+            </Text>
           </Pressable>
-        </>
+        </View>
       )}
 
-      {/* Dropdown for leagues */}
+      {/* Styled League Picker */}
       {managerLeagues?.classic?.length > 0 && (
-        <>
-          <Text
-            style={[
-              localStyles.label,
-              { marginTop: 20, color: colors.onBackground },
-            ]}
-          >
-            Select a League:
+        <View className="mt-6">
+          <Text className="text-base font-medium text-gray-800 dark:text-gray-200 mb-2">
+            Change League:
           </Text>
 
-          <Picker
-            selectedValue={selectedLeague}
-            onValueChange={(value) => setSelectedLeague(value)}
-            style={[localStyles.dropdown, { color: colors.onBackground }]} // 👈 combine theme + local
-            dropdownIconColor={colors.onBackground} // 👈 makes the chevron match theme
+          <Pressable
+            onPress={() => setLeagueModalVisible(true)}
+            className="border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-100 dark:bg-gray-800 px-4 py-3"
           >
-            <Picker.Item label="-- Choose League --" value={null} />
-            {managerLeagues.classic.map((league) => (
-              <Picker.Item
-                key={league.id}
-                label={league.name}
-                value={league.id}
-                color={colors.onBackground} // 👈 ensures items also respect theme
-              />
-            ))}
-          </Picker>
-
-          {selectedLeague && (
-            <Text style={{ color: colors.onBackground, marginTop: 10 }}>
-              ✅ Selected League:{" "}
-              {
-                managerLeagues?.classic?.find(
-                  (league) => league.id === selectedLeague
-                )?.name
-              }
+            <Text className="text-gray-900 dark:text-gray-100">
+              {selectedLeague?.name || "Select League"}
             </Text>
-          )}
-        </>
+          </Pressable>
+
+          <Modal
+            visible={leagueModalVisible}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setLeagueModalVisible(false)}
+          >
+            <View className="flex-1 justify-center bg-black/50 px-4">
+              <View className="bg-white dark:bg-gray-900 rounded-lg max-h-80 overflow-hidden">
+                <FlatList
+                  data={[null, ...managerLeagues.classic]}
+                  keyExtractor={(item) => (item?.id ?? "none").toString()}
+                  renderItem={({ item }) => (
+                    <Pressable
+                      onPress={() =>
+                        selectLeague(item ? { id: item.id, name: item.name } : null)
+                      }
+                      className="px-4 py-3 border-b border-gray-200 dark:border-gray-700"
+                    >
+                      <Text className="text-gray-900 dark:text-gray-100">
+                        {item ? item.name : "Clear Selection"}
+                      </Text>
+                    </Pressable>
+                  )}
+                />
+                <Pressable
+                  onPress={() => setLeagueModalVisible(false)}
+                  className="px-4 py-3 bg-gray-200 dark:bg-gray-800"
+                >
+                  <Text className="text-center text-gray-800 dark:text-gray-200 font-medium">
+                    Cancel
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+        </View>
       )}
 
-      {/* Theme Options */}
-      <Text
-        style={[
-          localStyles.label,
-          { marginTop: 20, color: colors.onBackground },
-        ]}
-      >
+      {/* Theme Buttons */}
+      <Text className="text-base font-medium text-gray-800 dark:text-gray-200 mt-6 mb-2">
         Theme:
       </Text>
-      <View style={localStyles.themeButtonsContainer}>
-        <Pressable
-          onPress={() => changeTheme("light")}
-          style={[
-            styles.button,
-            {
-              backgroundColor:
-                theme === "light" ? colors.primary : colors.surfaceVariant,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              {
-                color:
-                  theme === "light"
-                    ? colors.onPrimary
-                    : colors.onSurfaceVariant,
-              },
-            ]}
+      <View className="flex-row justify-around">
+        {["light", "dark", "system"].map((t) => (
+          <Pressable
+            key={t}
+            onPress={() => changeTheme(t)}
+            className={`px-4 py-2 rounded-lg ${
+              theme === t ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-700"
+            }`}
           >
-            Light
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => changeTheme("dark")}
-          style={[
-            styles.button,
-            {
-              backgroundColor:
-                theme === "dark" ? colors.primary : colors.surfaceVariant,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              {
-                color:
-                  theme === "dark" ? colors.onPrimary : colors.onSurfaceVariant,
-              },
-            ]}
-          >
-            Dark
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => changeTheme("system")}
-          style={[
-            styles.button,
-            {
-              backgroundColor:
-                theme === "system" ? colors.primary : colors.surfaceVariant,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              {
-                color:
-                  theme === "system"
-                    ? colors.onPrimary
-                    : colors.onSurfaceVariant,
-              },
-            ]}
-          >
-            System
-          </Text>
-        </Pressable>
+            <Text
+              className={`text-center font-medium ${
+                theme === t ? "text-white" : "text-gray-800 dark:text-gray-200"
+              }`}
+            >
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </Text>
+          </Pressable>
+        ))}
       </View>
 
-      {/* Error Modal Integration */}
+      {/* Error Modal */}
       <ErrorModal
         visible={modalVisible}
         title={modalTitle}
@@ -236,62 +208,3 @@ export default function SettingsScreen() {
     </View>
   );
 }
-
-const localStyles = StyleSheet.create({
-  label: {
-    fontSize: 16,
-    fontWeight: "500", // Medium weight for MD3 labels
-    marginBottom: 6,
-    letterSpacing: 0.15, // MD3 body/label spacing
-    color: "#49454F", // Neutral on-surface-variant tone
-  },
-  themeButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly", // more balanced spacing than space-around
-    alignItems: "center",
-    width: "100%",
-    marginTop: 12,
-    paddingHorizontal: 4, // subtle padding for breathing room
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderColor: "#CAC4D0", // outline variant
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 14,
-    fontSize: 16,
-    backgroundColor: "#FFFBFE", // surface container low
-    color: "#1C1B1F", // on-surface
-  },
-  placeholder: {
-    fontSize: 16,
-    color: "#49454F", // on-surface-variant
-  },
-  selectedText: {
-    fontSize: 16,
-    color: "#1C1B1F", // on-surface
-    fontWeight: "500",
-  },
-  icon: {
-    tintColor: "#49454F", // dropdown arrow
-    marginRight: 8,
-  },
-  dropdownMenu: {
-    borderRadius: 12,
-    backgroundColor: "#FFFBFE", // surface container
-    elevation: 3, // MD3 shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    marginTop: 4,
-  },
-  dropdownItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  dropdownItemText: {
-    fontSize: 16,
-    color: "#1C1B1F",
-  },
-});

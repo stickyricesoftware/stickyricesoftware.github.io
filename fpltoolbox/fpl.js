@@ -1,7 +1,11 @@
-const BASE_URL =
-  "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
-//  const BASE_URL =
+// const BASE_URL =
+//   "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
+
+  //  const BASE_URL =
 //  "http://fantasy.premierleague.com/api/";
+
+ const BASE_URL =
+ "https://coolproxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
 
 // import managerDataTest from "./testData/managerDataTest.js";
 // import eventStatusTest from "./testData/eventStatusTest.js";
@@ -45778,7 +45782,7 @@ async function getEventStatus() {
     const data = await res.json();
     let eventStatus = data;
     console.log(
-      "%c API CALL MADE - Event Status",
+      `%c API CALL MADE ${BASE_URL} - Event Status`,
       "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red; ",
       eventStatus
     );
@@ -45918,7 +45922,7 @@ async function getBootstrap() {
       const data = await res.json();
       bootstrap = data;
       console.log(
-        "%c API CALL MADE - Bootstrap Data",
+        `%c API CALL MADE ${BASE_URL} - Bootstrap Data`,
         "min-width: 100%; padding: 1rem 3rem; font-family: Roboto; font-size: 1.2em; line-height: 1.4em; color: white; background-color: red;",
         bootstrap
       );

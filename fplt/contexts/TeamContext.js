@@ -11,16 +11,14 @@ export const TeamProvider = ({ children }) => {
   const [selectedLeague, setSelectedLeague] = useState(null); // 👈 NEW
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [refresh, setRefresh] = useState(0);
   // Save league selection
-  const saveLeague = async (leagueId) => {
-    try {
-      await AsyncStorage.setItem("@leagueID", leagueId.toString());
-      setSelectedLeague(leagueId);
-    } catch (err) {
-      console.log("Error saving league:", err);
-    }
-  };
+const saveLeague = (leagueId) => {
+  const leagueName = managerLeagues.classic.find(l => l.id === leagueId)?.name ?? "";
+  setSelectedLeague({ id: leagueId, name: leagueName });
+  AsyncStorage.setItem("@leagueID", leagueId.toString()).catch(console.error);
+};
+
 
   // Validate & save Team ID (fetches manager data + leagues)
   const saveTeamID = async (id) => {
