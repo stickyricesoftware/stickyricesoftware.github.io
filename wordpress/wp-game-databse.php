@@ -2,7 +2,7 @@
 Plugin Name: WP Game Database (Single Page) - Fixed SQL
 Description: Hardcoded games + admin form + DataTables list with inline editing, custom table storage. SQL comment syntax fixed.
 Version: 1.0.1
-Author: You
+Author: Sunny
 */
 
 if (!defined('ABSPATH')) exit;
