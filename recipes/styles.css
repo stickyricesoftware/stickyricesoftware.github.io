@@ -1,0 +1,38 @@
+.accordion-item {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.accordion-header {
+  background: #f7f7f7;
+  padding: 12px;
+  font-size: 1.1em;
+  width: 100%;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.accordion-content {
+  display: none;
+  padding: 12px;
+  background: #fff;
+}
+
+.accordion-content.open {
+  display: block;
+}
+
+.accordion-content img {
+  max-width: 200px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+.recipe-photo{
+  min-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
