@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Example recipe objects (you can add as many as you like)
   const recipes = [
     {
-      title: "Chicken saag",
+      title: "Chicken saag ✅",
       photo:
         "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/chicken_saag_00975_16x9.jpg",
       ingredients: [
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `,
     },
     {
-      title: "Spiced Meatball Curry",
+      title: "Spiced Meatball Curry ✅",
       photo: "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/meatball_curry_51206_16x9.jpg", // replace with a real image if you have one
       ingredients: [
         "600g lean beef mince",
