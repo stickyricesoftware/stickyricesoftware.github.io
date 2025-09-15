@@ -103,6 +103,40 @@ document.addEventListener("DOMContentLoaded", () => {
   `,
     },
 
+{
+  title: "Quick Chicken & Veggie Stir-Fry", 
+  photo: "https://www.inspiredtaste.net/wp-content/uploads/2017/09/Vegetable-Chicken-Stir-Fry-Recipe-2-1200.jpg",
+
+  ingredients: [
+    "Chicken breast 400g (sliced thinly)",
+    "Garlic 3 cloves (minced)",
+    "Ginger 1 Tbsp (grated)",
+    "Onion 1 medium (sliced)",
+    "Broccoli 150g (cut into small florets)",
+    "Long beans 150g (cut into 5cm pieces)",
+    "Bok choy 200g (roughly chopped)",
+    "Soy sauce 3 Tbsp",
+    "Oyster sauce 2 Tbsp",
+    "Sesame oil 1 Tbsp",
+    "Vegetable oil 2 Tbsp",
+    "Optional: Sesame seeds for garnish",
+  ],
+  method: `
+    Heat vegetable oil in a large wok or frying pan over medium-high heat.<br><br>
+
+    Add the garlic and ginger, stir-fry for 30 seconds until fragrant.<br><br>
+
+    Add the chicken slices and stir-fry for 4–5 minutes until the meat is no longer pink.<br><br>
+
+    Toss in the onions, broccoli, and long beans. Stir-fry for 3–4 minutes until they begin to soften but stay crisp.<br><br>
+
+    Add the bok choy, soy sauce, oyster sauce, and sesame oil. Stir well and cook for another 2–3 minutes until vegetables are just tender and chicken is cooked through.<br><br>
+
+    Remove from heat and garnish with sesame seeds if desired. Serve hot with steamed rice or noodles.
+  `,
+}
+
+
   ];
 
   function createRecipeAccordion(recipe) {
