@@ -39,7 +39,7 @@ function export_students_csv() {
     $output = fopen('php://output', 'w');
 
     // Column headings
-    fputcsv($output, ['Email', 'First Name', 'Last Name', 'Year Group', 'Group ID', 'Group Name']);
+    fputcsv($output, ['User ID','Email', 'First Name', 'Last Name', 'Year Group', 'Group ID', 'Group Name']);
 
     // Process users in batches
     $paged     = 1;
@@ -74,7 +74,7 @@ function export_students_csv() {
                 }
             }
 
-            fputcsv($output, [$email, $fname, $lname, $year, $group_id, $group_name]);
+            fputcsv($output, [$user->ID, $email, $fname, $lname, $year, $group_id, $group_name]);
         }
 
         $paged++;

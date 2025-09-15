@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Example recipe objects (you can add as many as you like)
   const recipes = [
     {
-      title: "Chicken saag ✅",
+      title: "Chicken saag",
       photo:
         "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/chicken_saag_00975_16x9.jpg",
       ingredients: [
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `,
     },
     {
-      title: "Spiced Meatball Curry ✅",
+      title: "Spiced Meatball Curry",
       photo: "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/meatball_curry_51206_16x9.jpg", // replace with a real image if you have one
       ingredients: [
         "600g lean beef mince",
@@ -77,6 +77,32 @@ document.addEventListener("DOMContentLoaded", () => {
     Add the cooked meatballs, reduce the heat and simmer for 20 minutes. Add 60–90ml/2–3fl oz water if the curry is a bit dry.
   `,
     },
+    {
+      title: "Massaman Chicken",
+      photo: "https://blueelephant.com/wp-content/uploads/2024/09/massaman_chicken.webp", // replace with a real image if you have one
+      ingredients: [
+        "Massaman curry paste 70g",
+        "Chicken 800g",
+        "Salt 1/2 Tsp",
+        "Sugar 3 Tbsp",
+        "2 chopped Onions",
+        "2 chopped Potatoes",
+        "2 chopped Carrots",
+        "Coconut milk 800ml",
+        "Oil 3 Tbsp",
+        "Peanuts 80g",
+        "Water 400ml",
+  
+      ],
+      method: `
+    Heat vegetable oil in a saucepan and stir-fry the Massaman curry paste until aroma develops. Add in half of the coconut cream until some oil separates on top of the surface.<br><br>
+    Add the remaining coconut cream and 400ml of water, stir and bring to a boil.<br><br>
+    Add the chicken, the <strong>parboiled</strong> potatoes, carrots, onions and let it simmer until cooked though (15-20min)<br><br>
+    Season with sugar and salt.<br><br>
+    Add the crushed peanuts before turning off the heat
+  `,
+    },
+
   ];
 
   function createRecipeAccordion(recipe) {
