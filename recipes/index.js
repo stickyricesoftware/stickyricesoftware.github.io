@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Example recipe objects (you can add as many as you like)
   const recipes = [
     {
-      title: "Chicken saag",
+      title: "Pork saag",
       photo:
         "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/chicken_saag_00975_16x9.jpg",
       ingredients: [
@@ -29,54 +29,54 @@ document.addEventListener("DOMContentLoaded", () => {
         Season with a little lemon juice and extra salt and pepper, to taste. Serve.
       `,
     },
-    {
-      title: "Vegetable curry",
-      photo:
-        "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/vegetablecurry_80763_16x9.jpg",
-      ingredients: [
-        "3 medium potatoes (around 350g/12oz), peeled and cut into 2cm/¾in chunks",
-        "1.5 large carrot, peeled and sliced diagonally",
-        "½ cauliflower (around 400g), cut into small florets and halved",
-        "4 tbsp sunflower or vegetable oil",
-        "2 large onion, coarsely grated or very finely chopped",
-        "2 tbsp medium or hot curry powder",
-        "1.5 tin chopped tomatoes",
-        "400ml oz vegetable or chicken stock (made with ½ cube), gluten-free if required",
-        "150g frozen peas or two large handfuls young spinach leaves, or a mixture",
-      ],
-      method: `
-        Half-fill a saucepan with cold water and add the potatoes and carrots. Bring to the boil and cook for 8 minutes. Add the cauliflower florets and cook for 2 minutes more. Drain in a colander and set aside.<br><br>
-        Heat the oil in a large, non-stick frying pan or wide-based saucepan. Add the onion and cook over a medium heat for 8 minutes or until well softened and lightly browned, stirring regularly. Sprinkle over the curry powder and cook for 30 seconds more, stirring.<br><br>
-        Add the tomatoes to the onions and cook for 2–3 minutes, stirring constantly. Add the stock and bring to a gentle simmer. Add the vegetables and peas or spinach and simmer gently for 5 minutes, stirring regularly. If the sauce thickens too much, add a splash of water.<br><br>
-      `,
-    },
-    {
-      title: "Spiced Meatball Curry",
-      photo: "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/meatball_curry_51206_16x9.jpg", // replace with a real image if you have one
-      ingredients: [
-        "600g lean beef mince",
-        "2 tsp crushed garlic",
-        "2 large onion, finely chopped",
-        "1 tsp black pepper, coarsely ground",
-        "2 tsp garam masala",
-        "2 free-range egg",
-        "2 tsp oil",
-        "2 tsp cumin seeds",
-        "2 tsp finely chopped root ginger",
-        "2 cans chopped tomatoes",
-        "2 tsp tomato purée",
-        "1 tsp ground turmeric",
-        "90–120ml/2–3fl oz water (optional)",
+  //   {
+  //     title: "Vegetable curry",
+  //     photo:
+  //       "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/vegetablecurry_80763_16x9.jpg",
+  //     ingredients: [
+  //       "3 medium potatoes (around 350g/12oz), peeled and cut into 2cm/¾in chunks",
+  //       "1.5 large carrot, peeled and sliced diagonally",
+  //       "½ cauliflower (around 400g), cut into small florets and halved",
+  //       "4 tbsp sunflower or vegetable oil",
+  //       "2 large onion, coarsely grated or very finely chopped",
+  //       "2 tbsp medium or hot curry powder",
+  //       "1.5 tin chopped tomatoes",
+  //       "400ml oz vegetable or chicken stock (made with ½ cube), gluten-free if required",
+  //       "150g frozen peas or two large handfuls young spinach leaves, or a mixture",
+  //     ],
+  //     method: `
+  //       Half-fill a saucepan with cold water and add the potatoes and carrots. Bring to the boil and cook for 8 minutes. Add the cauliflower florets and cook for 2 minutes more. Drain in a colander and set aside.<br><br>
+  //       Heat the oil in a large, non-stick frying pan or wide-based saucepan. Add the onion and cook over a medium heat for 8 minutes or until well softened and lightly browned, stirring regularly. Sprinkle over the curry powder and cook for 30 seconds more, stirring.<br><br>
+  //       Add the tomatoes to the onions and cook for 2–3 minutes, stirring constantly. Add the stock and bring to a gentle simmer. Add the vegetables and peas or spinach and simmer gently for 5 minutes, stirring regularly. If the sauce thickens too much, add a splash of water.<br><br>
+  //     `,
+  //   },
+  //   {
+  //     title: "Spiced Meatball Curry",
+  //     photo: "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/meatball_curry_51206_16x9.jpg", // replace with a real image if you have one
+  //     ingredients: [
+  //       "600g lean beef mince",
+  //       "2 tsp crushed garlic",
+  //       "2 large onion, finely chopped",
+  //       "1 tsp black pepper, coarsely ground",
+  //       "2 tsp garam masala",
+  //       "2 free-range egg",
+  //       "2 tsp oil",
+  //       "2 tsp cumin seeds",
+  //       "2 tsp finely chopped root ginger",
+  //       "2 cans chopped tomatoes",
+  //       "2 tsp tomato purée",
+  //       "1 tsp ground turmeric",
+  //       "90–120ml/2–3fl oz water (optional)",
   
-      ],
-      method: `
-    Mix the beef mince, garlic, half of the onion, pepper, garam masala and egg together in a bowl. Using your hands, shape the meat mixture into 30 balls.<br><br>
-    Preheat the grill to hot. Line the bottom of a grill tray with aluminium foil and place the meatballs on the grill tray. (This will allow the fat to drain off into the lined tray, saving on washing up.) Grill the meatballs under a medium heat for 10–15 minutes, turning occasionally, or until nicely browned.<br><br>
-    Heat the oil in a frying pan, and add the cumin seeds and the remaining onion. Cook for 4–5 minutes, or until softened, then stir in the ginger.<br><br>
-    Add the chopped tomatoes, tomato purée and turmeric and cook for 10 minutes or until the sauce has thickened.<br><br>
-    Add the cooked meatballs, reduce the heat and simmer for 20 minutes. Add 60–90ml/2–3fl oz water if the curry is a bit dry.
-  `,
-    },
+  //     ],
+  //     method: `
+  //   Mix the beef mince, garlic, half of the onion, pepper, garam masala and egg together in a bowl. Using your hands, shape the meat mixture into 30 balls.<br><br>
+  //   Preheat the grill to hot. Line the bottom of a grill tray with aluminium foil and place the meatballs on the grill tray. (This will allow the fat to drain off into the lined tray, saving on washing up.) Grill the meatballs under a medium heat for 10–15 minutes, turning occasionally, or until nicely browned.<br><br>
+  //   Heat the oil in a frying pan, and add the cumin seeds and the remaining onion. Cook for 4–5 minutes, or until softened, then stir in the ginger.<br><br>
+  //   Add the chopped tomatoes, tomato purée and turmeric and cook for 10 minutes or until the sauce has thickened.<br><br>
+  //   Add the cooked meatballs, reduce the heat and simmer for 20 minutes. Add 60–90ml/2–3fl oz water if the curry is a bit dry.
+  // `,
+  //   },
     {
       title: "Massaman Chicken",
       photo: "https://blueelephant.com/wp-content/uploads/2024/09/massaman_chicken.webp", // replace with a real image if you have one
