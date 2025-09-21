@@ -463,7 +463,7 @@ function appendPayoutStructure(screenDiv) {
     <div class="collapsible-content">
         <div>
         <h3>Total Pot</h3>
-        <span>RM100 Buy-in = <strong>RM1900</strong></span>
+        <span>RM100 Buy-in = <strong>RM2000</strong></span>
         </div>
 <hr>
         <div>
@@ -477,9 +477,9 @@ function appendPayoutStructure(screenDiv) {
         <h3>End of Season</h3>
         <span>Pot = <strong>RM1500</strong></span>
         <div class="is-paid">
-          <div class="key" style="padding:20px">🥇 1st Place: RM750</div>
+          <div class="key" style="padding:20px">🥇 1st Place: RM800</div>
           <div class="key" style="padding:20px">🥈 2nd Place: RM300</div>
-          <div class="key" style="padding:20px">🥉 3rd Place: RM150</div>
+          <div class="key" style="padding:20px">🥉 3rd Place: RM200</div>
           <div class="key" style="padding:20px">🏆 Cup Winner: RM300</div>
         </div>
       </div>
