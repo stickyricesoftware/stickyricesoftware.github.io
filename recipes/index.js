@@ -3,32 +3,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Example recipe objects (you can add as many as you like)
   const recipes = [
-    {
-      title: "Pork saag",
-      photo:
-        "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/chicken_saag_00975_16x9.jpg",
-      ingredients: [
-        "2.5 tbsp sunflower or vegetable oil",
-        "2 large onion, finely chopped",
-        "40g piece fresh root ginger, peeled and finely chopped",
-        "5 garlic cloves, finely chopped",
-        "3 heaped tsp medium curry powder",
-        "Half tsp dried chilli flakes",
-        "400g young spinach leaves",
-        "1 tsp fine sea salt",
-        "4-5 boneless, skinless chicken breasts (around 800g), cut into roughly 2.5cm/1in chunks",
-        "5tsp fresh lemon juice",
-        "Salt and freshly ground black pepper",
-      ],
-      method: `
-        Heat 1.5 tablespoon of the oil in large non-stick saucepan over a medium heat. Add the onion, ginger and garlic, cover with a lid and fry for 8–10 minutes or until softened, stirring occasionally.<br><br>
-        Remove the lid, increase the heat a little and cook for 2–3 minutes more, or until the onions are lightly browned. Stir in the curry powder and chilli flakes (if using) and fry for 1 minute, stirring constantly.<br><br>
-        Add the spinach, a handful at a time, and sprinkle with the salt. Pour over 225ml cold water and cook for 5 minutes, stirring regularly. Remove from the heat and blitz with a blender until almost smooth. Set aside.<br><br>
-        Heat the remaining tablespoon of oil in a large non-stick frying pan. Season the chicken with a little salt and freshly ground black pepper and fry for 5–6 minutes over a medium-high heat, turning regularly until lightly browned in places.<br><br>
-        Pour the spinach sauce into the pan and bring to a simmer. Cook for 3–4 minutes, or until the chicken is cooked through, adding an extra splash of water if needed.<br><br>
-        Season with a little lemon juice and extra salt and pepper, to taste. Serve.
-      `,
-    },
+    // {
+    //   title: "Pork saag",
+    //   photo:
+    //     "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/chicken_saag_00975_16x9.jpg",
+    //   ingredients: [
+    //     "2.5 tbsp sunflower or vegetable oil",
+    //     "2 large onion, finely chopped",
+    //     "40g piece fresh root ginger, peeled and finely chopped",
+    //     "5 garlic cloves, finely chopped",
+    //     "3 heaped tsp medium curry powder",
+    //     "Half tsp dried chilli flakes",
+    //     "400g young spinach leaves",
+    //     "1 tsp fine sea salt",
+    //     "4-5 boneless, skinless chicken breasts (around 800g), cut into roughly 2.5cm/1in chunks",
+    //     "5tsp fresh lemon juice",
+    //     "Salt and freshly ground black pepper",
+    //   ],
+    //   method: `
+    //     Heat 1.5 tablespoon of the oil in large non-stick saucepan over a medium heat. Add the onion, ginger and garlic, cover with a lid and fry for 8–10 minutes or until softened, stirring occasionally.<br><br>
+    //     Remove the lid, increase the heat a little and cook for 2–3 minutes more, or until the onions are lightly browned. Stir in the curry powder and chilli flakes (if using) and fry for 1 minute, stirring constantly.<br><br>
+    //     Add the spinach, a handful at a time, and sprinkle with the salt. Pour over 225ml cold water and cook for 5 minutes, stirring regularly. Remove from the heat and blitz with a blender until almost smooth. Set aside.<br><br>
+    //     Heat the remaining tablespoon of oil in a large non-stick frying pan. Season the chicken with a little salt and freshly ground black pepper and fry for 5–6 minutes over a medium-high heat, turning regularly until lightly browned in places.<br><br>
+    //     Pour the spinach sauce into the pan and bring to a simmer. Cook for 3–4 minutes, or until the chicken is cooked through, adding an extra splash of water if needed.<br><br>
+    //     Season with a little lemon juice and extra salt and pepper, to taste. Serve.
+    //   `,
+    // },
   //   {
   //     title: "Vegetable curry",
   //     photo:
@@ -77,65 +77,96 @@ document.addEventListener("DOMContentLoaded", () => {
   //   Add the cooked meatballs, reduce the heat and simmer for 20 minutes. Add 60–90ml/2–3fl oz water if the curry is a bit dry.
   // `,
   //   },
-    {
-      title: "Massaman Chicken",
-      photo: "https://blueelephant.com/wp-content/uploads/2024/09/massaman_chicken.webp", // replace with a real image if you have one
+  //   {
+  //     title: "Massaman Chicken",
+  //     photo: "https://blueelephant.com/wp-content/uploads/2024/09/massaman_chicken.webp", // replace with a real image if you have one
+  //     ingredients: [
+  //       "Massaman curry paste 70g",
+  //       "Chicken 800g",
+  //       "Salt 1/2 Tsp",
+  //       "Sugar 3 Tbsp",
+  //       "2 chopped Onions",
+  //       "2 chopped Potatoes",
+  //       "2 chopped Carrots",
+  //       "Coconut milk 800ml",
+  //       "Oil 3 Tbsp",
+  //       "Peanuts 80g",
+  //       "Water 400ml",
+  
+  //     ],
+  //     method: `
+  //   Heat vegetable oil in a saucepan and stir-fry the Massaman curry paste until aroma develops. Add in half of the coconut cream until some oil separates on top of the surface.<br><br>
+  //   Add the remaining coconut cream and 400ml of water, stir and bring to a boil.<br><br>
+  //   Add the chicken, the <strong>parboiled</strong> potatoes, carrots, onions and let it simmer until cooked though (15-20min)<br><br>
+  //   Season with sugar and salt.<br><br>
+  //   Add the crushed peanuts before turning off the heat
+  // `,
+  //   },
+
+
+// {
+//   title: "Quick Chicken & Veggie Stir-Fry", 
+//   photo: "https://www.inspiredtaste.net/wp-content/uploads/2017/09/Vegetable-Chicken-Stir-Fry-Recipe-2-1200.jpg",
+
+//   ingredients: [
+//     "Chicken breast 400g (sliced thinly)",
+//     "Garlic 3 cloves (minced)",
+//     "Ginger 1 Tbsp (grated)",
+//     "Onion 1 medium (sliced)",
+//     "Broccoli 150g (cut into small florets)",
+//     "Long beans 150g (cut into 5cm pieces)",
+//     "Bok choy 200g (roughly chopped)",
+//     "Soy sauce 3 Tbsp",
+//     "Oyster sauce 2 Tbsp",
+//     "Sesame oil 1 Tbsp",
+//     "Vegetable oil 2 Tbsp",
+//     "Optional: Sesame seeds for garnish",
+//   ],
+//   method: `
+//     Heat vegetable oil in a large wok or frying pan over medium-high heat.<br><br>
+
+//     Add the garlic and ginger, stir-fry for 30 seconds until fragrant.<br><br>
+
+//     Add the chicken slices and stir-fry for 4–5 minutes until the meat is no longer pink.<br><br>
+
+//     Toss in the onions, broccoli, and long beans. Stir-fry for 3–4 minutes until they begin to soften but stay crisp.<br><br>
+
+//     Add the bok choy, soy sauce, oyster sauce, and sesame oil. Stir well and cook for another 2–3 minutes until vegetables are just tender and chicken is cooked through.<br><br>
+
+//     Remove from heat and garnish with sesame seeds if desired. Serve hot with steamed rice or noodles.
+//   `,
+// }
+      {
+      title: "Ground Pork Stroganoff Recipe",
+      photo: "https://natashaskitchen.com/wp-content/uploads/2020/01/Ground-Beef-Stroganoff-3-728x1092.jpg", // replace with a real image if you have one
       ingredients: [
-        "Massaman curry paste 70g",
-        "Chicken 800g",
-        "Salt 1/2 Tsp",
-        "Sugar 3 Tbsp",
-        "2 chopped Onions",
-        "2 chopped Potatoes",
-        "2 chopped Carrots",
-        "Coconut milk 800ml",
-        "Oil 3 Tbsp",
-        "Peanuts 80g",
-        "Water 400ml",
+        "Ground prok 600g",
+        "2 Tbsp olive oil",
+        "2 Tbsp butter",
+        "200g onions sliced",
+        "2 peppers sliced (green and yellow)",
+        "1 pack of mushrooms sliced",
+        "2 Tbsp chopped garlic",
+            "1 Tbsp smnoked Paprika",
+          "1 Tbsp Mustard",
+          "200ml Chicken stock (from cube)",
+          "250g Sour cream",
+      
+          "Salt and pepper to taste",
+  
   
       ],
       method: `
-    Heat vegetable oil in a saucepan and stir-fry the Massaman curry paste until aroma develops. Add in half of the coconut cream until some oil separates on top of the surface.<br><br>
-    Add the remaining coconut cream and 400ml of water, stir and bring to a boil.<br><br>
-    Add the chicken, the <strong>parboiled</strong> potatoes, carrots, onions and let it simmer until cooked though (15-20min)<br><br>
-    Season with sugar and salt.<br><br>
-    Add the crushed peanuts before turning off the heat
+    Heat 1 tbsp olive oil in a non-stick frying pan then add sliced onions and cook on a medium heat until completely softened, around 15 mins, adding a little splash of water if it starts to stick.<br><br>
+    Crush in 2 Tbsp chopped garlic and cook for 2-3 mins more, then add butter.<br><br>
+    Once the butter is foaming a little, add sliced mushrooms and peppers and cook for around 5 mins until completely softened.<br><br>
+    Season everything well, then take everything out and put into a bowl.<br><br>
+    Add ground pork, salt and pepper, and smoked paprika to the pan and cook until browned.<br><br>
+
+    Add vegetables back to the pan and stir to combine.<br><br>
+    Take off the heat and add mustard, chicken stock, and sour cream and stir.<br><br>
   `,
     },
-
-{
-  title: "Quick Chicken & Veggie Stir-Fry", 
-  photo: "https://www.inspiredtaste.net/wp-content/uploads/2017/09/Vegetable-Chicken-Stir-Fry-Recipe-2-1200.jpg",
-
-  ingredients: [
-    "Chicken breast 400g (sliced thinly)",
-    "Garlic 3 cloves (minced)",
-    "Ginger 1 Tbsp (grated)",
-    "Onion 1 medium (sliced)",
-    "Broccoli 150g (cut into small florets)",
-    "Long beans 150g (cut into 5cm pieces)",
-    "Bok choy 200g (roughly chopped)",
-    "Soy sauce 3 Tbsp",
-    "Oyster sauce 2 Tbsp",
-    "Sesame oil 1 Tbsp",
-    "Vegetable oil 2 Tbsp",
-    "Optional: Sesame seeds for garnish",
-  ],
-  method: `
-    Heat vegetable oil in a large wok or frying pan over medium-high heat.<br><br>
-
-    Add the garlic and ginger, stir-fry for 30 seconds until fragrant.<br><br>
-
-    Add the chicken slices and stir-fry for 4–5 minutes until the meat is no longer pink.<br><br>
-
-    Toss in the onions, broccoli, and long beans. Stir-fry for 3–4 minutes until they begin to soften but stay crisp.<br><br>
-
-    Add the bok choy, soy sauce, oyster sauce, and sesame oil. Stir well and cook for another 2–3 minutes until vegetables are just tender and chicken is cooked through.<br><br>
-
-    Remove from heat and garnish with sesame seeds if desired. Serve hot with steamed rice or noodles.
-  `,
-}
-
 
   ];
 
