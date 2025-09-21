@@ -475,7 +475,7 @@ function appendPayoutStructure(screenDiv) {
 
 <div>
         <h3>End of Season</h3>
-        <span>Pot = <strong>RM1500</strong></span>
+        <span>Pot = <strong>RM1600</strong></span>
         <div class="is-paid">
           <div class="key" style="padding:20px">🥇 1st Place: RM800</div>
           <div class="key" style="padding:20px">🥈 2nd Place: RM300</div>
