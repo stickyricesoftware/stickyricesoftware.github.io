@@ -951,3 +951,13 @@ margin-left: 20px;
   opacity: 0;
   animation: fadeIn 0.4s ease-out forwards;
 }
+
+.player-maker-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1) 100%);
+
+  aspect-ratio: 4/5;
+}

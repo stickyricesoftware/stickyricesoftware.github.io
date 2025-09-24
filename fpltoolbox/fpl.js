@@ -46621,6 +46621,14 @@ function toolsScreen() {
   ];
   if (theUser.username.data.ID == 1) {
     console.log("User: ID1");
+const playerMaker = {
+  icon: "bi-award",
+      label: "Player Maker",
+      action: showPlayerMaker,
+      tier: "free",
+      requiresData: true,
+}
+features.push(playerMaker)
   }
 
   features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
@@ -58242,3 +58250,228 @@ function trackButtonClick() {
   });
 }
 trackButtonClick();
+
+
+
+async function showPlayerMaker() {
+  const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const playerContainer = document.createElement("div");
+  playerContainer.classList.add("player-maker-container");
+  container.appendChild(playerContainer);
+
+  const form = document.createElement("form");
+  form.classList.add("player-form", "mb-4");
+
+  // Build the main form wrapper first
+  form.innerHTML = `
+    <div class="mb-3 p-2">
+      <h3>Create Custom Player Card</h3>  
+
+      <div class="mb-3" id="teamSelectWrapper">
+        <label class="form-label">Team</label>
+        <select class="form-control" id="teamCode" required>
+          <option value="">Select a team...</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Player Name</label>
+        <input type="text" class="form-control" id="playerName" required placeholder="e.g. Erling Haaland">
+      </div>
+
+      <div class="mb-3">
+  <label class="form-label">Player Name Background Colour</label>
+  <select class="form-control" id="playerNameBGColor" required>
+    <option value="">Select a colour...</option>
+    <option value="#37003c">#37003c (Purple)</option>
+    <option value="#fff">#fff (White)</option>
+    <option value="#b2002d">#b2002d (Red)</option>
+    <option value="#d44401">#d44401 (Orange)</option>
+    <option value="#ffab1b">#ffab1b (Yellow)</option>
+  </select>
+</div>
+
+
+
+
+      <div class="mb-3">
+        <label class="form-label">Score</label>
+        <input type="text" class="form-control" id="playerScore" required placeholder="e.g. 55">
+      </div>
+
+      
+      <div class="mb-3">
+  <label class="form-label">Score Background Colour</label>
+  <select class="form-control" id="scoreBGColor" required>
+    <option value="">Select a colour...</option>
+    <option value="#37003c">#37003c (Purple)</option>
+    <option value="#fff">#fff (White)</option>
+    <option value="#b2002d">#b2002d (Red)</option>
+    <option value="#d44401">#d44401 (Orange)</option>
+    <option value="#ffab1b">#ffab1b (Yellow)</option>
+  </select>
+</div>
+
+
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="isKeeper">
+        <label class="form-check-label" for="isKeeper">Is Keeper?</label>
+      </div>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="isCaptain">
+        <label class="form-check-label" for="isCaptain">Is Captain?</label>
+      </div>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="isViceCaptain">
+        <label class="form-check-label" for="isViceCaptain">Is Vice Captain?</label>
+      </div>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="isTripleCaptain">
+        <label class="form-check-label" for="isTripleCaptain">Triple Captain?</label>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Create Player Card</button>
+    </div>
+  `;
+
+  // ✅ Now safely populate the team dropdown
+  const teamSelect = form.querySelector("#teamCode");
+  bootstrap.teams.forEach(team => {
+    const option = document.createElement("option");
+    option.value = team.code;
+    option.textContent = team.name;
+    teamSelect.appendChild(option);
+  });
+
+  container.appendChild(form);
+
+  const cardContainer = document.createElement("div");
+  cardContainer.classList.add("player-card-preview", "mt-4");
+  playerContainer.appendChild(cardContainer);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    cardContainer.innerHTML = "";
+    showBootstrapSpinner(cardContainer);
+
+    const playerName = document.getElementById("playerName").value;
+    const playerNameBGColor = document.getElementById("playerNameBGColor").value;
+    const score = parseInt(document.getElementById("playerScore").value);
+    const scoreBGColor = document.getElementById("scoreBGColor").value;
+    const teamCode = parseInt(document.getElementById("teamCode").value);
+    const isKeeper = document.getElementById("isKeeper").checked;
+    const isCaptain = document.getElementById("isCaptain").checked;
+    const isViceCaptain = document.getElementById("isViceCaptain").checked;
+    const isTriple = document.getElementById("isTripleCaptain").checked;
+
+    const card = await createPlayerMakerCard(
+      playerName,
+      playerNameBGColor,
+      score,
+      scoreBGColor,
+      teamCode,
+      isKeeper,
+      isCaptain,
+      isViceCaptain,
+      isTriple
+    );
+
+    cardContainer.appendChild(card);
+    removeSpinner();
+  });
+}
+
+
+
+const MEDIA_URL = `https://fpltoolbox.com/wp-content/uploads/`
+
+async function createPlayerMakerCard(
+  playerName,
+  playerNameBGColor,
+  score,
+  scoreBGColor,
+  teamCode,
+  isKeeper,
+  isCaptain,
+  isViceCaptain,
+  isTriple
+) {
+  const card = document.createElement("div");
+  
+  // ✅ Inline styling for the card
+  card.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
+  card.style.backdropFilter = "blur(10px)";
+  card.style.borderRadius = "10px";
+  card.style.display = "flex";
+  card.style.flexDirection = "column";
+  card.style.alignItems = "center";
+  card.style.justifyContent = "space-between";
+  card.style.padding = "5px";
+  card.style.boxSizing = "border-box";
+  card.style.overflow = "hidden";
+  card.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+
+  const img = document.createElement("img");
+  const photo = teamCode;
+  img.src = `${MEDIA_URL}2025/08/shirt_${photo}.webp`;
+  if (isKeeper) {
+    img.src = `${MEDIA_URL}2025/08/shirt_${photo}_1.webp`;
+  }
+
+  // ✅ Image styling
+  img.style.width = "80%";
+  img.style.height = "auto";
+  img.style.objectFit = "contain";
+  img.style.marginTop = "8px";
+  img.style.marginBottom = "-40px";
+
+  // ✅ Name styling (black bg, white text)
+  const name = document.createElement("div");
+  name.textContent = playerName.slice(0, 10);
+  name.style.backgroundColor = playerNameBGColor;
+
+  if (playerNameBGColor === "#37003c") {
+    name.style.color = "#fff";
+  } else {
+    name.style.color = "#37003c"
+  }
+  name.style.width = "100%";
+  name.style.textAlign = "center";
+  name.style.padding = "6px 0";
+  name.style.fontWeight = "bold";
+  name.style.fontSize = "14px";
+  name.style.borderRadius = "10px 10px 0px 0px";
+
+  // ✅ Score styling (white bg, black text)
+  const scoreText = document.createElement("div");
+  scoreText.textContent = score;
+  scoreText.style.backgroundColor = scoreBGColor;
+
+    if (scoreBGColor === "#37003c") {
+    scoreText.style.color = "#fff";
+  } else {
+    scoreText.style.color = "#37003c"
+  }
+  scoreText.style.color = "black";
+  scoreText.style.width = "100%";
+  scoreText.style.textAlign = "center";
+  scoreText.style.padding = "6px 0";
+  scoreText.style.fontWeight = "bold";
+  scoreText.style.fontSize = "16px";
+  scoreText.style.borderRadius = "0px 0px 10px 10px";
+
+
+  card.append(img, name, scoreText);
+  return card;
+}
