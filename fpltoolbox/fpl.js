@@ -1,11 +1,11 @@
 // const BASE_URL =
 //   "https://proxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
 
-  //  const BASE_URL =
+//  const BASE_URL =
 //  "http://fantasy.premierleague.com/api/";
 
- const BASE_URL =
- "https://coolproxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
+const BASE_URL =
+  "https://coolproxy.fpltoolbox.com/http://fantasy.premierleague.com/api/";
 
 // import managerDataTest from "./testData/managerDataTest.js";
 // import eventStatusTest from "./testData/eventStatusTest.js";
@@ -46621,14 +46621,14 @@ function toolsScreen() {
   ];
   if (theUser.username.data.ID == 1) {
     console.log("User: ID1");
-const playerMaker = {
-  icon: "bi-award",
+    const playerMaker = {
+      icon: "bi-award",
       label: "Player Maker",
       action: showPlayerMaker,
       tier: "free",
-      requiresData: true,
-}
-features.push(playerMaker)
+      requiresData: false,
+    };
+    features.push(playerMaker);
   }
 
   features.forEach(({ icon, label, action, tier, requiresData = false }, i) => {
@@ -48907,9 +48907,6 @@ async function updateScoreCard(data) {
   //   );
   // }{
 
-
-
-
   const formattedOverallRank = overallRank.toLocaleString();
   const formattedGwRank = gwRank ? gwRank.toLocaleString() : "";
   let rankArrow = "";
@@ -49021,15 +49018,12 @@ async function updateScoreCard(data) {
           <div class="card-body text-center p-2 p-md-3">
                         <h6 id="team-name" class="fw-bold fs-6 mb-1">Avg Score</h6>
             <p id="gameweek-identifier" class="fs-7 mb-1">${
-              bootstrap.events[currentGw-1].average_entry_score
-
+              bootstrap.events[currentGw - 1].average_entry_score
             }</p>
             
                                     <h6 id="team-name" class="fw-bold fs-6 mb-1">Top Score</h6>
             <p id="gameweek-identifier" class="fs-7 mb-1">${
-              bootstrap.events[currentGw-1].highest_score
-
-
+              bootstrap.events[currentGw - 1].highest_score
             }</p>
           </div>
         </div>
@@ -53214,7 +53208,94 @@ async function showMemes() {
       console.log("meme appeneded");
     }
   }
+  async function findMissedPen() {
+    const teamsWith59Minutes = [];
+    const playerStatsCache = new Map(); // Cache for storing player stats
 
+    // Create and append the loading indicator
+    const memeLoader = document.createElement("div");
+    memeLoader.id = "meme-loader";
+    memeLoader.innerText =
+      "There might be a juicy meme loading here, just gotta do some more digging...";
+    memeLoader.className = "skeleton";
+    memeContainer.append(memeLoader);
+
+    for (const team of FPLToolboxLeagueData.standings) {
+      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
+
+      for (const player of team.currentWeek[0].picks) {
+        let playerStats;
+
+        // Check if player's stats are already cached
+        if (playerStatsCache.has(player.element)) {
+          playerStats = playerStatsCache.get(player.element);
+        } else {
+          // Fetch and store in cache
+          playerStats = await fetchPlayerCurrentStats(player.element);
+          playerStatsCache.set(player.element, playerStats);
+        }
+
+        //console.log(player);
+        //console.log(playerStats);
+        if (playerStats[0].penalties_missed > 0) {
+          teamsWith59Minutes.push(team);
+          team.fiftyNineMinutePlayer = player.element;
+          break; // Stop checking this team's players and move to the next team
+        }
+      }
+    }
+
+    // Example of updating the text later
+    setTimeout(() => {
+      memeLoader.innerText = "Finding the perfect meme...";
+    }, 2000);
+
+    if (teamsWith59Minutes.length > 0) {
+      const randomTeam = getRandomTeam(teamsWith59Minutes);
+      console.log(randomTeam);
+
+      const message1 = `POV: When ${randomTeam.player_name.substring(
+        0,
+        randomTeam.player_name.indexOf(" ")
+      )}'s player misses a pen!`;
+
+      const img =
+        "https://fpltoolbox.com/wp-content/uploads/2025/04/dogshit.jpeg";
+
+      const message2 = createPlayerCardNew(
+        randomTeam.fiftyNineMinutePlayer,
+        getPlayerScore(randomTeam.fiftyNineMinutePlayer),
+        null,
+        null,
+        null
+      );
+      if (message2 instanceof HTMLElement) {
+        message2.style.marginRight = "1.5rem";
+        message2.style.transform = "scale(1.5)";
+      } else {
+        console.warn("message2 is not a DOM element:", message2);
+      }
+
+      const meme = createMeme4Corners(
+        message1,
+        null,
+        message2,
+        null,
+        null,
+        null,
+        img
+      );
+
+      // ✅ Replace the loader with the actual meme
+      memeLoader.replaceWith(meme);
+    } else {
+      memeLoader.innerText = `naaah, thought I had something, but not today`;
+      setTimeout(() => {
+        memeLoader.remove();
+        console.log("No missed pens");
+      }, 2000);
+    }
+  }
   ///// Above tested working
 
   function findWorstRun() {
@@ -53791,94 +53872,7 @@ async function showMemes() {
       }, 2000);
     }
   }
-  async function findMissedPen() {
-    const teamsWith59Minutes = [];
-    const playerStatsCache = new Map(); // Cache for storing player stats
 
-    // Create and append the loading indicator
-    const memeLoader = document.createElement("div");
-    memeLoader.id = "meme-loader";
-    memeLoader.innerText =
-      "There might be a juicy meme loading here, just gotta do some more digging...";
-    memeLoader.className = "skeleton";
-    memeContainer.append(memeLoader);
-
-    for (const team of FPLToolboxLeagueData.standings) {
-      memeLoader.innerText = `There might be a juicy meme loading here, 👀 Just looking through ${team.player_name}'s team`;
-
-      for (const player of team.currentWeek[0].picks) {
-        let playerStats;
-
-        // Check if player's stats are already cached
-        if (playerStatsCache.has(player.element)) {
-          playerStats = playerStatsCache.get(player.element);
-        } else {
-          // Fetch and store in cache
-          playerStats = await fetchPlayerCurrentStats(player.element);
-          playerStatsCache.set(player.element, playerStats);
-        }
-
-        //console.log(player);
-        //console.log(playerStats);
-        if (playerStats[0].penalties_missed > 0) {
-          teamsWith59Minutes.push(team);
-          team.fiftyNineMinutePlayer = player.element;
-          break; // Stop checking this team's players and move to the next team
-        }
-      }
-    }
-
-    // Example of updating the text later
-    setTimeout(() => {
-      memeLoader.innerText = "Finding the perfect meme...";
-    }, 2000);
-
-    if (teamsWith59Minutes.length > 0) {
-      const randomTeam = getRandomTeam(teamsWith59Minutes);
-      console.log(randomTeam);
-
-      const message1 = `POV: When ${randomTeam.player_name.substring(
-        0,
-        randomTeam.player_name.indexOf(" ")
-      )}'s player misses a pen!`;
-
-      const img =
-        "https://fpltoolbox.com/wp-content/uploads/2025/04/dogshit.jpeg";
-
-      const message2 = createPlayerCardNew(
-        randomTeam.fiftyNineMinutePlayer,
-        getPlayerScore(randomTeam.fiftyNineMinutePlayer),
-        null,
-        null,
-        null
-      );
-      if (message2 instanceof HTMLElement) {
-        message2.style.marginRight = "1.5rem";
-        message2.style.transform = "scale(1.5)";
-      } else {
-        console.warn("message2 is not a DOM element:", message2);
-      }
-
-      const meme = createMeme4Corners(
-        message1,
-        null,
-        message2,
-        null,
-        null,
-        null,
-        img
-      );
-
-      // ✅ Replace the loader with the actual meme
-      memeLoader.replaceWith(meme);
-    } else {
-      memeLoader.innerText = `naaah, thought I had something, but not today`;
-      setTimeout(() => {
-        memeLoader.remove();
-        console.log("No missed pens");
-      }, 2000);
-    }
-  }
   function findHigestTransferMaker() {
     let gwAverage = bootstrap.events[currentGw - 1].average_entry_score;
 
@@ -54935,10 +54929,12 @@ async function showMemes() {
   function runAllRandomly() {
     const functionsList = [
       findBenchDor,
+      findMissedPen,
       findHighestandLowest,
       findKeeperFail,
       findLowestScorer,
       findLowestScorer1,
+      findPlayersWithOnePoint,
       findLowestScorerAlternative,
       findRedCards,
       findCaptaincyResults,
@@ -58251,8 +58247,6 @@ function trackButtonClick() {
 }
 trackButtonClick();
 
-
-
 async function showPlayerMaker() {
   const container = document.getElementById("screen-tools");
   container.innerHTML = "";
@@ -58261,92 +58255,153 @@ async function showPlayerMaker() {
   backBtn.classList.add("btn", "btn-secondary", "mb-3");
   container.appendChild(backBtn);
 
+  // ✅ Responsive container by default
   const playerContainer = document.createElement("div");
   playerContainer.classList.add("player-maker-container");
+
+  playerContainer.style.display = "flex";
+  playerContainer.style.alignItems = "center";
+  playerContainer.style.justifyContent = "center";
+  playerContainer.style.width = "100%";
+  playerContainer.style.background = "linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1) 100%)";
+  playerContainer.style.aspectRatio = "4/5"
+
+
+
+
   container.appendChild(playerContainer);
 
   const form = document.createElement("form");
   form.classList.add("player-form", "mb-4");
 
-  // Build the main form wrapper first
   form.innerHTML = `
-    <div class="mb-3 p-2">
+    <div class="mb-3 p-2 row">
       <h3>Create Custom Player Card</h3>  
 
-      <div class="mb-3" id="teamSelectWrapper">
-        <label class="form-label">Team</label>
-        <select class="form-control" id="teamCode" required>
-          <option value="">Select a team...</option>
-        </select>
+      <div class="col-md-6">
+<div class="mb-3">
+  <label class="form-label">Background Presets</label>
+  <select class="form-select" id="backgroundPreset">
+    <option value="">— Select a preset —</option>
+    <option value="gradient-1">Cool Blue → Purple</option>
+    <option value="gradient-2">Sunset Orange → Red</option>
+    <option value="gradient-3">Emerald Green → Teal</option>
+    <option value="solid-1">Solid Sky Blue</option>
+    <option value="solid-2">Solid Deep Purple</option>
+  </select>
+</div>
+<div class="mb-3">
+  <label class="form-label">Background Type</label>
+  <select class="form-control" id="backgroundType">
+    <option value="gradient" selected>Gradient</option>
+    <option value="solid">Solid Colour</option>
+  </select>
+</div>
+
+<!-- Gradient controls -->
+<div class="mb-3 bg-control gradient-control">
+  <label class="form-label">Gradient Colour 1</label>
+  <input type="color" class="form-control form-control-color" id="gradientColor1" value="#08edff">
+</div>
+
+<div class="mb-3 bg-control gradient-control">
+  <label class="form-label">Gradient Colour 2</label>
+  <input type="color" class="form-control form-control-color" id="gradientColor2" value="#933dff">
+</div>
+
+<!-- Solid colour control -->
+<div class="mb-3 bg-control solid-control" style="display:none;">
+  <label class="form-label">Solid Background Colour</label>
+  <input type="color" class="form-control form-control-color" id="solidColor" value="#262626">
+</div>
+
+        <div class="mb-3" id="teamSelectWrapper">
+          <label class="form-label">Team</label>
+          <select class="form-control" id="teamCode" required>
+            <option value="">Select a team...</option>
+          </select>
+        </div>
+
+                <div class="mb-3">
+          <label class="form-label">Kit Shadow</label>
+           <input type="color" class="form-control form-control-color" id="kitShadow" value="#fff" title="Kit Shadow">
+
+        </div>
+
+                <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="isKeeper">
+          <label class="form-check-label" for="isKeeper">Is Keeper?</label>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Player Name</label>
+          <input type="text" class="form-control" id="playerName" required placeholder="e.g. Erling Haaland">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Player Name Background Colour</label>
+          <select class="form-control" id="playerNameBGColor" required>
+            <option value="#fff" selected>#fff (White)</option>  
+            <option value="#37003c">#37003c (Purple)</option>
+            <option value="#b2002d">#b2002d (Red)</option>
+            <option value="#FFAB1B">#FFAB1B (Orange)</option>
+            <option value="#FBE772">#FBE772 (Yellow)</option>
+          </select>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Player Name</label>
-        <input type="text" class="form-control" id="playerName" required placeholder="e.g. Erling Haaland">
-      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">Score</label>
+          <input type="text" class="form-control" id="playerScore" required placeholder="e.g. 55">
+        </div>
 
-      <div class="mb-3">
-  <label class="form-label">Player Name Background Colour</label>
-  <select class="form-control" id="playerNameBGColor" required>
-    <option value="">Select a colour...</option>
-    <option value="#37003c">#37003c (Purple)</option>
-    <option value="#fff">#fff (White)</option>
-    <option value="#b2002d">#b2002d (Red)</option>
-    <option value="#d44401">#d44401 (Orange)</option>
-    <option value="#ffab1b">#ffab1b (Yellow)</option>
+        <div class="mb-3">
+          <label class="form-label">Score Background Colour</label>
+          <select class="form-control" id="scoreBGColor" required>
+            <option value="#37003c" selected>#37003c (Purple)</option>
+            <option value="#F5F2F5">#F5F2F5 (White)</option>
+            <option value="#b2002d">#b2002d (Red)</option>
+            <option value="#FFAB1B">#FFAB1B (Orange)</option>
+            <option value="#FBE772">#FBE772 (Yellow)</option>
+          </select>
+        </div>
+
+
+<div class="mb-3">
+  <label class="form-label" for="captainStatus">Captain Status</label>
+  <select class="form-control" id="captainStatus">
+    <option value="">None</option>
+    <option value="captain">Captain</option>
+    <option value="triple">Triple Captain</option>
+    <option value="vice">Vice Captain</option>
+      <option value="triple-vice">Triple Vice</option>
+    
+  </select>
+</div>
+
+
+<div class="mb-3">
+  <label class="form-label" for="playerStatus">Player Status</label>
+  <select class="form-control" id="playerStatus">
+    <option value="">None</option>
+    <option value="yellow">Yellow Flag</option>
+    <option value="orange">Orange Flag</option>
+    <option value="red">Red Flag</option>
+    <option value="dreamteam">Dream Team</option>
   </select>
 </div>
 
 
 
-
-      <div class="mb-3">
-        <label class="form-label">Score</label>
-        <input type="text" class="form-control" id="playerScore" required placeholder="e.g. 55">
+        <button type="submit" class="btn btn-primary w-100">Create Player Card</button>
       </div>
-
-      
-      <div class="mb-3">
-  <label class="form-label">Score Background Colour</label>
-  <select class="form-control" id="scoreBGColor" required>
-    <option value="">Select a colour...</option>
-    <option value="#37003c">#37003c (Purple)</option>
-    <option value="#fff">#fff (White)</option>
-    <option value="#b2002d">#b2002d (Red)</option>
-    <option value="#d44401">#d44401 (Orange)</option>
-    <option value="#ffab1b">#ffab1b (Yellow)</option>
-  </select>
-</div>
-
-
-
-      <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="isKeeper">
-        <label class="form-check-label" for="isKeeper">Is Keeper?</label>
-      </div>
-
-      <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="isCaptain">
-        <label class="form-check-label" for="isCaptain">Is Captain?</label>
-      </div>
-
-      <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="isViceCaptain">
-        <label class="form-check-label" for="isViceCaptain">Is Vice Captain?</label>
-      </div>
-
-      <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="isTripleCaptain">
-        <label class="form-check-label" for="isTripleCaptain">Triple Captain?</label>
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100">Create Player Card</button>
     </div>
   `;
 
-  // ✅ Now safely populate the team dropdown
+  // ✅ Populate team dropdown
   const teamSelect = form.querySelector("#teamCode");
-  bootstrap.teams.forEach(team => {
+  bootstrap.teams.forEach((team) => {
     const option = document.createElement("option");
     option.value = team.code;
     option.textContent = team.name;
@@ -58355,25 +58410,108 @@ async function showPlayerMaker() {
 
   container.appendChild(form);
 
+const bgType = form.querySelector("#backgroundType");
+const grad1 = form.querySelector("#gradientColor1");
+const grad2 = form.querySelector("#gradientColor2");
+const solid = form.querySelector("#solidColor");
+
+const presetSelect = form.querySelector("#backgroundPreset");
+
+
+
+// Show/hide relevant controls
+bgType.addEventListener("change", () => {
+  document.querySelectorAll(".bg-control").forEach(el => el.style.display = "none");
+  if (bgType.value === "gradient") {
+    document.querySelectorAll(".gradient-control").forEach(el => el.style.display = "block");
+  } else if (bgType.value === "solid") {
+    document.querySelector(".solid-control").style.display = "block";
+  } else if (bgType.value === "image") {
+    document.querySelector(".image-control").style.display = "block";
+  }
+  updateBackground();
+});
+
+
+// 🎨 Handle preset selection
+presetSelect.addEventListener("change", () => {
+  const preset = presetSelect.value;
+
+  if (preset.startsWith("gradient")) {
+    bgType.value = "gradient";
+    document.querySelectorAll(".bg-control").forEach(el => el.style.display = "none");
+    document.querySelectorAll(".gradient-control").forEach(el => el.style.display = "block");
+
+    if (preset === "gradient-1") {
+      grad1.value = "#08edff";
+      grad2.value = "#933dff";
+    } else if (preset === "gradient-2") {
+      grad1.value = "#ff7e00";
+      grad2.value = "#ff0033";
+    } else if (preset === "gradient-3") {
+      grad1.value = "#00c853";
+      grad2.value = "#00acc1";
+    }
+
+  } else if (preset.startsWith("solid")) {
+    bgType.value = "solid";
+    document.querySelectorAll(".bg-control").forEach(el => el.style.display = "none");
+    document.querySelector(".solid-control").style.display = "block";
+
+    if (preset === "solid-1") {
+      solid.value = "#42a5f5";
+    } else if (preset === "solid-2") {
+      solid.value = "#512da8";
+    }
+  } else {
+    // Reset: show relevant inputs based on bgType
+    bgType.dispatchEvent(new Event("change"));
+  }
+
+  updateBackground();
+});
+
+
+// Update background dynamically
+function updateBackground() {
+  if (bgType.value === "gradient") {
+    playerContainer.style.background = `linear-gradient(90deg, ${grad1.value} 0%, ${grad2.value} 100%)`;
+    playerContainer.style.backgroundSize = "";
+
+  } else if (bgType.value === "solid") {
+    playerContainer.style.background = solid.value;
+    playerContainer.style.backgroundSize = "";
+
+  }
+}
+
+// Listen for changes
+[grad1, grad2, solid, ].forEach(input =>
+  input.addEventListener("input", updateBackground)
+);
+
+
+
+
   const cardContainer = document.createElement("div");
   cardContainer.classList.add("player-card-preview", "mt-4");
   playerContainer.appendChild(cardContainer);
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     cardContainer.innerHTML = "";
-    showBootstrapSpinner(cardContainer);
+
 
     const playerName = document.getElementById("playerName").value;
     const playerNameBGColor = document.getElementById("playerNameBGColor").value;
-    const score = parseInt(document.getElementById("playerScore").value);
+    const score = document.getElementById("playerScore").value;
     const scoreBGColor = document.getElementById("scoreBGColor").value;
     const teamCode = parseInt(document.getElementById("teamCode").value);
+        const kitShadow = document.getElementById("kitShadow").value;
     const isKeeper = document.getElementById("isKeeper").checked;
-    const isCaptain = document.getElementById("isCaptain").checked;
-    const isViceCaptain = document.getElementById("isViceCaptain").checked;
-    const isTriple = document.getElementById("isTripleCaptain").checked;
+    const captainStatus = document.getElementById("captainStatus").value;
+
+    const playerStatus = document.getElementById("playerStatus").value;
 
     const card = await createPlayerMakerCard(
       playerName,
@@ -58381,20 +58519,53 @@ async function showPlayerMaker() {
       score,
       scoreBGColor,
       teamCode,
+      kitShadow,
       isKeeper,
-      isCaptain,
-      isViceCaptain,
-      isTriple
+      captainStatus,
+      playerStatus
     );
 
     cardContainer.appendChild(card);
-    removeSpinner();
+ 
+
+
+
+    card.addEventListener("click", async () => {
+      const target = document.querySelector(".player-maker-container");
+      if (!target) return;
+
+  
+
+      html2canvas(target, { backgroundColor: null, scale: 3, useCORS: true })
+        .then((originalCanvas) => {
+
+
+          const canvas = document.createElement("canvas");
+          canvas.width = originalCanvas.width;
+          canvas.height = originalCanvas.height;
+          const ctx = canvas.getContext("2d");
+
+          ctx.fillStyle = typeof darkMode !== "undefined" && darkMode ? "#212529" : "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(originalCanvas, 0, 0);
+
+          canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${playerName || "custom-player"}_Card.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+          });
+
+       
+        });
+    });
   });
 }
 
 
-
-const MEDIA_URL = `https://fpltoolbox.com/wp-content/uploads/`
+const MEDIA_URL = `https://fpltoolbox.com/wp-content/uploads/`;
 
 async function createPlayerMakerCard(
   playerName,
@@ -58402,22 +58573,27 @@ async function createPlayerMakerCard(
   score,
   scoreBGColor,
   teamCode,
+  kitShadow,
   isKeeper,
-  isCaptain,
-  isViceCaptain,
-  isTriple
+  captainStatus,
+  playerStatus
 ) {
   const card = document.createElement("div");
-  
+  console.log(kitShadow)
   // ✅ Inline styling for the card
   card.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
   card.style.backdropFilter = "blur(10px)";
   card.style.borderRadius = "10px";
   card.style.display = "flex";
+  card.style.position = "relative";
   card.style.flexDirection = "column";
   card.style.alignItems = "center";
   card.style.justifyContent = "space-between";
   card.style.padding = "5px";
+
+
+
+
   card.style.boxSizing = "border-box";
   card.style.overflow = "hidden";
   card.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
@@ -58430,11 +58606,16 @@ async function createPlayerMakerCard(
   }
 
   // ✅ Image styling
-  img.style.width = "80%";
+  img.style.width = "100%";
   img.style.height = "auto";
   img.style.objectFit = "contain";
   img.style.marginTop = "8px";
   img.style.marginBottom = "-40px";
+  img.style.zIndex = "-10";
+  img.style.filter = `drop-shadow(0 0 10px ${kitShadow})`; // Shadow based on team color
+    img.style.paddingLeft = "20px";
+  img.style.paddingRight = "20px";
+
 
   // ✅ Name styling (black bg, white text)
   const name = document.createElement("div");
@@ -58444,13 +58625,13 @@ async function createPlayerMakerCard(
   if (playerNameBGColor === "#37003c") {
     name.style.color = "#fff";
   } else {
-    name.style.color = "#37003c"
+    name.style.color = "#37003c";
   }
   name.style.width = "100%";
   name.style.textAlign = "center";
   name.style.padding = "6px 0";
   name.style.fontWeight = "bold";
-  name.style.fontSize = "14px";
+  name.style.fontSize = "24px";
   name.style.borderRadius = "10px 10px 0px 0px";
 
   // ✅ Score styling (white bg, black text)
@@ -58458,20 +58639,62 @@ async function createPlayerMakerCard(
   scoreText.textContent = score;
   scoreText.style.backgroundColor = scoreBGColor;
 
-    if (scoreBGColor === "#37003c") {
+  if (scoreBGColor === "#37003c") {
     scoreText.style.color = "#fff";
   } else {
-    scoreText.style.color = "#37003c"
+    scoreText.style.color = "#37003c";
   }
-  scoreText.style.color = "black";
+
   scoreText.style.width = "100%";
   scoreText.style.textAlign = "center";
   scoreText.style.padding = "6px 0";
   scoreText.style.fontWeight = "bold";
-  scoreText.style.fontSize = "16px";
+  scoreText.style.fontSize = "24px";
   scoreText.style.borderRadius = "0px 0px 10px 10px";
 
+ const badge = document.createElement("img");
+  // ✅ Badge styling
+  badge.style.width = "1.6rem";
+  badge.style.height = "auto";
+  badge.style.position = "absolute";
+  badge.style.top = "20px";
+  badge.style.left = "20px";  
+  
+  if (captainStatus == "captain"){badge.src = `${MEDIA_URL}2025/09/captain-badge.png`}
+  if (captainStatus == "triple"){badge.src = `${MEDIA_URL}2025/09/triple-captain-badge.png`}
+  if (captainStatus == "vice"){badge.src = `${MEDIA_URL}2025/09/vice-badge.png`}
+  if (captainStatus == "triple-vice"){badge.src = `${MEDIA_URL}2025/09/triple-vice-badge.png`}
 
-  card.append(img, name, scoreText);
+  const flag = document.createElement("img");
+  // ✅ Badge styling
+  flag.style.width = "1.6rem";
+  flag.style.height = "auto";
+  flag.style.position = "absolute";
+  flag.style.top = "20px";
+  flag.style.right = "20px";
+  
+  if (playerStatus == "yellow"){
+    flag.src = `${MEDIA_URL}2025/09/yellow-flag.png`
+ 
+    name.style.backgroundColor = "#FBE772"
+    name.style.color = "#37003c"
+  }
+  if (playerStatus == "orange"){
+    flag.src = `${MEDIA_URL}2025/09/orange-flag.png`
+        name.style.backgroundColor = "#FFAB1B"
+    name.style.color = "#37003c"
+  }
+  if (playerStatus == "red"){
+    flag.src = `${MEDIA_URL}2025/09/red-flag.png`
+            name.style.backgroundColor = "#b2002d"
+    name.style.color = "#fff"
+  }
+  if (playerStatus == "dreamteam"){
+    flag.src = `${MEDIA_URL}2025/09/dreamteam-badge.png`
+  }
+
+
+
+  card.append(img, name, scoreText, flag, badge);
   return card;
 }
