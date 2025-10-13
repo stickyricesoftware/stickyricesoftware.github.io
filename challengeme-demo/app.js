@@ -21,38 +21,75 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ Pages
   const pages = {
     welcome: `
-      <h1 class="text-3xl font-bold mb-4">Welcome to Your App</h1>
-      <p class="text-lg mb-8">Welcome your users here!</p>
-      <div class="max-w-4xl mx-auto overflow-hidden">
-        <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
-          ${[...Array(7)]
-            .map(
-              (_, i) => `
-              <img src="https://picsum.photos/200/300?random=${i + 1}"
-                   alt="Image ${i + 1}"
-                   class="w-1/3 flex-shrink-0 p-2 rounded-lg">
-            `
-            )
-            .join("")}
-        </div>
-        <div class="flex justify-center mt-4 space-x-3">
-          <button id="prevBtn" class="bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded">‹</button>
-          <button id="nextBtn" class="bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded">›</button>
-        </div>
-      </div>
+<h1 class="text-3xl font-bold mb-4">Welcome to Your Demo Chess App by Sunny</h1>
+
+
+
+<div class="max-w-4xl mx-auto overflow-hidden">
+
+  <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
+    <img src="https://images.pexels.com/photos/6115019/pexels-photo-6115019.jpeg"
+         alt="Image 1"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+    <img src="https://images.pexels.com/photos/277124/pexels-photo-277124.jpeg"
+         alt="Image 2"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+    <img src="https://images.pexels.com/photos/8438871/pexels-photo-8438871.jpeg"
+         alt="Image 3"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+    <img src="https://images.pexels.com/photos/459275/pexels-photo-459275.jpeg"
+         alt="Image 4"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+             <img src="https://images.pexels.com/photos/5234272/pexels-photo-5234272.jpeg"
+         alt="Image 4"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+           <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
+    <img src="https://images.pexels.com/photos/6115019/pexels-photo-6115019.jpeg"
+         alt="Image 1"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+    <img src="https://images.pexels.com/photos/277124/pexels-photo-277124.jpeg"
+         alt="Image 2"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+    <img src="https://images.pexels.com/photos/8438871/pexels-photo-8438871.jpeg"
+         alt="Image 3"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+    <img src="https://images.pexels.com/photos/459275/pexels-photo-459275.jpeg"
+         alt="Image 4"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+
+             <img src="https://images.pexels.com/photos/5234272/pexels-photo-5234272.jpeg"
+         alt="Image 4"
+         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
+  </div>
+
+  <div class="flex justify-center mt-4 space-x-3">
+    <button id="prevBtn" class="bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded">‹</button>
+    <button id="nextBtn" class="bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded">›</button>
+  </div>
+
+</div>
+
     `,
     about: `
       <h1 class="text-3xl font-bold mb-4">About</h1>
       <p class="text-lg">This is a demo app to help you visualise the basics of your project.</p>
+      <p class="text-lg">This is in no way a production ready app - this is purely a demo with almost zero functionality in the real world. Saying that, you can go ahead and play Chess against the computer.</p>
+      
       <p class="text-lg">Got any questions? Jsut reach out to me directly</p>
     
       `,
 play: `
   <h1 class="text-3xl font-bold mb-4">Play Chess ♟️</h1>
   <div id="board" class="max-w-md mx-auto"></div>
-  <div class="mt-4 text-center">
-    <button id="resetBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded">Restart Game</button>
-  </div>
+
   <p id="status" class="mt-4 text-center font-semibold"></p>
 `,
 
@@ -82,22 +119,6 @@ const board = Chessboard("board", {
   }
 });
 
-  function handleMove(source, target) {
-    // Try to make player move
-    const move = game.move({
-      from: source,
-      to: target,
-      promotion: "q",
-    });
-
-    if (move === null) return "snapback"; // illegal move
-
-    // Update board after player's move
-    board.position(game.fen());
-
-    // Delay computer move a bit for realism
-    setTimeout(makeComputerMove, 500);
-  }
 
   function makeComputerMove() {
     if (game.game_over()) {
