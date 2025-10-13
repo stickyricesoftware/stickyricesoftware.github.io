@@ -55224,28 +55224,33 @@ function featureRequest() {
 const influencersList = [
   {
     influencer: "FPL Harry",
-    entry: 3544,
+    entry: 1320,
     img: "https://fpltoolbox.com/wp-content/uploads/2025/01/channels4_profile.jpg",
   },
   {
     influencer: "Let's Talk FPL",
-    entry: 24,
+    entry: 44,
     img: "https://fpltoolbox.com/wp-content/uploads/2025/01/LTFPL_Icon-1-480x480-1.webp",
   },
   {
     influencer: "FPL Raptor",
-    entry: 746,
+    entry: 1587,
     img: "https://fpltoolbox.com/wp-content/uploads/2025/01/channels4_profile-1.jpg",
   },
   {
     influencer: "FPL Focal",
-    entry: 1301,
+    entry: 200,
     img: "https://fpltoolbox.com/wp-content/uploads/2025/01/ab67656300005f1f8105233ce9dc6cb312e54569.jpg",
   },
   {
     influencer: "Holly Shand",
-    entry: 9,
+    entry: 135,
     img: "https://fpltoolbox.com/wp-content/uploads/2025/01/0Fn-qMWH_400x400.jpg",
+  },
+    {
+    influencer: "Chunkz",
+    entry: 2253812,
+    img: "https://fpltoolbox.com/wp-content/uploads/2025/09/chunkz.jpg",
   },
 ];
 
@@ -55276,15 +55281,15 @@ async function showCopycatFinder() {
     });
     return;
   }
-  if (currentGw < 38) {
-    showModal({
-      title: "Coming Soon",
-      body: "Come back in a few weeks (around gameweek 6) - we don't have enough info to yet to give you anything useful!",
-      confirmText: "Ok",
-      onConfirm: () => {}, // No action taken
-    });
-    return;
-  }
+  // if (currentGw < 38) {
+  //   showModal({
+  //     title: "Coming Soon",
+  //     body: "Come back in a few weeks (around gameweek 6) - we don't have enough info to yet to give you anything useful!",
+  //     confirmText: "Ok",
+  //     onConfirm: () => {}, // No action taken
+  //   });
+  //   return;
+  // }
 
   let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
   const app = document.getElementById("screen-tools");
@@ -55703,7 +55708,7 @@ ${influencerRemoved}
     matchMessage = `<strong><h2>Sub Zero</h2></strong><p>${team2.player_name} is an FPL maverick with a completely unique strategy. No signs of influence detected.</p>`;
   }
 
-  let influencerContainer = `<h4 style="text-align:center">FPLToolbox Copycat Rating:</h4>  
+  let influencerContainer = `<h4 style="text-align:center">Copycat Rating:</h4>  
 <div class="best-match-percentage-bar-container">
   <div class="best-match-bar"></div>
   <div class="copycat-pointer" style="left: 0%">▼</div>
