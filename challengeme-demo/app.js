@@ -21,59 +21,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ Pages
   const pages = {
     welcome: `
-<h1 class="text-3xl font-bold mb-4">Welcome to Your Demo Chess App by Sunny</h1>
-
-
+<h1 class="text-3xl font-bold mb-4">Demo Chess App by Sunny for ChallengeME</h1>
 
 <div class="max-w-4xl mx-auto overflow-hidden">
 
-  <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
-    <img src="https://images.pexels.com/photos/6115019/pexels-photo-6115019.jpeg"
-         alt="Image 1"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-    <img src="https://images.pexels.com/photos/277124/pexels-photo-277124.jpeg"
-         alt="Image 2"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-    <img src="https://images.pexels.com/photos/8438871/pexels-photo-8438871.jpeg"
-         alt="Image 3"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-    <img src="https://images.pexels.com/photos/459275/pexels-photo-459275.jpeg"
-         alt="Image 4"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-             <img src="https://images.pexels.com/photos/5234272/pexels-photo-5234272.jpeg"
-         alt="Image 4"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-           <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
-    <img src="https://images.pexels.com/photos/6115019/pexels-photo-6115019.jpeg"
-         alt="Image 1"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-    <img src="https://images.pexels.com/photos/277124/pexels-photo-277124.jpeg"
-         alt="Image 2"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-    <img src="https://images.pexels.com/photos/8438871/pexels-photo-8438871.jpeg"
-         alt="Image 3"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-    <img src="https://images.pexels.com/photos/459275/pexels-photo-459275.jpeg"
-         alt="Image 4"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-
-             <img src="https://images.pexels.com/photos/5234272/pexels-photo-5234272.jpeg"
-         alt="Image 4"
-         class="w-1/3 flex-shrink-0 p-2 rounded-lg object-cover">
-  </div>
-
-  <div class="flex justify-center mt-4 space-x-3">
-    <button id="prevBtn" class="bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded">‹</button>
-    <button id="nextBtn" class="bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded">›</button>
-  </div>
+  <img src="https://images.pexels.com/photos/6115019/pexels-photo-6115019.jpeg"
+       alt="Welcome Image"
+       class="w-full p-2 rounded-lg object-cover">
 
 </div>
 
@@ -95,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
       `,
 play: `
-  <h1 class="text-3xl font-bold mb-4">Play Chess ♟️</h1>
+
   <div id="board" class="max-w-md mx-auto"></div>
 
   <p id="status" class="mt-4 text-center font-semibold"></p>
