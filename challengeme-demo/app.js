@@ -81,9 +81,17 @@ document.addEventListener("DOMContentLoaded", () => {
     about: `
       <h1 class="text-3xl font-bold mb-4">About</h1>
       <p class="text-lg">This is a demo app to help you visualise the basics of your project.</p>
-      <p class="text-lg">This is in no way a production ready app - this is purely a demo with almost zero functionality in the real world. Saying that, you can go ahead and play Chess against the computer.</p>
+      <br>
+      <p class="text-lg">This is in no way a production ready app - this is purely a demo with almost zero functionality in the real world. </p>
+      <br>
+      <p class="text-lg">Saying that, you can go ahead and play Chess against the computer. </p>
+<br>
+
       
-      <p class="text-lg">Got any questions? Jsut reach out to me directly</p>
+      
+      <p class="text-lg">Got any questions? Just reach out to me directly</p>
+
+
     
       `,
 play: `
