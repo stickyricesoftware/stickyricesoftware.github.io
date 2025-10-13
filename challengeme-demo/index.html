@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple App</title>
+  <title>Challenge ME Chess</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -17,11 +17,11 @@
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
   <!-- Navbar -->
   <nav class="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">My App</h1>
+    <h1 class="text-2xl font-bold">Challenge ME Chess</h1>
     <div class="space-x-4 hidden md:block">
       <button onclick="navigate('welcome')" class="hover:underline">Home</button>
       <button onclick="navigate('about')" class="hover:underline">About</button>
-      <button onclick="navigate('feature')" class="hover:underline">Feature</button>
+      <button onclick="navigate('play')" class="hover:underline">Play</button>
     </div>
     <div class="flex items-center space-x-3">
       <button id="themeToggle" class="p-2 bg-gray-200 dark:bg-gray-700 rounded">🌓</button>
@@ -33,7 +33,7 @@
   <div id="mobileMenu" class="hidden bg-gray-200 dark:bg-gray-700 p-3 md:hidden">
     <button onclick="navigate('welcome')" class="block w-full text-left mb-2">Home</button>
     <button onclick="navigate('about')" class="block w-full text-left mb-2">About</button>
-    <button onclick="navigate('feature')" class="block w-full text-left">Feature</button>
+    <button onclick="navigate('play')" class="block w-full text-left">Play</button>
   </div>
 
   <!-- Content -->

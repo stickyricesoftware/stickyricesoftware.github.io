@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <h1 class="text-3xl font-bold mb-4">About</h1>
       <p class="text-lg">Tell them about your app here!</p>
     `,
-    feature: `
+    play: `
       <h1 class="text-3xl font-bold mb-4">Word Guess Game</h1>
       <p class="text-lg mb-4">Guess the secret 5-letter word!</p>
       <div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ Navigation
   window.navigate = (page) => {
     content.innerHTML = pages[page];
-    if (page === "feature") initWordGame();
+    if (page === "play") initWordGame();
     if (page === "welcome") initCarousel();
     mobileMenu.classList.add("hidden");
   };
