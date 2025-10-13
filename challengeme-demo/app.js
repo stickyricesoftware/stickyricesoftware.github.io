@@ -106,32 +106,56 @@ play: `
 // Initialize Chess Game
 function initChessGame() {
   const game = new Chess(); // from chess.js
+  const boardContainer = document.getElementById("board");
 
-const board = Chessboard("board", {
-  draggable: true,
-  position: "start",
-  pieceTheme: "https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png",
-  onDrop: (source, target) => {
-    const move = game.move({ from: source, to: target, promotion: "q" });
-    if (move === null) return "snapback";
-    board.position(game.fen());
-    setTimeout(makeComputerMove, 300);
+  let board;
+
+  // Function to create/update the board
+  function createBoard() {
+    // Make board square and fit container
+    const containerWidth = boardContainer.offsetWidth;
+    const boardSize = containerWidth; // board will always be square
+
+    // Destroy old board if it exists
+    if (board) board.destroy();
+
+    board = Chessboard("board", {
+      draggable: true,
+      position: "start",
+      pieceTheme: "https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png",
+      width: boardSize,
+      onDrop: (source, target) => {
+        const move = game.move({ from: source, to: target, promotion: "q" });
+        if (move === null) return "snapback";
+        board.position(game.fen());
+        setTimeout(makeComputerMove, 300);
+      }
+    });
   }
-});
-
 
   function makeComputerMove() {
     if (game.game_over()) {
       alert("Game over!");
       return;
     }
-
     const moves = game.moves();
     const randomMove = moves[Math.floor(Math.random() * moves.length)];
     game.move(randomMove);
     board.position(game.fen());
   }
+
+  // Initial board
+  createBoard();
+
+  // Update board on window resize (debounced for performance)
+  let resizeTimeout;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(createBoard, 100);
+  });
 }
+
+
 
 
 
