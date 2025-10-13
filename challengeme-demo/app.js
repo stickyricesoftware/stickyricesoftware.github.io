@@ -1,31 +1,50 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Pages
+  const content = document.getElementById("content");
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const themeToggle = document.getElementById("themeToggle");
+
+  // ✅ Apply saved theme on page load
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") document.documentElement.classList.add("dark");
+  else document.documentElement.classList.remove("dark");
+
+  // ✅ Theme toggle
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+  }
+
+  // ✅ Pages
   const pages = {
     welcome: `
       <h1 class="text-3xl font-bold mb-4">Welcome to Your App</h1>
       <p class="text-lg mb-8">Welcome your users here!</p>
-
       <div class="max-w-4xl mx-auto overflow-hidden">
         <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
-          ${[...Array(7)].map((_, i) => `
-            <img src="https://picsum.photos/200/300?random=${i+1}" 
-                 alt="Image ${i+1}" 
-                 class="w-1/3 flex-shrink-0 p-2 rounded-lg">
-          `).join('')}
+          ${[...Array(7)]
+            .map(
+              (_, i) => `
+              <img src="https://picsum.photos/200/300?random=${i + 1}"
+                   alt="Image ${i + 1}"
+                   class="w-1/3 flex-shrink-0 p-2 rounded-lg">
+            `
+            )
+            .join("")}
         </div>
-
         <div class="flex justify-center mt-4 space-x-3">
           <button id="prevBtn" class="bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded">‹</button>
           <button id="nextBtn" class="bg-gray-300 dark:bg-gray-700 px-3 py-1 rounded">›</button>
         </div>
       </div>
     `,
-
     about: `
       <h1 class="text-3xl font-bold mb-4">About</h1>
       <p class="text-lg">Tell them about your app here!</p>
     `,
-
     feature: `
       <h1 class="text-3xl font-bold mb-4">Word Guess Game</h1>
       <p class="text-lg mb-4">Guess the secret 5-letter word!</p>
@@ -40,45 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
     `
   };
 
-  // DOM references
-  const content = document.getElementById("content");
-  const menuBtn = document.getElementById("menuBtn");
-  const mobileMenu = document.getElementById("mobileMenu");
-  const themeToggle = document.getElementById("themeToggle");
-
-// Apply saved theme on page load
-if (localStorage.getItem("theme") === "dark") {
-  document.documentElement.classList.add("dark");
-} else {
-  document.documentElement.classList.remove("dark");
-}
-
-// Handle theme toggle
-if (themeToggle) {
-  themeToggle.addEventListener("click", () => {
-    const html = document.documentElement;
-    const isDark = html.classList.toggle("dark");
-
-    // Save preference
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-
-    // Optional: add a little rotation animation to the icon
-    themeToggle.classList.add("rotate-180", "transition-transform", "duration-300");
-    setTimeout(() => themeToggle.classList.remove("rotate-180"), 300);
-  });
-}
-
   // ✅ Navigation
-  window.navigate = function (page) {
+  window.navigate = (page) => {
     content.innerHTML = pages[page];
     if (page === "feature") initWordGame();
     if (page === "welcome") initCarousel();
-
-    // Hide mobile menu when navigating
     mobileMenu.classList.add("hidden");
   };
 
-  // ✅ Word game
+  // ✅ Word Game
   function initWordGame() {
     const words = ["APPLE", "PLANT", "HOUSE", "MUSIC", "WATER", "CHAIR", "BRAIN"];
     const secret = words[Math.floor(Math.random() * words.length)];
@@ -90,13 +79,11 @@ if (themeToggle) {
     button.addEventListener("click", () => {
       const guess = input.value.toUpperCase();
       attempts++;
-
       if (guess.length !== 5) {
         message.textContent = "Please enter a 5-letter word.";
         message.className = "mt-4 text-yellow-600 dark:text-yellow-400 font-semibold";
         return;
       }
-
       if (guess === secret) {
         message.textContent = `🎉 Correct! The word was "${secret}". You guessed it in ${attempts} tries.`;
         message.className = "mt-4 text-green-600 dark:text-green-400 font-semibold";
@@ -112,7 +99,6 @@ if (themeToggle) {
         message.textContent = `Try again! Hint: ${feedback}`;
         message.className = "mt-4 text-red-600 dark:text-red-400 font-semibold";
       }
-
       input.value = "";
     });
   }
@@ -122,7 +108,6 @@ if (themeToggle) {
     const carousel = document.getElementById("carousel");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
-
     const totalImages = 7;
     const visibleImages = 3;
     let currentIndex = 0;
@@ -146,10 +131,12 @@ if (themeToggle) {
   }
 
   // ✅ Mobile menu
-  menuBtn.addEventListener("click", () => {
-    mobileMenu.classList.toggle("hidden");
-  });
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  }
 
-  // Default page
+  // ✅ Default page
   navigate("welcome");
 });

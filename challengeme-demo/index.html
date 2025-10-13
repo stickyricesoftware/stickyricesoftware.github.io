@@ -5,18 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simple App</title>
 
-  <!-- 1️⃣ Load Tailwind CDN -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- 2️⃣ Then configure it -->
   <script>
     tailwind.config = {
       darkMode: 'class',
     };
   </script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
   <!-- Navbar -->
   <nav class="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center">
     <h1 class="text-2xl font-bold">My App</h1>
@@ -41,6 +39,7 @@
   <!-- Content -->
   <main id="content" class="p-6"></main>
 
-  <script src="app.js"></script>
+  <!-- Load script at the END -->
+  <script src="app.js" defer></script>
 </body>
 </html>
