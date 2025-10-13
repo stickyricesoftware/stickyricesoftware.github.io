@@ -43,10 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
     `,
     about: `
       <h1 class="text-3xl font-bold mb-4">About</h1>
-      <p class="text-lg">Tell them about your app here!</p>
-    `,
+      <p class="text-lg">This is a demo app to help you visualise the basics of your project.</p>
+      <p class="text-lg">Got any questions? Jsut reach out to me directly</p>
+    
+      `,
     play: `
-      <h1 class="text-3xl font-bold mb-4">Word Guess Game</h1>
+       <p class="text-lg mb-4">This is your function page! Your chess logic goes here</p>
+      <h1 class="text-3xl font-bold mb-4">Sample Word Guess Game</h1>
       <p class="text-lg mb-4">Guess the secret 5-letter word!</p>
       <div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
         <input id="guessInput" type="text" maxlength="5" placeholder="Enter guess..."
