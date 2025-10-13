@@ -47,64 +47,72 @@ document.addEventListener("DOMContentLoaded", () => {
       <p class="text-lg">Got any questions? Jsut reach out to me directly</p>
     
       `,
-    play: `
-       <p class="text-lg mb-4">This is your function page! Your chess logic goes here</p>
-      <h1 class="text-3xl font-bold mb-4">Sample Word Guess Game</h1>
-      <p class="text-lg mb-4">Guess the secret 5-letter word!</p>
-      <div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <input id="guessInput" type="text" maxlength="5" placeholder="Enter guess..."
-          class="w-full p-2 border dark:border-gray-700 rounded mb-3 text-center uppercase bg-gray-50 dark:bg-gray-700 dark:text-white">
-        <button id="submitGuess" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded">
-          Submit Guess
-        </button>
-        <p id="message" class="mt-4 font-semibold"></p>
-      </div>
-    `
+play: `
+  <h1 class="text-3xl font-bold mb-4">Play Chess ♟️</h1>
+  <div id="board" class="max-w-md mx-auto"></div>
+  <div class="mt-4 text-center">
+    <button id="resetBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded">Restart Game</button>
+  </div>
+  <p id="status" class="mt-4 text-center font-semibold"></p>
+`,
+
   };
 
   // ✅ Navigation
   window.navigate = (page) => {
     content.innerHTML = pages[page];
-    if (page === "play") initWordGame();
+    if (page === "play") initChessGame();
     if (page === "welcome") initCarousel();
     mobileMenu.classList.add("hidden");
   };
 
-  // ✅ Word Game
-  function initWordGame() {
-    const words = ["APPLE", "PLANT", "HOUSE", "MUSIC", "WATER", "CHAIR", "BRAIN"];
-    const secret = words[Math.floor(Math.random() * words.length)];
-    const input = document.getElementById("guessInput");
-    const button = document.getElementById("submitGuess");
-    const message = document.getElementById("message");
-    let attempts = 0;
+// Initialize Chess Game
+function initChessGame() {
+  const game = new Chess(); // from chess.js
 
-    button.addEventListener("click", () => {
-      const guess = input.value.toUpperCase();
-      attempts++;
-      if (guess.length !== 5) {
-        message.textContent = "Please enter a 5-letter word.";
-        message.className = "mt-4 text-yellow-600 dark:text-yellow-400 font-semibold";
-        return;
-      }
-      if (guess === secret) {
-        message.textContent = `🎉 Correct! The word was "${secret}". You guessed it in ${attempts} tries.`;
-        message.className = "mt-4 text-green-600 dark:text-green-400 font-semibold";
-        button.disabled = true;
-        input.disabled = true;
-      } else {
-        let feedback = "";
-        for (let i = 0; i < 5; i++) {
-          if (guess[i] === secret[i]) feedback += guess[i];
-          else if (secret.includes(guess[i])) feedback += "?";
-          else feedback += "_";
-        }
-        message.textContent = `Try again! Hint: ${feedback}`;
-        message.className = "mt-4 text-red-600 dark:text-red-400 font-semibold";
-      }
-      input.value = "";
-    });
+const board = Chessboard("board", {
+  draggable: true,
+  position: "start",
+  pieceTheme: "https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png",
+  onDrop: (source, target) => {
+    const move = game.move({ from: source, to: target, promotion: "q" });
+    if (move === null) return "snapback";
+    board.position(game.fen());
+    setTimeout(makeComputerMove, 300);
   }
+});
+
+  function handleMove(source, target) {
+    // Try to make player move
+    const move = game.move({
+      from: source,
+      to: target,
+      promotion: "q",
+    });
+
+    if (move === null) return "snapback"; // illegal move
+
+    // Update board after player's move
+    board.position(game.fen());
+
+    // Delay computer move a bit for realism
+    setTimeout(makeComputerMove, 500);
+  }
+
+  function makeComputerMove() {
+    if (game.game_over()) {
+      alert("Game over!");
+      return;
+    }
+
+    const moves = game.moves();
+    const randomMove = moves[Math.floor(Math.random() * moves.length)];
+    game.move(randomMove);
+    board.position(game.fen());
+  }
+}
+
+
 
   // ✅ Carousel
   function initCarousel() {
