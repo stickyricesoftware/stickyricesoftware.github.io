@@ -45945,6 +45945,36 @@ async function getBootstrap() {
 }
 getBootstrap();
 
+
+function showModalOncePerDay() {
+  const STORAGE_KEY = "modalLastShown";
+  const now = new Date();
+  const today = now.toDateString(); // e.g. "Tue Oct 14 2025"
+
+  const lastShown = localStorage.getItem(STORAGE_KEY);
+
+  if (lastShown === today) {
+    console.log("[Modal] Already shown today — skipping.");
+    return;
+  }
+
+  // Show the modal
+    if (!userHasAccess([10, 12])) {
+    showModalWithTimer({
+      title: 'Hey,',
+      body: `Just so you know, if you have leagues with more than 10 teams, you should take a look at the paid memberships, there's a ton of other features included too!`,
+      confirmText: "OK",
+      onConfirm: () => {}, // No action taken
+      seconds: 7,
+    });
+  }
+
+  // Record today's date
+  localStorage.setItem(STORAGE_KEY, today);
+}
+setTimeout(showModalOncePerDay, 10000);
+
+
 function injectUI() {
   const app = document.getElementById("app-screen");
   app.innerHTML = ""; // Clear previous content
@@ -46445,6 +46475,12 @@ function toolsScreen() {
   const container = document.createElement("div");
   container.className = "container text-center py-3";
 
+
+
+
+
+
+
   const row = document.createElement("div");
   row.className = "row g-3";
 
@@ -46844,6 +46880,98 @@ function showModal({ title, body, confirmText = null, onConfirm = null }) {
     if (e.key === "Escape") closeModal();
   }
 }
+
+function showModalWithTimer({
+  title,
+  body,
+  confirmText = null,
+  onConfirm = null,
+  seconds = null,
+}) {
+  const modal = document.getElementById("modal-popup");
+  const titleEl = modal.querySelector(".modal-title");
+  const bodyEl = modal.querySelector(".modal-body-content");
+  const closeBtn = modal.querySelector(".modal-close");
+  const confirmBtn = modal.querySelector(".modal-confirm-btn");
+
+  if (!modal || !titleEl || !bodyEl || !closeBtn || !confirmBtn) {
+    console.error("[showModal] ⚠️ Could not find modal or required elements.");
+    return;
+  }
+
+  // Populate content
+  titleEl.textContent = title;
+  bodyEl.innerHTML = body;
+
+  // Default state
+  confirmBtn.classList.add("hidden");
+  confirmBtn.onclick = null;
+
+  let countdownInterval;
+  let remaining = seconds;
+  let canClose = !seconds;
+
+  // Confirm button logic
+  if (confirmText && typeof onConfirm === "function") {
+    confirmBtn.classList.remove("hidden");
+    confirmBtn.disabled = !!seconds;
+
+    const updateButtonLabel = () => {
+      confirmBtn.textContent = seconds
+        ? `${confirmText}${remaining ? ` (${remaining}s)` : ""}`
+        : confirmText;
+    };
+    updateButtonLabel();
+
+    confirmBtn.onclick = () => {
+      if (!confirmBtn.disabled) {
+        onConfirm();
+        closeModal();
+      }
+    };
+  }
+
+  // Disable close actions until countdown done
+  closeBtn.onclick = () => {
+    if (canClose) closeModal();
+  };
+  modal.onclick = (e) => {
+    if (canClose && e.target === modal) closeModal();
+  };
+  document.addEventListener("keydown", handleEsc);
+
+  // Apply dark/light theme if available
+  applyModalTheme(modal);
+
+  // Show it
+  modal.classList.add("open");
+
+  // Countdown logic
+  if (seconds) {
+    countdownInterval = setInterval(() => {
+      remaining--;
+      confirmBtn.textContent = `${confirmText} (${remaining}s)`;
+
+      if (remaining <= 0) {
+        clearInterval(countdownInterval);
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = confirmText;
+        canClose = true;
+      }
+    }, 1000);
+  }
+
+  function closeModal() {
+    modal.classList.remove("open");
+    document.removeEventListener("keydown", handleEsc);
+    clearInterval(countdownInterval);
+  }
+
+  function handleEsc(e) {
+    if (canClose && e.key === "Escape") closeModal();
+  }
+}
+
 function createBackButton() {
   const btn = document.createElement("button");
   btn.className = "btn btn-secondary mb-3";
@@ -55034,11 +55162,26 @@ async function showMemes() {
     theUser.username.data.membership_level.ID != 10 ||
     theUser.username.data.membership_level.ID != 12
   ) {
-    runAllRandomly(); //Turn off after testing
+
+    runAllRandomly();
+
     subscribeToProMeme();
+
     memesAddedEveryGW();
+  
     endOfMemes();
     addCaptainBadge();
+
+
+
+    showModalWithTimer({
+      title: 'Please subscribe to remove ads!',
+      body: " ",
+      confirmText: "OK",
+      onConfirm: () => {}, // No action taken
+      seconds: 10,
+    });
+
   }
   const refreshButton = document.createElement("button");
   refreshButton.id = "meme-refresh-button";
@@ -55247,7 +55390,7 @@ const influencersList = [
     entry: 135,
     img: "https://fpltoolbox.com/wp-content/uploads/2025/01/0Fn-qMWH_400x400.jpg",
   },
-    {
+  {
     influencer: "Chunkz",
     entry: 2253812,
     img: "https://fpltoolbox.com/wp-content/uploads/2025/09/chunkz.jpg",
@@ -58268,11 +58411,9 @@ async function showPlayerMaker() {
   playerContainer.style.alignItems = "center";
   playerContainer.style.justifyContent = "center";
   playerContainer.style.width = "100%";
-  playerContainer.style.background = "linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1) 100%)";
-  playerContainer.style.aspectRatio = "4/5"
-
-
-
+  playerContainer.style.background =
+    "linear-gradient(90deg, rgba(8, 237, 255, 1) 0%, rgba(147, 61, 255, 1) 100%)";
+  playerContainer.style.aspectRatio = "4/5";
 
   container.appendChild(playerContainer);
 
@@ -58415,88 +58556,88 @@ async function showPlayerMaker() {
 
   container.appendChild(form);
 
-const bgType = form.querySelector("#backgroundType");
-const grad1 = form.querySelector("#gradientColor1");
-const grad2 = form.querySelector("#gradientColor2");
-const solid = form.querySelector("#solidColor");
+  const bgType = form.querySelector("#backgroundType");
+  const grad1 = form.querySelector("#gradientColor1");
+  const grad2 = form.querySelector("#gradientColor2");
+  const solid = form.querySelector("#solidColor");
 
-const presetSelect = form.querySelector("#backgroundPreset");
+  const presetSelect = form.querySelector("#backgroundPreset");
 
+  // Show/hide relevant controls
+  bgType.addEventListener("change", () => {
+    document
+      .querySelectorAll(".bg-control")
+      .forEach((el) => (el.style.display = "none"));
+    if (bgType.value === "gradient") {
+      document
+        .querySelectorAll(".gradient-control")
+        .forEach((el) => (el.style.display = "block"));
+    } else if (bgType.value === "solid") {
+      document.querySelector(".solid-control").style.display = "block";
+    } else if (bgType.value === "image") {
+      document.querySelector(".image-control").style.display = "block";
+    }
+    updateBackground();
+  });
 
+  // 🎨 Handle preset selection
+  presetSelect.addEventListener("change", () => {
+    const preset = presetSelect.value;
 
-// Show/hide relevant controls
-bgType.addEventListener("change", () => {
-  document.querySelectorAll(".bg-control").forEach(el => el.style.display = "none");
-  if (bgType.value === "gradient") {
-    document.querySelectorAll(".gradient-control").forEach(el => el.style.display = "block");
-  } else if (bgType.value === "solid") {
-    document.querySelector(".solid-control").style.display = "block";
-  } else if (bgType.value === "image") {
-    document.querySelector(".image-control").style.display = "block";
-  }
-  updateBackground();
-});
+    if (preset.startsWith("gradient")) {
+      bgType.value = "gradient";
+      document
+        .querySelectorAll(".bg-control")
+        .forEach((el) => (el.style.display = "none"));
+      document
+        .querySelectorAll(".gradient-control")
+        .forEach((el) => (el.style.display = "block"));
 
+      if (preset === "gradient-1") {
+        grad1.value = "#08edff";
+        grad2.value = "#933dff";
+      } else if (preset === "gradient-2") {
+        grad1.value = "#ff7e00";
+        grad2.value = "#ff0033";
+      } else if (preset === "gradient-3") {
+        grad1.value = "#00c853";
+        grad2.value = "#00acc1";
+      }
+    } else if (preset.startsWith("solid")) {
+      bgType.value = "solid";
+      document
+        .querySelectorAll(".bg-control")
+        .forEach((el) => (el.style.display = "none"));
+      document.querySelector(".solid-control").style.display = "block";
 
-// 🎨 Handle preset selection
-presetSelect.addEventListener("change", () => {
-  const preset = presetSelect.value;
-
-  if (preset.startsWith("gradient")) {
-    bgType.value = "gradient";
-    document.querySelectorAll(".bg-control").forEach(el => el.style.display = "none");
-    document.querySelectorAll(".gradient-control").forEach(el => el.style.display = "block");
-
-    if (preset === "gradient-1") {
-      grad1.value = "#08edff";
-      grad2.value = "#933dff";
-    } else if (preset === "gradient-2") {
-      grad1.value = "#ff7e00";
-      grad2.value = "#ff0033";
-    } else if (preset === "gradient-3") {
-      grad1.value = "#00c853";
-      grad2.value = "#00acc1";
+      if (preset === "solid-1") {
+        solid.value = "#42a5f5";
+      } else if (preset === "solid-2") {
+        solid.value = "#512da8";
+      }
+    } else {
+      // Reset: show relevant inputs based on bgType
+      bgType.dispatchEvent(new Event("change"));
     }
 
-  } else if (preset.startsWith("solid")) {
-    bgType.value = "solid";
-    document.querySelectorAll(".bg-control").forEach(el => el.style.display = "none");
-    document.querySelector(".solid-control").style.display = "block";
+    updateBackground();
+  });
 
-    if (preset === "solid-1") {
-      solid.value = "#42a5f5";
-    } else if (preset === "solid-2") {
-      solid.value = "#512da8";
+  // Update background dynamically
+  function updateBackground() {
+    if (bgType.value === "gradient") {
+      playerContainer.style.background = `linear-gradient(90deg, ${grad1.value} 0%, ${grad2.value} 100%)`;
+      playerContainer.style.backgroundSize = "";
+    } else if (bgType.value === "solid") {
+      playerContainer.style.background = solid.value;
+      playerContainer.style.backgroundSize = "";
     }
-  } else {
-    // Reset: show relevant inputs based on bgType
-    bgType.dispatchEvent(new Event("change"));
   }
 
-  updateBackground();
-});
-
-
-// Update background dynamically
-function updateBackground() {
-  if (bgType.value === "gradient") {
-    playerContainer.style.background = `linear-gradient(90deg, ${grad1.value} 0%, ${grad2.value} 100%)`;
-    playerContainer.style.backgroundSize = "";
-
-  } else if (bgType.value === "solid") {
-    playerContainer.style.background = solid.value;
-    playerContainer.style.backgroundSize = "";
-
-  }
-}
-
-// Listen for changes
-[grad1, grad2, solid, ].forEach(input =>
-  input.addEventListener("input", updateBackground)
-);
-
-
-
+  // Listen for changes
+  [grad1, grad2, solid].forEach((input) =>
+    input.addEventListener("input", updateBackground)
+  );
 
   const cardContainer = document.createElement("div");
   cardContainer.classList.add("player-card-preview", "mt-4");
@@ -58506,13 +58647,13 @@ function updateBackground() {
     e.preventDefault();
     cardContainer.innerHTML = "";
 
-
     const playerName = document.getElementById("playerName").value;
-    const playerNameBGColor = document.getElementById("playerNameBGColor").value;
+    const playerNameBGColor =
+      document.getElementById("playerNameBGColor").value;
     const score = document.getElementById("playerScore").value;
     const scoreBGColor = document.getElementById("scoreBGColor").value;
     const teamCode = parseInt(document.getElementById("teamCode").value);
-        const kitShadow = document.getElementById("kitShadow").value;
+    const kitShadow = document.getElementById("kitShadow").value;
     const isKeeper = document.getElementById("isKeeper").checked;
     const captainStatus = document.getElementById("captainStatus").value;
 
@@ -58531,44 +58672,38 @@ function updateBackground() {
     );
 
     cardContainer.appendChild(card);
- 
-
-
 
     card.addEventListener("click", async () => {
       const target = document.querySelector(".player-maker-container");
       if (!target) return;
 
-  
+      html2canvas(target, {
+        backgroundColor: null,
+        scale: 3,
+        useCORS: true,
+      }).then((originalCanvas) => {
+        const canvas = document.createElement("canvas");
+        canvas.width = originalCanvas.width;
+        canvas.height = originalCanvas.height;
+        const ctx = canvas.getContext("2d");
 
-      html2canvas(target, { backgroundColor: null, scale: 3, useCORS: true })
-        .then((originalCanvas) => {
+        ctx.fillStyle =
+          typeof darkMode !== "undefined" && darkMode ? "#212529" : "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(originalCanvas, 0, 0);
 
-
-          const canvas = document.createElement("canvas");
-          canvas.width = originalCanvas.width;
-          canvas.height = originalCanvas.height;
-          const ctx = canvas.getContext("2d");
-
-          ctx.fillStyle = typeof darkMode !== "undefined" && darkMode ? "#212529" : "#ffffff";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(originalCanvas, 0, 0);
-
-          canvas.toBlob((blob) => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${playerName || "custom-player"}_Card.png`;
-            a.click();
-            URL.revokeObjectURL(url);
-          });
-
-       
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${playerName || "custom-player"}_Card.png`;
+          a.click();
+          URL.revokeObjectURL(url);
         });
+      });
     });
   });
 }
-
 
 const MEDIA_URL = `https://fpltoolbox.com/wp-content/uploads/`;
 
@@ -58584,7 +58719,7 @@ async function createPlayerMakerCard(
   playerStatus
 ) {
   const card = document.createElement("div");
-  console.log(kitShadow)
+  console.log(kitShadow);
   // ✅ Inline styling for the card
   card.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
   card.style.backdropFilter = "blur(10px)";
@@ -58595,9 +58730,6 @@ async function createPlayerMakerCard(
   card.style.alignItems = "center";
   card.style.justifyContent = "space-between";
   card.style.padding = "5px";
-
-
-
 
   card.style.boxSizing = "border-box";
   card.style.overflow = "hidden";
@@ -58618,9 +58750,8 @@ async function createPlayerMakerCard(
   img.style.marginBottom = "-40px";
   img.style.zIndex = "-10";
   img.style.filter = `drop-shadow(0 0 10px ${kitShadow})`; // Shadow based on team color
-    img.style.paddingLeft = "20px";
+  img.style.paddingLeft = "20px";
   img.style.paddingRight = "20px";
-
 
   // ✅ Name styling (black bg, white text)
   const name = document.createElement("div");
@@ -58657,18 +58788,26 @@ async function createPlayerMakerCard(
   scoreText.style.fontSize = "24px";
   scoreText.style.borderRadius = "0px 0px 10px 10px";
 
- const badge = document.createElement("img");
+  const badge = document.createElement("img");
   // ✅ Badge styling
   badge.style.width = "1.6rem";
   badge.style.height = "auto";
   badge.style.position = "absolute";
   badge.style.top = "20px";
-  badge.style.left = "20px";  
-  
-  if (captainStatus == "captain"){badge.src = `${MEDIA_URL}2025/09/captain-badge.png`}
-  if (captainStatus == "triple"){badge.src = `${MEDIA_URL}2025/09/triple-captain-badge.png`}
-  if (captainStatus == "vice"){badge.src = `${MEDIA_URL}2025/09/vice-badge.png`}
-  if (captainStatus == "triple-vice"){badge.src = `${MEDIA_URL}2025/09/triple-vice-badge.png`}
+  badge.style.left = "20px";
+
+  if (captainStatus == "captain") {
+    badge.src = `${MEDIA_URL}2025/09/captain-badge.png`;
+  }
+  if (captainStatus == "triple") {
+    badge.src = `${MEDIA_URL}2025/09/triple-captain-badge.png`;
+  }
+  if (captainStatus == "vice") {
+    badge.src = `${MEDIA_URL}2025/09/vice-badge.png`;
+  }
+  if (captainStatus == "triple-vice") {
+    badge.src = `${MEDIA_URL}2025/09/triple-vice-badge.png`;
+  }
 
   const flag = document.createElement("img");
   // ✅ Badge styling
@@ -58677,28 +58816,26 @@ async function createPlayerMakerCard(
   flag.style.position = "absolute";
   flag.style.top = "20px";
   flag.style.right = "20px";
-  
-  if (playerStatus == "yellow"){
-    flag.src = `${MEDIA_URL}2025/09/yellow-flag.png`
- 
-    name.style.backgroundColor = "#FBE772"
-    name.style.color = "#37003c"
-  }
-  if (playerStatus == "orange"){
-    flag.src = `${MEDIA_URL}2025/09/orange-flag.png`
-        name.style.backgroundColor = "#FFAB1B"
-    name.style.color = "#37003c"
-  }
-  if (playerStatus == "red"){
-    flag.src = `${MEDIA_URL}2025/09/red-flag.png`
-            name.style.backgroundColor = "#b2002d"
-    name.style.color = "#fff"
-  }
-  if (playerStatus == "dreamteam"){
-    flag.src = `${MEDIA_URL}2025/09/dreamteam-badge.png`
-  }
 
+  if (playerStatus == "yellow") {
+    flag.src = `${MEDIA_URL}2025/09/yellow-flag.png`;
 
+    name.style.backgroundColor = "#FBE772";
+    name.style.color = "#37003c";
+  }
+  if (playerStatus == "orange") {
+    flag.src = `${MEDIA_URL}2025/09/orange-flag.png`;
+    name.style.backgroundColor = "#FFAB1B";
+    name.style.color = "#37003c";
+  }
+  if (playerStatus == "red") {
+    flag.src = `${MEDIA_URL}2025/09/red-flag.png`;
+    name.style.backgroundColor = "#b2002d";
+    name.style.color = "#fff";
+  }
+  if (playerStatus == "dreamteam") {
+    flag.src = `${MEDIA_URL}2025/09/dreamteam-badge.png`;
+  }
 
   card.append(img, name, scoreText, flag, badge);
   return card;
