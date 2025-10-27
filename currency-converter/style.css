@@ -151,3 +151,46 @@ input {
     #nameOverlay button:hover {
       background: #218838;
     }
+
+
+
+
+
+    .keypad {
+
+  margin-top: 10px;
+  user-select: none;
+
+}
+
+.keypad .row {
+  display: flex;
+}
+
+.keypad button {
+  flex: 1;
+  padding: 15px;
+  font-size: 18px;
+  margin: 3px;
+  border: none;
+  background: #e9ecef;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.keypad button:hover {
+  background: #ced4da;
+}
+
+.keypad .equals {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+#preview{
+  
+  min-height: 20px;
+}

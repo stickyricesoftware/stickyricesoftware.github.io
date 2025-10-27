@@ -1,5 +1,6 @@
 const apiKey = "d14eeee6a4f935aab34c335e";
 const currencyNames = {
+
   AED: "United Arab Emirates Dirham",
   AFN: "Afghan Afghani",
   ALL: "Albanian Lek",
@@ -163,8 +164,11 @@ const currencyNames = {
   ZWL: "Zimbabwean Dollar",
 };
 
+
 const baseCurrencySelect = document.getElementById("baseCurrency");
 const amountInput = document.getElementById("amount");
+const keypad = document.getElementById("keypad");
+const preview = document.getElementById("preview");
 const alertContainer = document.getElementById("alertContainer");
 const targetSelectors = document.getElementById("targetCurrencySelectors");
 const convertedRow = document.getElementById("convertedCurrenciesRow");
@@ -183,9 +187,89 @@ function showAlert(message, type = "danger") {
   setTimeout(() => (alertContainer.innerHTML = ""), 3000);
 }
 
+
+// ✅ Main event listener for keypad
+  keypad.addEventListener("click", (e) => {
+    const key = e.target.getAttribute("data-key");
+    const id = e.target.id;
+
+    if (!key && id !== "clear" && id !== "equals") return;
+
+    if (key) {
+      amountInput.value += key;
+      try {
+        // Try evaluating current expression
+        const evaluated = eval(amountInput.value);
+        if (!isNaN(evaluated)) {
+          preview.textContent = `= ${evaluated}`;
+          updateConversionsWithValue(evaluated);
+        } else {
+          preview.textContent = "";
+        }
+      } catch {
+        // Expression not valid yet
+        preview.textContent = "";
+      }
+    }
+
+    if (id === "clear") {
+      amountInput.value = "";
+      preview.textContent = "";
+      updateConversionsWithValue(0);
+    }
+
+    if (id === "equals") {
+      try {
+        const result = eval(amountInput.value);
+        amountInput.value = result;
+        preview.textContent = "";
+        updateConversionsWithValue(result);
+      } catch {
+        amountInput.value = "Error";
+        preview.textContent = "";
+      }
+    }
+  });
+
+
+
 function populateCurrencyOptions(selectElement, selectedValue) {
   selectElement.innerHTML = "";
-  Object.entries(currencyNames).forEach(([code, name]) => {
+
+  // 1️⃣ Get base currency (stored or fallback)
+  const baseCurrency = localStorage.getItem("baseCurrency") || baseCurrencySelect.value;
+
+  // 2️⃣ Get target currencies (stored or fallback)
+  const targetCurrencies =
+    JSON.parse(localStorage.getItem("targetCurrencies")) || ["GBP", "USD", "MYR"];
+
+  // 3️⃣ Combine both into a single array (base + targets), remove duplicates
+  const pinnedCurrencies = [...new Set([baseCurrency, ...targetCurrencies])];
+
+  // 4️⃣ Sort all currencies alphabetically by name
+  const sortedCurrencies = Object.entries(currencyNames).sort((a, b) =>
+    a[1].localeCompare(b[1])
+  );
+
+  // 5️⃣ Add pinned currencies first
+  pinnedCurrencies.forEach((code) => {
+    const name = currencyNames[code];
+    if (!name) return; // skip if invalid
+    const option = document.createElement("option");
+    option.value = code;
+    option.textContent = `${name} (${code})`;
+    if (code === selectedValue) option.selected = true;
+    selectElement.appendChild(option);
+  });
+
+  // 6️⃣ Add a separator (optional)
+  const separator = document.createElement("option");
+  separator.disabled = true;
+  separator.textContent = "──────────";
+  selectElement.appendChild(separator);
+
+  // 7️⃣ Add all currencies in alphabetical order
+  sortedCurrencies.forEach(([code, name]) => {
     const option = document.createElement("option");
     option.value = code;
     option.textContent = `${name} (${code})`;
@@ -193,6 +277,9 @@ function populateCurrencyOptions(selectElement, selectedValue) {
     selectElement.appendChild(option);
   });
 }
+
+
+
 
 function saveToLocalStorage() {
   localStorage.setItem("targetCurrencies", JSON.stringify(targetCurrencies));
@@ -231,7 +318,15 @@ function updateTargetCurrencySelectors() {
   addTargetBtn.disabled = targetCurrencies.length >= 5;
 }
 
+  // ✅ Conversion helper functions
+  function updateConversionsWithValue(value) {
+    if (isNaN(value) || value === null || value === "") return;
+    updateConversions(value); // call your existing conversion function
+  }
+
+
 function updateConversions() {
+
   const amount = parseFloat(amountInput.value);
   convertedRow.innerHTML = "";
   if (isNaN(amount)) return;
@@ -322,6 +417,8 @@ addTargetBtn.onclick = () => {
     updateConversions();
   }
 };
+
+
 
 window.onload = () => {
   populateCurrencyOptions(baseCurrencySelect, baseCurrency);
