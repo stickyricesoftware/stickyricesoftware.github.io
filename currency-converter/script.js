@@ -175,6 +175,7 @@ const convertedRow = document.getElementById("convertedCurrenciesRow");
 const addTargetBtn = document.getElementById("addTargetCurrency");
 const themeSelector = document.getElementById("themeSelector");
 
+
 const userName = document.getElementById("userName");
 
 let targetCurrencies =
@@ -418,7 +419,9 @@ addTargetBtn.onclick = () => {
   }
 };
 
-
+setTimeout(() => {
+  document.getElementById("install-btn").style.display = "none";
+}, 3000); // hide after 5 seconds
 
 window.onload = () => {
   populateCurrencyOptions(baseCurrencySelect, baseCurrency);

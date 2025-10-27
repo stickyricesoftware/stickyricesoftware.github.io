@@ -113,7 +113,7 @@ input {
   font-size: 1rem;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   cursor: pointer;
-  z-index: 1000;
+  z-index: 1000000;
 }
 
     #nameOverlay {
@@ -158,8 +158,15 @@ input {
 
     .keypad {
 
-  margin-top: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #f8f9fa; /* light background (adjust as needed) */
+  border-top: 1px solid #ddd;
+  padding: 10px;
   user-select: none;
+  z-index: 1000; /* make sure it stays above other elements */
 
 }
 
