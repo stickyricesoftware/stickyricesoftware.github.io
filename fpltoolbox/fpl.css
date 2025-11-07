@@ -302,20 +302,21 @@ margin-left: 20px;
 
 /* Light mode pitch background */
 .pitch-light {
-  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png");
+  /* background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png"); */
   background-color: #01BA5C; /* light green */
 }
 
 /* Dark mode pitch background */
 .pitch-dark {
-  background-color: #2C3034; /* dark green */
+  background-color: #005030; /* dark green */
+
 }
 
 
 #pitch,
 #pitch1,
 #pitch2 {
-  background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png");
+  /* background-image: url("https://fpltoolbox.com/wp-content/uploads/2024/10/fpltoolbox.com-4.png"); */
   display: flex;
   flex-direction: column;
 
@@ -543,7 +544,9 @@ margin-left: 20px;
   background-color: #fc2c80;
 }
 
-
+#score-panel{
+  margin-bottom: -5px!important;
+}
 #my-score,
 #my-score2 {
   display: flex;
