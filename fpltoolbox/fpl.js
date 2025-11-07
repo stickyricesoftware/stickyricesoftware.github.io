@@ -48558,6 +48558,7 @@ function generateTeamName() {
     ✉️ Email: ${theUser.username.data.user_email}    
     🕒 Time: ${timestamp}
     🖥️ Team Name Generated: ${selectedName}`;
+    
     fetch("https://ntfy.sunny.bz/team-name-generator", {
       method: "POST",
       body: notifcation,
@@ -49025,15 +49026,7 @@ async function updateScoreCard(data) {
     }
   }
 
-  // Output the total live score and the player with the highest raw score
-  //console.log(`Total live score: ${liveScore}`);
-  // if (highestScoringPlayer) {
-  //   console.log(
-  //     `Highest scoring player: ${getPlayerWebName(
-  //       highestScoringPlayer.element
-  //     )} with ${highestScore} raw points`
-  //   );
-  // }{
+
 
   const formattedOverallRank = overallRank.toLocaleString();
   const formattedGwRank = gwRank ? gwRank.toLocaleString() : "";
@@ -49157,19 +49150,12 @@ async function updateScoreCard(data) {
         </div>
       </div>
 
-      <!-- Points Summary -->
-      <div class="col-12">
-        <div class="card shadow-sm mt-2 mt-md-3 ${cardTheme}">
-          <div class="card-body p-2 p-md-3">
-            <div id="points-summary"></div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 `;
 }
+
+
 // Fetch and render upcoming fixtures for each player
 async function fetchAndRenderUpcomingFixtures(data) {
   for (let i = 0; i < data.picks.length && i < 16; i++) {
@@ -53177,6 +53163,91 @@ async function showMemes() {
     }
   }
 
+    async function findPlayersWithOver20() {
+    console.log("Failed row");
+
+    const teamsWithPlayersOnOnePoint = [];
+
+    // Loop through teams
+    for (const team of FPLToolboxLeagueData.standings) {
+      for (const player of team.currentWeek[0].picks) {
+        const score = await getPlayerScore(player.element);
+
+        if (score > 20) {
+          teamsWithPlayersOnOnePoint.push(team);
+          break; // no need to keep checking this team once a 1-pointer is found
+        }
+      }
+    }
+
+    console.log("Teams with players with more than 20 points:", teamsWithPlayersOnOnePoint);
+
+    if (teamsWithPlayersOnOnePoint.length > 0) {
+      // Pick a random unlucky team
+      const randomTeam = getRandomTeam(teamsWithPlayersOnOnePoint);
+
+      const message1 = `POV: When ${
+        randomTeam.player_name.split(" ")[0]
+      } opens the FPL app`;
+
+      const images = [
+        "https://fpltoolbox.com/wp-content/uploads/2025/10/thankyou-for-changing-my-life.webp",
+      ];
+
+      const img = images[Math.floor(Math.random() * images.length)];
+
+      // Row of 1-pointers
+      const defenderRow = document.createElement("div");
+      defenderRow.style.display = "flex";
+      defenderRow.style.gap = "5px";
+      defenderRow.style.flexDirection = "row";
+      let message2 = document.createElement("p")
+      message2.style.color = "black"
+      for (const player of randomTeam.currentWeek[0].picks) {
+        const score = await getPlayerScore(player.element);
+        
+        message2.innerText = `I'm literally just...` ;
+        if (score > 20) {
+          let card = await createPlayerCardNew(
+            player.element,
+            score,
+            null,
+            null,
+            null
+          );
+
+          // Ensure card is a DOM node
+          if (!(card instanceof HTMLElement)) {
+            card = htmlToElement(card);
+          }
+           defenderRow.appendChild(message2);
+          defenderRow.appendChild(card);
+        }
+      }
+       
+      
+      let meme = createMeme4Corners(
+        message1,
+        null,
+       defenderRow,
+        null,
+        
+       
+        null,
+        null,
+        
+        img
+      );
+
+      // Ensure meme is DOM node
+      if (!(meme instanceof HTMLElement)) {
+        meme = htmlToElement(meme);
+      }
+
+      memeContainer.appendChild(meme);
+    }
+  }
+
   function memesAddedEveryGW() {
     const message1 = `New memes added every gw to show the highs and lows of your mini-league's FPL season`;
     const img =
@@ -55155,6 +55226,7 @@ async function showMemes() {
   ) {
     // Call the function to execute all in random order
     runAllRandomly();
+    findPlayersWithOver20()
     memesAddedEveryGW();
     endOfMemes();
     addCaptainBadge();
