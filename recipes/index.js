@@ -3,33 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Example recipe objects (you can add as many as you like)
   const recipes = [
-    {
-      title: "Pork Saag",
-      photo:
-        "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/chicken_saag_00975_16x9.jpg",
-      ingredients: [
-        "2.5 tbsp sunflower or vegetable oil",
-        "1 large onion, finely chopped",
-        "39g piece fresh root ginger, peeled and finely chopped",
-        "3 garlic cloves, finely chopped",
-        "2 heaped tsp medium curry powder",
-        "Half tsp dried chilli flakes",
-        "300g young spinach leaves",
-         "200g FROZEN PEAS",
-        "1 tsp fine sea salt",
-        "600g Pork mince",
-        "5tsp fresh lemon juice",
-        "Salt and freshly ground black pepper",
-      ],
-      method: `
-        Heat 1.5 tablespoon of the oil in large non-stick saucepan over a medium heat. Add the onion, ginger and garlic, cover with a lid and fry for 8–10 minutes or until softened, stirring occasionally.<br><br>
-        Remove the lid, increase the heat a little and cook for 2–3 minutes more, or until the onions are lightly browned. Stir in the curry powder and chilli flakes (if using) and fry for 1 minute, stirring constantly.<br><br>
-        Add the spinach, a handful at a time, and sprinkle with the salt. Pour over 225ml cold water and cook for 5 minutes, stirring regularly. Remove from the heat and blitz with a blender until almost smooth. Set aside.<br><br>
-        Heat the remaining tablespoon of oil in a large non-stick frying pan. Season the chicken with a little salt and freshly ground black pepper and fry for 5–6 minutes over a medium-high heat, turning regularly until lightly browned in places.<br><br>
-        Pour the spinach sauce into the pan and bring to a simmer. Cook for 3–4 minutes, or until the chicken is cooked through, adding an extra splash of water if needed.<br><br>
-        Season with a little lemon juice and extra salt and pepper, to taste. Serve.
-      `,
-    },
+
 //         {
 //       title: "Lamb saag",
 //       photo:
@@ -254,6 +228,33 @@ document.addEventListener("DOMContentLoaded", () => {
     Add vegetables back to the pan and stir to combine.<br><br>
     Take off the heat and add mustard, chicken stock, and sour cream and stir.<br><br>
   `,
+    },
+        {
+      title: "Pork Saag",
+      photo:
+        "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/chicken_saag_00975_16x9.jpg",
+      ingredients: [
+        "2.5 tbsp sunflower or vegetable oil",
+        "1 large onion, finely chopped",
+        "39g piece fresh root ginger, peeled and finely chopped",
+        "3 garlic cloves, finely chopped",
+        "2 heaped tsp medium curry powder",
+        "Half tsp dried chilli flakes",
+        "300g young spinach leaves",
+         "200g FROZEN PEAS",
+        "1 tsp fine sea salt",
+        "600g Pork mince",
+        "5tsp fresh lemon juice",
+        "Salt and freshly ground black pepper",
+      ],
+      method: `
+        Heat 1.5 tablespoon of the oil in large non-stick saucepan over a medium heat. Add the onion, ginger and garlic, cover with a lid and fry for 8–10 minutes or until softened, stirring occasionally.<br><br>
+        Remove the lid, increase the heat a little and cook for 2–3 minutes more, or until the onions are lightly browned. Stir in the curry powder and chilli flakes (if using) and fry for 1 minute, stirring constantly.<br><br>
+        Add the spinach, a handful at a time, and sprinkle with the salt. Pour over 225ml cold water and cook for 5 minutes, stirring regularly. Remove from the heat and blitz with a blender until almost smooth. Set aside.<br><br>
+        Heat the remaining tablespoon of oil in a large non-stick frying pan. Season the chicken with a little salt and freshly ground black pepper and fry for 5–6 minutes over a medium-high heat, turning regularly until lightly browned in places.<br><br>
+        Pour the spinach sauce into the pan and bring to a simmer. Cook for 3–4 minutes, or until the chicken is cooked through, adding an extra splash of water if needed.<br><br>
+        Season with a little lemon juice and extra salt and pepper, to taste. Serve.
+      `,
     },
 
   ];
