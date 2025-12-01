@@ -34,6 +34,7 @@ if (
 }
 
 const changelogData = [
+  { version: "4.5", description: "GW Transfer Summaries and backend changes" },
   { version: "4.4.1", description: "Defcon Leaderboard" },
   { version: "4.4.0", description: "Homescreen stats" },
   { version: "4.3.5", description: "Bench D'or meme" },
@@ -46521,13 +46522,6 @@ function toolsScreen() {
       requiresData: true,
     },
     {
-      icon: "bi-arrow-repeat",
-      label: "GW Transfer Summaries",
-      action: showTransferSummaries,
-      tier: "free",
-      requiresData: true,
-    },
-    {
       icon: "bi-emoji-smile",
       label: "GW Memes",
       action: showMemes,
@@ -46540,6 +46534,13 @@ function toolsScreen() {
       action: generateTeamName,
       tier: "free",
       requiresData: false,
+    },
+    {
+      icon: "bi-arrow-repeat",
+      label: "GW Transfer Summaries",
+      action: showCurrentGwTransferSummaries,
+      tier: "pro",
+      requiresData: true,
     },
     {
       icon: "bi-people",
@@ -49909,6 +49910,149 @@ async function showGameweekStats() {
     console.error("Error building table:", error);
   }
 }
+
+async function showCurrentGwTransferSummaries() {
+ const container = document.getElementById("screen-tools");
+  container.innerHTML = "";
+
+  const backBtn = createBackButton();
+  backBtn.classList.add("btn", "btn-secondary", "mb-3");
+  container.appendChild(backBtn);
+
+  const title = document.createElement("h6");
+  title.classList.add("text-center", "mb-3");
+  title.innerText = `${FPLToolboxLeagueData.leagueName} \n GW Transfers`;
+  container.appendChild(title);
+
+  const tableWrapper = document.createElement("div");
+  tableWrapper.className = "table-responsive";
+
+  const table = document.createElement("table");
+  const darkMode = localStorage.getItem("darkMode") === "true";
+  table.classList.add(
+    "table",
+    "table-striped",
+    "table-hover",
+    "table-bordered",
+    "align-middle",
+    darkMode ? "table-dark" : "table-light"
+  );
+
+  // Header
+  const thead = document.createElement("thead");
+  thead.classList.add("text-center");
+  const headerRow = document.createElement("tr");
+  ["Team", "Transfers (Out → In)", "Total OUT", "Total IN", "Result"].forEach((h) => {
+    const th = document.createElement("th");
+    th.innerText = h;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  
+
+  for (const team of window.FPLToolboxLeagueData.standings) {
+    const transfersThisGW = (team.transfers?.[0] || []).filter(
+      (t) => t.event === currentGw
+    );
+
+    // One row per team now
+    const tr = document.createElement("tr");
+
+    // Highlight user's own row
+    if (team.entry == theUser.info.team_id) {
+      tr.classList.add("table-primary");
+    }
+
+
+    const activeChip = document.createElement("span");
+    activeChip.className = "top-0 end-0 m-1";
+    activeChip.style.fontSize = "1.5rem";
+    activeChip.style.padding = "0.25em 0.5em";
+
+    activeChip.innerText = team.currentWeek[0].active_chip
+   
+    // TEAM CELL
+    const teamCell = document.createElement("td");
+ 
+    teamCell.innerHTML = `<br><strong>${team.entry_name}</strong><br><small>${team.player_name}</small>`;
+    tr.appendChild(teamCell);
+
+       teamCell.prepend(activeChip)
+
+    // TRANSFER VISUAL CELL
+    const transfersCell = document.createElement("td");
+    transfersCell.className = "text-center";
+
+    let totalOutScore = 0;
+    let totalInScore = 0;
+
+    if (transfersThisGW.length === 0) {
+      transfersCell.innerHTML = `<span class="text-muted">No transfers</span>`;
+    } else {
+      for (const t of transfersThisGW) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "d-flex justify-content-center align-items-center gap-2 mb-2";
+
+        // OUT card and score
+        const outScore = await getPlayerScore(t.element_out);
+        totalOutScore += outScore;
+        const outCard = await createPlayerCardNew(t.element_out, outScore, null, null, null);
+
+        // IN card and score
+        const inScore = await getPlayerScore(t.element_in);
+        totalInScore += inScore;
+        const inCard = await createPlayerCardNew(t.element_in, inScore, null, null, null);
+
+        const arrow = document.createElement("div");
+        arrow.className = "fw-bold fs-5";
+        arrow.innerText = "→";
+
+        wrapper.appendChild(outCard);
+        wrapper.appendChild(arrow);
+        wrapper.appendChild(inCard);
+
+        transfersCell.appendChild(wrapper);
+      }
+    }
+
+    tr.appendChild(transfersCell);
+
+    // TOTAL OUT score
+    const outCell = document.createElement("td");
+    outCell.className = "text-center fw-bold";
+    outCell.innerText = totalOutScore;
+    tr.appendChild(outCell);
+
+    // TOTAL IN score
+    const inCell = document.createElement("td");
+    inCell.className = "text-center fw-bold";
+    inCell.innerText = totalInScore;
+    tr.appendChild(inCell);
+
+    // RESULT ICON
+    const resultCell = document.createElement("td");
+    resultCell.className = "text-center fs-4";
+
+    let icon = "";
+    if (totalInScore > totalOutScore) icon = `<span class="text-success fw-bold">✓</span>`;
+    else if (totalInScore < totalOutScore) icon = `<span class="text-danger fw-bold">✗</span>`;
+    else icon = `<span class="text-muted">•</span>`;
+
+    resultCell.innerHTML = icon;
+    tr.appendChild(resultCell);
+
+    tbody.appendChild(tr);
+  }
+
+  table.appendChild(tbody);
+  tableWrapper.appendChild(table);
+  container.appendChild(tableWrapper);
+}
+
+
 
 async function showSeasonStats() {
   let leagueToDisplay = getLeagueToDisplay(FPLToolboxLeagueData, dummyLeague);
