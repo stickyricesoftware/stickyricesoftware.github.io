@@ -11,6 +11,22 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', function(event) {
-  // Bypass cache for now; you can add caching later if needed
-  event.respondWith(fetch(event.request));
+  event.respondWith(
+    caches.open('currency-converter-cache').then(function(cache) {
+      return cache.match(event.request).then(function(response) {
+        if (response) return response;
+        return fetch(event.request)
+          .then(function(networkResponse) {
+            if (event.request.method === 'GET') {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(function() {
+            // Return a fallback response or empty response on error
+            return new Response('', { status: 503, statusText: 'Service Unavailable' });
+          });
+      });
+    })
+  );
 });
