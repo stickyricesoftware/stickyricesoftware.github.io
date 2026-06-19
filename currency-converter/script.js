@@ -496,7 +496,7 @@ function updateTargetCurrencySelectors() {
         function renderList(filter = '') {
           list.innerHTML = '';
           // Priority currencies (always show, but disable if not available)
-          const priority = ['GBP', 'MYR', 'USD'];
+          const priority = ['GBP', 'MYR', 'SGD', 'USD'];
           const base = baseCurrencySelect.value;
           priority.forEach(code => {
             const name = currencyNames[code];
