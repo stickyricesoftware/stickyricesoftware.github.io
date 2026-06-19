@@ -742,7 +742,7 @@ baseCurrencySelect.onclick = function(e) {
   function renderList(filter = '') {
     list.innerHTML = '';
     // Priority currencies
-    const priority = ['GBP', 'MYR', 'USD'];
+    const priority = ['GBP', 'MYR', 'SGD', 'USD'];
     const allCodes = Object.keys(currencyNames);
     const filteredPriority = priority.filter(code => allCodes.includes(code))
       .filter(code => {
