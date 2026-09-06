@@ -5,7 +5,7 @@ const artworks = [
         title: "Malaysia",
         images: [
             "https://stickyricesoftware.github.io/rollerandink/A2-Malaysia_.jpg",
-            "https://images.unsplash.com/photo-1561214115-6d2f1b0c68da?w=500&h=500&fit=crop"
+            "https://picsum.photos/500/500?random=1"
         ],
         cost: "$1,200",
         description: "A contemplative piece exploring the intersection of digital and analog art forms."
@@ -14,7 +14,7 @@ const artworks = [
         id: 2,
         title: "Urban Geometry",
         images: [
-            "https://images.unsplash.com/photo-1561214115-6d2f1b0c68da?w=500&h=500&fit=crop"
+            "https://picsum.photos/500/500?random=2"
         ],
         cost: "$950",
         description: "Bold geometric patterns that challenge our perception of space and dimension."
@@ -23,8 +23,8 @@ const artworks = [
         id: 3,
         title: "Serenity",
         images: [
-            "https://images.unsplash.com/photo-1561214115-6d2f1b0c68da?w=500&h=500&fit=crop",
-            "https://images.unsplash.com/photo-1557672172-298e090d0f80?w=500&h=500&fit=crop"
+            "https://picsum.photos/500/500?random=3",
+            "https://picsum.photos/500/500?random=4"
         ],
         cost: "$1,500",
         description: "A minimalist approach to capturing calm and tranquility through color and form."
@@ -33,7 +33,7 @@ const artworks = [
         id: 4,
         title: "Chromatic Waves",
         images: [
-            "https://images.unsplash.com/photo-1557672172-298e090d0f80?w=500&h=500&fit=crop"
+            "https://picsum.photos/500/500?random=5"
         ],
         cost: "$1,100",
         description: "Flowing layers of color that evoke movement and emotion without boundaries."
@@ -42,9 +42,9 @@ const artworks = [
         id: 5,
         title: "Abstract Horizon",
         images: [
-            "https://images.unsplash.com/photo-1561914556-c89907a8aadb?w=500&h=500&fit=crop",
-            "https://images.unsplash.com/photo-1579783902614-e3fb5141b0cb?w=500&h=500&fit=crop",
-            "https://images.unsplash.com/photo-1557672172-298e090d0f80?w=500&h=500&fit=crop"
+            "https://picsum.photos/500/500?random=6",
+            "https://picsum.photos/500/500?random=7",
+            "https://picsum.photos/500/500?random=8"
         ],
         cost: "$1,800",
         description: "An exploration of landscape abstraction, where reality meets imagination."
@@ -53,7 +53,7 @@ const artworks = [
         id: 6,
         title: "Monochrome Study",
         images: [
-            "https://images.unsplash.com/photo-1561914556-c89907a8aadb?w=500&h=500&fit=crop"
+            "https://picsum.photos/500/500?random=9"
         ],
         cost: "$800",
         description: "A refined study in contrast, form, and the beauty of simplicity."
