@@ -2,9 +2,9 @@
 const artworks = [
     {
         id: 1,
-        title: "Midnight Dreams",
+        title: "Malaysia",
         images: [
-            "https://images.unsplash.com/photo-1579783902614-e3fb5141b0cb?w=500&h=500&fit=crop",
+            "https://stickyricesoftware.github.io/rollerandink/A2-Malaysia_.jpg",
             "https://images.unsplash.com/photo-1561214115-6d2f1b0c68da?w=500&h=500&fit=crop"
         ],
         cost: "$1,200",
