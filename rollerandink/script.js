@@ -1,24 +1,6 @@
 // Dummy artwork data - Update with your actual artwork
 const artworks = [
     {
-        id: 1,
-        title: "Malaysia",
-        images: [
-            "/rollerandink/images/a2-malaysia.jpg"
-        ],
-        cost: "$1,200",
-        description: "A contemplative piece exploring the intersection of digital and analog art forms."
-    },
-    {
-        id: 2,
-        title: "Thailand",
-        images: [
-            "/rollerandink/images/a2-thailand.jpg"
-        ],
-        cost: "$950",
-        description: "Bold geometric patterns that challenge our perception of space and dimension."
-    },
-    {
         id: 3,
         title: "Books and cats",
         images: [
