@@ -227,11 +227,34 @@ const themeIcon = document.getElementById("themeIcon");
 const userName = document.getElementById("userName");
 
 // State
+// Exchange rates are kept on the device so the app can open without calling the API.
+const SAVED_RATES_KEY = "savedExchangeRates";
+
 let targetCurrencies = JSON.parse(localStorage.getItem("targetCurrencies")) || [];
 let baseCurrency = localStorage.getItem("baseCurrency") || "MYR";
 let exchangeRates = {};
-let ratesCache = {};
+let ratesCache = loadSavedRates();
 let debounceTimeout = null;
+
+function loadSavedRates() {
+  try {
+    const raw = localStorage.getItem(SAVED_RATES_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    console.warn("Could not read saved exchange rates:", err);
+    return {};
+  }
+}
+
+function persistRates() {
+  try {
+    localStorage.setItem(SAVED_RATES_KEY, JSON.stringify(ratesCache));
+  } catch (err) {
+    console.warn("Could not save exchange rates to the device:", err);
+  }
+}
 
 // Show alert message
 function showAlert(message, type = "danger") {
@@ -617,16 +640,98 @@ function updateTargetCurrencySelectors() {
   }
 }
 
-// Fetch exchange rates from API with caching and loading indicator
-async function fetchRates() {
+// Exchange rates saved on the device, for a given base currency.
+function getSavedRates(base) {
+  const entry = ratesCache[base];
+  return entry && entry.rates ? entry : null;
+}
+
+// Apply rates to the UI and show when they were saved.
+function applyRates(rates, savedAt) {
+  exchangeRates = rates;
+  updateTargetCurrencySelectors();
+  renderRatesStatus(savedAt);
+}
+
+// Store rates on the device and show them.
+function storeRates(base, rates) {
+  const savedAt = Date.now();
+  ratesCache[base] = { rates, savedAt };
+  persistRates();
+  applyRates(rates, savedAt);
+}
+
+// Show when the rates currently on screen were last saved.
+function renderRatesStatus(savedAt) {
+  const statusEl = document.getElementById("ratesStatus");
+  const dotEl = document.getElementById("ratesDot");
+  if (!statusEl) return;
+  if (!savedAt) {
+    statusEl.textContent = "No exchange rates saved yet";
+    if (dotEl) dotEl.className = "rates-dot rates-dot-none";
+    return;
+  }
+  const ageHours = (Date.now() - savedAt) / 3600000;
+  statusEl.textContent = `Rates saved ${formatSavedAt(new Date(savedAt))} · ${describeAge(savedAt)}`;
+  if (dotEl) {
+    dotEl.className = "rates-dot " + (ageHours <= 24 ? "rates-dot-fresh" : "rates-dot-stale");
+  }
+}
+
+function formatSavedAt(date) {
+  try {
+    return date.toLocaleString(undefined, {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  } catch (err) {
+    return date.toISOString().slice(0, 16).replace("T", " ");
+  }
+}
+
+function describeAge(savedAt) {
+  const minutes = Math.floor((Date.now() - savedAt) / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? "" : "s"} ago`;
+}
+
+// Toggle the spinning state on the refresh button.
+function setRefreshing(on) {
+  const btn = document.getElementById("refreshRates");
+  if (!btn) return;
+  btn.disabled = on;
+  btn.classList.toggle("is-refreshing", on);
+}
+
+// Fetch exchange rates. Rates already saved on the device are reused so the app
+// does not call the API every time it opens - pass { force: true } to refresh.
+async function fetchRates(options = {}) {
+  const force = options.force === true;
   const selectedBase = baseCurrencySelect.value;
-  showLoading(true);
-  if (ratesCache[selectedBase]) {
-    exchangeRates = ratesCache[selectedBase];
-    updateTargetCurrencySelectors();
+  const saved = getSavedRates(selectedBase);
+
+  if (!force && saved) {
+    applyRates(saved.rates, saved.savedAt);
     showLoading(false);
     return;
   }
+
+  if (force) {
+    setRefreshing(true);
+  } else {
+    showLoading(true);
+  }
+
+  let primaryError = null;
+  let fallbackError = null;
+
   try {
     // Primary API (may require valid apiKey)
     const response = await fetch(
@@ -634,41 +739,51 @@ async function fetchRates() {
     );
     const data = await response.json();
     if (data && data.result === "success" && data.conversion_rates) {
-      exchangeRates = data.conversion_rates;
-      ratesCache[selectedBase] = exchangeRates;
-      console.info('Rates loaded from primary API for', selectedBase);
-      updateTargetCurrencySelectors();
+      storeRates(selectedBase, data.conversion_rates);
       showLoading(false);
+      setRefreshing(false);
+      console.info('Rates loaded from primary API for', selectedBase);
       return;
     }
     throw new Error(data && data["error-type"] ? data["error-type"] : 'Primary API returned unexpected response');
   } catch (err) {
+    primaryError = err;
     console.warn('Primary exchange API failed:', err && err.message ? err.message : err);
     // Try fallback free API (no API key required)
     try {
       const resp2 = await fetch(`https://api.exchangerate.host/latest?base=${selectedBase}`);
       const d2 = await resp2.json();
       if (d2 && d2.rates) {
-        exchangeRates = d2.rates;
-        ratesCache[selectedBase] = exchangeRates;
-        console.info('Rates loaded from fallback exchangerate.host for', selectedBase);
-        updateTargetCurrencySelectors();
+        storeRates(selectedBase, d2.rates);
         showLoading(false);
+        setRefreshing(false);
+        console.info('Rates loaded from fallback exchangerate.host for', selectedBase);
         return;
       }
       throw new Error('Fallback API returned unexpected response');
     } catch (err2) {
+      fallbackError = err2;
       console.error('Both primary and fallback exchange APIs failed:', err2 && err2.message ? err2.message : err2);
-      showLoading(false);
-      // Show persistent error overlay
-      let loader = document.getElementById('loader');
-      if (loader) {
-        loader.innerHTML = `<span style='color:#b71c1c;'>Error loading exchange rates.<br>${err.message}<br>${err2 ? err2.message : ''}</span>`;
-        loader.style.display = 'flex';
-      }
-      showAlert('Unable to load exchange rates. Please check your connection.', 'danger');
     }
   }
+
+  showLoading(false);
+  setRefreshing(false);
+
+  if (saved) {
+    // Keep using the rates already on the device rather than losing them.
+    renderRatesStatus(saved.savedAt);
+    showAlert('Could not reach the exchange rate service. Using the rates saved on this device.', 'warning');
+    return;
+  }
+
+  // Nothing saved to fall back on - show persistent error overlay
+  let loader = document.getElementById('loader');
+  if (loader) {
+    loader.innerHTML = `<span style='color:#b71c1c;'>Error loading exchange rates.<br>${primaryError && primaryError.message}<br>${fallbackError ? fallbackError.message : ''}</span>`;
+    loader.style.display = 'flex';
+  }
+  showAlert('Unable to load exchange rates. Please check your connection.', 'danger');
 }
 
 // Apply selected theme (light/dark only) and update icon
@@ -700,6 +815,26 @@ themeIcon.addEventListener("keypress", (e) => {
     themeIcon.click();
   }
 });
+
+// Refresh button - forces a new fetch even when rates are already saved.
+const refreshRatesBtn = document.getElementById("refreshRates");
+if (refreshRatesBtn) {
+  refreshRatesBtn.addEventListener("click", () => {
+    fetchRates({ force: true });
+  });
+}
+
+// Keep the bottom of the page clear of the fixed keypad so the saved-rates
+// indicator stays reachable.
+function syncKeypadClearance() {
+  const keypadEl = document.getElementById("keypad");
+  if (!keypadEl) return;
+  const height = keypadEl.getBoundingClientRect().height;
+  if (height > 0) {
+    document.body.style.paddingBottom = (height + 16) + "px";
+  }
+}
+window.addEventListener("resize", syncKeypadClearance);
 
 // Modal for base currency selection
 baseCurrencySelect.onclick = function(e) {
@@ -923,14 +1058,15 @@ window.onload = () => {
   populateCurrencyOptions(baseCurrencySelect, baseCurrency);
   updateTargetCurrencySelectors();
   initTheme();
+  syncKeypadClearance();
   fetchRates();
   checkAndAskForUserName();
   // Notify app open (for analytics)
   // Removed failing POST request to ntfy.sunny.bz
 };
 
-// Register service worker for PWA
-if ("serviceWorker" in navigator) {
+// Register service worker for PWA (not applicable inside the Cordova app)
+if ("serviceWorker" in navigator && !window.cordova) {
   navigator.serviceWorker
     .register("/sw.js")
     .then(() => console.log("Service Worker Registered"));

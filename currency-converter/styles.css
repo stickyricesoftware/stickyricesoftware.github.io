@@ -797,3 +797,99 @@ body.theme-dark #themeIcon {
     padding: 0.5rem 1rem;
   }
 }
+
+/* Header actions: refresh button next to the theme toggle */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+}
+.icon-btn svg {
+  width: 19px;
+  height: 19px;
+}
+.icon-btn:hover {
+  background: var(--input-bg);
+}
+.icon-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.icon-btn.is-refreshing svg {
+  animation: cdv-spin 0.9s linear infinite;
+}
+@keyframes cdv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .icon-btn.is-refreshing svg {
+    animation: none;
+  }
+}
+
+/* Saved exchange rate indicator at the bottom of the app */
+.rates-footer {
+  max-width: 480px;
+  margin: 0.5rem auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-color);
+  opacity: 0.72;
+}
+.rates-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9aa0a6;
+}
+.rates-dot-fresh {
+  background: #22a06b;
+}
+.rates-dot-stale {
+  background: #f59e42;
+}
+
+/* Inline alerts (rate errors and warnings) */
+.alert {
+  padding: 0.6rem 0.8rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.alert-danger {
+  background: #fdecea;
+  color: #b71c1c;
+}
+.alert-warning {
+  background: #fff4e5;
+  color: #9a5b00;
+}
+body.theme-dark .alert-danger {
+  background: #3b1f1f;
+  color: #ff8a80;
+}
+body.theme-dark .alert-warning {
+  background: #3b2f1a;
+  color: #ffcc80;
+}

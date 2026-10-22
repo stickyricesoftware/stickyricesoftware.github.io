@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no" />
     <title>Currency Converter</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,9 +11,8 @@
       href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Rowdies:wght@300;400;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="manifest" href="/currency-converter/manifest.json" />
     <meta name="theme-color" content="#121212" />
-    <link rel="stylesheet" href="/currency-converter/style.css">
+    <link rel="stylesheet" href="styles.css">
 
   </head>
   <!-- Google tag (gtag.js) -->
@@ -44,7 +44,15 @@
     <div class="main-container">
       <div class="header-row" style="display:flex;align-items:center;justify-content:space-between;padding:0.1rem 0.2rem;margin-bottom:0.3rem;">
         <span id="headerTitle" style="font-size:1.1rem;font-weight:700;"></span>
-        <span id="themeIcon" style="font-size:1.3rem;cursor:pointer;margin-left:0.5rem;" aria-label="Toggle theme" tabindex="0">🌞</span>
+        <div class="header-actions">
+          <button id="refreshRates" class="icon-btn" type="button" aria-label="Refresh exchange rates" title="Refresh exchange rates">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 11a8 8 0 1 0-2.34 5.66" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <span id="themeIcon" style="font-size:1.3rem;cursor:pointer;margin-left:0.5rem;" aria-label="Toggle theme" tabindex="0">🌞</span>
+        </div>
       </div>
 
       <div id="alertContainer"></div>
@@ -69,6 +77,8 @@
       <div class="converted-currencies" id="convertedCurrenciesRow">
         <!-- Converted currencies will appear here -->
       </div>
+
+     
 
 
 
@@ -122,12 +132,16 @@
   </div>
 </div>
 </div>
-
-  <button id="install-btn" class="btn btn-primary btn-sm">Install as app</button>
+<div class="rates-footer">
+  <span class="rates-dot rates-dot-none" id="ratesDot" aria-hidden="true"></span>
+  <span id="ratesStatus" role="status">No exchange rates saved yet</span>
+</div>
+  <button id="install-btn" class="btn btn-primary btn-sm" style="display:none">Install as app</button>
 
 
     </div>
 
-  <script src="/currency-converter/script.js"></script>
+  <script src="cordova.js"></script>
+  <script src="script.js"></script>
   </body>
 </html>
