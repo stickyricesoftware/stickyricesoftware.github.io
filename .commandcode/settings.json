@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(node -e console.log(process.version))",
+      "Shell(npx --no-install playwright --version 2 >& 1)",
+      "Shell(where chrome.exe 2>nul & where msedge.exe 2>nul & ls \"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe\" 2>nul & ls \"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" 2>nul & echo DONE)",
+      "Shell(agent-browser:*)",
+      "Shell(npm:*)",
+      "Shell(node -e \" const fs=require('fs'); const css=fs.readFileSync('currency-converter/styles.css','utf8').split(/\\r?\\n/); let depth=0, stack=[]; css.forEach((l,i)=>{ const before=depth; for(const ch of l){ if(ch==='{'){depth++; stack.push(i+1);} if(ch==='}'){depth--; stack.pop();} } if(before===0 && depth>0 && l.includes('{')) console.log('OPEN depth->'+depth+' line '+(i+1)+': '+l.trim().slice(0,60)); if(before>0 && depth===0) console.log('CLOSE depth->0 line '+(i+1)+': '+l.trim().slice(0,60)); }); console.log('FINAL DEPTH (0 = balanced):', depth); \")",
+      "Shell(node -e \" const fs=require('fs'); const p='C:/Users/Sunny/Documents/Github Repos/stickyricesoftware.github.io/currency-converter/styles.css'; const css=fs.readFileSync(p,'utf8').split(/\\r?\\n/); let depth=0; css.forEach((l,i)=>{ const before=depth; for(const ch of l){ if(ch==='{'){depth++;} if(ch==='}'){depth--;} } if(before===0 && depth>0 && l.includes('{')) console.log('OPEN depth->'+depth+' L'+(i+1)+': '+l.trim().slice(0,55)); if(before>0 && depth===0) console.log('CLOSE depth->0 L'+(i+1)+': '+l.trim().slice(0,55)); }); console.log('FINAL DEPTH (0=balanced):', depth); \")",
+      "Shell(node C:\\Users\\Sunny\\AppData\\Local\\Temp\\commandcode\\C--Users-Sunny-Documents-Github-Repos-stickyricesoftware-github-io\\2bad8da0-a507-47b8-8d7d-68009b102fae\\scratchpad\\csscheck.js)",
+      "Shell(type:*)",
+      "Shell(npm i -g agent-browser > \"%TEMP%\\ab_install.log\" 2>&1; echo \"EXIT=$?\"; type \"%TEMP%\\ab_install.log\")",
+      "powershell"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
