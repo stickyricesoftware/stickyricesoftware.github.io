@@ -5,31 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="format-detection" content="telephone=no" />
     <title>Currency Converter</title>
+    <meta name="theme-color" content="#121212" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Rowdies:wght@300;400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
     />
-    <meta name="theme-color" content="#121212" />
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Currency Converter" />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-0L5RNGKJ43"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
+      gtag("config", "G-0L5RNGKJ43");
+    </script>
   </head>
-  <!-- Google tag (gtag.js) -->
-  <script
-    async
-    src="https://www.googletagmanager.com/gtag/js?id=G-0L5RNGKJ43"
-  ></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
-
-    gtag("config", "G-0L5RNGKJ43");
-  </script>
-  <body>
+  <body class="theme-light">
     <div id="loader" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.8);z-index:99999;align-items:center;justify-content:center;">
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="currency-spinner">
@@ -41,107 +46,111 @@
         <span style="margin-top:1rem;font-size:1.2rem;color:#222;">Loading exchange rates...</span>
       </div>
     </div>
+
     <div class="main-container">
-      <div class="header-row" style="display:flex;align-items:center;justify-content:space-between;padding:0.1rem 0.2rem;margin-bottom:0.3rem;">
-        <span id="headerTitle" style="font-size:1.1rem;font-weight:700;"></span>
-        <div class="header-actions">
-          <button id="refreshRates" class="icon-btn" type="button" aria-label="Refresh exchange rates" title="Refresh exchange rates">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20 11a8 8 0 1 0-2.34 5.66" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <span id="themeIcon" style="font-size:1.3rem;cursor:pointer;margin-left:0.5rem;" aria-label="Toggle theme" tabindex="0">🌞</span>
-        </div>
+      <div class="rates-status">
+        <span class="rates-dot rates-dot-none" id="ratesDot" aria-hidden="true"></span>
+        <span id="ratesStatus" role="status">No exchange rates saved yet</span>
+      </div>
+
+      <div class="header-row">
+        <span id="headerTitle"></span>
+        <button id="settingsBtn" class="icon-btn" type="button" aria-label="Open settings" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
       </div>
 
       <div id="alertContainer"></div>
 
-<div class="input-row">
-  <select id="baseCurrency" aria-label="From Currency">
-    <!-- Options -->
-  </select>
-  <label for="baseCurrency">From Currency</label>
-</div>
+      <main class="content-scroll">
+        <div class="input-row">
+          <select id="baseCurrency" aria-label="From Currency">
+            <!-- Options -->
+          </select>
+          <label for="baseCurrency">From Currency</label>
+        </div>
 
-<div class="input-row">
-  <input type="text" id="amount" placeholder="Amount" readonly aria-label="Amount" />
-  <label for="amount">Amount</label>
-</div>
+        <div class="input-row">
+          <input type="text" id="amount" placeholder="Amount" readonly aria-label="Amount" />
+          <label for="amount">Amount</label>
+        </div>
 
+        <div id="preview"></div>
 
+        <div class="converted-currencies" id="convertedCurrenciesRow">
+          <!-- Converted currencies will appear here -->
+        </div>
+      </main>
 
+      <button id="install-btn" style="display:none">Install as app</button>
 
-  <div id="preview" style="margin-top:5px; color:#888; font-size:14px;"></div>
-</div>
-      <div class="converted-currencies" id="convertedCurrenciesRow">
-        <!-- Converted currencies will appear here -->
+      <div class="keypad-container">
+        <div id="keypad" class="keypad" role="group" aria-label="Calculator keypad">
+          <div class="row">
+            <button id="ac" class="btn-c" aria-label="All Clear">AC</button>
+            <button data-key="(" class="btn-func" aria-label="Open parenthesis">(</button>
+            <button data-key=")" class="btn-func" aria-label="Close parenthesis">)</button>
+            <button data-key="%" class="btn-func" aria-label="Percent">%</button>
+            <button data-key="/" class="btn-op" aria-label="Divide">÷</button>
+          </div>
+          <div class="row">
+            <button data-key="7" class="btn-num" aria-label="7">7</button>
+            <button data-key="8" class="btn-num" aria-label="8">8</button>
+            <button data-key="9" class="btn-num" aria-label="9">9</button>
+            <button data-key="*" class="btn-op" aria-label="Multiply">×</button>
+          </div>
+          <div class="row">
+            <button data-key="4" class="btn-num" aria-label="4">4</button>
+            <button data-key="5" class="btn-num" aria-label="5">5</button>
+            <button data-key="6" class="btn-num" aria-label="6">6</button>
+            <button data-key="-" class="btn-op" aria-label="Subtract">−</button>
+          </div>
+          <div class="row">
+            <button data-key="1" class="btn-num" aria-label="1">1</button>
+            <button data-key="2" class="btn-num" aria-label="2">2</button>
+            <button data-key="3" class="btn-num" aria-label="3">3</button>
+            <button data-key="+" class="btn-op" aria-label="Add">+</button>
+          </div>
+          <div class="row">
+            <button data-key="0" class="btn-num" aria-label="0">0</button>
+            <button data-key="." class="btn-num" aria-label="Decimal">.</button>
+            <button id="backspace" class="btn-func" aria-label="Backspace">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+            </button>
+            <button id="equals" class="equals" aria-label="Equals">=</button>
+          </div>
+        </div>
       </div>
 
-     
-
-
-
-      <!-- <div class="mb-3">
-        <label for="amount" class="form-label"></label>
-        <input
-          type="number"
-          id="amount"
-          class="form-control"
-          placeholder="Enter amount"
-          aria-label="Large"
-          aria-describedby="inputGroup-sizing-sm"
-        />
-      </div> -->
-
-
-
-<div class="keypad-container">
-<div id="keypad" class="keypad" role="group" aria-label="Calculator keypad">
-  <div class="row">
-    <button id="ac" class="btn-c" aria-label="All Clear">AC</button>
-    <button data-key="(" class="btn-func" aria-label="Open parenthesis">(</button>
-    <button data-key=")" class="btn-func" aria-label="Close parenthesis">)</button>
-    <button data-key="%" class="btn-func" aria-label="Percent">%</button>
-    <button data-key="/" class="btn-op" aria-label="Divide">÷</button>
-  </div>
-  <div class="row">
-    <button data-key="7" class="btn-num" aria-label="7">7</button>
-    <button data-key="8" class="btn-num" aria-label="8">8</button>
-    <button data-key="9" class="btn-num" aria-label="9">9</button>
-    <button data-key="*" class="btn-op" aria-label="Multiply">×</button>
-  </div>
-  <div class="row">
-    <button data-key="4" class="btn-num" aria-label="4">4</button>
-    <button data-key="5" class="btn-num" aria-label="5">5</button>
-    <button data-key="6" class="btn-num" aria-label="6">6</button>
-    <button data-key="-" class="btn-op" aria-label="Subtract">−</button>
-  </div>
-  <div class="row">
-    <button data-key="1" class="btn-num" aria-label="1">1</button>
-    <button data-key="2" class="btn-num" aria-label="2">2</button>
-    <button data-key="3" class="btn-num" aria-label="3">3</button>
-    <button data-key="+" class="btn-op" aria-label="Add">+</button>
-  </div>
-  <div class="row">
-    <button data-key="0" class="btn-num" aria-label="0">0</button>
-    <button data-key="." class="btn-num" aria-label="Decimal">.</button>
-    <button id="backspace" class="btn-func" aria-label="Backspace">⌫</button>
-    <button id="equals" class="equals" aria-label="Equals">=</button>
-  </div>
-  </div>
-</div>
-</div>
-<div class="rates-footer">
-  <span class="rates-dot rates-dot-none" id="ratesDot" aria-hidden="true"></span>
-  <span id="ratesStatus" role="status">No exchange rates saved yet</span>
-</div>
-  <button id="install-btn" class="btn btn-primary btn-sm" style="display:none">Install as app</button>
-
-
+      <div id="settingsDrawer" class="drawer-overlay" hidden>
+        <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+          <div class="drawer-header">
+            <h2 id="drawerTitle">Settings</h2>
+            <button id="closeDrawer" class="icon-btn" type="button" aria-label="Close settings">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="drawer-body">
+            <div class="drawer-row">
+              <span class="drawer-label">Title</span>
+              <span id="drawerTitleValue" class="drawer-value"></span>
+            </div>
+            <button id="refreshRates" class="drawer-action" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>Refresh rates</span>
+            </button>
+            <div class="drawer-row">
+              <span class="drawer-label">Theme</span>
+              <button id="themeIcon" class="icon-btn" type="button" aria-label="Toggle theme">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-  <script src="cordova.js"></script>
-  <script src="script.js"></script>
+    <script src="cordova.js"></script>
+    <script src="script.js"></script>
   </body>
 </html>

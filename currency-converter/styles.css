@@ -1,808 +1,133 @@
-.currency-list-item[style*="not-allowed"], .currency-list-item.disabled {
-  opacity: 0.5;
-  color: #f7f7f7 !important;
-  background: #23243a !important;
-  cursor: not-allowed;
-}
-/* Modal Overlay and Content Theme Styles */
-.currency-modal-content input {
-  color: #222;
-  background: #f9f9f9;
-}
-body.theme-dark .currency-modal-content input {
-  color: #f7f7f7;
-  background: #23243a;
-}
-.currency-modal-content .currency-list-item {
-  background: #f9f9f9;
-  color: #222;
-}
-body.theme-dark .currency-modal-content .currency-list-item {
-  background: #23243a;
-  color: #f7f7f7;
-}
-.currency-modal-overlay {
-  background: rgba(0,0,0,0.35);
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-.currency-modal-content {
-  background: #fff;
-  color: #222;
-  border-radius: 16px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.12);
-  padding: 2rem;
-  min-width: 320px;
-  max-width: 90vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* ============================================================
+   Currency Converter
+   App-shell layout: rates status + header pinned to the top,
+   scrollable content in the middle, keypad docked at the bottom.
+   ============================================================ */
+
+/* ---------- Base ---------- */
+* {
   box-sizing: border-box;
-  margin: 1.5rem;
 }
-body.theme-dark .currency-modal-content {
-  background: #23243a;
-  color: #f7f7f7;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.32);
-}
-body.theme-dark .currency-modal-overlay {
-  background: rgba(20,20,40,0.65);
-}
-/* Circular Liquid Glass Keypad Styles */
-.keypad button {
-  border: none;
-  border-radius: 50%;
-  padding: 0;
-  width: 48px;
-  height: 48px;
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin: 0.15rem;
-  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(220,220,255,0.10) 100%);
-  box-shadow: 0 2px 12px 0 rgba(60,60,120,0.10), 0 1.5px 0 rgba(255,255,255,0.18) inset;
-  color: var(--text-color);
-  backdrop-filter: blur(8px);
-  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-  outline: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.theme-dark .keypad button {
-  background: linear-gradient(135deg, rgba(40,40,60,0.45) 0%, rgba(80,80,120,0.18) 100%);
-  color: var(--text-color);
-  box-shadow: 0 2px 12px 0 rgba(20,20,40,0.18), 0 1.5px 0 rgba(255,255,255,0.08) inset;
-}
-.keypad .btn-op, .keypad .equals {
-  background: linear-gradient(135deg, #f59e42 0%, #fbbf24 100%);
-  color: #fff;
-  font-weight: 700;
-  box-shadow: 0 2px 12px 0 rgba(251,191,36,0.18);
-}
-.theme-dark .keypad .btn-op, .theme-dark .keypad .equals {
-  background: linear-gradient(135deg, #f59e42 0%, #fbbf24 100%);
-  color: #fff;
-  box-shadow: 0 2px 12px 0 rgba(251,191,36,0.28);
-}
-.keypad .btn-c {
-  background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
-  color: #222;
-  font-weight: 600;
-}
-.theme-dark .keypad .btn-c {
-  background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
-  color: #f3f3f3;
-}
-.keypad button:active, .keypad button:focus {
-  filter: brightness(0.95);
-  box-shadow: 0 1px 6px 0 rgba(124,58,237,0.18);
-}
-/* Liquid Glass Keypad Styles */
-.keypad button {
-  border: none;
-  border-radius: 12px;
-  padding: 0.3rem 0;
-  font-size: 1.1rem;
-  font-weight: 500;
-  margin: 0.15rem;
-  min-width: 44px;
-  min-height: 44px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(220,220,255,0.35) 100%);
-  box-shadow: 0 4px 24px 0 rgba(60,60,120,0.10), 0 1.5px 0 rgba(255,255,255,0.25) inset;
-  color: var(--text-color);
-  backdrop-filter: blur(8px);
-  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-  outline: none;
-  cursor: pointer;
-}
-.theme-dark .keypad button {
-  background: linear-gradient(135deg, rgba(40,40,60,0.65) 0%, rgba(80,80,120,0.35) 100%);
-  color: var(--text-color);
-  box-shadow: 0 4px 24px 0 rgba(20,20,40,0.25), 0 1.5px 0 rgba(255,255,255,0.10) inset;
-}
-.keypad button:active, .keypad button:focus {
-  background: linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(220,220,255,0.45) 100%);
-  box-shadow: 0 2px 12px 0 rgba(124,58,237,0.18);
-}
-.theme-dark .keypad button:active, .theme-dark .keypad button:focus {
-  background: linear-gradient(135deg, rgba(124,58,237,0.28) 0%, rgba(80,80,120,0.45) 100%);
-  box-shadow: 0 2px 12px 0 rgba(124,58,237,0.28);
-}
-.keypad .equals {
-  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
-  color: #fff;
-  font-weight: 700;
-  box-shadow: 0 4px 24px 0 rgba(37,99,235,0.18);
-}
-.theme-dark .keypad .equals {
-  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
-  color: #fff;
-  box-shadow: 0 4px 24px 0 rgba(99,102,241,0.18);
-}
-/* Light/Dark Theme Styles */
-.theme-light {
-  --container-bg: #fff;
-  --text-color: #222;
-  --input-bg: #f7f7f7;
-  --input-border: #ddd;
-  --header-bg: #f3f3f3;
-}
-.theme-dark {
-  --container-bg: #181824;
-  --text-color: #f3f3f3;
-  --input-bg: #232336;
-  --input-border: #444;
-  --header-bg: #232336;
-}
-body.theme-light, body.theme-dark {
-  background: var(--container-bg);
-  color: var(--text-color);
-}
-.main-container {
-  background: var(--container-bg);
-  color: var(--text-color);
-}
-.input-row input,
-.input-row select {
-  background: var(--input-bg);
-  color: var(--text-color);
-  border: 1px solid var(--input-border);
-}
-.header-row {
-  background: var(--header-bg);
-  color: var(--text-color);
-}
-.currency-row,
-.currency-abbr,
-.currency-output {
-  color: var(--text-color);
-}
-.delete-currency-btn {
-  color: #b71c1c;
-  border-color: #b71c1c;
-  background: transparent;
-}
-/* Custom layout and input styles replacing Bootstrap */
-.main-container {
-  max-width: 480px;
-  margin: 2rem auto;
-  background: var(--container-bg, #fff);
-  border-radius: 18px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-  padding: 2rem 1.5rem;
-}
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.7rem;
-  padding: 0.3rem 0.2rem;
-}
-.header-row h1 {
-  font-size: 1.25rem;
-  margin: 0;
-  font-weight: 700;
-}
-#userName {
-  font-size: 0.95rem;
-  margin-right: 0.7rem;
-  font-weight: 500;
-}
-#themeIcon {
-  font-size: 1.5rem !important;
-  margin-left: 0.3rem;
-}
-.input-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.5rem;
-}
-.input-row label {
-  font-size: 1rem;
-  color: #888;
-  margin-top: 0.3rem;
-}
-.input-row input,
-.input-row select {
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  font-size: 1.2rem;
-  background: #f7f7f7;
-  color: #222;
-}
-.row {
-  display: flex;
-  flex-direction: row;
-}
-.converted-currencies {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 0.7rem;
-  margin: 0.7rem 0 1.2rem 0;
-  align-items: stretch;
-}
-.currency-row {
-  position: relative;
-  background: var(--input-bg);
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(60,60,120,0.07);
-  padding: 0.7rem 0.8rem 0.7rem 0.8rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  min-width: 0;
-}
-.currency-abbr {
-  font-weight: 700;
-  font-size: 0.95rem;
-  margin-top: 0.35rem;
-  opacity: 0.85;
-}
-.currency-output {
-  font-size: 1.25rem;
-  font-weight: 800;
-  line-height: 1.1;
-}
-.delete-currency-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--delete-bg, #fff);
-  border: 1.5px solid var(--delete-border, #b71c1c);
-  color: var(--delete-x, #b71c1c);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  z-index: 2;
-  box-shadow: 0 1px 4px rgba(183,28,28,0.08);
-  transition: background 0.2s, color 0.2s, border 0.2s;
-}
-.delete-currency-btn:hover {
-  background: var(--delete-x, #b71c1c);
-  color: #fff;
-  border-color: var(--delete-x, #b71c1c);
-}
-.delete-currency-btn::after {
-  content: "";
-  display: block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-.delete-currency-btn svg {
-  width: 10px;
-  height: 10px;
-  stroke: currentColor;
-  stroke-width: 2;
-  fill: none;
-}
-.theme-light {
-  --delete-bg: #fff;
-  --delete-border: #b71c1c;
-  --delete-x: #b71c1c;
-}
-.theme-dark {
-  --delete-bg: #232336;
-  --delete-border: #f87171;
-  --delete-x: #f87171;
-}
-.target-currencies {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-#addTargetCurrency {
-  background: linear-gradient(135deg, var(--accent-bg1, #f59e42) 0%, var(--accent-bg2, #fbbf24) 100%);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  margin-top: 0.5rem;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(251,191,36,0.10);
-  transition: background 0.2s;
-}
-#addTargetCurrency:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-#addTargetCurrency:hover {
-  filter: brightness(1.08);
-}
-.theme-light {
-  --accent-bg1: #f59e42;
-  --accent-bg2: #fbbf24;
-}
-.theme-dark {
-  --accent-bg1: #f59e42;
-  --accent-bg2: #fbbf24;
-}
-.keypad-container {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
-/* Currency symbol spinner animation for loader */
-.currency-spinner {
-  display: flex;
-  gap: 1.5rem;
-  font-size: 3rem;
-  justify-content: center;
-  align-items: center;
-}
-.currency-symbol {
-  animation: spin-currency 1.2s linear infinite;
-  display: inline-block;
-}
-.currency-symbol:nth-child(2) {
-  animation-delay: 0.3s;
-}
-.currency-symbol:nth-child(3) {
-  animation-delay: 0.6s;
-}
-.currency-symbol:nth-child(4) {
-  animation-delay: 0.9s;
-}
-@keyframes spin-currency {
-  0% { transform: scale(1) rotate(0deg); opacity: 1; }
-  50% { transform: scale(1.3) rotate(180deg); opacity: 0.7; }
-  100% { transform: scale(1) rotate(360deg); opacity: 1; }
-}
-/* Currency output row styling */
-.currency-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  gap: 12px;
-}
-.currency-row .currency-abbr {
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: inherit;
-}
-.currency-row .currency-output {
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: inherit;
-  margin-left: 0;
-  padding-left: 0;
-}
-.currency-row .delete-currency-btn {
-  margin-left: 12px;
-  background: transparent;
-  border: 1px solid #b71c1c;
-  color: #b71c1c;
-  border-radius: 100%;
-  width: 16px;
-  height: 16px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+html,
+body {
+  height: 100%;
 }
 body {
+  margin: 0;
   font-family: "Inter", "Cal Sans", sans-serif;
   font-weight: 700;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
   transition: background-color 0.3s, color 0.3s;
 }
-body.theme-light {
-  background-color: #f7f7f7;
-  color: #222;
-}
-body.theme-dark {
-  background-color: #232323;
-  color: #f7f7f7;
-}
-
-.theme-dark .form-select,
-.theme-dark .form-control,
-.theme-dark .alert {
-  background-color: #2c2c2c;
-  color: #fff;
-}
-
-/* Blue Theme */
-body.theme-blue {
-  background-color: #e3f2fd;
-  color: #0d47a1;
-}
-.theme-blue .form-select,
-.theme-blue .form-control,
-.theme-blue .alert {
-  background-color: #bbdefb;
-  color: #0d47a1;
-}
-
-/* Green Theme */
-body.theme-green {
-  background-color: #e8f5e9;
-  color: #1b5e20;
-}
-.theme-green .form-select,
-.theme-green .form-control,
-.theme-green .alert {
-  background-color: #c8e6c9;
-  color: #1b5e20;
-}
-
-/* Red Theme */
-body.theme-red {
-  background-color: #ffebee;
-  color: #b71c1c;
-}
-.theme-red .form-select,
-.theme-red .form-control,
-.theme-red .alert {
-  background-color: #ffcdd2;
-  color: #b71c1c;
-}
-
-/* Amber Theme */
-body.theme-amber {
-  background-color: #fff8e1;
-  color: #ff6f00;
-}
-.theme-amber .form-select,
-.theme-amber .form-control,
-.theme-amber .alert {
-  background-color: #ffe082;
-  color: #ff6f00;
-}
-
-/* Charcoal Theme */
-body.theme-charcoal {
-  background-color: #2d2d2d;
-  color: #f5f5f5;
-}
-.theme-charcoal .form-select,
-.theme-charcoal .form-control,
-.theme-charcoal .alert {
-  background-color: #424242;
-  color: #f5f5f5;
-}
-
-/* Purple Theme */
-body.theme-purple {
-  background-color: #f3e5f5;
-  color: #4a148c;
-}
-.theme-purple .form-select,
-.theme-purple .form-control,
-.theme-purple .alert {
-  background-color: #e1bee7;
-  color: #4a148c;
-}
-
 p {
   margin: 0;
   padding: 0;
 }
-input {
-  min-height: 60px;
-  border-radius: 16px;
-  font-size: 2rem;
-  text-align: right;
-  background: transparent;
-  border: none;
-  color: inherit;
+button {
+  font-family: inherit;
+}
+button:focus-visible,
+#themeIcon:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
 }
 
-
-#install-btn {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000000;
+/* ---------- Themes ---------- */
+.theme-light {
+  --container-bg: #ffffff;
+  --text-color: #222222;
+  --muted-color: #8a8a8a;
+  --input-bg: #f7f7f7;
+  --input-border: #dddddd;
+  --header-bg: #f3f3f3;
+  --accent-bg1: #f59e42;
+  --accent-bg2: #fbbf24;
+  --delete-bg: #ffffff;
+  --delete-border: #b71c1c;
+  --delete-x: #b71c1c;
+  --page-bg: #ececf1;
+}
+.theme-dark {
+  --container-bg: #181824;
+  --text-color: #f3f3f3;
+  --muted-color: #9a9aad;
+  --input-bg: #232336;
+  --input-border: #444444;
+  --header-bg: #232336;
+  --accent-bg1: #f59e42;
+  --accent-bg2: #fbbf24;
+  --delete-bg: #232336;
+  --delete-border: #f87171;
+  --delete-x: #f87171;
+  --page-bg: #0f0f16;
+}
+body.theme-light,
+body.theme-dark {
+  background: var(--page-bg);
+  color: var(--text-color);
 }
 
-    #nameOverlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-
-/* Calculator Keypad Modern Styles */
-.keypad {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: transparent;
-  border-top: none;
-  padding: 10px 0;
-  user-select: none;
-  z-index: 1000;
+/* ---------- App shell ---------- */
+.main-container {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  background: var(--container-bg);
+  color: var(--text-color);
+  box-shadow: 0 0 32px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
 }
-.keypad .row {
+
+/* ---------- Rates status indicator (very top) ---------- */
+.rates-status {
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
-}
-.keypad button {
-  flex: none;
-  width: 56px;
-  height: 56px;
-  margin: 6px;
-  border-radius: 50%;
-  border: none;
-  font-size: 1.5rem;
+  gap: 0.45rem;
+  padding: calc(0.45rem + env(safe-area-inset-top, 0px)) 1rem 0.35rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  background: #f3f3f3;
-  color: #222;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, transform 0.2s;
+  color: var(--muted-color);
+}
+.rates-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9aa0a6;
+}
+.rates-dot-fresh {
+  background: #22a06b;
+}
+.rates-dot-stale {
+  background: #f59e42;
+}
+
+/* ---------- Header ---------- */
+.header-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.3rem 1rem 0.7rem;
+  border-bottom: 1px solid var(--input-border);
 }
-body.theme-dark .keypad button {
-  background: #2c2c2c;
-  color: #f7f7f7;
-}
-.keypad button:hover {
-  background: #e0e0e0;
-  transform: scale(1.08);
-}
-body.theme-dark .keypad button:hover {
-  background: #444;
-}
-.keypad .btn-num {
-  background: #fff;
-  color: #222;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-body.theme-dark .keypad .btn-num {
-  background: #232323;
-  color: #f7f7f7;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-}
-.keypad .btn-op {
-  background: #ede9fe;
-  color: #7c3aed;
-}
-body.theme-dark .keypad .btn-op {
-  background: #3c2a4d;
-  color: #a78bfa;
-}
-.keypad .btn-func {
-  background: #fff7e6;
-  color: #bfa76f;
-}
-body.theme-dark .keypad .btn-func {
-  background: #2c2c2c;
-  color: #ffd600;
-}
-.keypad .btn-c {
-  background: #ffb300;
-  color: #fff;
-}
-body.theme-dark .keypad .btn-c {
-  background: #ffd600;
-  color: #232323;
-}
-.keypad .equals {
-  width: 56px;
-  height: 56px;
-  background: #7c3aed;
-  color: #fff;
-  font-weight: bold;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(124,58,237,0.15);
-}
-.keypad .equals:hover {
-  background: #a78bfa;
-}
-body.theme-dark .keypad .equals {
-  background: #a78bfa;
-  color: #232323;
-}
-      @media (max-width: 600px) {
-        .container {
-          padding: 0.5rem;
-        }
-        .keypad {
-          padding: 5px 0;
-        }
-        .keypad button {
-          width: 44px;
-          height: 44px;
-          font-size: 1.1rem;
-          margin: 3px;
-        }
-        .keypad .equals {
-          width: 44px;
-          height: 44px;
-          font-size: 1.1rem;
-        }
-        #install-btn {
-          font-size: 0.9rem;
-          padding: 0.5rem 1rem;
-        }
-        input {
-          min-height: 40px;
-          font-size: 1.2rem;
-        }
-        #preview {
-          font-size: 1.2rem;
-        }
-      }
-      background: #f8f9fa;
-      border-top: 1px solid #ddd;
-      padding: 10px;
-      user-select: none;
-      z-index: 1000;
-      transition: background 0.3s;
-    }
-
-
-.keypad .row {
-  display: flex;
-}
-
-
-.keypad button {
-  flex: 1;
-  padding: 15px;
-  font-size: 18px;
-  margin: 3px;
-  border: none;
-  background: #e9ecef;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-}
-
-
-.keypad button:hover {
-  background: #ced4da;
-  transform: scale(1.05);
-}
-
-
-.keypad .equals {
-  width: 100%;
-  background: #007bff;
-  color: white;
-  font-weight: bold;
-  transition: background 0.2s, transform 0.2s;
-}
-
-
-
-#preview{
-  min-height: 20px;
-  font-size: 2.2rem;
+#headerTitle {
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #222;
-  transition: color 0.3s;
-  text-align: right;
-  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-body.theme-dark #preview {
-  color: #f7f7f7;
-}
-/* Sun/Moon Theme Toggle Icon Styling */
-#themeIcon {
-  font-size: 2rem;
-  cursor: pointer;
-  transition: color 0.2s, text-shadow 0.2s;
-  color: #7c3aed;
-  text-shadow: 0 2px 8px rgba(124,58,237,0.10);
-}
-body.theme-dark #themeIcon {
-  color: #ffd600;
-  text-shadow: 0 2px 8px rgba(255,214,0,0.10);
-}
-/* Responsive design for mobile */
-@media (max-width: 600px) {
-  .container {
-    padding: 0.5rem;
-  }
-  .keypad {
-    padding: 5px 0;
-  }
-  .keypad button {
-    width: 44px;
-    height: 44px;
-    font-size: 1.1rem;
-    margin: 3px;
-  }
-  .keypad .equals {
-    width: 44px;
-    height: 44px;
-    font-size: 1.1rem;
-  }
-  #install-btn {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-  }
-  input {
-    min-height: 40px;
-    font-size: 1.2rem;
-  }
-  #preview {
-    font-size: 1.2rem;
-  }
-}
-
-/* Responsive design for mobile */
-@media (max-width: 600px) {
-  .container {
-    padding: 0.5rem;
-  }
-  .keypad {
-    padding: 5px;
-  }
-  .keypad button {
-    padding: 10px;
-    font-size: 16px;
-    margin: 2px;
-  }
-  #install-btn {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-  }
-}
-
-/* Header actions: refresh button next to the theme toggle */
 .header-actions {
   display: flex;
   align-items: center;
   gap: 0.45rem;
+  flex: none;
 }
 .icon-btn {
   display: inline-flex;
@@ -836,40 +161,36 @@ body.theme-dark #themeIcon {
     transform: rotate(360deg);
   }
 }
+#themeIcon {
+  font-size: 1.35rem;
+  cursor: pointer;
+  color: #7c3aed;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.theme-dark #themeIcon {
+  color: #ffd600;
+}
 @media (prefers-reduced-motion: reduce) {
   .icon-btn.is-refreshing svg {
     animation: none;
   }
 }
 
-/* Saved exchange rate indicator at the bottom of the app */
-.rates-footer {
-  max-width: 480px;
-  margin: 0.5rem auto 0;
+/* ---------- Scrollable content ---------- */
+.content-scroll {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-color);
-  opacity: 0.72;
+  flex-direction: column;
+  justify-content: safe center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.9rem 1rem 1.1rem;
 }
-.rates-dot {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #9aa0a6;
+#alertContainer {
+  padding: 0 1rem;
 }
-.rates-dot-fresh {
-  background: #22a06b;
-}
-.rates-dot-stale {
-  background: #f59e42;
-}
-
-/* Inline alerts (rate errors and warnings) */
 .alert {
   padding: 0.6rem 0.8rem;
   margin: 0.5rem 0;
@@ -885,11 +206,483 @@ body.theme-dark #themeIcon {
   background: #fff4e5;
   color: #9a5b00;
 }
-body.theme-dark .alert-danger {
+.theme-dark .alert-danger {
   background: #3b1f1f;
   color: #ff8a80;
 }
-body.theme-dark .alert-warning {
+.theme-dark .alert-warning {
   background: #3b2f1a;
   color: #ffcc80;
+}
+
+/* ---------- Inputs ---------- */
+.input-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.55rem;
+}
+.input-row label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted-color);
+  margin-top: 0.25rem;
+}
+.input-row select,
+.input-row input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--input-border);
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--input-bg);
+  color: var(--text-color);
+}
+#baseCurrencyBtn {
+  width: 100%;
+  margin-bottom: 0.55rem;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent-bg2);
+  background: var(--input-bg);
+  color: var(--accent-bg1);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+#baseCurrencyBtn:hover {
+  filter: brightness(0.97);
+}
+#amount {
+  min-height: 60px;
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: right;
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0.15rem;
+}
+#amount:focus {
+  outline: none;
+}
+#preview {
+  min-height: 1.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--muted-color);
+  text-align: right;
+  margin: 0.1rem 0 0.5rem;
+}
+
+/* ---------- Converted currency cards ---------- */
+.converted-currencies {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.7rem;
+  margin: 0.9rem 0 1rem;
+}
+.currency-row {
+  position: relative;
+  background: var(--input-bg);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(60, 60, 120, 0.07);
+  padding: 0.7rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+}
+.currency-output {
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.currency-abbr {
+  font-size: 0.9rem;
+  font-weight: 700;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+.delete-currency-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--delete-bg);
+  border: 1.5px solid var(--delete-border);
+  color: var(--delete-x);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 2;
+  transition: background 0.2s, color 0.2s;
+}
+.delete-currency-btn:hover {
+  background: var(--delete-x);
+  color: #fff;
+}
+.delete-currency-btn svg {
+  width: 10px;
+  height: 10px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* ---------- Docked keypad ---------- */
+.keypad-container {
+  flex: none;
+  padding: 0.55rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+  background: var(--container-bg);
+  border-top: 1px solid var(--input-border);
+}
+.keypad {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+.keypad .row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.keypad .row:last-child {
+  margin-bottom: 0;
+}
+.keypad button {
+  flex: 1;
+  height: 56px;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-color);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(225, 225, 240, 0.35) 100%);
+  box-shadow: 0 2px 10px rgba(60, 60, 120, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: filter 0.15s, transform 0.1s;
+}
+.theme-dark .keypad button {
+  background: linear-gradient(135deg, rgba(52, 52, 72, 0.7) 0%, rgba(70, 70, 100, 0.4) 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.keypad .btn-num {
+  background: linear-gradient(135deg, #ffffff 0%, #eef0f6 100%);
+  color: #222222;
+}
+.theme-dark .keypad .btn-num {
+  background: linear-gradient(135deg, #2b2b3d 0%, #232336 100%);
+  color: var(--text-color);
+}
+.keypad .btn-op {
+  background: linear-gradient(135deg, #ede9fe 0%, #e0d9fb 100%);
+  color: #7c3aed;
+}
+.theme-dark .keypad .btn-op {
+  background: linear-gradient(135deg, #3c2a4d 0%, #342447 100%);
+  color: #a78bfa;
+}
+.keypad .btn-func {
+  background: linear-gradient(135deg, #fff7e6 0%, #fdefc9 100%);
+  color: #a07c2c;
+}
+.theme-dark .keypad .btn-func {
+  background: linear-gradient(135deg, #332d1a 0%, #2c2716 100%);
+  color: #ffd600;
+}
+.keypad .btn-c {
+  background: linear-gradient(135deg, #f59e42 0%, #fbbf24 100%);
+  color: #ffffff;
+  font-weight: 700;
+}
+.keypad .equals {
+  background: linear-gradient(135deg, #7c3aed 0%, #60a5fa 100%);
+  color: #ffffff;
+  font-weight: 700;
+}
+.theme-dark .keypad .equals {
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+}
+.keypad button:active {
+  filter: brightness(0.94);
+  transform: scale(0.97);
+}
+
+/* ---------- Install prompt ---------- */
+#install-btn {
+  display: none;
+  margin: 0.5rem auto;
+  padding: 0.6rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent-bg1) 0%, var(--accent-bg2) 100%);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(251, 191, 36, 0.25);
+}
+
+/* ---------- Currency picker modal ---------- */
+.currency-modal-overlay {
+  background: rgba(0, 0, 0, 0.35);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.currency-modal-content {
+  background: #ffffff;
+  color: #222222;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.12);
+  padding: 2rem;
+  min-width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.5rem;
+}
+.theme-dark .currency-modal-content {
+  background: #23243a;
+  color: #f7f7f7;
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.32);
+}
+.currency-modal-content input {
+  color: #222222;
+  background: #f9f9f9;
+}
+.theme-dark .currency-modal-content input {
+  color: #f7f7f7;
+  background: #23243a;
+}
+.currency-modal-content .currency-list-item {
+  background: #f9f9f9;
+  color: #222222;
+}
+.theme-dark .currency-modal-content .currency-list-item {
+  background: #23243a;
+  color: #f7f7f7;
+}
+.currency-list-item[style*="not-allowed"],
+.currency-list-item.disabled {
+  opacity: 0.5;
+  color: #f7f7f7 !important;
+  background: #23243a !important;
+  cursor: not-allowed;
+}
+
+/* ---------- Name prompt overlay ---------- */
+#nameOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 18, 24, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  z-index: 99999;
+  backdrop-filter: blur(4px);
+}
+#nameOverlay h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.4rem;
+  text-align: center;
+}
+#nameOverlay input {
+  min-height: 48px;
+  font-size: 1.1rem;
+  font-family: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  border: none;
+  width: min(320px, 80vw);
+  text-align: center;
+}
+#nameOverlay button {
+  padding: 0.7rem 2rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent-bg1) 0%, var(--accent-bg2) 100%);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---------- Loader spinner ---------- */
+.currency-spinner {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 3rem;
+  justify-content: center;
+  align-items: center;
+}
+.currency-symbol {
+  animation: spin-currency 1.2s linear infinite;
+  display: inline-block;
+}
+.currency-symbol:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.currency-symbol:nth-child(3) {
+  animation-delay: 0.6s;
+}
+.currency-symbol:nth-child(4) {
+  animation-delay: 0.9s;
+}
+@keyframes spin-currency {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3) rotate(180deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+/* ---------- Settings drawer ---------- */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 18, 24, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 10000;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.drawer-overlay[hidden] {
+  display: none;
+}
+.drawer-overlay:not([hidden]) {
+  opacity: 1;
+  pointer-events: auto;
+}
+.drawer {
+  width: min(320px, 85vw);
+  height: 100%;
+  background: var(--container-bg);
+  color: var(--text-color);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.drawer-overlay:not([hidden]) .drawer {
+  transform: translateX(0);
+}
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem 0.8rem;
+  border-bottom: 1px solid var(--input-border);
+}
+.drawer-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.drawer-body {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.drawer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+.drawer-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted-color);
+}
+.drawer-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: right;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.drawer-action {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.drawer-action:hover {
+  filter: brightness(0.97);
+}
+.drawer-action.is-refreshing svg {
+  animation: cdv-spin 0.9s linear infinite;
+}
+
+/* keep icon buttons inside drawer usable */
+.drawer .icon-btn {
+  background: var(--input-bg);
+}
+.drawer .icon-btn:hover {
+  background: var(--header-bg);
+}
+@media (max-width: 600px) {
+  .keypad button {
+    height: 50px;
+    font-size: 1.2rem;
+    border-radius: 12px;
+  }
+  .keypad .row {
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+  .keypad-container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .content-scroll {
+    padding: 0.8rem 0.9rem 1rem;
+  }
 }

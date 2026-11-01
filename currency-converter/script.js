@@ -789,12 +789,14 @@ async function fetchRates(options = {}) {
 // Apply selected theme (light/dark only) and update icon
 function applyTheme(theme) {
   document.body.classList.remove("theme-light", "theme-dark");
+  const sunSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  const moonSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
   if (theme === "dark") {
     document.body.classList.add("theme-dark");
-    themeIcon.textContent = "🌙";
+    themeIcon.innerHTML = moonSvg;
   } else {
     document.body.classList.add("theme-light");
-    themeIcon.textContent = "🌞";
+    themeIcon.innerHTML = sunSvg;
   }
   localStorage.setItem("theme", theme);
 }
@@ -810,11 +812,6 @@ themeIcon.addEventListener("click", () => {
   const currentTheme = document.body.classList.contains("theme-dark") ? "dark" : "light";
   applyTheme(currentTheme === "dark" ? "light" : "dark");
 });
-themeIcon.addEventListener("keypress", (e) => {
-  if (e.key === "Enter" || e.key === " ") {
-    themeIcon.click();
-  }
-});
 
 // Refresh button - forces a new fetch even when rates are already saved.
 const refreshRatesBtn = document.getElementById("refreshRates");
@@ -823,18 +820,6 @@ if (refreshRatesBtn) {
     fetchRates({ force: true });
   });
 }
-
-// Keep the bottom of the page clear of the fixed keypad so the saved-rates
-// indicator stays reachable.
-function syncKeypadClearance() {
-  const keypadEl = document.getElementById("keypad");
-  if (!keypadEl) return;
-  const height = keypadEl.getBoundingClientRect().height;
-  if (height > 0) {
-    document.body.style.paddingBottom = (height + 16) + "px";
-  }
-}
-window.addEventListener("resize", syncKeypadClearance);
 
 // Modal for base currency selection
 baseCurrencySelect.onclick = function(e) {
@@ -1033,14 +1018,6 @@ window.onload = () => {
   let baseCurrencyBtn = document.createElement('button');
   baseCurrencyBtn.id = 'baseCurrencyBtn';
   baseCurrencyBtn.textContent = `From: ${currencyNames[baseCurrencySelect.value] || baseCurrencySelect.value}`;
-  baseCurrencyBtn.style.background = '#fff';
-  baseCurrencyBtn.style.color = '#f59e42';
-  baseCurrencyBtn.style.border = '2px solid #fbbf24';
-  baseCurrencyBtn.style.borderRadius = '8px';
-  baseCurrencyBtn.style.padding = '0.5rem 1.5rem';
-  baseCurrencyBtn.style.fontWeight = 'bold';
-  baseCurrencyBtn.style.cursor = 'pointer';
-  baseCurrencyBtn.style.marginBottom = '1rem';
   baseCurrencySelect.parentNode.insertBefore(baseCurrencyBtn, baseCurrencySelect);
   baseCurrencyBtn.onclick = baseCurrencySelect.onclick;
 
@@ -1058,17 +1035,44 @@ window.onload = () => {
   populateCurrencyOptions(baseCurrencySelect, baseCurrency);
   updateTargetCurrencySelectors();
   initTheme();
-  syncKeypadClearance();
   fetchRates();
   checkAndAskForUserName();
   // Notify app open (for analytics)
   // Removed failing POST request to ntfy.sunny.bz
 };
 
+// Settings drawer (slide-out menu)
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsDrawer = document.getElementById("settingsDrawer");
+const closeDrawerBtn = document.getElementById("closeDrawer");
+const drawerTitleValue = document.getElementById("drawerTitleValue");
+
+function openSettingsDrawer() {
+  if (!settingsDrawer) return;
+  settingsDrawer.hidden = false;
+  settingsBtn?.setAttribute("aria-expanded", "true");
+  if (drawerTitleValue) {
+    drawerTitleValue.textContent = document.getElementById("headerTitle")?.textContent || "";
+  }
+}
+function closeSettingsDrawer() {
+  if (!settingsDrawer) return;
+  settingsDrawer.hidden = true;
+  settingsBtn?.setAttribute("aria-expanded", "false");
+}
+settingsBtn?.addEventListener("click", openSettingsDrawer);
+closeDrawerBtn?.addEventListener("click", closeSettingsDrawer);
+settingsDrawer?.addEventListener("click", (e) => {
+  if (e.target === settingsDrawer) closeSettingsDrawer();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && settingsDrawer && !settingsDrawer.hidden) closeSettingsDrawer();
+});
+
 // Register service worker for PWA (not applicable inside the Cordova app)
 if ("serviceWorker" in navigator && !window.cordova) {
   navigator.serviceWorker
-    .register("/sw.js")
+    .register("sw.js")
     .then(() => console.log("Service Worker Registered"));
 }
 
