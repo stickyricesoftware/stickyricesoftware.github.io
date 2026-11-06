@@ -1005,11 +1005,6 @@ if (addTargetBtn) {
   };
 }
 
-// Hide install button after 5 seconds
-setTimeout(() => {
-  document.getElementById("install-btn").style.display = "none";
-}, 3000);
-
 // App initialization
 window.onload = () => {
   // Hide the base currency dropdown, use only modal
@@ -1076,21 +1071,64 @@ if ("serviceWorker" in navigator && !window.cordova) {
     .then(() => console.log("Service Worker Registered"));
 }
 
-// Handle PWA install prompt
-let deferredPrompt;
+// Handle PWA install banner. The banner is shown on every page load until the
+// app is installed. Dismissing it only hides it for the current session.
+const installBanner = document.getElementById("installBanner");
+const installBannerInstall = document.getElementById("installBannerInstall");
+const installBannerClose = document.getElementById("installBannerClose");
+let deferredInstallPrompt = null;
+let installBannerHideTimer = null;
+
+function isRunningStandalone() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    window.matchMedia("(display-mode: minimal-ui)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function showInstallBanner() {
+  if (!installBanner || isRunningStandalone()) return;
+  clearTimeout(installBannerHideTimer);
+  installBanner.hidden = false;
+  requestAnimationFrame(() => installBanner.classList.add("install-banner--visible"));
+}
+
+function hideInstallBanner() {
+  if (!installBanner) return;
+  installBanner.classList.remove("install-banner--visible");
+  clearTimeout(installBannerHideTimer);
+  installBannerHideTimer = setTimeout(() => {
+    installBanner.hidden = true;
+  }, 300);
+}
+
+installBannerInstall?.addEventListener("click", async () => {
+  if (!deferredInstallPrompt) return;
+  const prompt = deferredInstallPrompt;
+  deferredInstallPrompt = null;
+  hideInstallBanner();
+  prompt.prompt();
+  try {
+    const choiceResult = await prompt.userChoice;
+    console.log("User choice", choiceResult.outcome);
+  } catch (err) {
+    console.warn("Install prompt failed:", err);
+  }
+});
+
+installBannerClose?.addEventListener("click", hideInstallBanner);
+
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
-  deferredPrompt = e;
-  const btn = document.getElementById("install-btn");
-  btn.style.display = "block";
-  btn.addEventListener("click", () => {
-    btn.style.display = "none";
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      console.log("User choice", choiceResult.outcome);
-      deferredPrompt = null;
-    });
-  });
+  deferredInstallPrompt = e;
+  showInstallBanner();
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  hideInstallBanner();
 });
 
 // Ask for user name if not set

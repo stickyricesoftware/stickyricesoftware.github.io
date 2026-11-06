@@ -21,5 +21,35 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/narrow-light.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Convert currencies on your phone with the built-in calculator keypad"
+    },
+    {
+      "src": "screenshots/narrow-dark.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "The same converter in dark mode"
+    },
+    {
+      "src": "screenshots/wide-light.png",
+      "sizes": "2400x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Currency Converter on a desktop screen"
+    },
+    {
+      "src": "screenshots/wide-dark.png",
+      "sizes": "2400x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Currency Converter on a desktop screen in dark mode"
+    }
   ]
 }
